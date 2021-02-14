@@ -20,16 +20,76 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type Hostpath struct {
+	Enabled          string `json:"enabled,omitempty"`
+	Image            string `json:"image,omitempty"`
+	HostPath         string `json:"hostPath,omitempty"`
+	StorageClassName string `json:"storageClassName,omitempty"`
+	NodeName         string `json:"nodeName,omitempty"`
+	CPURequest       string `json:"cpuRequest,omitempty"`
+	MemoryRequest    string `json:"memoryRequest,omitempty"`
+	CPULimit         string `json:"cpuLimit,omitempty"`
+	MemoryLimit      string `json:"memoryLimit,omitempty"`
+	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
+	DefaultSc        string `json:"defaultSc,omitempty"`
+}
+
+type Nfs struct {
+	Enabled          string `json:"enabled,omitempty"`
+	Image            string `json:"image,omitempty"`
+	Provisioner      string `json:"provisioner,omitempty"`
+	StorageClassName string `json:"storageClassName,omitempty"`
+	Server           string `json:"server,omitempty"`
+	Path             string `json:"path,omitempty"`
+	CPURequest       string `json:"cpuRequest,omitempty"`
+	MemoryRequest    string `json:"memoryRequest,omitempty"`
+	CPULimit         string `json:"cpuLimit,omitempty"`
+	MemoryLimit      string `json:"memoryLimit,omitempty"`
+	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
+	DefaultSc        string `json:"defaultSc,omitempty"`
+}
+
+type Storage struct {
+	Enabled         string   `json:"enabled,omitempty"`
+	CcpStorageClass string   `json:"ccpStorageClass,omitempty"`
+	Hostpath        Hostpath `json:"hostpath,omitempty"`
+	Nfs             Nfs      `json:"nfs,omitempty"`
+}
+
+type HugePages struct {
+	Enabled string `json:"enabled,omitempty"`
+	Size    string `json:"size,omitempty"`
+	Memory  string `json:"memory,omitempty"`
+}
+
+type Pg struct {
+	Enabled        string    `json:"enabled,omitempty"`
+	SecretName     string    `json:"secretName,omitempty"`
+	Image          string    `json:"image,omitempty"`
+	Port           int       `json:"port,omitempty"`
+	StorageSize    string    `json:"storageSize,omitempty"`
+	SvcName        string    `json:"svcName,omitempty"`
+	Dbname         string    `json:"dbname,omitempty"`
+	Pass           string    `json:"pass,omitempty"`
+	User           string    `json:"user,omitempty"`
+	RunAsUser      int       `json:"runAsUser,omitempty"`
+	FsGroup        int       `json:"fsGroup,omitempty"`
+	StorageClass   string    `json:"storageClass,omitempty"`
+	CPURequest     int       `json:"cpuRequest,omitempty"`
+	MemoryRequest  string    `json:"memoryRequest,omitempty"`
+	MaxConnections int       `json:"maxConnections,omitempty"`
+	SharedBuffers  string    `json:"sharedBuffers,omitempty"`
+	HugePages      HugePages `json:"hugePages,omitempty"`
+}
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // CnvrgAppSpec defines the desired state of CnvrgApp
 type CnvrgAppSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of CnvrgApp. Edit CnvrgApp_types.go to remove/update
-	Message string `json:"message,omitempty"`
+	Pg      Pg      `json:"pg,omitempty"`
+	Storage Storage `json:"storage,omitempty"`
+	Message string  `json:"message,omitempty"`
 }
 
 // CnvrgAppStatus defines the observed state of CnvrgApp
@@ -61,4 +121,63 @@ type CnvrgAppList struct {
 
 func init() {
 	SchemeBuilder.Register(&CnvrgApp{}, &CnvrgAppList{})
+}
+
+func DefaultCnvrgAppSpec() CnvrgAppSpec {
+	return CnvrgAppSpec{
+		Pg: Pg{
+			Enabled:        "true",
+			SecretName:     "cnvrg-pg-secret",
+			Image:          "centos/postgresql-12-centos7",
+			Port:           5432,
+			StorageSize:    "80Gi",
+			SvcName:        "postgres",
+			Dbname:         "cnvrg_production",
+			Pass:           "pg_pass",
+			User:           "cnvrg",
+			RunAsUser:      26,
+			FsGroup:        26,
+			StorageClass:   "use-default",
+			CPURequest:     4,
+			MemoryRequest:  "4Gi",
+			MaxConnections: 100,
+			SharedBuffers:  "64Mb",
+			HugePages: HugePages{
+				Enabled: "false",
+				Size:    "2Mi",
+				Memory:  "",
+			},
+		},
+		Storage: Storage{
+			Enabled:         "false",
+			CcpStorageClass: "",
+			Hostpath: Hostpath{
+				Enabled:          "false",
+				Image:            "quay.io/kubevirt/hostpath-provisioner",
+				HostPath:         "/cnvrg-hostpath-storage",
+				StorageClassName: "cnvrg-hostpath-storage",
+				NodeName:         "",
+				CPURequest:       "100m",
+				MemoryRequest:    "100Mi",
+				CPULimit:         "200m",
+				MemoryLimit:      "200Mi",
+				ReclaimPolicy:    "Retain",
+				DefaultSc:        "false",
+			},
+			Nfs: Nfs{
+				Enabled:          "false",
+				Image:            "quay.io/external_storage/nfs-client-provisioner:latest",
+				Provisioner:      "cnvrg.io/ifs",
+				StorageClassName: "cnvrg-nfs-storage",
+				Server:           "",
+				Path:             "",
+				CPURequest:       "100m",
+				MemoryRequest:    "100Mi",
+				CPULimit:         "100m",
+				MemoryLimit:      "200Mi",
+				ReclaimPolicy:    "Retain",
+				DefaultSc:        "false",
+			},
+		},
+	}
 }
