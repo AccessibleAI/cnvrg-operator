@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/pg"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
@@ -52,6 +53,7 @@ type CnvrgAppReconciler struct {
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
+	r.Log.Info("asd")
 	_ = r.Log.WithValues("cnvrgapp", req.NamespacedName)
 	r.Log.Info("RC Name: " + req.NamespacedName.Name)
 	r.Log.Info("This is my first k8s controller!!!!!")
@@ -60,7 +62,6 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		r.Log.Info("unable to fetch CnvrgApp, probably cr was deleted")
 		return ctrl.Result{}, nil
 	}
-	r.Log.Info("CR Message: " + cnvrgApp.Spec.Message)
 
 	//cnvrgFinalizer := "cnvrgapp.finalizers.cnvrg.io"
 
@@ -99,7 +100,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			return ctrl.Result{}, err
 		}
 	}
-	f, err := pkger.Open("/pkg/db/pg/pvc.tpl")
+	f, err := pkger.Open("/pkg/pg/tmpl/svc.tpl")
 	if err != nil {
 
 	}
@@ -108,14 +109,16 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	tmpl, err := template.New("pg-pvc").Parse(string(b))
 	//tmpl, err := template.ParseFiles("/pkg/db/pg/pvc.tpl")
 	defaultCnvrgApp := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}
+
 	if err := mergo.Merge(&defaultCnvrgApp, cnvrgApp, mergo.WithOverride); err != nil {
 		// ...
 	}
+	pg.Deploy()
+
 	err = tmpl.Execute(os.Stdout, defaultCnvrgApp)
 	if err != nil {
 		r.Log.Error(err, "error parsing template")
 	}
-
 
 	return ctrl.Result{}, nil
 }
@@ -128,13 +131,25 @@ func (r *CnvrgAppReconciler) manageConfigMap(cnvrgApp *mlopsv1.CnvrgApp) (*recon
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
-	obj := &unstructured.Unstructured{}
-	obj.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Deployment", Group: "", Version: "apps/v1"})
+	deployments := &unstructured.Unstructured{}
+	deployments.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Deployment", Group: "", Version: "apps/v1"})
+
+	services := &unstructured.Unstructured{}
+	services.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Service", Group: "", Version: "v1"})
+
+	pvcs := &unstructured.Unstructured{}
+	pvcs.SetGroupVersionKind(schema.GroupVersionKind{Kind: "PersistentVolumeClaim", Group: "", Version: "v1"})
+
+	secrets := &unstructured.Unstructured{}
+	secrets.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Secret", Group: "", Version: "v1"})
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgApp{}).
 		Owns(&corev1.ConfigMap{}).
-		Owns(obj).
+		Owns(deployments).
+		Owns(services).
+		Owns(pvcs).
+		Owns(secrets).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

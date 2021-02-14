@@ -19,11 +19,11 @@ test: generate fmt vet manifests
 
 # Build manager binary
 manager: generate fmt vet
-	go build -o bin/manager main.go
+	go build -o bin/cnvrg-operator cmd/main.go cmd/manager.go cmd/pkged.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
-	go run ./main.go
+	go run ./cmd/main.go operator run
 
 # Install CRDs into a cluster
 install: manifests

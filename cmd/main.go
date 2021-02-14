@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -20,6 +21,9 @@ type param struct {
 var rootCmd = &cobra.Command{
 	Use:   "cnvrg-operator",
 	Short: "cnvrg-operator - K8s operator for deploying cnvrg stack",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		setupLogging()
+	},
 }
 var rootParams = []param{}
 
@@ -46,6 +50,26 @@ func setupCommands() {
 	setParams(runOperatorParams, runOperatorCmd)
 	setParams(rootParams, rootCmd)
 	rootCmd.AddCommand(runOperatorCmd)
+}
+
+func setupLogging() {
+
+	// Set log verbosity
+	if viper.GetBool("verbose") {
+		logrus.SetLevel(logrus.DebugLevel)
+		logrus.SetReportCaller(true)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+		logrus.SetReportCaller(false)
+	}
+	// Set log format
+	if viper.GetBool("json-log") {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	} else {
+		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	}
+	// Logs are always goes to STDOUT
+	logrus.SetOutput(os.Stdout)
 }
 
 func main() {
