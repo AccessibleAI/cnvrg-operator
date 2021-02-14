@@ -1,0 +1,7 @@
+apiVersion: mlops.cnvrg.io/v1
+kind: CnvrgApp
+metadata:
+  name: cnvrgapp-sample
+spec:
+  # Add fields here
+  message: "Hello world!!!"

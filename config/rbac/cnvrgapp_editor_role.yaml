@@ -1,0 +1,24 @@
+# permissions for end users to edit cnvrgapps.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cnvrgapp-editor-role
+rules:
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - cnvrgapps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - cnvrgapps/status
+  verbs:
+  - get

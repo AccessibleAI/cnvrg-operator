@@ -1,0 +1,7 @@
+domain: cnvrg.io
+repo: github.com/cnvrg-operator
+resources:
+- group: mlops
+  kind: CnvrgApp
+  version: v1
+version: "2"
