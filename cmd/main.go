@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/markbates/pkger"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -72,7 +73,12 @@ func setupLogging() {
 	logrus.SetOutput(os.Stdout)
 }
 
+func informPkger() {
+	pkger.Include("/pkg/pg/tmpl")
+}
+
 func main() {
+	informPkger()
 	setupCommands()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

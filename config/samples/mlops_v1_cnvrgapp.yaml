@@ -24,4 +24,3 @@ spec:
       enabled: "false"
       size: "2Mi" # 2Mi,1Gi,etc... https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-hugepages/, https://www.thegeekdiary.com/centos-rhel-67-how-to-configure-hugepages/, https://wiki.debian.org/Hugepages#pages-size
       memory: "" # how much memo
-  message: "Hello world!!!"

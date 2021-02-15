@@ -36,8 +36,258 @@ spec:
           spec:
             description: CnvrgAppSpec defines the desired state of CnvrgApp
             properties:
-              message:
-                type: string
+              controlPlan:
+                properties:
+                  cnvrgRouter:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                  conf:
+                    properties:
+                      checkJobExpiration:
+                        type: string
+                      cnvrgJobUid:
+                        type: string
+                      cnvrgStorageAccessKey:
+                        type: string
+                      cnvrgStorageAzureAccessKey:
+                        type: string
+                      cnvrgStorageAzureAccountName:
+                        type: string
+                      cnvrgStorageAzureContainer:
+                        type: string
+                      cnvrgStorageBucket:
+                        type: string
+                      cnvrgStorageEndpoint:
+                        type: string
+                      cnvrgStorageProject:
+                        type: string
+                      cnvrgStorageRegion:
+                        type: string
+                      cnvrgStorageSecretKey:
+                        type: string
+                      cnvrgStorageType:
+                        type: string
+                      customAgentTag:
+                        type: string
+                      defaultComputeConfig:
+                        type: string
+                      defaultComputeName:
+                        type: string
+                      extractTagsFromCmd:
+                        type: string
+                      featureFlags:
+                        type: string
+                      fixpg:
+                        type: string
+                      gcpKeyfileMountPath:
+                        type: string
+                      gcpKeyfileName:
+                        type: string
+                      gcpStorageSecret:
+                        type: string
+                      intercom:
+                        type: string
+                      jobsStorageClass:
+                        type: string
+                      ldap:
+                        properties:
+                          account:
+                            type: string
+                          adminPassword:
+                            type: string
+                          adminUser:
+                            type: string
+                          base:
+                            type: string
+                          enabled:
+                            type: string
+                          host:
+                            type: string
+                          port:
+                            type: string
+                          ssl:
+                            type: string
+                        type: object
+                      minioSseMasterKey:
+                        type: string
+                      passengerAppEnv:
+                        type: string
+                      railsEnv:
+                        type: string
+                      rbac:
+                        properties:
+                          role:
+                            type: string
+                          roleBindingName:
+                            type: string
+                          serviceAccountName:
+                            type: string
+                        type: object
+                      redisUrl:
+                        type: string
+                      registry:
+                        properties:
+                          name:
+                            type: string
+                          password:
+                            type: string
+                          url:
+                            type: string
+                          user:
+                            type: string
+                        type: object
+                      resourcesRequestEnabled:
+                        type: string
+                      runJobsOnSelfCluster:
+                        type: string
+                      secretKeyBase:
+                        type: string
+                      sentryUrl:
+                        type: string
+                      smtp:
+                        properties:
+                          domain:
+                            type: string
+                          password:
+                            type: string
+                          port:
+                            type: string
+                          server:
+                            type: string
+                          username:
+                            type: string
+                        type: object
+                      stsIv:
+                        type: string
+                      stsKey:
+                        type: string
+                      useStdout:
+                        type: string
+                    type: object
+                  hyper:
+                    properties:
+                      cpuLimit:
+                        type: integer
+                      cpuRequest:
+                        type: string
+                      enableReadinessProbe:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      readinessPeriodSeconds:
+                        type: integer
+                      readinessTimeoutSeconds:
+                        type: integer
+                      replicas:
+                        type: integer
+                      svcName:
+                        type: string
+                      token:
+                        type: string
+                    type: object
+                  kiqPrestopHook:
+                    properties:
+                      enabled:
+                        type: string
+                      killTimeout:
+                        type: integer
+                    type: object
+                  searchkiq:
+                    properties:
+                      cpu:
+                        type: string
+                      enabled:
+                        type: string
+                      memory:
+                        type: string
+                      replicas:
+                        type: integer
+                    type: object
+                  seeder:
+                    properties:
+                      createBucketCmd:
+                        type: string
+                      image:
+                        type: string
+                      seedCmd:
+                        type: string
+                    type: object
+                  sidekiq:
+                    properties:
+                      cpu:
+                        type: string
+                      enabled:
+                        type: string
+                      memory:
+                        type: string
+                      replicas:
+                        type: integer
+                      split:
+                        type: string
+                    type: object
+                  systemkiq:
+                    properties:
+                      cpu:
+                        type: string
+                      enabled:
+                        type: string
+                      memory:
+                        type: string
+                      replicas:
+                        type: integer
+                    type: object
+                  webapp:
+                    properties:
+                      cpu:
+                        type: integer
+                      enableReadinessProbe:
+                        type: string
+                      enabled:
+                        type: string
+                      failureThreshold:
+                        type: integer
+                      image:
+                        type: string
+                      initialDelaySeconds:
+                        type: integer
+                      memory:
+                        type: string
+                      nodePort:
+                        type: integer
+                      passengerMaxPoolSize:
+                        type: integer
+                      port:
+                        type: integer
+                      readinessPeriodSeconds:
+                        type: integer
+                      readinessTimeoutSeconds:
+                        type: integer
+                      replicas:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                type: object
               pg:
                 properties:
                   cpuRequest:
@@ -140,6 +390,27 @@ spec:
                       storageClassName:
                         type: string
                     type: object
+                type: object
+              tenancy:
+                properties:
+                  cnvrg:
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                    - key
+                    - value
+                    type: object
+                  dedicatedNodes:
+                    type: string
+                  enabled:
+                    type: string
+                required:
+                - cnvrg
+                - dedicatedNodes
+                - enabled
                 type: object
             type: object
           status:
