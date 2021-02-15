@@ -17,14 +17,13 @@ limitations under the License.
 package controllers
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/pg"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
-	"github.com/markbates/pkger"
-	"io/ioutil"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,12 +32,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
-	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"text/template"
 )
 
 // CnvrgAppReconciler reconciles a CnvrgApp object
@@ -87,6 +84,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	cm := getCm()
 	ctrl.SetControllerReference(&cnvrgApp, cm, r.Scheme)
 	err := ctrl.SetControllerReference(&cnvrgApp, dep, r.Scheme)
+
 	if err != nil {
 		r.Log.Info("This is error")
 	}
@@ -100,25 +98,34 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			return ctrl.Result{}, err
 		}
 	}
-	f, err := pkger.Open("/pkg/pg/tmpl/svc.tpl")
-	if err != nil {
-
-	}
-	b, err := ioutil.ReadAll(f)
-	fmt.Print(string(b))
-	tmpl, err := template.New("pg-pvc").Parse(string(b))
+	//f, err := pkger.Open("/pkg/pg/tmpl/svc.tpl")
+	//if err != nil {
+	//
+	//}
+	//b, err := ioutil.ReadAll(f)
+	//fmt.Print(string(b))
+	//tmpl, err := template.New("pg-pvc").Parse(string(b))
 	//tmpl, err := template.ParseFiles("/pkg/db/pg/pvc.tpl")
 	defaultCnvrgApp := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}
 
 	if err := mergo.Merge(&defaultCnvrgApp, cnvrgApp, mergo.WithOverride); err != nil {
 		// ...
 	}
-	pg.Deploy()
-
-	err = tmpl.Execute(os.Stdout, defaultCnvrgApp)
-	if err != nil {
-		r.Log.Error(err, "error parsing template")
+	tmpls := pg.GetTemplates()
+	for _, v := range tmpls {
+		var tpl bytes.Buffer
+		err = v.Execute(&tpl, defaultCnvrgApp)
+		if err != nil {
+			r.Log.Error(err, "error parsing template")
+		}
+		r.Log.Info(tpl.String())
 	}
+
+	//err = tmpl.Execute(os.Stdout, defaultCnvrgApp)
+	//
+	//if err != nil {
+	//	r.Log.Error(err, "error parsing template")
+	//}
 
 	return ctrl.Result{}, nil
 }

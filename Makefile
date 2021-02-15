@@ -17,8 +17,13 @@ all: manager
 test: generate fmt vet manifests
 	go test ./... -coverprofile cover.out
 
+pack:
+	pkger
+	sed 's/cnvrg-operator/main/g' pkged.go > cmd/pkged.go
+	rm -fr pkged.go
+
 # Build manager binary
-manager: generate fmt vet
+manager: pack generate fmt vet
 	go build -o bin/cnvrg-operator cmd/main.go cmd/manager.go cmd/pkged.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config

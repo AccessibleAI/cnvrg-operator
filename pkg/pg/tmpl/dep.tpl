@@ -18,23 +18,23 @@ spec:
         app: {{.Spec.Pg.SvcName}}
     spec:
       serviceAccountName: {{ .Spec.CnvrgApp.Conf.Rbac.ServiceAccountName }}
-      {{- if eq .Spec.Tenancy.Enabled  "true" and eq .Spec.Tenancy.DedicatedNodes "true" }}
+      {{- if and (eq .Spec.Tenancy.Enabled "true") (eq .Spec.Tenancy.DedicatedNodes "true") }}
       tolerations:
         - key: {{ .Spec.Tenancy.Cnvrg.Key }}
           operator: Equal
           value: {{ .Spec.Tenancy.Cnvrg.Value }}
           effect: "NoSchedule"
-      {{-end }}
+      {{- end }}
       securityContext:
         runAsUser: {{ .Spec.Pg.RunAsUser }}
         fsGroup: {{ .Spec.Pg.FsGroup }}
-      {{- if eq .Spec.Storage.Hostpath.Enabled "true" and eq .Spec.Tenancy.Enabled "false" }}
+      {{- if and (eq .Spec.Storage.Hostpath.Enabled "true") (eq .Spec.Tenancy.Enabled "false") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.Storage.Hostpath.NodeName }}"
-      {{- else if eq .Spec.Storage.Hostpath.Enabled "false" and eq .Spec.Tenancy.Enabled "true" }}
+      {{- else if and (eq .Spec.Storage.Hostpath.Enabled "false") (eq .Spec.Tenancy.Enabled "true") }}
       nodeSelector:
       {{ .Spec.Tenancy.Cnvrg.Key }}: "{{ .Spec.Tenancy.Cnvrg.Value }}"
-      {{- else if eq .Spec.Storage.Hostpath.Enabled "true" and .Spec.Tenancy.Enabled "true" }}
+      {{- else if and (eq .Spec.Storage.Hostpath.Enabled "true") (eq .Spec.Tenancy.Enabled "true") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.Storage.Hostpath.NodeName }}"
         {{ .Spec.Tenancy.Cnvrg.Key }}: "{{ .Spec.Tenancy.Cnvrg.Value }}"
@@ -44,7 +44,7 @@ spec:
           envFrom:
             - secretRef:
                 name: "pg-secret"
-          image: {{.Spec.Pg.image}}
+          image: {{.Spec.Pg.Image}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: {{.Spec.Pg.Port}}
@@ -71,7 +71,7 @@ spec:
               name: postgres-data
             - mountPath: /dev/shm
               name: dshm
-            {{- if eq Spec.Pg.HugePages.Enabled "true" -}}
+            {{- if eq .Spec.Pg.HugePages.Enabled "true" -}}
             - mountPath: "/hugepages"
               name: "hugepage"
             {{- end}}
@@ -85,7 +85,7 @@ spec:
               {{- end }}
             {{- end}}
             requests:
-              cpu: {{ .Spec.Pg.CpuRequest }}
+              cpu: {{ .Spec.Pg.CPURequest }}
               memory: {{ .Spec.Pg.MemoryRequest }}
       volumes:
         - name: postgres-data

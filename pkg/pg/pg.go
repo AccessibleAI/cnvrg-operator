@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"github.com/Masterminds/sprig"
 	"github.com/markbates/pkger"
 	"io/ioutil"
 	"os"
@@ -38,20 +39,23 @@ func Defaults() Pg {
 	}
 }
 
-func Deploy() {
-	manifests, err := ReadTmplFiles()
+func GetTemplates() map[string]*template.Template {
+	manifests, err := ReadTemplatesFiles()
 	if err != nil {
 
 	}
 
-	LoadTemplates(manifests)
+	tmpls, err := LoadTemplates(manifests)
+	if err != nil {
+
+	}
+	return tmpls
 
 }
 
-func ReadTmplFiles() (map[string]string, error) {
+func ReadTemplatesFiles() (map[string]string, error) {
 	var manifests = make(map[string]string)
-	dir := "/pkg/pg/tmpl"
-	err := pkger.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err := pkger.Walk("/pkg/pg/tmpl", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -70,7 +74,7 @@ func ReadTmplFiles() (map[string]string, error) {
 		return nil
 	})
 	if err != nil {
-		log.Error(err, "error walking dir", "dir", dir)
+		log.Error(err, "error walking dir", "dir", "/pkg/pg/tmpl")
 		return nil, err
 	}
 	return manifests, nil
@@ -79,7 +83,7 @@ func ReadTmplFiles() (map[string]string, error) {
 func LoadTemplates(tmplFiles map[string]string) (map[string]*template.Template, error) {
 	var templates = make(map[string]*template.Template)
 	for k, v := range tmplFiles {
-		tmpl, err := template.New(k).Parse(v)
+		tmpl, err := template.New(k).Funcs(sprig.TxtFuncMap()).Parse(v)
 		if err != nil {
 			log.Error(err, "parse error", "file", k)
 			return nil, err
