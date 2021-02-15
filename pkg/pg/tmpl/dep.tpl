@@ -17,7 +17,7 @@ spec:
       labels:
         app: {{.Spec.Pg.SvcName}}
     spec:
-      serviceAccountName: {{ .Spec.CnvrgApp.Conf.Rbac.ServiceAccountName }}
+      serviceAccountName: {{ .Spec.ControlPlan.Conf.Rbac.ServiceAccountName }}
       {{- if and (eq .Spec.Tenancy.Enabled "true") (eq .Spec.Tenancy.DedicatedNodes "true") }}
       tolerations:
         - key: {{ .Spec.Tenancy.Cnvrg.Key }}

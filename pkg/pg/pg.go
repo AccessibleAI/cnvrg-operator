@@ -1,9 +1,12 @@
 package pg
 
 import (
+	"bytes"
 	"github.com/Masterminds/sprig"
+	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/markbates/pkger"
 	"io/ioutil"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"text/template"
@@ -13,30 +16,66 @@ var (
 	log = zap.New(zap.UseDevMode(true))
 )
 
-func Defaults() Pg {
-	return Pg{
-		Enabled:        "true",
-		SecretName:     "cnvrg-pg-secret",
-		Image:          "centos/postgresql-12-centos7",
-		Port:           5432,
-		StorageSize:    "80Gi",
-		SvcName:        "postgres",
-		Dbname:         "cnvrg_production",
-		Pass:           "pg_pass",
-		User:           "cnvrg",
-		RunAsUser:      26,
-		FsGroup:        26,
-		StorageClass:   "use-default",
-		CPURequest:     4,
-		MemoryRequest:  "4Gi",
-		MaxConnections: 100,
-		SharedBuffers:  "64Mb",
-		HugePages: HugePages{
-			Enabled: "false",
-			Size:    "2Mi",
-			Memory:  "",
-		},
+var S = []*State{
+	{
+		Name:           "pg-pvc",
+		TemplatePath:   "/pkg/pg/tmpl/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            PvcGVR,
+	},
+	{
+		Name:           "pg-dep",
+		TemplatePath:   "/pkg/pg/tmpl/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            DeploymentGVR,
+	},
+	{
+		Name:           "pg-secret",
+		TemplatePath:   "/pkg/pg/tmpl/secret.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            SecretGVR,
+	},
+	{
+		Name:           "pg-svc",
+		TemplatePath:   "/pkg/pg/tmpl/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            PvcGVR,
+	},
+}
+
+func (s *State) InitTemplate(cnvrgApp mlopsv1.CnvrgApp) error {
+	var tpl bytes.Buffer
+	f, err := pkger.Open(s.TemplatePath)
+	if err != nil {
+		log.Error(err, "error reading path", "path", s.TemplatePath)
+		return err
 	}
+	b, err := ioutil.ReadAll(f)
+
+	if err != nil {
+		log.Error(err, "error reading file", "path", s.TemplatePath)
+		return err
+	}
+	s.Template, err = template.New(s.Name).Funcs(sprig.TxtFuncMap()).Parse(string(b))
+	if err != nil {
+		log.Error(err, "parse error", "file", s.Name)
+		return err
+	}
+	s.Obj.SetGroupVersionKind(s.GVR)
+	if err := s.Template.Execute(&tpl, cnvrgApp); err != nil {
+		log.Error(err, "rendering template error", "file", s.Name)
+		return err
+	}
+	s.ParsedTemplate = tpl.String()
+	return nil
 }
 
 func GetTemplates() map[string]*template.Template {

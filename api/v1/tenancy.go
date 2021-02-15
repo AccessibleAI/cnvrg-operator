@@ -1,4 +1,4 @@
-package tenancy
+package v1
 
 type Tenancy struct {
 	Enabled        string `json:"enabled"`
@@ -11,13 +11,11 @@ type Cnvrg struct {
 	Value string `json:"value"`
 }
 
-func Defaults() Tenancy {
-	return Tenancy{
-		Enabled:        "false",
-		DedicatedNodes: "false",
-		Cnvrg: Cnvrg{
-			Key:   "cnvrg-taint",
-			Value: "true",
-		},
-	}
+var tenancyDefault = Tenancy{
+	Enabled:        "false",
+	DedicatedNodes: "false",
+	Cnvrg: Cnvrg{
+		Key:   "cnvrg-taint",
+		Value: "true",
+	},
 }

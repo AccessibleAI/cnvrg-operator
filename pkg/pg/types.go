@@ -1,27 +1,40 @@
 package pg
 
-type HugePages struct {
-	Enabled string `json:"enabled,omitempty"`
-	Size    string `json:"size,omitempty"`
-	Memory  string `json:"memory,omitempty"`
+import (
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"text/template"
+)
+
+type State struct {
+	Name           string
+	TemplatePath   string
+	Template       *template.Template
+	ParsedTemplate string
+	Obj            *unstructured.Unstructured
+	GVR            schema.GroupVersionKind
 }
 
-type Pg struct {
-	Enabled        string    `json:"enabled,omitempty"`
-	SecretName     string    `json:"secretName,omitempty"`
-	Image          string    `json:"image,omitempty"`
-	Port           int       `json:"port,omitempty"`
-	StorageSize    string    `json:"storageSize,omitempty"`
-	SvcName        string    `json:"svcName,omitempty"`
-	Dbname         string    `json:"dbname,omitempty"`
-	Pass           string    `json:"pass,omitempty"`
-	User           string    `json:"user,omitempty"`
-	RunAsUser      int       `json:"runAsUser,omitempty"`
-	FsGroup        int       `json:"fsGroup,omitempty"`
-	StorageClass   string    `json:"storageClass,omitempty"`
-	CPURequest     int       `json:"cpuRequest,omitempty"`
-	MemoryRequest  string    `json:"memoryRequest,omitempty"`
-	MaxConnections int       `json:"maxConnections,omitempty"`
-	SharedBuffers  string    `json:"sharedBuffers,omitempty"`
-	HugePages      HugePages `json:"hugePages,omitempty"`
+var DeploymentGVR = schema.GroupVersionKind{
+	Kind:    "Deployment",
+	Group:   "",
+	Version: "apps/v1",
+}
+
+var PvcGVR = schema.GroupVersionKind{
+	Kind:    "PersistentVolumeClaim",
+	Group:   "",
+	Version: "v1",
+}
+
+var SecretGVR = schema.GroupVersionKind{
+	Kind:    "Secret",
+	Group:   "",
+	Version: "v1",
+}
+
+var SvcGVR = schema.GroupVersionKind{
+	Kind:    "Service",
+	Group:   "",
+	Version: "v1",
 }

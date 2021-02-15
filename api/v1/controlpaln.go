@@ -1,11 +1,22 @@
-package cnvrgApp
+package v1
 
-type Registry struct {
-	Name     string `json:"name,omitempty"`
-	URL      string `json:"url,omitempty"`
-	User     string `json:"user,omitempty"`
-	Password string `json:"password,omitempty"`
+type WebApp struct {
+	Replicas                int    `json:"replicas,omitempty"`
+	Enabled                 string `json:"enabled,omitempty"`
+	Image                   string `json:"image,omitempty"`
+	Port                    int    `json:"port,omitempty"`
+	CPU                     int    `json:"cpu,omitempty"`
+	Memory                  string `json:"memory,omitempty"`
+	SvcName                 string `json:"svcName,omitempty"`
+	NodePort                int    `json:"nodePort,omitempty"`
+	PassengerMaxPoolSize    int    `json:"passengerMaxPoolSize,omitempty"`
+	EnableReadinessProbe    string `json:"enableReadinessProbe,omitempty"`
+	InitialDelaySeconds     int    `json:"initialDelaySeconds,omitempty"`
+	ReadinessPeriodSeconds  int    `json:"readinessPeriodSeconds,omitempty"`
+	ReadinessTimeoutSeconds int    `json:"readinessTimeoutSeconds,omitempty"`
+	FailureThreshold        int    `json:"failureThreshold,omitempty"`
 }
+
 type Sidekiq struct {
 	Enabled  string `json:"enabled,omitempty"`
 	Split    string `json:"split,omitempty"`
@@ -28,6 +39,12 @@ type Systemkiq struct {
 type KiqPrestopHook struct {
 	Enabled     string `json:"enabled,omitempty"`
 	KillTimeout int    `json:"killTimeout,omitempty"`
+}
+type Registry struct {
+	Name     string `json:"name,omitempty"`
+	URL      string `json:"url,omitempty"`
+	User     string `json:"user,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 type Hyper struct {
 	Enabled                 string `json:"enabled,omitempty"`
@@ -105,6 +122,8 @@ type Conf struct {
 	CustomAgentTag               string   `json:"customAgentTag,omitempty"`
 	Intercom                     string   `json:"intercom,omitempty"`
 	CnvrgJobUID                  string   `json:"cnvrgJobUid,omitempty"`
+	Fixpg                        string   `json:"fixpg,omitempty"`
+	ResourcesRequestEnabled      string   `json:"resourcesRequestEnabled,omitempty"`
 	Ldap                         Ldap     `json:"ldap,omitempty"`
 	Registry                     Registry `json:"registry,omitempty"`
 	Rbac                         Rbac     `json:"rbac,omitempty"`
@@ -118,35 +137,21 @@ type CnvrgRouter struct {
 	Port     int    `json:"port,omitempty"`
 }
 
-type CnvrgApp struct {
-	Replicas                int            `json:"replicas,omitempty"`
-	Enabled                 string         `json:"enabled,omitempty"`
-	Image                   string         `json:"image,omitempty"`
-	Port                    int            `json:"port,omitempty"`
-	CPU                     int            `json:"cpu,omitempty"`
-	Memory                  string         `json:"memory,omitempty"`
-	SvcName                 string         `json:"svcName,omitempty"`
-	Fixpg                   string         `json:"fixpg,omitempty"`
-	NodePort                int            `json:"nodePort,omitempty"`
-	PassengerMaxPoolSize    int            `json:"passengerMaxPoolSize,omitempty"`
-	EnableReadinessProbe    string         `json:"enableReadinessProbe,omitempty"`
-	InitialDelaySeconds     int            `json:"initialDelaySeconds,omitempty"`
-	ReadinessPeriodSeconds  int            `json:"readinessPeriodSeconds,omitempty"`
-	ReadinessTimeoutSeconds int            `json:"readinessTimeoutSeconds,omitempty"`
-	FailureThreshold        int            `json:"failureThreshold,omitempty"`
-	ResourcesRequestEnabled string         `json:"resourcesRequestEnabled,omitempty"`
-	Sidekiq                 Sidekiq        `json:"sidekiq,omitempty"`
-	Searchkiq               Searchkiq      `json:"searchkiq,omitempty"`
-	Systemkiq               Systemkiq      `json:"systemkiq,omitempty"`
-	KiqPrestopHook          KiqPrestopHook `json:"kiqPrestopHook,omitempty"`
-	Hyper                   Hyper          `json:"hyper,omitempty"`
-	Seeder                  Seeder         `json:"seeder,omitempty"`
-	Conf                    Conf           `json:"conf,omitempty"`
-	CnvrgRouter             CnvrgRouter    `json:"cnvrgRouter,omitempty"`
+type ControlPlan struct {
+	WebApp         WebApp         `json:"webapp,omitempty"`
+	Sidekiq        Sidekiq        `json:"sidekiq,omitempty"`
+	Searchkiq      Searchkiq      `json:"searchkiq,omitempty"`
+	Systemkiq      Systemkiq      `json:"systemkiq,omitempty"`
+	KiqPrestopHook KiqPrestopHook `json:"kiqPrestopHook,omitempty"`
+	Hyper          Hyper          `json:"hyper,omitempty"`
+	Seeder         Seeder         `json:"seeder,omitempty"`
+	Conf           Conf           `json:"conf,omitempty"`
+	CnvrgRouter    CnvrgRouter    `json:"cnvrgRouter,omitempty"`
 }
 
-func Defaults() CnvrgApp {
-	return CnvrgApp{
+var controlPlanDefault = ControlPlan{
+
+	WebApp: WebApp{
 		Replicas:                1,
 		Enabled:                 "true",
 		Image:                   "",
@@ -154,7 +159,6 @@ func Defaults() CnvrgApp {
 		CPU:                     2,
 		Memory:                  "4Gi",
 		SvcName:                 "app",
-		Fixpg:                   "true",
 		NodePort:                30080,
 		PassengerMaxPoolSize:    20,
 		EnableReadinessProbe:    "true",
@@ -162,119 +166,127 @@ func Defaults() CnvrgApp {
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
 		FailureThreshold:        4,
-		ResourcesRequestEnabled: "true",
-		Sidekiq: Sidekiq{
-			Enabled:  "true",
-			Split:    "true",
-			CPU:      "1750m",
-			Memory:   "3750Mi",
-			Replicas: 2,
+	},
+
+	Sidekiq: Sidekiq{
+		Enabled:  "true",
+		Split:    "true",
+		CPU:      "1750m",
+		Memory:   "3750Mi",
+		Replicas: 2,
+	},
+
+	Searchkiq: Searchkiq{
+		Enabled:  "true",
+		CPU:      "750m",
+		Memory:   "750Mi",
+		Replicas: 1,
+	},
+
+	Systemkiq: Systemkiq{
+		Enabled:  "false",
+		CPU:      "500m",
+		Memory:   "500Mi",
+		Replicas: 1,
+	},
+
+	KiqPrestopHook: KiqPrestopHook{
+		Enabled:     "true",
+		KillTimeout: 60,
+	},
+
+	Hyper: Hyper{
+		Enabled:                 "true",
+		Image:                   "cnvrg/hyper-server:latest",
+		Port:                    5050,
+		Replicas:                1,
+		NodePort:                30050,
+		SvcName:                 "hyper",
+		Token:                   "token",
+		CPURequest:              "100m",
+		MemoryRequest:           "200Mi",
+		CPULimit:                2,
+		MemoryLimit:             "4Gi",
+		EnableReadinessProbe:    "true",
+		ReadinessPeriodSeconds:  100,
+		ReadinessTimeoutSeconds: 60,
+	},
+
+	Seeder: Seeder{
+		Image:           "docker.io/cnvrg/cnvrg-boot:v0.25",
+		SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
+		CreateBucketCmd: "mb.sh",
+	},
+
+	Conf: Conf{
+		GcpStorageSecret:             "gcp-storage-secret",
+		GcpKeyfileMountPath:          "/tmp/gcp_keyfile",
+		GcpKeyfileName:               "key.json",
+		JobsStorageClass:             "",
+		FeatureFlags:                 "",
+		SentryURL:                    "https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32",
+		SecretKeyBase:                "0d2b33c2cc19cfaa838d3c354354a18fcc92beaaa8e97889ef99341c8aaf963ad3afcf0f7c20454cabb5c573c3fc35b60221034e109f4fb651ed1415bf61e9d5",
+		StsIv:                        "DeJ/CGz/Hkb/IbRe4t1xLg==",
+		StsKey:                       "05646d3cbf8baa5be7150b4283eda07d",
+		RedisURL:                     "redis://redis",
+		PassengerAppEnv:              "app",
+		RailsEnv:                     "app",
+		RunJobsOnSelfCluster:         "true",
+		DefaultComputeConfig:         "/opt/kube",
+		DefaultComputeName:           "default",
+		UseStdout:                    "true",
+		ExtractTagsFromCmd:           "false",
+		CheckJobExpiration:           "true",
+		CnvrgStorageType:             "minio",
+		CnvrgStorageBucket:           "cnvrg-storage",
+		CnvrgStorageAccessKey:        "AKIAIOSFODNN7EXAMPLE",
+		CnvrgStorageSecretKey:        "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+		CnvrgStorageEndpoint:         "http://minio",
+		MinioSseMasterKey:            "my-minio-key:a310aadcefdb634b748ae31225f175e3f64591f955dfc66ccc20e128a6817ff9",
+		CnvrgStorageAzureAccessKey:   "",
+		CnvrgStorageAzureAccountName: "",
+		CnvrgStorageAzureContainer:   "",
+		CnvrgStorageRegion:           "eastus",
+		CnvrgStorageProject:          "",
+		CustomAgentTag:               "false",
+		Intercom:                     "true",
+		CnvrgJobUID:                  "1000",
+		Fixpg:                        "true",
+		ResourcesRequestEnabled:      "true",
+		Ldap: Ldap{
+			Enabled:       "false",
+			Host:          "",
+			Port:          "",
+			Account:       "userPrincipalName",
+			Base:          "", // dc=my-domain,dc=local
+			AdminUser:     "",
+			AdminPassword: "",
+			Ssl:           "", // true/false
 		},
-		Searchkiq: Searchkiq{
-			Enabled:  "true",
-			CPU:      "750m",
-			Memory:   "750Mi",
-			Replicas: 1,
+		Registry: Registry{
+			Name:     "cnvrg-registry",
+			URL:      "docker.io",
+			User:     "",
+			Password: "",
 		},
-		Systemkiq: Systemkiq{
-			Enabled:  "false",
-			CPU:      "500m",
-			Memory:   "500Mi",
-			Replicas: 1,
+		Rbac: Rbac{
+			Role:               "cnvrg-role",
+			ServiceAccountName: "cnvrg",
+			RoleBindingName:    "cnvrg-role-binding",
 		},
-		KiqPrestopHook: KiqPrestopHook{
-			Enabled:     "true",
-			KillTimeout: 60,
+		SMTP: SMTP{
+			Server:   "",
+			Port:     "",
+			Username: "",
+			Password: "",
+			Domain:   "",
 		},
-		Hyper: Hyper{
-			Enabled:                 "true",
-			Image:                   "cnvrg/hyper-server:latest",
-			Port:                    5050,
-			Replicas:                1,
-			NodePort:                30050,
-			SvcName:                 "hyper",
-			Token:                   "token",
-			CPURequest:              "100m",
-			MemoryRequest:           "200Mi",
-			CPULimit:                2,
-			MemoryLimit:             "4Gi",
-			EnableReadinessProbe:    "true",
-			ReadinessPeriodSeconds:  100,
-			ReadinessTimeoutSeconds: 60,
-		},
-		Seeder: Seeder{
-			Image:           "docker.io/cnvrg/cnvrg-boot:v0.25",
-			SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
-			CreateBucketCmd: "mb.sh",
-		},
-		Conf: Conf{
-			GcpStorageSecret:             "gcp-storage-secret",
-			GcpKeyfileMountPath:          "/tmp/gcp_keyfile",
-			GcpKeyfileName:               "key.json",
-			JobsStorageClass:             "",
-			FeatureFlags:                 "",
-			SentryURL:                    "https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32",
-			SecretKeyBase:                "0d2b33c2cc19cfaa838d3c354354a18fcc92beaaa8e97889ef99341c8aaf963ad3afcf0f7c20454cabb5c573c3fc35b60221034e109f4fb651ed1415bf61e9d5",
-			StsIv:                        "DeJ/CGz/Hkb/IbRe4t1xLg==",
-			StsKey:                       "05646d3cbf8baa5be7150b4283eda07d",
-			RedisURL:                     "redis://redis",
-			PassengerAppEnv:              "app",
-			RailsEnv:                     "app",
-			RunJobsOnSelfCluster:         "true",
-			DefaultComputeConfig:         "/opt/kube",
-			DefaultComputeName:           "default",
-			UseStdout:                    "true",
-			ExtractTagsFromCmd:           "false",
-			CheckJobExpiration:           "true",
-			CnvrgStorageType:             "minio",
-			CnvrgStorageBucket:           "cnvrg-storage",
-			CnvrgStorageAccessKey:        "AKIAIOSFODNN7EXAMPLE",
-			CnvrgStorageSecretKey:        "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-			CnvrgStorageEndpoint:         "http://minio",
-			MinioSseMasterKey:            "my-minio-key:a310aadcefdb634b748ae31225f175e3f64591f955dfc66ccc20e128a6817ff9",
-			CnvrgStorageAzureAccessKey:   "",
-			CnvrgStorageAzureAccountName: "",
-			CnvrgStorageAzureContainer:   "",
-			CnvrgStorageRegion:           "eastus",
-			CnvrgStorageProject:          "",
-			CustomAgentTag:               "false",
-			Intercom:                     "true",
-			CnvrgJobUID:                  "1000",
-			Ldap: Ldap{
-				Enabled:       "false",
-				Host:          "",
-				Port:          "",
-				Account:       "userPrincipalName",
-				Base:          "", // dc=my-domain,dc=local
-				AdminUser:     "",
-				AdminPassword: "",
-				Ssl:           "", // true/false
-			},
-			Registry: Registry{
-				Name:     "cnvrg-registry",
-				URL:      "docker.io",
-				User:     "",
-				Password: "",
-			},
-			Rbac: Rbac{
-				Role:               "cnvrg-role",
-				ServiceAccountName: "cnvrg",
-				RoleBindingName:    "cnvrg-role-binding",
-			},
-			SMTP: SMTP{
-				Server:   "",
-				Port:     "",
-				Username: "",
-				Password: "",
-				Domain:   "",
-			},
-		},
-		CnvrgRouter: CnvrgRouter{
-			Enabled:  "false",
-			Image:    "nginx",
-			SvcName:  "routing-service",
-			NodePort: 30081,
-			Port:     80,
-		},
-	}
+	},
+	CnvrgRouter: CnvrgRouter{
+		Enabled:  "false",
+		Image:    "nginx",
+		SvcName:  "routing-service",
+		NodePort: 30081,
+		Port:     80,
+	},
 }

@@ -17,11 +17,6 @@ limitations under the License.
 package v1
 
 import (
-	"fmt"
-	"github.com/cnvrg-operator/pkg/cnvrgApp"
-	"github.com/cnvrg-operator/pkg/pg"
-	"github.com/cnvrg-operator/pkg/storage"
-	"github.com/cnvrg-operator/pkg/tenancy"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,10 +25,10 @@ import (
 
 // CnvrgAppSpec defines the desired state of CnvrgApp
 type CnvrgAppSpec struct {
-	Pg       pg.Pg             `json:"pg,omitempty"`
-	Storage  storage.Storage   `json:"storage,omitempty"`
-	Tenancy  tenancy.Tenancy   `json:"tenancy,omitempty"`
-	CnvrgApp cnvrgApp.CnvrgApp `json:"cnvrgApp,omitempty"`
+	Pg          Pg          `json:"pg,omitempty"`
+	Storage     Storage     `json:"storage,omitempty"`
+	Tenancy     Tenancy     `json:"tenancy,omitempty"`
+	ControlPlan ControlPlan `json:"controlPlan,omitempty"`
 }
 
 // CnvrgAppStatus defines the observed state of CnvrgApp
@@ -67,15 +62,9 @@ func init() {
 	SchemeBuilder.Register(&CnvrgApp{}, &CnvrgAppList{})
 }
 
-func (c *CnvrgApp) Render() {
-	fmt.Print("this is interface test ")
-}
-
-func DefaultCnvrgAppSpec() CnvrgAppSpec {
-	return CnvrgAppSpec{
-		Pg:       pg.Defaults(),
-		Storage:  storage.Defaults(),
-		Tenancy:  tenancy.Defaults(),
-		CnvrgApp: cnvrgApp.Defaults(),
-	}
+var DefaultSpec = CnvrgAppSpec{
+	Pg:          pgDefault,
+	Storage:     storageDefault,
+	Tenancy:     tenancyDefault,
+	ControlPlan: controlPlanDefault,
 }

@@ -17,7 +17,6 @@ limitations under the License.
 package controllers
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
@@ -106,20 +105,41 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	//fmt.Print(string(b))
 	//tmpl, err := template.New("pg-pvc").Parse(string(b))
 	//tmpl, err := template.ParseFiles("/pkg/db/pg/pvc.tpl")
-	defaultCnvrgApp := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}
+	defaultCnvrgApp := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}
 
 	if err := mergo.Merge(&defaultCnvrgApp, cnvrgApp, mergo.WithOverride); err != nil {
 		// ...
 	}
-	tmpls := pg.GetTemplates()
-	for _, v := range tmpls {
-		var tpl bytes.Buffer
-		err = v.Execute(&tpl, defaultCnvrgApp)
+
+	for _, s := range pg.S {
+		err := s.InitTemplate(defaultCnvrgApp)
 		if err != nil {
-			r.Log.Error(err, "error parsing template")
+			r.Log.Error(err, "error")
 		}
-		r.Log.Info(tpl.String())
 	}
+	x := pg.S
+	fmt.Print(x)
+	for _, s := range pg.S {
+		//var tpl bytes.Buffer
+		//err := s.InitTemplate(defaultCnvrgApp)
+		//err = s.Template.Execute(&tpl, defaultCnvrgApp)
+		//if err != nil {
+		//	r.Log.Error(err, "error parsing template")
+		//}
+		//s.ParsedTemplate = tpl.String()
+		r.Log.Info(s.ParsedTemplate)
+
+	}
+
+	//tmpls := pg.GetTemplates()
+	//for _, v := range tmpls {
+	//	var tpl bytes.Buffer
+	//	err = v.Execute(&tpl, defaultCnvrgApp)
+	//	if err != nil {
+	//		r.Log.Error(err, "error parsing template")
+	//	}
+	//	r.Log.Info(tpl.String())
+	//}
 
 	//err = tmpl.Execute(os.Stdout, defaultCnvrgApp)
 	//
@@ -149,6 +169,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	secrets := &unstructured.Unstructured{}
 	secrets.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Secret", Group: "", Version: "v1"})
+
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgApp{}).

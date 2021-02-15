@@ -1,4 +1,4 @@
-package storage
+package v1
 
 type Storage struct {
 	Enabled         string   `json:"enabled,omitempty"`
@@ -36,36 +36,34 @@ type Nfs struct {
 	DefaultSc        string `json:"defaultSc,omitempty"`
 }
 
-func Defaults() Storage {
-	return Storage{
-		Enabled:         "false",
-		CcpStorageClass: "",
-		Hostpath: Hostpath{
-			Enabled:          "false",
-			Image:            "quay.io/kubevirt/hostpath-provisioner",
-			HostPath:         "/cnvrg-hostpath-storage",
-			StorageClassName: "cnvrg-hostpath-storage",
-			NodeName:         "",
-			CPURequest:       "100m",
-			MemoryRequest:    "100Mi",
-			CPULimit:         "200m",
-			MemoryLimit:      "200Mi",
-			ReclaimPolicy:    "Retain",
-			DefaultSc:        "false",
-		},
-		Nfs: Nfs{
-			Enabled:          "false",
-			Image:            "quay.io/external_storage/nfs-client-provisioner:latest",
-			Provisioner:      "cnvrg.io/ifs",
-			StorageClassName: "cnvrg-nfs-storage",
-			Server:           "",
-			Path:             "",
-			CPURequest:       "100m",
-			MemoryRequest:    "100Mi",
-			CPULimit:         "100m",
-			MemoryLimit:      "200Mi",
-			ReclaimPolicy:    "Retain",
-			DefaultSc:        "false",
-		},
-	}
+var storageDefault = Storage{
+	Enabled:         "false",
+	CcpStorageClass: "",
+	Hostpath: Hostpath{
+		Enabled:          "false",
+		Image:            "quay.io/kubevirt/hostpath-provisioner",
+		HostPath:         "/cnvrg-hostpath-storage",
+		StorageClassName: "cnvrg-hostpath-storage",
+		NodeName:         "",
+		CPURequest:       "100m",
+		MemoryRequest:    "100Mi",
+		CPULimit:         "200m",
+		MemoryLimit:      "200Mi",
+		ReclaimPolicy:    "Retain",
+		DefaultSc:        "false",
+	},
+	Nfs: Nfs{
+		Enabled:          "false",
+		Image:            "quay.io/external_storage/nfs-client-provisioner:latest",
+		Provisioner:      "cnvrg.io/ifs",
+		StorageClassName: "cnvrg-nfs-storage",
+		Server:           "",
+		Path:             "",
+		CPURequest:       "100m",
+		MemoryRequest:    "100Mi",
+		CPULimit:         "100m",
+		MemoryLimit:      "200Mi",
+		ReclaimPolicy:    "Retain",
+		DefaultSc:        "false",
+	},
 }
