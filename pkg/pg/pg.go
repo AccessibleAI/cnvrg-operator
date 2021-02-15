@@ -10,7 +10,7 @@ const path = "/pkg/pg/tmpl"
 
 var state = []*desired.State{
 	{
-		Name:           "pg-pvc",
+		Name:           "",
 		TemplatePath:   path + "/pvc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -18,7 +18,7 @@ var state = []*desired.State{
 		GVR:            desired.PvcGVR,
 	},
 	{
-		Name:           "pg-dep",
+		Name:           "",
 		TemplatePath:   path + "/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -26,7 +26,7 @@ var state = []*desired.State{
 		GVR:            desired.DeploymentGVR,
 	},
 	{
-		Name:           "pg-secret",
+		Name:           "",
 		TemplatePath:   path + "/secret.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -34,7 +34,7 @@ var state = []*desired.State{
 		GVR:            desired.SecretGVR,
 	},
 	{
-		Name:           "pg-svc",
+		Name:           "",
 		TemplatePath:   path + "/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

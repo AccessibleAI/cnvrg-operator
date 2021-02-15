@@ -1,37 +1,23 @@
-/*
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package controllers
 
 import (
 	"context"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/pg"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 )
 
-// CnvrgAppReconciler reconciles a CnvrgApp object
 type CnvrgAppReconciler struct {
 	client.Client
 	Log    logr.Logger
@@ -48,7 +34,12 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	if err := r.pg(desiredSpec); err != nil {
+
+	if desiredSpec == nil {
+		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
+	}
+
+	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -70,9 +61,9 @@ func (r *CnvrgAppReconciler) desiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, e
 	return &desiredSpec, nil
 }
 
-func (r *CnvrgAppReconciler) pg(desiredSpec *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
 	ctx := context.Background()
-	for _, s := range pg.State(desiredSpec) {
+	for _, s := range desiredManifests {
 		if err := s.GenerateDeployable(desiredSpec); err != nil {
 			r.Log.Error(err, "error generating deployable", "name", s.Name)
 			return err
@@ -81,9 +72,13 @@ func (r *CnvrgAppReconciler) pg(desiredSpec *mlopsv1.CnvrgApp) error {
 			r.Log.Error(err, "error setting controller reference", "name", s.Name)
 			return err
 		}
-		if err := r.Create(ctx, s.Obj); err != nil {
-			r.Log.Error(err, "error creating object", "name", s.Name)
-			return err
+		err := r.Get(ctx, types.NamespacedName{Name: s.Name, Namespace: desiredSpec.Namespace}, s.Obj)
+		if err != nil && errors.IsNotFound(err) {
+			r.Log.Info("creating", "name", s.Name, "kind", s.GVR.Kind)
+			if err := r.Create(ctx, s.Obj); err != nil {
+				r.Log.Error(err, "error creating object", "name", s.Name)
+				return err
+			}
 		}
 	}
 	return nil
@@ -114,7 +109,6 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-// Helper functions to check and remove string from a slice of strings.
 func containsString(slice []string, s string) bool {
 	for _, item := range slice {
 		if item == s {

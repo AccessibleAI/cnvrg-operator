@@ -4,7 +4,7 @@ metadata:
   name: cnvrgapp-sample
 spec:
   pg:
-    enabled: "true"
+    enabled: "false"
     secretName: "cnvrg-pg-secret"
     image: "centos/postgresql-12-centos7" # registry.redhat.io/rhscl/postgresql-10-rhel7:latest https://github.com/sclorg/postgresql-container
     port: 5432

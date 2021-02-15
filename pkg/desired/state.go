@@ -45,6 +45,7 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		log.Error(err, "parsing object", "template", s.ParsedTemplate)
 		return err
 	}
+	s.Name = s.Obj.Object["metadata"].(map[string]interface{})["name"].(string)
 
 	return nil
 }
