@@ -13,7 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -83,7 +82,7 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 			r.Log.Info("dry run enabled, skipping applying...")
 			continue
 		}
-		err := r.Get(ctx, types.NamespacedName{Name: s.Name, Namespace: desiredSpec.Namespace}, s.Obj)
+		err := r.Get(ctx, types.NamespacedName{Name: s.Name, Namespace: desiredSpec.Spec.CnvrgNs}, s.Obj)
 		if err != nil && errors.IsNotFound(err) {
 			r.Log.Info("creating", "name", s.Name, "kind", s.GVR.Kind)
 			if err := r.Create(ctx, s.Obj); err != nil {
@@ -98,16 +97,19 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	deployments := &unstructured.Unstructured{}
-	deployments.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Deployment", Group: "", Version: "apps/v1"})
+	deployments.SetGroupVersionKind(desired.DeploymentGVR)
 
 	services := &unstructured.Unstructured{}
-	services.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Service", Group: "", Version: "v1"})
+	services.SetGroupVersionKind(desired.SvcGVR)
 
 	pvcs := &unstructured.Unstructured{}
-	pvcs.SetGroupVersionKind(schema.GroupVersionKind{Kind: "PersistentVolumeClaim", Group: "", Version: "v1"})
+	pvcs.SetGroupVersionKind(desired.PvcGVR)
 
 	secrets := &unstructured.Unstructured{}
-	secrets.SetGroupVersionKind(schema.GroupVersionKind{Kind: "Secret", Group: "", Version: "v1"})
+	secrets.SetGroupVersionKind(desired.SecretGVR)
+
+	istio := &unstructured.Unstructured{}
+	istio.SetGroupVersionKind(desired.IstioGVR)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgApp{}).
@@ -116,6 +118,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(services).
 		Owns(pvcs).
 		Owns(secrets).
+		Owns(istio).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

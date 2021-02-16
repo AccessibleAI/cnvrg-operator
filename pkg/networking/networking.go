@@ -57,6 +57,14 @@ var istioState = []*desired.State{
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.SvcGVR,
 	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/instance.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.IstioGVR,
+	},
 }
 
 func IstioState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {

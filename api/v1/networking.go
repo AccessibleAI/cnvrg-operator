@@ -1,37 +1,37 @@
 package v1
 
 type Networking struct {
-	Enabled     string  `json:"enabled"`
-	IngressType string  `json:"ingressType"`
-	HTTPS       HTTPS   `json:"https"`
-	Istio       Istio   `json:"istio"`
-	Ingress     Ingress `json:"ingress"`
+	Enabled     string  `json:"enabled,omitempty"`
+	IngressType string  `json:"ingressType,omitempty"`
+	HTTPS       HTTPS   `json:"https,omitempty"`
+	Istio       Istio   `json:"istio,omitempty"`
+	Ingress     Ingress `json:"ingress,omitempty"`
 }
 type HTTPS struct {
-	Enabled    string `json:"enabled"`
-	Cert       string `json:"cert"`
-	Key        string `json:"key"`
-	CertSecret string `json:"certSecret"`
+	Enabled    string `json:"enabled,omitempty"`
+	Cert       string `json:"cert,omitempty"`
+	Key        string `json:"key,omitempty"`
+	CertSecret string `json:"certSecret,omitempty"`
 }
 type Istio struct {
-	Enabled                  string `json:"enabled"`
-	OperatorImage            string `json:"operatorImage"`
-	Hub                      string `json:"hub"`
-	Tag                      string `json:"tag"`
-	ProxyImage               string `json:"proxyImage"`
-	MixerImage               string `json:"mixerImage"`
-	PilotImage               string `json:"pilotImage"`
-	GwName                   string `json:"gwName"`
-	ExternalIP               string `json:"externalIp"`
-	IngressSvcAnnotations    string `json:"ingressSvcAnnotations"`
-	IngressSvcExtraPorts     string `json:"ingressSvcExtraPorts"`
-	LoadBalancerSourceRanges string `json:"loadBalancerSourceRanges"`
+	Enabled                  string `json:"enabled,omitempty"`
+	OperatorImage            string `json:"operatorImage,omitempty"`
+	Hub                      string `json:"hub,omitempty"`
+	Tag                      string `json:"tag,omitempty"`
+	ProxyImage               string `json:"proxyImage,omitempty"`
+	MixerImage               string `json:"mixerImage,omitempty"`
+	PilotImage               string `json:"pilotImage,omitempty"`
+	GwName                   string `json:"gwName,omitempty"`
+	ExternalIP               string `json:"externalIp,omitempty"`
+	IngressSvcAnnotations    string `json:"ingressSvcAnnotations,omitempty"`
+	IngressSvcExtraPorts     string `json:"ingressSvcExtraPorts,omitempty"`
+	LoadBalancerSourceRanges string `json:"loadBalancerSourceRanges,omitempty"`
 }
 type Ingress struct {
-	Enabled         string `json:"enabled"`
-	Timeout         string `json:"timeout"`
-	RetriesAttempts int    `json:"retriesAttempts"`
-	PerTryTimeout   string `json:"perTryTimeout"`
+	Enabled         string `json:"enabled,omitempty"`
+	Timeout         string `json:"timeout,omitempty"`
+	RetriesAttempts int    `json:"retriesAttempts,omitempty"`
+	PerTryTimeout   string `json:"perTryTimeout,omitempty"`
 }
 
 var networkingDefault = Networking{

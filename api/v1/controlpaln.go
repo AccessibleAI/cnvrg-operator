@@ -151,10 +151,10 @@ type ControlPlan struct {
 }
 
 type Tenancy struct {
-	Enabled        string `json:"enabled"`
-	DedicatedNodes string `json:"dedicatedNodes"`
-	Key            string `json:"key"`
-	Value          string `json:"value"`
+	Enabled        string `json:"enabled,omitempty"`
+	DedicatedNodes string `json:"dedicatedNodes,omitempty"`
+	Key            string `json:"key,omitempty"`
+	Value          string `json:"value,omitempty"`
 }
 
 type Cnvrg struct {

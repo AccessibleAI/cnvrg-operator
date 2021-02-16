@@ -179,24 +179,14 @@ spec:
                         type: string
                       tenancy:
                         properties:
-                          cnvrg:
-                            properties:
-                              key:
-                                type: string
-                              value:
-                                type: string
-                            required:
-                            - key
-                            - value
-                            type: object
                           dedicatedNodes:
                             type: string
                           enabled:
                             type: string
-                        required:
-                        - cnvrg
-                        - dedicatedNodes
-                        - enabled
+                          key:
+                            type: string
+                          value:
+                            type: string
                         type: object
                       useStdout:
                         type: string
@@ -329,11 +319,6 @@ spec:
                         type: string
                       key:
                         type: string
-                    required:
-                    - cert
-                    - certSecret
-                    - enabled
-                    - key
                     type: object
                   ingress:
                     properties:
@@ -345,11 +330,6 @@ spec:
                         type: integer
                       timeout:
                         type: string
-                    required:
-                    - enabled
-                    - perTryTimeout
-                    - retriesAttempts
-                    - timeout
                     type: object
                   ingressType:
                     type: string
@@ -379,26 +359,7 @@ spec:
                         type: string
                       tag:
                         type: string
-                    required:
-                    - enabled
-                    - externalIp
-                    - gwName
-                    - hub
-                    - ingressSvcAnnotations
-                    - ingressSvcExtraPorts
-                    - loadBalancerSourceRanges
-                    - mixerImage
-                    - operatorImage
-                    - pilotImage
-                    - proxyImage
-                    - tag
                     type: object
-                required:
-                - enabled
-                - https
-                - ingress
-                - ingressType
-                - istio
                 type: object
               pg:
                 properties:
