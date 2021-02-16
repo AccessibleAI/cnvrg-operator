@@ -25,10 +25,11 @@ import (
 
 // CnvrgAppSpec defines the desired state of CnvrgApp
 type CnvrgAppSpec struct {
+	CnvrgNs     string      `json:"cnvrgNs,omitempty"`
+	ControlPlan ControlPlan `json:"controlPlan,omitempty"`
 	Pg          Pg          `json:"pg,omitempty"`
 	Storage     Storage     `json:"storage,omitempty"`
-	Tenancy     Tenancy     `json:"tenancy,omitempty"`
-	ControlPlan ControlPlan `json:"controlPlan,omitempty"`
+	Networking  Networking  `json:"networking,omitempty"`
 }
 
 // CnvrgAppStatus defines the observed state of CnvrgApp
@@ -39,6 +40,9 @@ type CnvrgAppStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlan.webApp.image`
+// +kubebuilder:resource:scope=Cluster
+// +kubebuilder:subresource:status
 
 // CnvrgApp is the Schema for the cnvrgapps API
 type CnvrgApp struct {
@@ -63,8 +67,9 @@ func init() {
 }
 
 var DefaultSpec = CnvrgAppSpec{
+	CnvrgNs:     "cnvrg",
 	Pg:          pgDefault,
 	Storage:     storageDefault,
-	Tenancy:     tenancyDefault,
 	ControlPlan: controlPlanDefault,
+	Networking:  networkingDefault,
 }

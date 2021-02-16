@@ -128,6 +128,7 @@ type Conf struct {
 	Registry                     Registry `json:"registry,omitempty"`
 	Rbac                         Rbac     `json:"rbac,omitempty"`
 	SMTP                         SMTP     `json:"smtp,omitempty"`
+	Tenancy                      Tenancy  `json:"tenancy,omitempty"`
 }
 type CnvrgRouter struct {
 	Enabled  string `json:"enabled,omitempty"`
@@ -142,11 +143,23 @@ type ControlPlan struct {
 	Sidekiq        Sidekiq        `json:"sidekiq,omitempty"`
 	Searchkiq      Searchkiq      `json:"searchkiq,omitempty"`
 	Systemkiq      Systemkiq      `json:"systemkiq,omitempty"`
+	CnvrgRouter    CnvrgRouter    `json:"cnvrgRouter,omitempty"`
 	KiqPrestopHook KiqPrestopHook `json:"kiqPrestopHook,omitempty"`
 	Hyper          Hyper          `json:"hyper,omitempty"`
 	Seeder         Seeder         `json:"seeder,omitempty"`
 	Conf           Conf           `json:"conf,omitempty"`
-	CnvrgRouter    CnvrgRouter    `json:"cnvrgRouter,omitempty"`
+}
+
+type Tenancy struct {
+	Enabled        string `json:"enabled"`
+	DedicatedNodes string `json:"dedicatedNodes"`
+	Key            string `json:"key"`
+	Value          string `json:"value"`
+}
+
+type Cnvrg struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 var controlPlanDefault = ControlPlan{
@@ -218,6 +231,14 @@ var controlPlanDefault = ControlPlan{
 		CreateBucketCmd: "mb.sh",
 	},
 
+	CnvrgRouter: CnvrgRouter{
+		Enabled:  "false",
+		Image:    "nginx",
+		SvcName:  "routing-service",
+		NodePort: 30081,
+		Port:     80,
+	},
+
 	Conf: Conf{
 		GcpStorageSecret:             "gcp-storage-secret",
 		GcpKeyfileMountPath:          "/tmp/gcp_keyfile",
@@ -281,12 +302,11 @@ var controlPlanDefault = ControlPlan{
 			Password: "",
 			Domain:   "",
 		},
-	},
-	CnvrgRouter: CnvrgRouter{
-		Enabled:  "false",
-		Image:    "nginx",
-		SvcName:  "routing-service",
-		NodePort: 30081,
-		Port:     80,
+		Tenancy: Tenancy{
+			Enabled:        "false",
+			DedicatedNodes: "false",
+			Key:            "cnvrg-taint",
+			Value:          "true",
+		},
 	},
 }

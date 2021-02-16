@@ -5,22 +5,3 @@ metadata:
 spec:
   pg:
     enabled: "false"
-    secretName: "cnvrg-pg-secret"
-    image: "centos/postgresql-12-centos7" # registry.redhat.io/rhscl/postgresql-10-rhel7:latest https://github.com/sclorg/postgresql-container
-    port: 5432
-    storageSize: "80Gi"
-    svcName: "postgres"
-    dbname: "cnvrg_production"
-    pass: "pg_pass"
-    user: "cnvrg"
-    runAsUser: 26
-    fsGroup: 26
-    storageClass: "use-default"
-    cpuRequest: 2
-    memoryRequest: 4Gi
-    maxConnections: 500
-    sharedBuffers: 64MB
-    hugePages:
-      enabled: "false"
-      size: "2Mi" # 2Mi,1Gi,etc... https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-hugepages/, https://www.thegeekdiary.com/centos-rhel-67-how-to-configure-hugepages/, https://wiki.debian.org/Hugepages#pages-size
-      memory: "" # how much memo

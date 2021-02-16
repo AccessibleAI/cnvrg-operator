@@ -40,6 +40,7 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 	s.ParsedTemplate = tpl.String()
+	log.Info("template: " + s.TemplatePath + "\n" + s.ParsedTemplate)
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
 		log.Error(err, "parsing object", "template", s.ParsedTemplate)

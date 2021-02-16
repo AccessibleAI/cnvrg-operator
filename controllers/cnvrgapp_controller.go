@@ -4,9 +4,11 @@ import (
 	"context"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/pg"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	"github.com/spf13/viper"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -39,10 +41,14 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
+	// PostgreSQL
 	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
 		return ctrl.Result{}, err
 	}
-
+	// Istio
+	if err := r.apply(networking.IstioState(desiredSpec), desiredSpec); err != nil {
+		return ctrl.Result{}, err
+	}
 	return ctrl.Result{}, nil
 }
 
@@ -62,6 +68,7 @@ func (r *CnvrgAppReconciler) desiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, e
 }
 
 func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
+
 	ctx := context.Background()
 	for _, s := range desiredManifests {
 		if err := s.GenerateDeployable(desiredSpec); err != nil {
@@ -71,6 +78,10 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 		if err := ctrl.SetControllerReference(desiredSpec, s.Obj, r.Scheme); err != nil {
 			r.Log.Error(err, "error setting controller reference", "name", s.Name)
 			return err
+		}
+		if viper.GetBool("dry-run") {
+			r.Log.Info("dry run enabled, skipping applying...")
+			continue
 		}
 		err := r.Get(ctx, types.NamespacedName{Name: s.Name, Namespace: desiredSpec.Namespace}, s.Obj)
 		if err != nil && errors.IsNotFound(err) {

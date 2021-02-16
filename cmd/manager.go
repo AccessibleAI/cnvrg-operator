@@ -21,6 +21,7 @@ var (
 	runOperatorParams = []param{
 		{name: "metrics-addr", shorthand: "", value: ":8080", usage: "The address the metric endpoint binds to."},
 		{name: "enable-leader-election", shorthand: "", value: false, usage: "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager."},
+		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
 	}
 )
 

@@ -14,9 +14,13 @@ spec:
     listKind: CnvrgAppList
     plural: cnvrgapps
     singular: cnvrgapp
-  scope: Namespaced
+  scope: Cluster
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.controlPlan.webApp.image
+      name: Version
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
         description: CnvrgApp is the Schema for the cnvrgapps API
@@ -36,6 +40,8 @@ spec:
           spec:
             description: CnvrgAppSpec defines the desired state of CnvrgApp
             properties:
+              cnvrgNs:
+                type: string
               controlPlan:
                 properties:
                   cnvrgRouter:
@@ -171,6 +177,27 @@ spec:
                         type: string
                       stsKey:
                         type: string
+                      tenancy:
+                        properties:
+                          cnvrg:
+                            properties:
+                              key:
+                                type: string
+                              value:
+                                type: string
+                            required:
+                            - key
+                            - value
+                            type: object
+                          dedicatedNodes:
+                            type: string
+                          enabled:
+                            type: string
+                        required:
+                        - cnvrg
+                        - dedicatedNodes
+                        - enabled
+                        type: object
                       useStdout:
                         type: string
                     type: object
@@ -288,6 +315,91 @@ spec:
                         type: string
                     type: object
                 type: object
+              networking:
+                properties:
+                  enabled:
+                    type: string
+                  https:
+                    properties:
+                      cert:
+                        type: string
+                      certSecret:
+                        type: string
+                      enabled:
+                        type: string
+                      key:
+                        type: string
+                    required:
+                    - cert
+                    - certSecret
+                    - enabled
+                    - key
+                    type: object
+                  ingress:
+                    properties:
+                      enabled:
+                        type: string
+                      perTryTimeout:
+                        type: string
+                      retriesAttempts:
+                        type: integer
+                      timeout:
+                        type: string
+                    required:
+                    - enabled
+                    - perTryTimeout
+                    - retriesAttempts
+                    - timeout
+                    type: object
+                  ingressType:
+                    type: string
+                  istio:
+                    properties:
+                      enabled:
+                        type: string
+                      externalIp:
+                        type: string
+                      gwName:
+                        type: string
+                      hub:
+                        type: string
+                      ingressSvcAnnotations:
+                        type: string
+                      ingressSvcExtraPorts:
+                        type: string
+                      loadBalancerSourceRanges:
+                        type: string
+                      mixerImage:
+                        type: string
+                      operatorImage:
+                        type: string
+                      pilotImage:
+                        type: string
+                      proxyImage:
+                        type: string
+                      tag:
+                        type: string
+                    required:
+                    - enabled
+                    - externalIp
+                    - gwName
+                    - hub
+                    - ingressSvcAnnotations
+                    - ingressSvcExtraPorts
+                    - loadBalancerSourceRanges
+                    - mixerImage
+                    - operatorImage
+                    - pilotImage
+                    - proxyImage
+                    - tag
+                    type: object
+                required:
+                - enabled
+                - https
+                - ingress
+                - ingressType
+                - istio
+                type: object
               pg:
                 properties:
                   cpuRequest:
@@ -391,27 +503,6 @@ spec:
                         type: string
                     type: object
                 type: object
-              tenancy:
-                properties:
-                  cnvrg:
-                    properties:
-                      key:
-                        type: string
-                      value:
-                        type: string
-                    required:
-                    - key
-                    - value
-                    type: object
-                  dedicatedNodes:
-                    type: string
-                  enabled:
-                    type: string
-                required:
-                - cnvrg
-                - dedicatedNodes
-                - enabled
-                type: object
             type: object
           status:
             description: CnvrgAppStatus defines the observed state of CnvrgApp
@@ -422,6 +513,8 @@ spec:
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}
 status:
   acceptedNames:
     kind: ""

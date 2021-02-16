@@ -17,8 +17,8 @@ type State struct {
 
 var DeploymentGVR = schema.GroupVersionKind{
 	Kind:    "Deployment",
-	Group:   "",
-	Version: "apps/v1",
+	Group:   "apps",
+	Version: "v1",
 }
 
 var PvcGVR = schema.GroupVersionKind{
@@ -36,5 +36,41 @@ var SecretGVR = schema.GroupVersionKind{
 var SvcGVR = schema.GroupVersionKind{
 	Kind:    "Service",
 	Group:   "",
+	Version: "v1",
+}
+
+var SaGVR = schema.GroupVersionKind{
+	Kind:    "ServiceAccount",
+	Group:   "",
+	Version: "v1",
+}
+
+var CrdGVR = schema.GroupVersionKind{
+	Kind:    "CustomResourceDefinition",
+	Group:   "apiextensions.k8s.io",
+	Version: "v1",
+}
+
+var IstioGVR = schema.GroupVersionKind{
+	Kind:    "IstioOperator",
+	Group:   "install.istio.io",
+	Version: "v1alpha1",
+}
+
+var ClusterRoleGVR = schema.GroupVersionKind{
+	Kind:    "ClusterRole",
+	Group:   "rbac.authorization.k8s.io",
+	Version: "v1",
+}
+
+var ClusterRoleBindingGVR = schema.GroupVersionKind{
+	Kind:    "ClusterRoleBinding",
+	Group:   "rbac.authorization.k8s.io",
+	Version: "v1",
+}
+
+var RoleGVR = schema.GroupVersionKind{
+	Kind:    "Role",
+	Group:   "rbac.authorization.k8s.io",
 	Version: "v1",
 }
