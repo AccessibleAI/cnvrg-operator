@@ -9,7 +9,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -98,38 +97,18 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
-	deployments := &unstructured.Unstructured{}
-	deployments.SetGroupVersionKind(desired.DeploymentGVR)
+	cnvrgAppController := ctrl.NewControllerManagedBy(mgr).For(&mlopsv1.CnvrgApp{})
 
-	services := &unstructured.Unstructured{}
-	services.SetGroupVersionKind(desired.SvcGVR)
+	for k, v := range desired.Kinds {
+		if k == desired.IstioVsGVR {
 
-	pvcs := &unstructured.Unstructured{}
-	pvcs.SetGroupVersionKind(desired.PvcGVR)
+		}
+		u := &unstructured.Unstructured{}
+		u.SetGroupVersionKind(v)
+		cnvrgAppController.Owns(u)
+	}
 
-	secrets := &unstructured.Unstructured{}
-	secrets.SetGroupVersionKind(desired.SecretGVR)
-
-	istio := &unstructured.Unstructured{}
-	istio.SetGroupVersionKind(desired.IstioGVR)
-
-	ocpRoute := &unstructured.Unstructured{}
-	ocpRoute.SetGroupVersionKind(desired.OcpRouteGVR)
-
-	istioVs := &unstructured.Unstructured{}
-	istioVs.SetGroupVersionKind(desired.IstioVsGVR)
-
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&mlopsv1.CnvrgApp{}).
-		Owns(&corev1.ConfigMap{}).
-		Owns(deployments).
-		Owns(services).
-		Owns(pvcs).
-		Owns(secrets).
-		//Owns(istioVs).
-		//Owns(istio).
-		//Owns(ocpRoute).
-
+	return cnvrgAppController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

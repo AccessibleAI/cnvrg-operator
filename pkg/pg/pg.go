@@ -15,7 +15,7 @@ var state = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.PvcGVR,
+		GVR:            desired.Kinds[desired.PvcGVR],
 	},
 	{
 		Name:           "",
@@ -23,7 +23,7 @@ var state = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.DeploymentGVR,
+		GVR:            desired.Kinds[desired.DeploymentGVR],
 	},
 	{
 		Name:           "",
@@ -31,7 +31,7 @@ var state = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.SecretGVR,
+		GVR:            desired.Kinds[desired.SecretGVR],
 	},
 	{
 		Name:           "",
@@ -39,7 +39,7 @@ var state = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.PvcGVR,
+		GVR:            desired.Kinds[desired.PvcGVR],
 	},
 }
 

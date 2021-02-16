@@ -11,19 +11,11 @@ const path = "/pkg/networking/tmpl"
 var istioState = []*desired.State{
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/crds.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.CrdGVR,
-	},
-	{
-		Name:           "",
 		TemplatePath:   path + "/istio/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.ClusterRoleGVR,
+		GVR:            desired.Kinds[desired.DeploymentGVR],
 	},
 	{
 		Name:           "",
@@ -31,7 +23,7 @@ var istioState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.ClusterRoleBindingGVR,
+		GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 	},
 	{
 		Name:           "",
@@ -39,7 +31,7 @@ var istioState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.DeploymentGVR,
+		GVR:            desired.Kinds[desired.DeploymentGVR],
 	},
 	{
 		Name:           "",
@@ -47,7 +39,7 @@ var istioState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.SaGVR,
+		GVR:            desired.Kinds[desired.SaGVR],
 	},
 	{
 		Name:           "",
@@ -55,7 +47,7 @@ var istioState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.SvcGVR,
+		GVR:            desired.Kinds[desired.SvcGVR],
 	},
 	{
 		Name:           "",
@@ -63,7 +55,7 @@ var istioState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.IstioGVR,
+		GVR:            desired.Kinds[desired.IstioGVR],
 	},
 }
 
@@ -74,7 +66,7 @@ var ocpRoutesState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.OcpRouteGVR,
+		GVR:            desired.Kinds[desired.OcpRouteGVR],
 	},
 }
 
@@ -85,7 +77,7 @@ var istioVsState = []*desired.State{
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.IstioVsGVR,
+		GVR:            desired.Kinds[desired.IstioVsGVR],
 	},
 }
 

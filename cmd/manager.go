@@ -22,6 +22,10 @@ var (
 		{name: "metrics-addr", shorthand: "", value: ":8080", usage: "The address the metric endpoint binds to."},
 		{name: "enable-leader-election", shorthand: "", value: false, usage: "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager."},
 		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
+		{name: "deploy-depended-crds", shorthand: "", value: true, usage: "Deploy depended (external) CRDs automatically"},
+		{name: "own-istio-resources", shorthand: "", value: true, usage: "Watch for istio resources"},
+		{name: "own-openshift-resources", shorthand: "", value: false, usage: "Watch for OpenShift resources"},
+		{name: "own-prometheus-resources", shorthand: "", value: false, usage: "Watch for Prometheus resources"},
 	}
 )
 
