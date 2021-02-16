@@ -74,3 +74,15 @@ var RoleGVR = schema.GroupVersionKind{
 	Group:   "rbac.authorization.k8s.io",
 	Version: "v1",
 }
+
+var OcpRouteGVR = schema.GroupVersionKind{
+	Kind:    "Route",
+	Group:   "route.openshift.io",
+	Version: "v1",
+}
+
+var IstioVsGVR = schema.GroupVersionKind{
+	Kind:    "VirtualService",
+	Group:   "networking.istio.io",
+	Version: "v1alpha3",
+}

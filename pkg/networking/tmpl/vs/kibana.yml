@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "{{logging.kibana.svcName}}"
+  namespace: "{{ansible_operator_meta.namespace}}"
+spec:
+  hosts:
+  - "{{(logging.kibana.svcName + '.' + clusterDomain).split(':')[0] }}"
+  gateways:
+  - "{{networking.istio.gwName}}"
+  http:
+  - retries:
+      attempts: {{ networking.istio.retriesAttempts | default ('5') }}
+      perTryTimeout: {{ networking.istio.perTryTimeout | default ('180s') }}
+    timeout: {{ networking.ingress.timeout | default ('900s') }}
+    route:
+    - destination:
+        port:
+          number: {{logging.kibana.port}}
+        host: "{{logging.kibana.svcName +'.'+ ansible_operator_meta.namespace + ".svc.cluster.local" }}"

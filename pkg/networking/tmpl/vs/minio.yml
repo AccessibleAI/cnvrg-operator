@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "{{minio.svcName}}"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+spec:
+  hosts:
+  - "{{(minio.svcName + '.' + clusterDomain).split(':')[0] }}"
+  gateways:
+  - "{{networking.istio.gwName}}"
+  http:
+  - retries:
+      attempts: {{ networking.istio.retriesAttempts | default ('5') }}
+      perTryTimeout: 172800s
+    timeout: 864000s
+    route:
+    - destination:
+        host: "{{minio.svcName + '.' + ansible_operator_meta.namespace + ".svc.cluster.local" }}"

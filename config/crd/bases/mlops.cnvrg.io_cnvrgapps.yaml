@@ -332,6 +332,11 @@ spec:
                         type: string
                     type: object
                   ingressType:
+                    enum:
+                    - istio
+                    - k8singress
+                    - openshift
+                    - nodeport
                     type: string
                   istio:
                     properties:

@@ -1,11 +1,21 @@
 package v1
 
+// +kubebuilder:validation:Enum=istio;k8singress;openshift;nodeport
+type IngressType string
+
+const (
+	IstioIngress     IngressType = "istio"
+	NginxIngress     IngressType = "k8singress"
+	OpenShiftIngress IngressType = "openshift"
+	NodePortIngress  IngressType = "nodeport"
+)
+
 type Networking struct {
-	Enabled     string  `json:"enabled,omitempty"`
-	IngressType string  `json:"ingressType,omitempty"`
-	HTTPS       HTTPS   `json:"https,omitempty"`
-	Istio       Istio   `json:"istio,omitempty"`
-	Ingress     Ingress `json:"ingress,omitempty"`
+	Enabled     string      `json:"enabled,omitempty"`
+	IngressType IngressType `json:"ingressType,omitempty"`
+	HTTPS       HTTPS       `json:"https,omitempty"`
+	Istio       Istio       `json:"istio,omitempty"`
+	Ingress     Ingress     `json:"ingress,omitempty"`
 }
 type HTTPS struct {
 	Enabled    string `json:"enabled,omitempty"`
@@ -36,7 +46,7 @@ type Ingress struct {
 
 var networkingDefault = Networking{
 	Enabled:     "true",
-	IngressType: "istio", // openshift | istio | k8singress | nodeport
+	IngressType: IstioIngress,
 	HTTPS: HTTPS{
 		Enabled:    "false",
 		Cert:       "",

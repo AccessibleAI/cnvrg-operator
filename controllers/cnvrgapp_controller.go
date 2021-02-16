@@ -44,10 +44,12 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
 		return ctrl.Result{}, err
 	}
-	// Istio
-	if err := r.apply(networking.IstioState(desiredSpec), desiredSpec); err != nil {
+
+	// Networking
+	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
 		return ctrl.Result{}, err
 	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -111,6 +113,12 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	istio := &unstructured.Unstructured{}
 	istio.SetGroupVersionKind(desired.IstioGVR)
 
+	ocpRoute := &unstructured.Unstructured{}
+	ocpRoute.SetGroupVersionKind(desired.OcpRouteGVR)
+
+	istioVs := &unstructured.Unstructured{}
+	istioVs.SetGroupVersionKind(desired.IstioVsGVR)
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgApp{}).
 		Owns(&corev1.ConfigMap{}).
@@ -118,7 +126,10 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(services).
 		Owns(pvcs).
 		Owns(secrets).
-		Owns(istio).
+		//Owns(istioVs).
+		//Owns(istio).
+		//Owns(ocpRoute).
+
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

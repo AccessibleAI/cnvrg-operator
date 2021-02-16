@@ -67,9 +67,38 @@ var istioState = []*desired.State{
 	},
 }
 
-func IstioState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
+var ocpRoutesState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/route/app.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.OcpRouteGVR,
+	},
+}
+
+var istioVsState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/vs/app.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.IstioVsGVR,
+	},
+}
+
+func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
+	var state []*desired.State
 	if cnvrgApp.Spec.Networking.Enabled == "true" && cnvrgApp.Spec.Networking.Istio.Enabled == "true" {
-		return istioState
+		state = append(state, istioState...)
 	}
-	return nil
+	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.OpenShiftIngress {
+		state = append(state, ocpRoutesState...)
+	}
+	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
+		state = append(state, istioVsState...)
+	}
+	return state
 }
