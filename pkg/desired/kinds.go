@@ -12,6 +12,7 @@ const (
 	SaGVR                 GVRName = "SaGVR"
 	CrdGVR                GVRName = "CrdGVR"
 	IstioGVR              GVRName = "IstioGVR"
+	PrometheusGVR         GVRName = "PrometheusGVR"
 	ClusterRoleGVR        GVRName = "ClusterRoleGVR"
 	ClusterRoleBindingGVR GVRName = "ClusterRoleBindingGVR"
 	RoleGVR               GVRName = "RoleGVR"

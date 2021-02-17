@@ -3,10 +3,97 @@ package networking
 import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/markbates/pkger"
+	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"os"
+	//"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 const path = "/pkg/networking/tmpl"
+
+var crdsState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/authorizationpolicies.security.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/destinationrules.networking.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/envoyfilters.networking.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/istiooperators.install.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/authorizationpolicies.security.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/peerauthentications.security.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/requestauthentications.security.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/sidecars.networking.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/workloadentries.networking.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/crd/workloadgroups.networking.istio.io.yaml",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.CrdGVR],
+	},
+}
 
 var istioState = []*desired.State{
 	{
@@ -93,4 +180,35 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, istioVsState...)
 	}
 	return state
+}
+
+func LoadCrds() (crds []*desired.State) {
+	zap.S().Debug("THIS IS DEBUG")
+	zap.S().Info("THIS IS info")
+	err := pkger.Walk(path+"/istio/crds", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		crd := &desired.State{
+			Name:           "",
+			TemplatePath:   path,
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.CrdGVR],
+		}
+		if err := crd.GenerateDeployable(nil); err != nil {
+			zap.S().Error(err, "error loading istio crds")
+
+		}
+		if err := crd.Apply(); err != nil {
+			zap.S().Error(err, "error applying crd")
+		}
+		crds = append(crds, crd)
+		return nil
+	})
+	if err != nil {
+		zap.S().Error(err, "error loading istio crds")
+	}
+	return
 }

@@ -40,6 +40,8 @@ spec:
           spec:
             description: CnvrgAppSpec defines the desired state of CnvrgApp
             properties:
+              clusterDomain:
+                type: string
               cnvrgNs:
                 type: string
               controlPlan:

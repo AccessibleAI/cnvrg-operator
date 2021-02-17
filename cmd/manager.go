@@ -1,17 +1,19 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/controllers"
+	"github.com/cnvrg-operator/pkg/networking"
+	"github.com/go-logr/zapr"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -25,7 +27,7 @@ var (
 		{name: "deploy-depended-crds", shorthand: "", value: true, usage: "Deploy depended (external) CRDs automatically"},
 		{name: "own-istio-resources", shorthand: "", value: true, usage: "Watch for istio resources"},
 		{name: "own-openshift-resources", shorthand: "", value: false, usage: "Watch for OpenShift resources"},
-		{name: "own-prometheus-resources", shorthand: "", value: false, usage: "Watch for Prometheus resources"},
+		{name: "own-prometheus-resources", shorthand: "", value: true, usage: "Watch for Prometheus resources"},
 	}
 )
 
@@ -35,17 +37,47 @@ func init() {
 	// +kubebuilder:scaffold:scheme
 }
 
+func initZapLog() *zap.Logger {
+
+	config := zap.NewDevelopmentConfig()
+	config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	config.EncoderConfig.TimeKey = "timestamp"
+	//config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	logger, _ := config.Build()
+	return logger
+}
+
 // run operator cmd and params
 var runOperatorCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run cnvrg operator",
 	Run: func(cmd *cobra.Command, args []string) {
+		loggerMgr := initZapLog()
+		zap.ReplaceGlobals(loggerMgr)
+		logger := loggerMgr.Sugar()
+		logger.Info("this is info")
+		logger.Debug("this is debug")
+		ensureCrdsAvailability()
+		os.Exit(1)
+
 		runOperator()
 	},
 }
 
+func ensureCrdsAvailability() {
+	if viper.GetBool("own-istio-resources") {
+		networking.LoadCrds()
+	}
+}
+
 func runOperator() {
-	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
+	//zapLog, err := zap.NewDevelopment()
+	//ctrl.SetLogger(zapr.NewLogger(zapLog))
+	l := initZapLog()
+	l.Sugar()
+	ctrl.SetLogger(zapr.NewLogger(l))
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: viper.GetString("metrics-addr"),

@@ -16,6 +16,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"strings"
 )
 
 type CnvrgAppReconciler struct {
@@ -99,9 +100,16 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	cnvrgAppController := ctrl.NewControllerManagedBy(mgr).For(&mlopsv1.CnvrgApp{})
 
-	for k, v := range desired.Kinds {
-		if k == desired.IstioVsGVR {
+	for _, v := range desired.Kinds {
 
+		if strings.Contains(v.Group, "istio.io") && viper.GetBool("own-istio-resources") == false {
+			continue
+		}
+		if strings.Contains(v.Group, "openshift.io") && viper.GetBool("own-openshift-resources") == false {
+			continue
+		}
+		if strings.Contains(v.Group, "coreos.com") && viper.GetBool("own-prometheus-resources") == false {
+			continue
 		}
 		u := &unstructured.Unstructured{}
 		u.SetGroupVersionKind(v)

@@ -25,11 +25,12 @@ import (
 
 // CnvrgAppSpec defines the desired state of CnvrgApp
 type CnvrgAppSpec struct {
-	CnvrgNs     string      `json:"cnvrgNs,omitempty"`
-	ControlPlan ControlPlan `json:"controlPlan,omitempty"`
-	Pg          Pg          `json:"pg,omitempty"`
-	Storage     Storage     `json:"storage,omitempty"`
-	Networking  Networking  `json:"networking,omitempty"`
+	CnvrgNs       string      `json:"cnvrgNs,omitempty"`
+	ClusterDomain string      `json:"clusterDomain,omitempty"`
+	ControlPlan   ControlPlan `json:"controlPlan,omitempty"`
+	Pg            Pg          `json:"pg,omitempty"`
+	Storage       Storage     `json:"storage,omitempty"`
+	Networking    Networking  `json:"networking,omitempty"`
 }
 
 // CnvrgAppStatus defines the observed state of CnvrgApp
@@ -67,9 +68,10 @@ func init() {
 }
 
 var DefaultSpec = CnvrgAppSpec{
-	CnvrgNs:     "cnvrg",
-	Pg:          pgDefault,
-	Storage:     storageDefault,
-	ControlPlan: controlPlanDefault,
-	Networking:  networkingDefault,
+	ClusterDomain: "",
+	CnvrgNs:       "cnvrg",
+	Pg:            pgDefault,
+	Storage:       storageDefault,
+	ControlPlan:   controlPlanDefault,
+	Networking:    networkingDefault,
 }

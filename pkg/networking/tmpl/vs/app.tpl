@@ -5,6 +5,6 @@ metadata:
   namespace: {{ .Spec.CnvrgNs }}
 spec:
   hosts:
-    - {{ .Spec.ControlPlan.WebApp.svcName}}.{{split ":" clusterDomain}}
+    - {{ .Spec.ControlPlan.WebApp.SvcName}}.{{split ":" .Spec.ClusterDomain}}
   gateways:
     - {{ .Spec.Networking.Istio.GwName}}
