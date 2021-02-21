@@ -24,6 +24,7 @@ var (
 		{name: "metrics-addr", shorthand: "", value: ":8080", usage: "The address the metric endpoint binds to."},
 		{name: "enable-leader-election", shorthand: "", value: false, usage: "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager."},
 		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
+		{name: "verbose", shorthand: "v", value: false, usage: "Verbose output"},
 		{name: "deploy-depended-crds", shorthand: "", value: true, usage: "Deploy depended (external) CRDs automatically"},
 		{name: "own-istio-resources", shorthand: "", value: true, usage: "Watch for istio resources"},
 		{name: "own-openshift-resources", shorthand: "", value: false, usage: "Watch for OpenShift resources"},
@@ -40,43 +41,40 @@ func init() {
 func initZapLog() *zap.Logger {
 
 	config := zap.NewDevelopmentConfig()
-	config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	if viper.GetBool("verbose") {
+		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	}
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.TimeKey = "timestamp"
-	//config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	logger, _ := config.Build()
 	return logger
 }
 
-// run operator cmd and params
 var runOperatorCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run cnvrg operator",
 	Run: func(cmd *cobra.Command, args []string) {
 		loggerMgr := initZapLog()
+		loggerMgr.Sugar()
 		zap.ReplaceGlobals(loggerMgr)
-		logger := loggerMgr.Sugar()
-		logger.Info("this is info")
-		logger.Debug("this is debug")
 		ensureCrdsAvailability()
-		os.Exit(1)
-
 		runOperator()
 	},
 }
 
 func ensureCrdsAvailability() {
+	if viper.GetBool("deploy-depended-crds") == false {
+		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
+	}
 	if viper.GetBool("own-istio-resources") {
+		zap.S().Debug("deploying istio crds...")
 		networking.LoadCrds()
 	}
 }
 
 func runOperator() {
-	//zapLog, err := zap.NewDevelopment()
-	//ctrl.SetLogger(zapr.NewLogger(zapLog))
-	l := initZapLog()
-	l.Sugar()
-	ctrl.SetLogger(zapr.NewLogger(l))
+	ctrl.SetLogger(zapr.NewLogger(initZapLog()))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,

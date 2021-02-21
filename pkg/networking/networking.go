@@ -183,8 +183,6 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 }
 
 func LoadCrds() (crds []*desired.State) {
-	zap.S().Debug("THIS IS DEBUG")
-	zap.S().Info("THIS IS info")
 	err := pkger.Walk(path+"/istio/crds", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil

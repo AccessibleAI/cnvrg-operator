@@ -8,7 +8,6 @@ spec:
     istio:
       enabled: "true"
       ingressSvcAnnotations: "foo: bla     ;bar         : bla-bla    "
-      loadBalancerSourceRanges: "1.1.1.1/0      ;      2.2.2.2/32;  ; "
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"
   pg:
