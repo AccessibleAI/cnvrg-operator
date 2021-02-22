@@ -17,7 +17,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"strings"
+	"time"
 )
+
+const CNVRGAPP_FINALIZER = "cnvrgapp.mlops.cnvrg.io/finalizer"
 
 type CnvrgAppReconciler struct {
 	client.Client
@@ -29,15 +32,44 @@ type CnvrgAppReconciler struct {
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-
+	ctx := context.Background()
 	r.Log.Info("starting reconciliation")
-	desiredSpec, err := r.desiredSpec(req)
+	desiredSpec, err := r.defineDesiredSpec(req)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
 	if desiredSpec == nil {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
+	}
+
+	// Setup finalizer
+	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER) {
+			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER)
+			if err := r.Update(ctx, desiredSpec); err != nil {
+				r.Log.Error(err, "failed to add finalizer")
+				return ctrl.Result{}, err
+			}
+		}
+	} else {
+		if containsString(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER) {
+			if err := r.cleanup(desiredSpec); err != nil {
+				return ctrl.Result{}, err
+			}
+			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER)
+			cnvrgApp, err := r.getCnvrgSpec(req)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			if cnvrgApp == nil {
+				return ctrl.Result{}, nil
+			}
+			if err := r.Update(ctx, desiredSpec); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		return ctrl.Result{}, nil
 	}
 
 	// PostgreSQL
@@ -53,11 +85,13 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *CnvrgAppReconciler) desiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, error) {
-	ctx := context.Background()
-	var cnvrgApp mlopsv1.CnvrgApp
-	if err := r.Get(ctx, req.NamespacedName, &cnvrgApp); err != nil {
-		r.Log.Info("unable to fetch CnvrgApp, probably cr was deleted")
+func (r *CnvrgAppReconciler) defineDesiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, error) {
+	cnvrgApp, err := r.getCnvrgSpec(req)
+	if err != nil {
+		return nil, err
+	}
+	// probably cnvrgapp was removed
+	if cnvrgApp == nil {
 		return nil, nil
 	}
 	desiredSpec := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}
@@ -66,6 +100,20 @@ func (r *CnvrgAppReconciler) desiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, e
 		return nil, err
 	}
 	return &desiredSpec, nil
+}
+
+func (r *CnvrgAppReconciler) getCnvrgSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, error) {
+	ctx := context.Background()
+	var cnvrgApp mlopsv1.CnvrgApp
+	if err := r.Get(ctx, req.NamespacedName, &cnvrgApp); err != nil {
+		if errors.IsNotFound(err) {
+			r.Log.Info("unable to fetch CnvrgApp, probably cr was deleted")
+			return nil, nil
+		}
+		r.Log.Error(err, "unable to fetch CnvrgApp")
+		return nil, err
+	}
+	return &cnvrgApp, nil
 }
 
 func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
@@ -90,6 +138,43 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 			if err := r.Create(ctx, s.Obj); err != nil {
 				r.Log.Error(err, "error creating object", "name", s.Name)
 				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
+	r.Log.Info("running finalizer")
+	ctx := context.Background()
+	// remove istio
+	istioManifests := networking.State(desiredSpec)
+	for _, m := range istioManifests {
+		// Make sure IstioOperator was deployed
+		if m.GVR == desired.Kinds[desired.IstioGVR] {
+			if err := m.GenerateDeployable(desiredSpec); err != nil {
+				r.Log.Error(err, "can't make manifest deployable")
+				return err
+			}
+			if err := r.Delete(ctx, m.Obj); err != nil {
+				if errors.IsNotFound(err) {
+					r.Log.Info("istio instance not found - probably removed previously")
+					return nil
+				}
+				return err
+			}
+			r.Log.Info("has to remove istio first")
+			istioExists := true
+			for istioExists {
+				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.Spec.CnvrgNs}, m.Obj)
+				if err != nil && errors.IsNotFound(err) {
+					r.Log.Info("istio instance was successfully removed")
+					istioExists = false
+				}
+				if istioExists {
+					r.Log.Info("istio instance still present, will sleep of 1 sec, and check again...")
+				}
+				time.Sleep(20 * time.Second)
 			}
 		}
 	}
