@@ -18,6 +18,17 @@ import (
 	"text/template"
 )
 
+func cnvrgTemplateFuncs() map[string]interface{} {
+	return map[string]interface{}{
+		"httpScheme": func(httpsEnabled string) string {
+			if httpsEnabled == "true" {
+				return "https://"
+			}
+			return "http://"
+		},
+	}
+}
+
 func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 	var tpl bytes.Buffer
 	f, err := pkger.Open(s.TemplatePath)
@@ -31,7 +42,10 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		zap.S().Error(err, "error reading file", "path", s.TemplatePath)
 		return err
 	}
-	s.Template, err = template.New(s.Name).Funcs(sprig.TxtFuncMap()).Parse(string(b))
+	s.Template, err = template.New(s.Name).
+		Funcs(sprig.TxtFuncMap()).
+		Funcs(cnvrgTemplateFuncs()).
+		Parse(string(b))
 	if err != nil {
 		zap.S().Error(err, "parse error", "file", s.Name)
 		return err

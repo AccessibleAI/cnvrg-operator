@@ -17,10 +17,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"strings"
-	"time"
 )
 
-const CNVRGAPP_FINALIZER = "cnvrgapp.mlops.cnvrg.io/finalizer"
+const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
 
 type CnvrgAppReconciler struct {
 	client.Client
@@ -45,19 +44,19 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Setup finalizer
 	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER) {
-			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER)
+		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(ctx, desiredSpec); err != nil {
 				r.Log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
-		if containsString(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER) {
+		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			if err := r.cleanup(desiredSpec); err != nil {
 				return ctrl.Result{}, err
 			}
-			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CNVRGAPP_FINALIZER)
+			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			cnvrgApp, err := r.getCnvrgSpec(req)
 			if err != nil {
 				return ctrl.Result{}, err
@@ -145,7 +144,6 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 }
 
 func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
-	r.Log.Info("running finalizer")
 	ctx := context.Background()
 	// remove istio
 	istioManifests := networking.State(desiredSpec)
@@ -174,7 +172,6 @@ func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 				if istioExists {
 					r.Log.Info("istio instance still present, will sleep of 1 sec, and check again...")
 				}
-				time.Sleep(20 * time.Second)
 			}
 		}
 	}
