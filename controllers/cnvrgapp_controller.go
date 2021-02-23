@@ -17,6 +17,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
 )
 
@@ -33,6 +34,7 @@ type CnvrgAppReconciler struct {
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
+
 	r.Log.Info("starting reconciliation")
 	desiredSpec, err := r.defineDesiredSpec(req)
 	if err != nil {
@@ -43,6 +45,9 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
+	// set reconciling status
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec)
+
 	// Setup finalizer
 	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
@@ -51,7 +56,6 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				r.Log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
-			r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "", desiredSpec)
 		}
 	} else {
 		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
@@ -91,7 +95,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "Successfully Reconciled", desiredSpec)
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec)
 	return ctrl.Result{}, nil
 }
 
@@ -217,7 +221,9 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		cnvrgAppController.Owns(u)
 	}
 
+	pred := predicate.GenerationChangedPredicate{}
 	return cnvrgAppController.
+		WithEventFilter(pred).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

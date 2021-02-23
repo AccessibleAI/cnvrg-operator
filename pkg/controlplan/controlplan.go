@@ -17,6 +17,14 @@ var webAppState = []*desired.State{
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.DeploymentGVR],
 	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/webapp/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+	},
 }
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
