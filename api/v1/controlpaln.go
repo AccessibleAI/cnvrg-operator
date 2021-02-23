@@ -90,17 +90,17 @@ type SMTP struct {
 }
 
 type OauthProxy struct {
-	Enabled       string `yaml:"enabled"`
-	Image         string `yaml:"image"`
-	AdminUser     string `yaml:"adminUser"`
-	Provider      string `yaml:"provider"`
-	EmailDomain   string `yaml:"emailDomain"`
-	RedirectURI   string `yaml:"redirectUri"`
-	ClientID      string `yaml:"clientId"`
-	ClientSecret  string `yaml:"clientSecret"`
-	CookieSecret  string `yaml:"cookieSecret"`
-	AzureTenant   string `yaml:"azureTenant"`
-	OidcIssuerURL string `yaml:"oidcIssuerUrl"`
+	Enabled       string `json:"enabled,omitempty"`
+	Image         string `json:"image,omitempty"`
+	AdminUser     string `json:"adminUser,omitempty"`
+	Provider      string `json:"provider,omitempty"`
+	EmailDomain   string `json:"emailDomain,omitempty"`
+	RedirectURI   string `json:"redirectUri,omitempty"`
+	ClientID      string `json:"clientId,omitempty"`
+	ClientSecret  string `json:"clientSecret,omitempty"`
+	CookieSecret  string `json:"cookieSecret,omitempty"`
+	AzureTenant   string `json:"azureTenant,omitempty"`
+	OidcIssuerURL string `json:"oidcIssuerUrl,omitempty"`
 }
 
 type Conf struct {
@@ -182,7 +182,7 @@ var controlPlanDefault = ControlPlan{
 	WebApp: WebApp{
 		Replicas:                1,
 		Enabled:                 "true",
-		Image:                   "",
+		Image:                   "cnvrg/core:3.1.5",
 		Port:                    80,
 		CPU:                     2,
 		Memory:                  "4Gi",

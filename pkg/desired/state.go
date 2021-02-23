@@ -39,15 +39,16 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 	b, err := ioutil.ReadAll(f)
 
 	if err != nil {
-		zap.S().Error(err, "error reading file", "path", s.TemplatePath)
+		zap.S().Errorf("%v, error reading file: %v", err, s.TemplatePath)
 		return err
 	}
-	s.Template, err = template.New(s.Name).
+
+	s.Template, err = template.New(strings.ReplaceAll(s.TemplatePath, "/", "-")).
 		Funcs(sprig.TxtFuncMap()).
 		Funcs(cnvrgTemplateFuncs()).
 		Parse(string(b))
 	if err != nil {
-		zap.S().Error(err, "parse error", "file", s.Name)
+		zap.S().Errorf("%v, template: %v", err, s.TemplatePath)
 		return err
 	}
 	s.Obj.SetGroupVersionKind(s.GVR)
@@ -59,7 +60,7 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 	zap.S().Debug("template: " + s.TemplatePath + "\n" + s.ParsedTemplate)
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
-		zap.S().Error(err, "parsing object", "template", s.ParsedTemplate)
+		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
 		return err
 	}
 	s.Name = s.Obj.Object["metadata"].(map[string]interface{})["name"].(string)

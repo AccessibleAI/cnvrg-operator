@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/pg"
@@ -50,6 +51,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				r.Log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
+			r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "", desiredSpec)
 		}
 	} else {
 		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
@@ -73,15 +75,33 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// PostgreSQL
 	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 		return ctrl.Result{}, err
 	}
 
 	// Networking
 	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 		return ctrl.Result{}, err
 	}
 
+	// ControlPlan
+	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "Successfully Reconciled", desiredSpec)
 	return ctrl.Result{}, nil
+}
+
+func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, desiredSpec *mlopsv1.CnvrgApp) {
+	ctx := context.Background()
+	desiredSpec.Status.Status = status
+	desiredSpec.Status.Message = message
+	if err := r.Status().Update(ctx, desiredSpec); err != nil {
+		r.Log.Error(err, "can't update status")
+	}
 }
 
 func (r *CnvrgAppReconciler) defineDesiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, error) {
@@ -116,7 +136,6 @@ func (r *CnvrgAppReconciler) getCnvrgSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, 
 }
 
 func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
-
 	ctx := context.Background()
 	for _, s := range desiredManifests {
 		if err := s.GenerateDeployable(desiredSpec); err != nil {

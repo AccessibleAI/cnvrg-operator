@@ -1,29 +1,17 @@
-/*
-
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type OperatorStatus string
 
-// CnvrgAppSpec defines the desired state of CnvrgApp
+const (
+	STATUS_ERROR       OperatorStatus = "ERROR"
+	STATUS_RECONCILING OperatorStatus = "RECONCILING"
+	STATUS_HEALTHY     OperatorStatus = "HEALTHY"
+)
+
 type CnvrgAppSpec struct {
 	CnvrgNs       string      `json:"cnvrgNs,omitempty"`
 	ClusterDomain string      `json:"clusterDomain,omitempty"`
@@ -31,21 +19,21 @@ type CnvrgAppSpec struct {
 	Pg            Pg          `json:"pg,omitempty"`
 	Storage       Storage     `json:"storage,omitempty"`
 	Networking    Networking  `json:"networking,omitempty"`
+	Minio         Minio       `json:"minio,omitempty"`
 }
 
-// CnvrgAppStatus defines the observed state of CnvrgApp
 type CnvrgAppStatus struct {
-	Message string `json:"message,omitempty"`
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Status   OperatorStatus `json:"status,omitempty"`
+	Message  string         `json:"message,omitempty"`
+	Progress string         `json:"progress,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlan.webApp.image`
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlan.webapp.image`
+// +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
+// +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
 // +kubebuilder:resource:scope=Cluster
 // +kubebuilder:subresource:status
-
-// CnvrgApp is the Schema for the cnvrgapps API
 type CnvrgApp struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -55,8 +43,6 @@ type CnvrgApp struct {
 }
 
 // +kubebuilder:object:root=true
-
-// CnvrgAppList contains a list of CnvrgApp
 type CnvrgAppList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -74,4 +60,5 @@ var DefaultSpec = CnvrgAppSpec{
 	Storage:       storageDefault,
 	ControlPlan:   controlPlanDefault,
 	Networking:    networkingDefault,
+	Minio:         minioDefaults,
 }

@@ -17,13 +17,18 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.controlPlan.webApp.image
+    - jsonPath: .spec.controlPlan.webapp.image
       name: Version
+      type: string
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - jsonPath: .status.message
+      name: Message
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: CnvrgApp is the Schema for the cnvrgapps API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -38,7 +43,6 @@ spec:
           metadata:
             type: object
           spec:
-            description: CnvrgAppSpec defines the desired state of CnvrgApp
             properties:
               clusterDomain:
                 type: string
@@ -128,6 +132,31 @@ spec:
                         type: object
                       minioSseMasterKey:
                         type: string
+                      oauthProxy:
+                        properties:
+                          adminUser:
+                            type: string
+                          azureTenant:
+                            type: string
+                          clientId:
+                            type: string
+                          clientSecret:
+                            type: string
+                          cookieSecret:
+                            type: string
+                          emailDomain:
+                            type: string
+                          enabled:
+                            type: string
+                          image:
+                            type: string
+                          oidcIssuerUrl:
+                            type: string
+                          provider:
+                            type: string
+                          redirectUri:
+                            type: string
+                        type: object
                       passengerAppEnv:
                         type: string
                       railsEnv:
@@ -192,6 +221,8 @@ spec:
                         type: object
                       useStdout:
                         type: string
+                    required:
+                    - oauthProxy
                     type: object
                   hyper:
                     properties:
@@ -279,8 +310,6 @@ spec:
                     properties:
                       cpu:
                         type: integer
-                      enableReadinessProbe:
-                        type: string
                       enabled:
                         type: string
                       failureThreshold:
@@ -306,6 +335,43 @@ spec:
                       svcName:
                         type: string
                     type: object
+                type: object
+              minio:
+                properties:
+                  cpuRequest:
+                    type: integer
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  memoryRequest:
+                    type: string
+                  nodePort:
+                    type: integer
+                  port:
+                    type: integer
+                  replicas:
+                    type: integer
+                  sharedStorage:
+                    properties:
+                      consistentHash:
+                        properties:
+                          key:
+                            type: string
+                          value:
+                            type: string
+                        type: object
+                      enabled:
+                        type: string
+                      useExistingClaim:
+                        type: string
+                    type: object
+                  storageClass:
+                    type: string
+                  storageSize:
+                    type: string
+                  svcName:
+                    type: string
                 type: object
               networking:
                 properties:
@@ -473,9 +539,12 @@ spec:
                 type: object
             type: object
           status:
-            description: CnvrgAppStatus defines the observed state of CnvrgApp
             properties:
               message:
+                type: string
+              progress:
+                type: string
+              status:
                 type: string
             type: object
         type: object

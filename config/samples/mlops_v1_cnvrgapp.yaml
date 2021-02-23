@@ -1,12 +1,16 @@
 apiVersion: mlops.cnvrg.io/v1
 kind: CnvrgApp
 metadata:
-  name: cnvrgapp-sample
+  name: cnvrgapp
 spec:
+  controlPlan:
+    webapp:
+      image: "cnvrg/core:3.1.5"
   networking:
+    enabled: "false"
     ingressType: "istio"
     istio:
-      enabled: "true"
+      enabled: "false"
       ingressSvcAnnotations: "foo: bla     ;bar         : bla-bla    "
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"

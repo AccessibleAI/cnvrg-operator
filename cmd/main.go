@@ -76,6 +76,7 @@ func setupLogging() {
 func informPkger() {
 	pkger.Include("/pkg/pg/tmpl")
 	pkger.Include("/pkg/networking/tmpl")
+	pkger.Include("/pkg/controlplan/tmpl")
 }
 
 func main() {

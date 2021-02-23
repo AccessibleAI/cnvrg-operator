@@ -7,93 +7,9 @@ import (
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"os"
-	//"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 const path = "/pkg/networking/tmpl"
-
-var crdsState = []*desired.State{
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/authorizationpolicies.security.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/destinationrules.networking.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/envoyfilters.networking.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/istiooperators.install.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/authorizationpolicies.security.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/peerauthentications.security.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/requestauthentications.security.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/sidecars.networking.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/workloadentries.networking.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/crd/workloadgroups.networking.istio.io.yaml",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.CrdGVR],
-	},
-}
 
 var istioState = []*desired.State{
 	{
@@ -170,8 +86,14 @@ var istioVsState = []*desired.State{
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.Networking.Enabled == "true" && cnvrgApp.Spec.Networking.Istio.Enabled == "true" {
+	if cnvrgApp.Spec.Networking.Enabled == "false" {
+		return state
+	}
+	if cnvrgApp.Spec.Networking.Istio.Enabled == "true" {
 		state = append(state, istioState...)
+	}
+	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
+		// set istio VSs and GWs here
 	}
 	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.OpenShiftIngress {
 		state = append(state, ocpRoutesState...)
