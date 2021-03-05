@@ -16,6 +16,7 @@ var state = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -24,6 +25,7 @@ var state = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -32,6 +34,7 @@ var state = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -40,6 +43,7 @@ var state = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
 	},
 }
 

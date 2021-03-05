@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .Spec.Pg.SvcName }}
-  namespace: {{ .ObjectMeta.Namespace }}
+  namespace: {{ .Spec.CnvrgNs }}
 spec:
   accessModes:
     - ReadWriteOnce

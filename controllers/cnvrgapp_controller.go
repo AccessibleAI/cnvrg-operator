@@ -10,10 +10,12 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -31,6 +33,7 @@ type CnvrgAppReconciler struct {
 
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=*,resources=*,verbs=*
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
@@ -141,24 +144,26 @@ func (r *CnvrgAppReconciler) getCnvrgSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, 
 
 func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
 	ctx := context.Background()
-	for _, s := range desiredManifests {
-		if err := s.GenerateDeployable(desiredSpec); err != nil {
-			r.Log.Error(err, "error generating deployable", "name", s.Name)
+	for _, manifest := range desiredManifests {
+		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
+			r.Log.Error(err, "error generating deployable", "name", manifest.Name)
 			return err
 		}
-		if err := ctrl.SetControllerReference(desiredSpec, s.Obj, r.Scheme); err != nil {
-			r.Log.Error(err, "error setting controller reference", "name", s.Name)
-			return err
+		if manifest.Own {
+			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, r.Scheme); err != nil {
+				r.Log.Error(err, "error setting controller reference", "name", manifest.Name)
+				return err
+			}
 		}
 		if viper.GetBool("dry-run") {
 			r.Log.Info("dry run enabled, skipping applying...")
 			continue
 		}
-		err := r.Get(ctx, types.NamespacedName{Name: s.Name, Namespace: desiredSpec.Spec.CnvrgNs}, s.Obj)
+		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.Spec.CnvrgNs}, manifest.Obj)
 		if err != nil && errors.IsNotFound(err) {
-			r.Log.Info("creating", "name", s.Name, "kind", s.GVR.Kind)
-			if err := r.Create(ctx, s.Obj); err != nil {
-				r.Log.Error(err, "error creating object", "name", s.Name)
+			r.Log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
+			if err := r.Create(ctx, manifest.Obj); err != nil {
+				r.Log.Error(err, "error creating object", "name", manifest.Name)
 				return err
 			}
 		}
@@ -202,6 +207,16 @@ func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
+
+	if viper.GetBool("deploy-depended-crds") == false {
+		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
+	}
+	if viper.GetBool("own-istio-resources") {
+		if err := r.apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}); err != nil {
+			r.Log.Error(err, "can't apply networking CRDs")
+			os.Exit(1)
+		}
+	}
 
 	cnvrgAppController := ctrl.NewControllerManagedBy(mgr).For(&mlopsv1.CnvrgApp{})
 

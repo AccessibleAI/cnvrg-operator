@@ -57,6 +57,7 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 	s.ParsedTemplate = tpl.String()
+	zap.S().Infof("parsing: %v ", s.TemplatePath)
 	zap.S().Debug("template: " + s.TemplatePath + "\n" + s.ParsedTemplate)
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
@@ -64,6 +65,7 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 	s.Name = s.Obj.Object["metadata"].(map[string]interface{})["name"].(string)
+
 	return nil
 }
 

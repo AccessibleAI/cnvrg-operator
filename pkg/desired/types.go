@@ -13,4 +13,5 @@ type State struct {
 	ParsedTemplate string
 	Obj            *unstructured.Unstructured
 	GVR            schema.GroupVersionKind
+	Own            bool
 }

@@ -19,6 +19,7 @@ var istioState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -27,6 +28,7 @@ var istioState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -35,6 +37,7 @@ var istioState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -43,6 +46,7 @@ var istioState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -51,6 +55,7 @@ var istioState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -59,6 +64,7 @@ var istioState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.IstioGVR],
+		Own:            true,
 	},
 }
 
@@ -70,6 +76,7 @@ var ocpRoutesState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.OcpRouteGVR],
+		Own:            true,
 	},
 }
 
@@ -81,6 +88,7 @@ var istioVsState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
 	},
 }
 
@@ -104,7 +112,7 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	return state
 }
 
-func LoadCrds() (crds []*desired.State) {
+func Crds() (crds []*desired.State) {
 	err := pkger.Walk(path+"/istio/crds", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
@@ -116,14 +124,14 @@ func LoadCrds() (crds []*desired.State) {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.CrdGVR],
+			Own:            false,
 		}
-		if err := crd.GenerateDeployable(nil); err != nil {
-			zap.S().Error(err, "error loading istio crds")
-
-		}
-		if err := crd.Apply(); err != nil {
-			zap.S().Error(err, "error applying crd")
-		}
+		//if err := crd.GenerateDeployable(nil); err != nil {
+		//	zap.S().Error(err, "error loading istio crds")
+		//}
+		//if err := crd.Apply(); err != nil {
+		//	zap.S().Error(err, "error applying crd")
+		//}
 		crds = append(crds, crd)
 		return nil
 	})

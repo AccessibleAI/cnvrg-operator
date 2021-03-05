@@ -19,12 +19,12 @@ test: generate fmt vet manifests
 
 pack:
 	pkger
-	sed 's/cnvrg-operator/main/g' pkged.go > cmd/pkged.go
-	rm -fr pkged.go
+	#sed 's/cnvrg-operator/main/g' pkged.go > cmd/pkged.go
+	#rm -fr pkged.go
 
 # Build manager binary
 manager: pack generate fmt vet
-	go build -o bin/cnvrg-operator cmd/main.go cmd/manager.go cmd/pkged.go
+	go build -o bin/cnvrg-operator main.go pkged.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
@@ -61,7 +61,7 @@ generate: controller-gen
 
 # Build the docker image
 docker-build: test
-	docker build . -t ${IMG}
+		docker build . -t ${IMG}
 
 # Push the docker image
 docker-push:

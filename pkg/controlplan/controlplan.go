@@ -16,6 +16,7 @@ var webAppState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -24,7 +25,9 @@ var webAppState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
 	},
+
 }
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {

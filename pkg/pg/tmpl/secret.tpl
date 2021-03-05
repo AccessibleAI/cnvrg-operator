@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: pg-secret
-  namespace: {{ .ObjectMeta.Namespace }}
+  namespace: {{ .Spec.CnvrgNs }}
 data:
   POSTGRESQL_USER: {{ .Spec.Pg.User | b64enc }}
   POSTGRESQL_PASSWORD: {{ .Spec.Pg.Pass | b64enc }}

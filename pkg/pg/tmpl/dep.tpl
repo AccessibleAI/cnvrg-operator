@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{.Spec.Pg.SvcName}}
-  namespace: {{ .ObjectMeta.Namespace }}
+  namespace: {{ .Spec.CnvrgNs }}
   labels:
     app: {{.Spec.Pg.SvcName}}
 spec:
@@ -18,23 +18,23 @@ spec:
         app: {{.Spec.Pg.SvcName}}
     spec:
       serviceAccountName: {{ .Spec.ControlPlan.Conf.Rbac.ServiceAccountName }}
-      {{- if and (eq .Spec.Tenancy.Enabled "true") (eq .Spec.Tenancy.DedicatedNodes "true") }}
+      {{- if and (eq .Spec.ControlPlan.Conf.Tenancy.Enabled "true") (eq .Spec.ControlPlan.Conf.Tenancy.DedicatedNodes "true") }}
       tolerations:
-        - key: {{ .Spec.Tenancy.Cnvrg.Key }}
+        - key: {{ .Spec.ControlPlan.Conf.Tenancy.Key }}
           operator: Equal
-          value: {{ .Spec.Tenancy.Cnvrg.Value }}
+          value: {{ .Spec.ControlPlan.Conf.Tenancy.Value }}
           effect: "NoSchedule"
       {{- end }}
       securityContext:
         runAsUser: {{ .Spec.Pg.RunAsUser }}
         fsGroup: {{ .Spec.Pg.FsGroup }}
-      {{- if and (eq .Spec.Storage.Hostpath.Enabled "true") (eq .Spec.Tenancy.Enabled "false") }}
+      {{- if and (eq .Spec.Storage.Hostpath.Enabled "true") (eq .Spec.ControlPlan.Conf.Tenancy.Enabled "false") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.Storage.Hostpath.NodeName }}"
-      {{- else if and (eq .Spec.Storage.Hostpath.Enabled "false") (eq .Spec.Tenancy.Enabled "true") }}
+      {{- else if and (eq .Spec.Storage.Hostpath.Enabled "false") (eq .Spec.ControlPlan.Conf.Tenancy.Enabled "true") }}
       nodeSelector:
       {{ .Spec.Tenancy.Cnvrg.Key }}: "{{ .Spec.Tenancy.Cnvrg.Value }}"
-      {{- else if and (eq .Spec.Storage.Hostpath.Enabled "true") (eq .Spec.Tenancy.Enabled "true") }}
+      {{- else if and (eq .Spec.Storage.Hostpath.Enabled "true") (eq .Spec.ControlPlan.Conf.Tenancy.Enabled "true") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.Storage.Hostpath.NodeName }}"
         {{ .Spec.Tenancy.Cnvrg.Key }}: "{{ .Spec.Tenancy.Cnvrg.Value }}"

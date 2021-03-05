@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Spec.Pg.SvcName }}
-  namespace: {{ .ObjectMeta.Namespace }}
+  namespace: {{ .Spec.CnvrgNs }}
   labels:
     app: cnvrg-postgres
 spec:
