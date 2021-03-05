@@ -1,10 +1,10 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Spec.ControlPlan.WebApp.SvcName }}
-  namespace: {{ .Spec.CnvrgNs }}
+  name: {{ .ControlPlan.WebApp.SvcName }}
+  namespace: {{ .CnvrgNs }}
 spec:
   hosts:
-    - {{ .Spec.ControlPlan.WebApp.SvcName}}.{{split ":" .Spec.ClusterDomain}}
+    - {{ .ControlPlan.WebApp.SvcName}}.{{split ":" .ClusterDomain}}
   gateways:
-    - {{ .Spec.Networking.Istio.GwName}}
+    - {{ .Networking.Istio.GwName}}

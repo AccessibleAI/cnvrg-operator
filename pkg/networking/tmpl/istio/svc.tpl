@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace:  {{ .Spec.CnvrgNs }}
+  namespace:  {{ .CnvrgNs }}
   labels:
     name: istio-operator
   name: istio-operator

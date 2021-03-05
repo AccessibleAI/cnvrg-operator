@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Spec.Pg.SvcName }}
-  namespace: {{ .Spec.CnvrgNs }}
+  name: {{ .Pg.SvcName }}
+  namespace: {{ .CnvrgNs }}
   labels:
     app: cnvrg-postgres
 spec:
   ports:
-    - port: {{.Spec.Pg.Port}}
+    - port: {{.Pg.Port}}
   selector:
-    app: {{ .Spec.Pg.SvcName }}
+    app: {{ .Pg.SvcName }}

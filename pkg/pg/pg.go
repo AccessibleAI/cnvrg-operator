@@ -47,8 +47,8 @@ var state = []*desired.State{
 	},
 }
 
-func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
-	if cnvrgApp.Spec.Pg.Enabled == "true" {
+func State(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) []*desired.State {
+	if cnvrgAppSpec.Pg.Enabled == "true" {
 		return state
 	}
 	return nil

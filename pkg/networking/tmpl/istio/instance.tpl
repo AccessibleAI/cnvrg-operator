@@ -2,50 +2,50 @@ apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 metadata:
   name: cnvrg-istio
-  namespace:  {{ .Spec.CnvrgNs }}
+  namespace:  {{ .CnvrgNs }}
 spec:
   profile: minimal
-  namespace:  {{ .Spec.CnvrgNs }}
-  hub: {{ .Spec.Networking.Istio.Hub }}
-  tag: {{ .Spec.Networking.Istio.Tag }}
+  namespace:  {{ .CnvrgNs }}
+  hub: {{ .Networking.Istio.Hub }}
+  tag: {{ .Networking.Istio.Tag }}
   values:
     global:
-      istioNamespace:  {{ .Spec.CnvrgNs }}
+      istioNamespace:  {{ .CnvrgNs }}
       imagePullSecrets:
-        - {{ .Spec.ControlPlan.Conf.Registry.Name }}
+        - {{ .ControlPlan.Conf.Registry.Name }}
     meshConfig:
-      rootNamespace:  {{ .Spec.CnvrgNs }}
+      rootNamespace:  {{ .CnvrgNs }}
   components:
     base:
       enabled: true
     pilot:
       enabled: true
       k8s:
-        {{- if eq .Spec.ControlPlan.Conf.Tenancy.Enabled "true" }}
+        {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
         nodeSelector:
-          {{ .Spec.ControlPlan.Conf.Tenancy.Key }}: "{{ .Spec.ControlPlan.Conf.Tenancy.Value }}"
+          {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
         {{- end }}
         tolerations:
-        - key: "{{ .Spec.ControlPlan.Conf.Tenancy.Key }}"
+        - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .Spec.ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
           effect: "NoSchedule"
     ingressGateways:
     - enabled: true
       name: istio-ingressgateway
       k8s:
-        {{- if eq .Spec.ControlPlan.Conf.Tenancy.Enabled "true" }}
+        {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
         nodeSelector:
-          {{ .Spec.ControlPlan.Conf.Tenancy.Key }}: "{{ .Spec.ControlPlan.Conf.Tenancy.Value }}"
+          {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
         {{- end }}
         tolerations:
-        - key: "{{ .Spec.ControlPlan.Conf.Tenancy.Key }}"
+        - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .Spec.ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
           effect: "NoSchedule"
-        {{- if ne .Spec.Networking.Istio.IngressSvcAnnotations "" }}
+        {{- if ne .Networking.Istio.IngressSvcAnnotations "" }}
         serviceAnnotations:
-          {{- $annotations := split ";" .Spec.Networking.Istio.IngressSvcAnnotations }}
+          {{- $annotations := split ";" .Networking.Istio.IngressSvcAnnotations }}
             {{- range $idx, $annotation := $annotations }}
               {{- $annotationItem := split ":" $annotation}}
               {{- if eq (len $annotationItem) 2 }}
@@ -76,19 +76,19 @@ spec:
             cpu: 100m
             memory: 128Mi
         service:
-          {{- if ne .Spec.Networking.Istio.LoadBalancerSourceRanges "" }}
+          {{- if ne .Networking.Istio.LoadBalancerSourceRanges "" }}
           loadBalancerSourceRanges:
-            {{- $srouceRanges := split ";" .Spec.Networking.Istio.LoadBalancerSourceRanges }}
+            {{- $srouceRanges := split ";" .Networking.Istio.LoadBalancerSourceRanges }}
             {{- range $idx, $range := $srouceRanges }}
               {{- if ne (trim $range) "" }}
             - {{trim $range}}
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if ne .Spec.Networking.Istio.ExternalIP "" }}
+          {{- if ne .Networking.Istio.ExternalIP "" }}
           type: ClusterIP
           externalIPs:
-          {{- $ips := split ";" .Spec.Networking.Istio.ExternalIP }}
+          {{- $ips := split ";" .Networking.Istio.ExternalIP }}
           {{- range $idx, $ip := $ips }}
             {{- if ne (trim $ip) "" }}
             - {{trim $ip}}
@@ -102,8 +102,8 @@ spec:
           - name: https
             port: 443
             targetPort: 8443
-          {{- if ne .Spec.Networking.Istio.IngressSvcExtraPorts "" }}
-          {{- $ports := split ";" .Spec.Networking.Istio.IngressSvcExtraPorts }}
+          {{- if ne .Networking.Istio.IngressSvcExtraPorts "" }}
+          {{- $ports := split ";" .Networking.Istio.IngressSvcExtraPorts }}
           {{- range $idx, $port := $ports }}
             {{- if ne (trim $port) "" }}
           - name: port{{trim $port}}

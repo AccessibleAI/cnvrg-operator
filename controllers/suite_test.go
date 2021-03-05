@@ -41,7 +41,7 @@ import (
 var cfg *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
-var useExistingCluster = false
+var useExistingCluster = true
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)

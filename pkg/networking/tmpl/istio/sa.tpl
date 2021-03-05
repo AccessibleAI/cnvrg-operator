@@ -1,5 +1,5 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace:  {{ .Spec.CnvrgNs }}
+  namespace:  {{ .CnvrgNs }}
   name: istio-operator

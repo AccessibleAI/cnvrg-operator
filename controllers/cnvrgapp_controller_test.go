@@ -59,7 +59,7 @@ var _ = Describe("CnvrgApp controller", func() {
 		})
 	})
 	Context("Test PG2", func() {
-		It("No tenancy is set", func() {
+		It("Tenancy is set", func() {
 			cnvrgapp := "test-with-tenancy"
 			ns := "test-with-tenancy"
 			ctx := context.Background()

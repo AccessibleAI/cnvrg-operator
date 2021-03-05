@@ -15,4 +15,4 @@ spec:
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"
   pg:
-    enabled: "false"
+    enabled: "true"

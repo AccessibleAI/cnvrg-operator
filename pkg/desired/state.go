@@ -24,7 +24,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 	}
 }
 
-func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
+func (s *State) GenerateDeployable(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) error {
 	var tpl bytes.Buffer
 	f, err := pkger.Open(s.TemplatePath)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 	s.Obj.SetGroupVersionKind(s.GVR)
-	if err := s.Template.Execute(&tpl, cnvrgApp); err != nil {
+	if err := s.Template.Execute(&tpl, cnvrgAppSpec); err != nil {
 		zap.S().Error(err, "rendering template error", "file", s.TemplatePath)
 		return err
 	}

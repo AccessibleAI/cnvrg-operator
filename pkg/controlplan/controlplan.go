@@ -27,12 +27,11 @@ var webAppState = []*desired.State{
 		GVR:            desired.Kinds[desired.SvcGVR],
 		Own:            true,
 	},
-
 }
 
-func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
+func State(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
+	if cnvrgAppSpec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
 	}
 	return state

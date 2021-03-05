@@ -36,36 +36,42 @@ type CnvrgAppReconciler struct {
 // +kubebuilder:rbac:groups=*,resources=*,verbs=*
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
 
+	ctx := context.Background()
 	r.Log.Info("starting reconciliation")
-	desiredSpec, err := r.defineDesiredSpec(req)
+
+	cnvrgApp, err := r.getCnvrgSpec(req)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	// probably cnvrgapp was removed
+	if cnvrgApp == nil {
+		return ctrl.Result{}, nil
+	}
+
+	desiredSpec, err := r.defineDesiredSpec(&cnvrgApp.Spec)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
-	if desiredSpec == nil {
-		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
-	}
-
 	// set reconciling status
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec)
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgApp)
 
 	// Setup finalizer
-	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(ctx, desiredSpec); err != nil {
+	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			if err := r.Update(ctx, cnvrgApp); err != nil {
 				r.Log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
-		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			if err := r.cleanup(desiredSpec); err != nil {
 				return ctrl.Result{}, err
 			}
-			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			cnvrgApp, err := r.getCnvrgSpec(req)
 			if err != nil {
 				return ctrl.Result{}, err
@@ -73,7 +79,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			if cnvrgApp == nil {
 				return ctrl.Result{}, nil
 			}
-			if err := r.Update(ctx, desiredSpec); err != nil {
+			if err := r.Update(ctx, cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -81,24 +87,24 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// PostgreSQL
-	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+	if err := r.apply(pg.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
 		return ctrl.Result{}, err
 	}
 
 	// Networking
-	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+	if err := r.apply(networking.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
 		return ctrl.Result{}, err
 	}
 
 	// ControlPlan
-	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+	if err := r.apply(controlplan.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
 		return ctrl.Result{}, err
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec)
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp)
 	return ctrl.Result{}, nil
 }
 
@@ -111,18 +117,11 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 	}
 }
 
-func (r *CnvrgAppReconciler) defineDesiredSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, error) {
-	cnvrgApp, err := r.getCnvrgSpec(req)
-	if err != nil {
-		return nil, err
-	}
-	// probably cnvrgapp was removed
-	if cnvrgApp == nil {
-		return nil, nil
-	}
-	desiredSpec := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}
-	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
-		r.Log.Error(err, "can't merge")
+func (r *CnvrgAppReconciler) defineDesiredSpec(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) (*mlopsv1.CnvrgAppSpec, error) {
+
+	desiredSpec := mlopsv1.DefaultSpec
+	if err := mergo.Merge(&desiredSpec, cnvrgAppSpec, mergo.WithOverride); err != nil {
+		r.Log.Error(err, "can't merge desiredSpec")
 		return nil, err
 	}
 	return &desiredSpec, nil
@@ -142,7 +141,7 @@ func (r *CnvrgAppReconciler) getCnvrgSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, 
 	return &cnvrgApp, nil
 }
 
-func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgAppSpec, cnvrgApp *mlopsv1.CnvrgApp) error {
 	ctx := context.Background()
 	for _, manifest := range desiredManifests {
 		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
@@ -150,7 +149,7 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 			return err
 		}
 		if manifest.Own {
-			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, r.Scheme); err != nil {
+			if err := ctrl.SetControllerReference(cnvrgApp, manifest.Obj, r.Scheme); err != nil {
 				r.Log.Error(err, "error setting controller reference", "name", manifest.Name)
 				return err
 			}
@@ -159,7 +158,7 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 			r.Log.Info("dry run enabled, skipping applying...")
 			continue
 		}
-		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.Spec.CnvrgNs}, manifest.Obj)
+		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.CnvrgNs}, manifest.Obj)
 		if err != nil && errors.IsNotFound(err) {
 			r.Log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
 			if err := r.Create(ctx, manifest.Obj); err != nil {
@@ -171,7 +170,7 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 	return nil
 }
 
-func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgAppSpec) error {
 	ctx := context.Background()
 	// remove istio
 	istioManifests := networking.State(desiredSpec)
@@ -192,7 +191,7 @@ func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 			r.Log.Info("has to remove istio first")
 			istioExists := true
 			for istioExists {
-				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.Spec.CnvrgNs}, m.Obj)
+				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.CnvrgNs}, m.Obj)
 				if err != nil && errors.IsNotFound(err) {
 					r.Log.Info("istio instance was successfully removed")
 					istioExists = false
@@ -212,7 +211,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
 	}
 	if viper.GetBool("own-istio-resources") {
-		if err := r.apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}); err != nil {
+		if err := r.apply(networking.Crds(), &mlopsv1.DefaultSpec, &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}); err != nil {
 			r.Log.Error(err, "can't apply networking CRDs")
 			os.Exit(1)
 		}

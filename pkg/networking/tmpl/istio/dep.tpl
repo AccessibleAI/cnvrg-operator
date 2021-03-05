@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ .Spec.CnvrgNs }}
+  namespace: {{ .CnvrgNs }}
   name: istio-operator
 spec:
   replicas: 1
@@ -14,20 +14,20 @@ spec:
         name: istio-operator
     spec:
       imagePullSecrets:
-        - name: {{ .Spec.ControlPlan.Conf.Registry.Name }}
+        - name: {{ .ControlPlan.Conf.Registry.Name }}
       serviceAccountName: istio-operator
-      {{- if eq .Spec.ControlPlan.Conf.Tenancy.Enabled "true" }}
+      {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
       nodeSelector:
-        {{ .Spec.ControlPlan.Conf.Tenancy.Key }}: "{{ .Spec.ControlPlan.Conf.Tenancy.Value }}"
+        {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: "{{ .Spec.ControlPlan.Conf.Tenancy.Key }}"
+        - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .Spec.ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
         - name: istio-operator
-          image: {{ .Spec.Networking.Istio.OperatorImage }}
+          image: {{ .Networking.Istio.OperatorImage }}
           command:
             - operator
             - server
@@ -51,9 +51,9 @@ spec:
               memory: 128Mi
           env:
             - name: WATCH_NAMESPACE
-              value:  {{ .Spec.CnvrgNs }}
+              value:  {{ .CnvrgNs }}
             - name: LEADER_ELECTION_NAMESPACE
-              value:  {{ .Spec.CnvrgNs }}
+              value:  {{ .CnvrgNs }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
