@@ -126,12 +126,6 @@ func Crds() (crds []*desired.State) {
 			GVR:            desired.Kinds[desired.CrdGVR],
 			Own:            false,
 		}
-		//if err := crd.GenerateDeployable(nil); err != nil {
-		//	zap.S().Error(err, "error loading istio crds")
-		//}
-		//if err := crd.Apply(); err != nil {
-		//	zap.S().Error(err, "error applying crd")
-		//}
 		crds = append(crds, crd)
 		return nil
 	})
