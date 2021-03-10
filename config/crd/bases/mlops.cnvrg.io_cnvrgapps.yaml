@@ -221,8 +221,6 @@ spec:
                         type: object
                       useStdout:
                         type: string
-                    required:
-                    - oauthProxy
                     type: object
                   hyper:
                     properties:

@@ -234,7 +234,6 @@ func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
-
 	if viper.GetBool("deploy-depended-crds") == false {
 		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
 	}

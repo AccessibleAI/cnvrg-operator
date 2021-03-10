@@ -22,7 +22,7 @@ spec:
       tolerations:
         - key: {{ .ControlPlan.Conf.Tenancy.Key }}
           operator: Equal
-          value: {{ .ControlPlan.Conf.Tenancy.Value }}
+          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
       securityContext:
@@ -33,7 +33,7 @@ spec:
         kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
       {{- else if and (eq .Storage.Hostpath.Enabled "false") (eq .ControlPlan.Conf.Tenancy.Enabled "true") }}
       nodeSelector:
-      {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+        {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
       {{- else if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Conf.Tenancy.Enabled "true") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"

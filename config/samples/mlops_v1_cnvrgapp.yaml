@@ -6,6 +6,9 @@ spec:
   controlPlan:
     webapp:
       image: "cnvrg/core:3.1.5"
+    conf:
+      tenancy:
+        enabled: "false"
   networking:
     enabled: "true"
     ingressType: "istio"
@@ -15,4 +18,4 @@ spec:
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"
   pg:
-    enabled: "true"
+    enabled: "false"

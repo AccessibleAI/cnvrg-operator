@@ -143,7 +143,7 @@ type Conf struct {
 	Rbac                         Rbac       `json:"rbac,omitempty"`
 	SMTP                         SMTP       `json:"smtp,omitempty"`
 	Tenancy                      Tenancy    `json:"tenancy,omitempty"`
-	OauthProxy                   OauthProxy `json:"oauthProxy"`
+	OauthProxy                   OauthProxy `json:"oauthProxy,omitempty"`
 }
 type CnvrgRouter struct {
 	Enabled  string `json:"enabled,omitempty"`
