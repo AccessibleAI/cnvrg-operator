@@ -92,21 +92,21 @@ var istioVsState = []*desired.State{
 	},
 }
 
-func State(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) []*desired.State {
+func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	if cnvrgAppSpec.Networking.Enabled == "false" {
+	if cnvrgApp.Spec.Networking.Enabled == "false" {
 		return state
 	}
-	if cnvrgAppSpec.Networking.Istio.Enabled == "true" {
+	if cnvrgApp.Spec.Networking.Istio.Enabled == "true" {
 		state = append(state, istioState...)
 	}
-	if cnvrgAppSpec.Networking.IngressType == mlopsv1.IstioIngress {
+	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
 		// set istio VSs and GWs here
 	}
-	if cnvrgAppSpec.Networking.IngressType == mlopsv1.OpenShiftIngress {
+	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.OpenShiftIngress {
 		state = append(state, ocpRoutesState...)
 	}
-	if cnvrgAppSpec.Networking.IngressType == mlopsv1.IstioIngress {
+	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
 		state = append(state, istioVsState...)
 	}
 	return state

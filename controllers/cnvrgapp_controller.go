@@ -33,43 +33,47 @@ type CnvrgAppReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+var log logr.Logger
+
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=*,resources=*,verbs=*
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
-	r.Log.Info("starting reconciliation")
-	cnvrgApp, err := r.getCnvrgSpec(req.NamespacedName)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-	// probably cnvrgapp was removed
-	if cnvrgApp == nil {
-		return ctrl.Result{}, nil
-	}
+	log = r.Log.WithValues("name", req.NamespacedName)
+	log.Info("starting reconciliation")
 
-	desiredSpec, err := r.defineDesiredSpec(&cnvrgApp.Spec)
+	desiredSpec, err := r.defineDesiredSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
+	}
+	if desiredSpec == nil {
+		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
 	// Setup finalizer
-	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), cnvrgApp); err != nil {
-				r.Log.Error(err, "failed to add finalizer")
+	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			if err := r.Update(context.Background(), desiredSpec); err != nil {
+				log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
-		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			if err := r.cleanup(desiredSpec); err != nil {
 				return ctrl.Result{}, err
 			}
-			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), cnvrgApp); err != nil {
+			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			if err := r.Update(context.Background(), desiredSpec); err != nil {
+				log.Info("error in removing finalizer, checking if cnvrgApp object still exists")
+				// if update was failed, make sure that cnvrgApp still exists
+				spec, e := r.getCnvrgSpec(req.NamespacedName)
+				if spec == nil && e == nil {
+					return ctrl.Result{}, nil // probably spec was deleted, stop reconcile
+				}
 				return ctrl.Result{}, err
 			}
 		}
@@ -77,27 +81,27 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// set reconciling status
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgApp, req.NamespacedName)
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec, req.NamespacedName)
 
 	// PostgreSQL
-	if err := r.apply(pg.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp, req.NamespacedName)
+	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
 
 	// Networking
-	if err := r.apply(networking.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp, req.NamespacedName)
+	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
 
 	// ControlPlan
-	if err := r.apply(controlplan.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp, req.NamespacedName)
+	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp, req.NamespacedName)
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec, req.NamespacedName)
 	return ctrl.Result{}, nil
 }
 
@@ -106,7 +110,7 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 	cnvrgApp.Status.Status = status
 	cnvrgApp.Status.Message = message
 	if err := r.Status().Update(ctx, cnvrgApp); err != nil {
-		r.Log.Error(err, "can't update status")
+		log.Error(err, "can't update status")
 	}
 	// This check is to make sure that the status is indeed updated
 	// short reconciliations loop might cause status to be applied but not yet saved into BD
@@ -116,29 +120,37 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 	for {
 		cnvrgApp, err := r.getCnvrgSpec(name)
 		if err != nil {
-			r.Log.Error(err, "can't validate status update")
+			log.Error(err, "can't validate status update")
 		}
-		r.Log.V(1).Info("expected status", "status", status, "message", message)
-		r.Log.V(1).Info("current status", "status", cnvrgApp.Status.Status, "message", cnvrgApp.Status.Message)
+		log.V(1).Info("expected status", "status", status, "message", message)
+		log.V(1).Info("current status", "status", cnvrgApp.Status.Status, "message", cnvrgApp.Status.Message)
 		if cnvrgApp.Status.Status == status && cnvrgApp.Status.Message == message {
 			break
 		}
 		if statusCheckAttempts == 0 {
-			r.Log.Error(fmt.Errorf("status update failed"), "can't update status")
+			log.Error(fmt.Errorf("status update failed"), "can't update status")
 		}
 		statusCheckAttempts--
-		r.Log.V(1).Info("validating status update", "attempts", statusCheckAttempts)
+		log.V(1).Info("validating status update", "attempts", statusCheckAttempts)
 		time.Sleep(1 * time.Second)
 	}
 }
 
-func (r *CnvrgAppReconciler) defineDesiredSpec(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) (*mlopsv1.CnvrgAppSpec, error) {
-
-	desiredSpec := mlopsv1.DefaultSpec
-	if err := mergo.Merge(&desiredSpec, cnvrgAppSpec, mergo.WithOverride); err != nil {
-		r.Log.Error(err, "can't merge desiredSpec")
+func (r *CnvrgAppReconciler) defineDesiredSpec(name types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
+	cnvrgApp, err := r.getCnvrgSpec(name)
+	if err != nil {
 		return nil, err
 	}
+	// probably cnvrgapp was removed
+	if cnvrgApp == nil {
+		return nil, nil
+	}
+	desiredSpec := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}
+	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
+		log.Error(err, "can't merge")
+		return nil, err
+	}
+	log = r.Log.WithValues("name", name, "ns", desiredSpec.Spec.CnvrgNs)
 	return &desiredSpec, nil
 }
 
@@ -147,37 +159,37 @@ func (r *CnvrgAppReconciler) getCnvrgSpec(namespacedName types.NamespacedName) (
 	var cnvrgApp mlopsv1.CnvrgApp
 	if err := r.Get(ctx, namespacedName, &cnvrgApp); err != nil {
 		if errors.IsNotFound(err) {
-			r.Log.Info("unable to fetch CnvrgApp, probably cr was deleted")
+			log.Info("unable to fetch CnvrgApp, probably cr was deleted")
 			return nil, nil
 		}
-		r.Log.Error(err, "unable to fetch CnvrgApp")
+		log.Error(err, "unable to fetch CnvrgApp")
 		return nil, err
 	}
 	return &cnvrgApp, nil
 }
 
-func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgAppSpec, cnvrgApp *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpec *mlopsv1.CnvrgApp) error {
 	ctx := context.Background()
 	for _, manifest := range desiredManifests {
 		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
-			r.Log.Error(err, "error generating deployable", "name", manifest.Name)
+			log.Error(err, "error generating deployable", "name", manifest.Name)
 			return err
 		}
 		if manifest.Own {
-			if err := ctrl.SetControllerReference(cnvrgApp, manifest.Obj, r.Scheme); err != nil {
-				r.Log.Error(err, "error setting controller reference", "name", manifest.Name)
+			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, r.Scheme); err != nil {
+				log.Error(err, "error setting controller reference", "name", manifest.Name)
 				return err
 			}
 		}
 		if viper.GetBool("dry-run") {
-			r.Log.Info("dry run enabled, skipping applying...")
+			log.Info("dry run enabled, skipping applying...")
 			continue
 		}
-		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.CnvrgNs}, manifest.Obj)
+		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.Spec.CnvrgNs}, manifest.Obj)
 		if err != nil && errors.IsNotFound(err) {
-			r.Log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
+			log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
 			if err := r.Create(ctx, manifest.Obj); err != nil {
-				r.Log.Error(err, "error creating object", "name", manifest.Name)
+				log.Error(err, "error creating object", "name", manifest.Name)
 				return err
 			}
 		}
@@ -185,7 +197,7 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 	return nil
 }
 
-func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgAppSpec) error {
+func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 	ctx := context.Background()
 	// remove istio
 	istioManifests := networking.State(desiredSpec)
@@ -193,26 +205,27 @@ func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgAppSpec) error {
 		// Make sure IstioOperator was deployed
 		if m.GVR == desired.Kinds[desired.IstioGVR] {
 			if err := m.GenerateDeployable(desiredSpec); err != nil {
-				r.Log.Error(err, "can't make manifest deployable")
+				log.Error(err, "can't make manifest deployable")
 				return err
 			}
 			if err := r.Delete(ctx, m.Obj); err != nil {
 				if errors.IsNotFound(err) {
-					r.Log.Info("istio instance not found - probably removed previously")
+					log.Info("istio instance not found - probably removed previously")
 					return nil
 				}
 				return err
 			}
-			r.Log.Info("has to remove istio first")
+
 			istioExists := true
+			log.Info("wait for istio instance removal")
 			for istioExists {
-				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.CnvrgNs}, m.Obj)
+				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.Spec.CnvrgNs}, m.Obj)
 				if err != nil && errors.IsNotFound(err) {
-					r.Log.Info("istio instance was successfully removed")
+					log.Info("istio instance was successfully removed")
 					istioExists = false
 				}
 				if istioExists {
-					r.Log.Info("istio instance still present, will sleep of 1 sec, and check again...")
+					log.Info("istio instance still present, will sleep of 1 sec, and check again...")
 				}
 			}
 		}
@@ -226,8 +239,8 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
 	}
 	if viper.GetBool("own-istio-resources") {
-		if err := r.apply(networking.Crds(), &mlopsv1.DefaultSpec, &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}); err != nil {
-			r.Log.Error(err, "can't apply networking CRDs")
+		if err := r.apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}); err != nil {
+			log.Error(err, "can't apply networking CRDs")
 			os.Exit(1)
 		}
 	}

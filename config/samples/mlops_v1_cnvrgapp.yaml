@@ -7,10 +7,10 @@ spec:
     webapp:
       image: "cnvrg/core:3.1.5"
   networking:
-    enabled: "false"
+    enabled: "true"
     ingressType: "istio"
     istio:
-      enabled: "false"
+      enabled: "true"
       ingressSvcAnnotations: "foo: bla     ;bar         : bla-bla    "
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"
