@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
@@ -21,6 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
+	"time"
 )
 
 const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
@@ -37,10 +39,8 @@ type CnvrgAppReconciler struct {
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
-	ctx := context.Background()
 	r.Log.Info("starting reconciliation")
-
-	cnvrgApp, err := r.getCnvrgSpec(req)
+	cnvrgApp, err := r.getCnvrgSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -54,17 +54,15 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	// set reconciling status
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgApp)
-
 	// Setup finalizer
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(ctx, cnvrgApp); err != nil {
+			if err := r.Update(context.Background(), cnvrgApp); err != nil {
 				r.Log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
+			return ctrl.Result{}, nil
 		}
 	} else {
 		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
@@ -72,49 +70,68 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				return ctrl.Result{}, err
 			}
 			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			cnvrgApp, err := r.getCnvrgSpec(req)
-			if err != nil {
-				return ctrl.Result{}, err
-			}
-			if cnvrgApp == nil {
-				return ctrl.Result{}, nil
-			}
-			if err := r.Update(ctx, cnvrgApp); err != nil {
+			if err := r.Update(context.Background(), cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
 		return ctrl.Result{}, nil
 	}
 
+	// set reconciling status
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgApp, req.NamespacedName)
+
 	// PostgreSQL
 	if err := r.apply(pg.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
 
 	// Networking
 	if err := r.apply(networking.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
 
 	// ControlPlan
 	if err := r.apply(controlplan.State(desiredSpec), desiredSpec, cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp)
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp, req.NamespacedName)
 	return ctrl.Result{}, nil
 }
 
-func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, desiredSpec *mlopsv1.CnvrgApp) {
+func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgApp *mlopsv1.CnvrgApp, name types.NamespacedName) {
 	ctx := context.Background()
-	desiredSpec.Status.Status = status
-	desiredSpec.Status.Message = message
-	if err := r.Status().Update(ctx, desiredSpec); err != nil {
+	cnvrgApp.Status.Status = status
+	cnvrgApp.Status.Message = message
+	if err := r.Status().Update(ctx, cnvrgApp); err != nil {
 		r.Log.Error(err, "can't update status")
 	}
+	// This check is to make sure that the status is indeed updated
+	// short reconciliations loop might cause status to be applied but not yet saved into BD
+	// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
+	// to avoid this error, fetch the object and compare the status
+	statusCheckAttempts := 10
+	for {
+		cnvrgApp, err := r.getCnvrgSpec(name)
+		if err != nil {
+			r.Log.Error(err, "can't validate status update")
+		}
+		zap.S().Debugf("current   status   [%v] [%v]", status, message)
+		zap.S().Debugf("expeceted status   [%v] [%v]", cnvrgApp.Status.Status, cnvrgApp.Status.Message)
+		if cnvrgApp.Status.Status == status && cnvrgApp.Status.Message == message {
+			break
+		}
+		if statusCheckAttempts == 0 {
+			r.Log.Error(fmt.Errorf("status update failed"), "can't update status")
+		}
+		statusCheckAttempts--
+		zap.S().Debugf("validating status update, left attempt: %v", statusCheckAttempts)
+		time.Sleep(1 * time.Second)
+	}
+
 }
 
 func (r *CnvrgAppReconciler) defineDesiredSpec(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) (*mlopsv1.CnvrgAppSpec, error) {
@@ -127,10 +144,10 @@ func (r *CnvrgAppReconciler) defineDesiredSpec(cnvrgAppSpec *mlopsv1.CnvrgAppSpe
 	return &desiredSpec, nil
 }
 
-func (r *CnvrgAppReconciler) getCnvrgSpec(req ctrl.Request) (*mlopsv1.CnvrgApp, error) {
+func (r *CnvrgAppReconciler) getCnvrgSpec(namespacedName types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
 	ctx := context.Background()
 	var cnvrgApp mlopsv1.CnvrgApp
-	if err := r.Get(ctx, req.NamespacedName, &cnvrgApp); err != nil {
+	if err := r.Get(ctx, namespacedName, &cnvrgApp); err != nil {
 		if errors.IsNotFound(err) {
 			r.Log.Info("unable to fetch CnvrgApp, probably cr was deleted")
 			return nil, nil
