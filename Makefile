@@ -19,12 +19,10 @@ test: generate fmt vet manifests
 
 pack:
 	pkger
-	#sed 's/cnvrg-operator/main/g' pkged.go > cmd/pkged.go
-	#rm -fr pkged.go
 
 # Build manager binary
 manager: pack generate fmt vet
-	go build -o bin/cnvrg-operator main.go pkged.go
+	go build -mod=readonly -o bin/cnvrg-operator main.go pkged.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests

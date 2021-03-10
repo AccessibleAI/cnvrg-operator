@@ -62,7 +62,6 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				r.Log.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
-			return ctrl.Result{}, nil
 		}
 	} else {
 		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
@@ -119,8 +118,8 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 		if err != nil {
 			r.Log.Error(err, "can't validate status update")
 		}
-		zap.S().Debugf("current   status   [%v] [%v]", status, message)
-		zap.S().Debugf("expeceted status   [%v] [%v]", cnvrgApp.Status.Status, cnvrgApp.Status.Message)
+		r.Log.V(1).Info("expected status", "status", status, "message", message)
+		r.Log.V(1).Info("current status", "status", cnvrgApp.Status.Status, "message", cnvrgApp.Status.Message)
 		if cnvrgApp.Status.Status == status && cnvrgApp.Status.Message == message {
 			break
 		}
@@ -128,10 +127,9 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 			r.Log.Error(fmt.Errorf("status update failed"), "can't update status")
 		}
 		statusCheckAttempts--
-		zap.S().Debugf("validating status update, left attempt: %v", statusCheckAttempts)
+		r.Log.V(1).Info("validating status update", "attempts", statusCheckAttempts)
 		time.Sleep(1 * time.Second)
 	}
-
 }
 
 func (r *CnvrgAppReconciler) defineDesiredSpec(cnvrgAppSpec *mlopsv1.CnvrgAppSpec) (*mlopsv1.CnvrgAppSpec, error) {
