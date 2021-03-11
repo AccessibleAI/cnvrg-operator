@@ -50,6 +50,19 @@ var rbacState = []*desired.State{
 	},
 }
 
+var cmState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/conf/cm/cm.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ConfigMapGVR],
+		Own:            true,
+	},
+}
+
+
 var webAppState = []*desired.State{
 	{
 		Name:           "",
@@ -73,8 +86,9 @@ var webAppState = []*desired.State{
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	state = append(state, registryState...)
-	state = append(state, rbacState...)
+	//state = append(state, registryState...)
+	//state = append(state, rbacState...)
+	state = append(state, cmState...)
 	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
 	}

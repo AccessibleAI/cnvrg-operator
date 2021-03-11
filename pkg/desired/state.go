@@ -9,17 +9,26 @@ import (
 	"io/ioutil"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
+	"strconv"
 	"strings"
 	"text/template"
 )
 
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
-		"httpScheme": func(httpsEnabled string) string {
-			if httpsEnabled == "true" {
+		"httpScheme": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
+			if cnvrgappspec.Networking.HTTPS.Enabled == "true" {
 				return "https://"
 			}
 			return "http://"
+		},
+		"appDomain": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
+			if cnvrgappspec.Networking.IngressType == mlopsv1.NodePortIngress {
+				return cnvrgappspec.ClusterDomain + ":" +
+					strconv.Itoa(cnvrgappspec.ControlPlan.WebApp.NodePort)
+			} else {
+				return cnvrgappspec.ControlPlan.WebApp.SvcName + "." + cnvrgappspec.ClusterDomain
+			}
 		},
 	}
 }

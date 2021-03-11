@@ -6,6 +6,7 @@ type GVRName string
 
 const (
 	DeploymentGVR         GVRName = "DeploymentGVR"
+	ConfigMapGVR          GVRName = "ConfigMapGVR"
 	PvcGVR                GVRName = "PvcGVR"
 	SecretGVR             GVRName = "SecretGVR"
 	SvcGVR                GVRName = "SvcGVR"
@@ -97,5 +98,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "rbac.authorization.k8s.io",
 		Version: "v1",
 		Kind:    "RoleBinding",
+	},
+	ConfigMapGVR: schema.GroupVersionKind{
+		Group:   "",
+		Version: "v1",
+		Kind:    "ConfigMap",
 	},
 }
