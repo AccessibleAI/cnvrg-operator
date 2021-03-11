@@ -176,28 +176,21 @@ var _ = Describe("CnvrgApp controller", func() {
 			istio := &unstructured.Unstructured{}
 			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
 
+			ns1 := &corev1.NamespaceList{}
+			err := k8sClient.List(ctx, ns1)
+			if err != nil {
+				fmt.Println("x")
+			}
+			fmt.Println("x")
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
-				fmt.Println(istio.Object["spec"])
-				//enc := json.NewEncoder(os.Stdout)
-				//enc.SetIndent("", "    ")
-				//enc.Encode(istio)
-
-
-
-				//s.Name = s.Obj.Object["metadata"].(map[string]interface{})["name"].(string)
-				//fmt.Println(istio.Object["spec"].(map[string]interface{})["components"])
-
-				//fmt.Println(istio.Object["spec"].(map[string]interface{})["components"])
-
 				if err != nil {
 					fmt.Println(err)
 					return false
 				}
+
 				return true
 			}, timeout, interval).Should(BeTrue())
-			x := istio.Object["spec"].(map[string]interface{})["components"]
-			fmt.Println(x)
 
 		})
 	})

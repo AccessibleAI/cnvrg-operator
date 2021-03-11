@@ -14,6 +14,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"strings"
 )
 
@@ -31,6 +32,7 @@ var (
 	rootParams        = []param{}
 	runOperatorParams = []param{
 		{name: "metrics-addr", shorthand: "", value: ":8080", usage: "The address the metric endpoint binds to."},
+		{name: "health-probe-addr", shorthand: "", value: ":8081", usage: "The address the health probes endpoints (/healthz, /readyz) binds to."},
 		{name: "enable-leader-election", shorthand: "", value: false, usage: "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager."},
 		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
 		{name: "verbose", shorthand: "v", value: false, usage: "Verbose output"},
@@ -96,11 +98,12 @@ func runOperator() {
 	ctrl.SetLogger(zapr.NewLogger(initZapLog()))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: viper.GetString("metrics-addr"),
-		Port:               9443,
-		LeaderElection:     viper.GetBool("enable-leader-election"),
-		LeaderElectionID:   "99748453.cnvrg.io",
+		Scheme:                 scheme,
+		MetricsBindAddress:     viper.GetString("metrics-addr"),
+		HealthProbeBindAddress: viper.GetString("health-probe-addr"),
+		Port:                   9443,
+		LeaderElection:         viper.GetBool("enable-leader-election"),
+		LeaderElectionID:       "99748453.cnvrg.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -117,6 +120,16 @@ func runOperator() {
 	}
 
 	// +kubebuilder:scaffold:builder
+
+	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to set up health check")
+		os.Exit(1)
+	}
+	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to set up ready check")
+		os.Exit(1)
+	}
+
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")

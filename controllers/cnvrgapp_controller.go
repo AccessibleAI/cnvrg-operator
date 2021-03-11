@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
@@ -128,7 +127,8 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 			break
 		}
 		if statusCheckAttempts == 0 {
-			log.Error(fmt.Errorf("status update failed"), "can't update status")
+			log.Info("can't verify status update, status checks attempts exceeded")
+			break
 		}
 		statusCheckAttempts--
 		log.V(1).Info("validating status update", "attempts", statusCheckAttempts)
@@ -198,6 +198,7 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 }
 
 func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
+	log.Info("running finalizer cleanup")
 	ctx := context.Background()
 	// remove istio
 	istioManifests := networking.State(desiredSpec)

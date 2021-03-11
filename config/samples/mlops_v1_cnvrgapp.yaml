@@ -3,6 +3,7 @@ kind: CnvrgApp
 metadata:
   name: cnvrgapp
 spec:
+  cnvrgNs: "bla-bla"
   controlPlan:
     webapp:
       image: "cnvrg/core:3.1.5"
@@ -18,4 +19,4 @@ spec:
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"
   pg:
-    enabled: "false"
+    enabled: "true"
