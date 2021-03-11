@@ -8,6 +8,18 @@ import (
 
 const path = "/pkg/controlplan/tmpl"
 
+var registryState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/conf/registry/secret.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+}
+
 var webAppState = []*desired.State{
 	{
 		Name:           "",
@@ -31,6 +43,7 @@ var webAppState = []*desired.State{
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
+	state = append(state, registryState...)
 	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
 	}

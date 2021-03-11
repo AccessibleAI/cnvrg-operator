@@ -185,11 +185,20 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 			log.Info("dry run enabled, skipping applying...")
 			continue
 		}
-		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.Spec.CnvrgNs}, manifest.Obj)
+		fetchInto := &unstructured.Unstructured{}
+		fetchInto.SetGroupVersionKind(manifest.GVR)
+		err := r.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.Spec.CnvrgNs}, fetchInto)
 		if err != nil && errors.IsNotFound(err) {
 			log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
 			if err := r.Create(ctx, manifest.Obj); err != nil {
 				log.Error(err, "error creating object", "name", manifest.Name)
+				return err
+			}
+		} else {
+			manifest.Obj.SetResourceVersion(fetchInto.GetResourceVersion())
+			err := r.Update(ctx, manifest.Obj)
+			if err != nil {
+				log.Info("error updating object", "manifest", manifest.TemplatePath)
 				return err
 			}
 		}
@@ -265,6 +274,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	pred := predicate.GenerationChangedPredicate{}
 	return cnvrgAppController.
+		For(&mlopsv1.CnvrgApp{}).
 		WithEventFilter(pred).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)

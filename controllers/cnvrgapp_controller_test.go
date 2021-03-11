@@ -3,14 +3,14 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/cnvrg-operator/pkg/desired"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/desired"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"time"
 )
@@ -185,32 +185,15 @@ var _ = Describe("CnvrgApp controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeTrue())
-			serviceAnnotations := istio.Object["spec"].
-			(map[string]interface{})["components"].
-			(map[string]interface{})["ingressGateways"].
-			([]interface{})[0].
-			(map[string]interface{})["k8s"].
-			(map[string]interface{})["serviceAnnotations"]
+			serviceAnnotations := istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["serviceAnnotations"]
 			Expect(serviceAnnotations.(map[string]interface{})["bar"]).Should(Equal("bla-bla"))
 			Expect(serviceAnnotations.(map[string]interface{})["foo"]).Should(Equal("bla"))
 
-			externalIP := istio.Object["spec"].
-			(map[string]interface{})["components"].
-			(map[string]interface{})["ingressGateways"].
-			([]interface{})[0].
-			(map[string]interface{})["k8s"].
-			(map[string]interface{})["service"].
-			(map[string]interface{})["externalIPs"]
+			externalIP := istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["service"].(map[string]interface{})["externalIPs"]
 			Expect(externalIP.([]interface{})[0]).Should(Equal("1.1.1.1"))
 			Expect(externalIP.([]interface{})[1]).Should(Equal("2.2.2.2"))
 
-			ingressSvcExtraPorts := istio.Object["spec"].
-			(map[string]interface{})["components"].
-			(map[string]interface{})["ingressGateways"].
-			([]interface{})[0].
-			(map[string]interface{})["k8s"].
-			(map[string]interface{})["service"].
-			(map[string]interface{})["ports"]
+			ingressSvcExtraPorts := istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["service"].(map[string]interface{})["ports"]
 			extraPorts := map[int64]bool{123: false, 2323: false, 2321: false}
 			var expectedRes []bool
 			for _, port := range ingressSvcExtraPorts.([]interface{}) {
@@ -247,12 +230,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeTrue())
-			nodeSelector := istio.Object["spec"].
-			(map[string]interface{})["components"].
-			(map[string]interface{})["ingressGateways"].
-			([]interface{})[0].
-			(map[string]interface{})["k8s"].
-			(map[string]interface{})["nodeSelector"]
+			nodeSelector := istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["nodeSelector"]
 			Expect(nodeSelector.(map[string]interface{})["cnvrg-taint"]).Should(Equal("true"))
 		})
 
