@@ -20,6 +20,36 @@ var registryState = []*desired.State{
 	},
 }
 
+var rbacState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/conf/rbac/role.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.RoleGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/conf/rbac/rolebinding.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.RoleBindingGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/conf/rbac/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
+}
+
 var webAppState = []*desired.State{
 	{
 		Name:           "",
@@ -44,6 +74,7 @@ var webAppState = []*desired.State{
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, registryState...)
+	state = append(state, rbacState...)
 	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
 	}

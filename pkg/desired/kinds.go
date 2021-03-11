@@ -16,6 +16,7 @@ const (
 	ClusterRoleGVR        GVRName = "ClusterRoleGVR"
 	ClusterRoleBindingGVR GVRName = "ClusterRoleBindingGVR"
 	RoleGVR               GVRName = "RoleGVR"
+	RoleBindingGVR        GVRName = "RoleBindingGVR"
 	OcpRouteGVR           GVRName = "OcpRouteGVR"
 	IstioVsGVR            GVRName = "IstioVsGVR"
 )
@@ -91,5 +92,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Kind:    "VirtualService",
 		Group:   "networking.istio.io",
 		Version: "v1alpha3",
+	},
+	RoleBindingGVR: schema.GroupVersionKind{
+		Group:   "rbac.authorization.k8s.io",
+		Version: "v1",
+		Kind:    "RoleBinding",
 	},
 }
