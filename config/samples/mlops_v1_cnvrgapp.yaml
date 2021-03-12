@@ -10,13 +10,16 @@ spec:
       image: "cnvrg/core:3.1.5"
       enabled: "false"
     conf:
-      tenancy:
-        enabled: "false"
-      registry:
-        name: "cnvrg-registry"
-        url: "docker.io"
-        user: "dimssss-bla--test-update"
-        password: "3c21c46d-8eea-4906-9445-c9cc9e41718d"
+      featureFlags:
+        flag1: "value1"
+        flag2: "value1"
+    tenancy:
+      enabled: "false"
+    registry:
+      name: "cnvrg-registry"
+      url: "docker.io"
+      user: "dimssss-bla--test-update"
+      password: "3c21c46d-8eea-4906-9445-c9cc9e41718d"
   networking:
     enabled: "false"
     https:

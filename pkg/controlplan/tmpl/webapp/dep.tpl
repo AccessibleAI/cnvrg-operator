@@ -51,7 +51,7 @@ spec:
             name: env-secrets
         name: cnvrg-app
         ports:
-          - containerPort: {{ .ControlPlan.WebApp.Port}}
+          - containerPort: {{ .ControlPlan.WebApp.Port }}
         readinessProbe:
           httpGet:
             path: "/healthz"
@@ -120,7 +120,7 @@ spec:
         imagePullPolicy: Always
       {{- end }}
       - name: seeder
-        image: {{.ControlPlan.Seeder.Image}}
+        image: {{ .ControlPlan.Seeder.Image }}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py seeder --mode master"]
         imagePullPolicy: Always
         env:
@@ -131,7 +131,7 @@ spec:
         - name: "CNVRG_NS"
           value: {{ .CnvrgNs }}
         - name: "CNVRG_SA_NAME"
-          value: "{{.ControlPlan.Conf.Rbac.ServiceAccountName}}"
+          value: "cnvrg-control-plan"
         {{- if eq .ControlPlan.Conf.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: "{{ .ControlPlan.Conf.GcpStorageSecret }}"

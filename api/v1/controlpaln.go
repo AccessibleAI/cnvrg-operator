@@ -17,23 +17,26 @@ type WebApp struct {
 }
 
 type Sidekiq struct {
-	Enabled  string `json:"enabled,omitempty"`
-	Split    string `json:"split,omitempty"`
-	CPU      string `json:"cpu,omitempty"`
-	Memory   string `json:"memory,omitempty"`
-	Replicas int    `json:"replicas,omitempty"`
+	Enabled     string         `json:"enabled,omitempty"`
+	Split       string         `json:"split,omitempty"`
+	CPU         string         `json:"cpu,omitempty"`
+	Memory      string         `json:"memory,omitempty"`
+	Replicas    int            `json:"replicas,omitempty"`
+	PrestopHook KiqPrestopHook `json:"prestopHook,omitempty"`
 }
 type Searchkiq struct {
-	Enabled  string `json:"enabled,omitempty"`
-	CPU      string `json:"cpu,omitempty"`
-	Memory   string `json:"memory,omitempty"`
-	Replicas int    `json:"replicas,omitempty"`
+	Enabled     string         `json:"enabled,omitempty"`
+	CPU         string         `json:"cpu,omitempty"`
+	Memory      string         `json:"memory,omitempty"`
+	Replicas    int            `json:"replicas,omitempty"`
+	PrestopHook KiqPrestopHook `json:"prestopHook,omitempty"`
 }
 type Systemkiq struct {
-	Enabled  string `json:"enabled,omitempty"`
-	CPU      string `json:"cpu,omitempty"`
-	Memory   string `json:"memory,omitempty"`
-	Replicas int    `json:"replicas,omitempty"`
+	Enabled     string         `json:"enabled,omitempty"`
+	CPU         string         `json:"cpu,omitempty"`
+	Memory      string         `json:"memory,omitempty"`
+	Replicas    int            `json:"replicas,omitempty"`
+	PrestopHook KiqPrestopHook `json:"prestopHook,omitempty"`
 }
 type KiqPrestopHook struct {
 	Enabled     string `json:"enabled,omitempty"`
@@ -90,60 +93,69 @@ type SMTP struct {
 }
 
 type OauthProxy struct {
-	Enabled       string `json:"enabled,omitempty"`
-	Image         string `json:"image,omitempty"`
-	AdminUser     string `json:"adminUser,omitempty"`
-	Provider      string `json:"provider,omitempty"`
-	EmailDomain   string `json:"emailDomain,omitempty"`
-	RedirectURI   string `json:"redirectUri,omitempty"`
-	ClientID      string `json:"clientId,omitempty"`
-	ClientSecret  string `json:"clientSecret,omitempty"`
-	CookieSecret  string `json:"cookieSecret,omitempty"`
-	AzureTenant   string `json:"azureTenant,omitempty"`
-	OidcIssuerURL string `json:"oidcIssuerUrl,omitempty"`
+	Enabled       string   `json:"enabled"`
+	Image         string   `json:"image"`
+	AdminUser     string   `json:"adminUser"`
+	Provider      string   `json:"provider"`
+	EmailDomain   string   `json:"emailDomain"`
+	RedirectURI   string   `json:"redirectUri"`
+	ClientID      string   `json:"clientId"`
+	ClientSecret  string   `json:"clientSecret"`
+	CookieSecret  string   `json:"cookieSecret"`
+	AzureTenant   string   `json:"azureTenant"`
+	OidcIssuerURL string   `json:"oidcIssuerUrl"`
+	SkipAuthRegex []string `json:"skipAuthRegex"`
+}
+
+type ObjectStorage struct {
+	CnvrgStorageType             string            `json:"cnvrgStorageType,omitempty"`
+	CnvrgStorageBucket           string            `json:"cnvrgStorageBucket,omitempty"`
+	CnvrgStorageAccessKey        string            `json:"cnvrgStorageAccessKey,omitempty"`
+	CnvrgStorageSecretKey        string            `json:"cnvrgStorageSecretKey,omitempty"`
+	CnvrgStorageEndpoint         string            `json:"cnvrgStorageEndpoint,omitempty"`
+	MinioSseMasterKey            string            `json:"minioSseMasterKey,omitempty"`
+	CnvrgStorageAzureAccessKey   string            `json:"cnvrgStorageAzureAccessKey,omitempty"`
+	CnvrgStorageAzureAccountName string            `json:"cnvrgStorageAzureAccountName,omitempty"`
+	CnvrgStorageAzureContainer   string            `json:"cnvrgStorageAzureContainer,omitempty"`
+	CnvrgStorageRegion           string            `json:"cnvrgStorageRegion,omitempty"`
+	CnvrgStorageProject          string            `json:"cnvrgStorageProject,omitempty"`
 }
 
 type Conf struct {
-	GcpStorageSecret             string     `json:"gcpStorageSecret,omitempty"`
-	GcpKeyfileMountPath          string     `json:"gcpKeyfileMountPath,omitempty"`
-	GcpKeyfileName               string     `json:"gcpKeyfileName,omitempty"`
-	JobsStorageClass             string     `json:"jobsStorageClass,omitempty"`
-	FeatureFlags                 string     `json:"featureFlags,omitempty"`
-	SentryURL                    string     `json:"sentryUrl,omitempty"`
-	SecretKeyBase                string     `json:"secretKeyBase,omitempty"`
-	StsIv                        string     `json:"stsIv,omitempty"`
-	StsKey                       string     `json:"stsKey,omitempty"`
-	RedisURL                     string     `json:"redisUrl,omitempty"`
-	PassengerAppEnv              string     `json:"passengerAppEnv,omitempty"`
-	RailsEnv                     string     `json:"railsEnv,omitempty"`
-	RunJobsOnSelfCluster         string     `json:"runJobsOnSelfCluster,omitempty"`
-	DefaultComputeConfig         string     `json:"defaultComputeConfig,omitempty"`
-	DefaultComputeName           string     `json:"defaultComputeName,omitempty"`
-	UseStdout                    string     `json:"useStdout,omitempty"`
-	ExtractTagsFromCmd           string     `json:"extractTagsFromCmd,omitempty"`
-	CheckJobExpiration           string     `json:"checkJobExpiration,omitempty"`
-	CnvrgStorageType             string     `json:"cnvrgStorageType,omitempty"`
-	CnvrgStorageBucket           string     `json:"cnvrgStorageBucket,omitempty"`
-	CnvrgStorageAccessKey        string     `json:"cnvrgStorageAccessKey,omitempty"`
-	CnvrgStorageSecretKey        string     `json:"cnvrgStorageSecretKey,omitempty"`
-	CnvrgStorageEndpoint         string     `json:"cnvrgStorageEndpoint,omitempty"`
-	MinioSseMasterKey            string     `json:"minioSseMasterKey,omitempty"`
-	CnvrgStorageAzureAccessKey   string     `json:"cnvrgStorageAzureAccessKey,omitempty"`
-	CnvrgStorageAzureAccountName string     `json:"cnvrgStorageAzureAccountName,omitempty"`
-	CnvrgStorageAzureContainer   string     `json:"cnvrgStorageAzureContainer,omitempty"`
-	CnvrgStorageRegion           string     `json:"cnvrgStorageRegion,omitempty"`
-	CnvrgStorageProject          string     `json:"cnvrgStorageProject,omitempty"`
-	CustomAgentTag               string     `json:"customAgentTag,omitempty"`
-	Intercom                     string     `json:"intercom,omitempty"`
-	CnvrgJobUID                  string     `json:"cnvrgJobUid,omitempty"`
-	Fixpg                        string     `json:"fixpg,omitempty"`
-	ResourcesRequestEnabled      string     `json:"resourcesRequestEnabled,omitempty"`
-	Ldap                         Ldap       `json:"ldap,omitempty"`
-	Registry                     Registry   `json:"registry,omitempty"`
-	Rbac                         Rbac       `json:"rbac,omitempty"`
-	SMTP                         SMTP       `json:"smtp,omitempty"`
-	Tenancy                      Tenancy    `json:"tenancy,omitempty"`
-	OauthProxy                   OauthProxy `json:"oauthProxy,omitempty"`
+	GcpStorageSecret             string            `json:"gcpStorageSecret,omitempty"`
+	GcpKeyfileMountPath          string            `json:"gcpKeyfileMountPath,omitempty"`
+	GcpKeyfileName               string            `json:"gcpKeyfileName,omitempty"`
+	JobsStorageClass             string            `json:"jobsStorageClass,omitempty"`
+	FeatureFlags                 map[string]string `json:"featureFlags,omitempty"`
+	SentryURL                    string            `json:"sentryUrl,omitempty"`
+	SecretKeyBase                string            `json:"secretKeyBase,omitempty"`
+	StsIv                        string            `json:"stsIv,omitempty"`
+	StsKey                       string            `json:"stsKey,omitempty"`
+	RedisURL                     string            `json:"redisUrl,omitempty"`
+	PassengerAppEnv              string            `json:"passengerAppEnv,omitempty"`
+	RailsEnv                     string            `json:"railsEnv,omitempty"`
+	RunJobsOnSelfCluster         string            `json:"runJobsOnSelfCluster,omitempty"`
+	DefaultComputeConfig         string            `json:"defaultComputeConfig,omitempty"`
+	DefaultComputeName           string            `json:"defaultComputeName,omitempty"`
+	UseStdout                    string            `json:"useStdout,omitempty"`
+	ExtractTagsFromCmd           string            `json:"extractTagsFromCmd,omitempty"`
+	CheckJobExpiration           string            `json:"checkJobExpiration,omitempty"`
+	CnvrgStorageType             string            `json:"cnvrgStorageType,omitempty"`
+	CnvrgStorageBucket           string            `json:"cnvrgStorageBucket,omitempty"`
+	CnvrgStorageAccessKey        string            `json:"cnvrgStorageAccessKey,omitempty"`
+	CnvrgStorageSecretKey        string            `json:"cnvrgStorageSecretKey,omitempty"`
+	CnvrgStorageEndpoint         string            `json:"cnvrgStorageEndpoint,omitempty"`
+	MinioSseMasterKey            string            `json:"minioSseMasterKey,omitempty"`
+	CnvrgStorageAzureAccessKey   string            `json:"cnvrgStorageAzureAccessKey,omitempty"`
+	CnvrgStorageAzureAccountName string            `json:"cnvrgStorageAzureAccountName,omitempty"`
+	CnvrgStorageAzureContainer   string            `json:"cnvrgStorageAzureContainer,omitempty"`
+	CnvrgStorageRegion           string            `json:"cnvrgStorageRegion,omitempty"`
+	CnvrgStorageProject          string            `json:"cnvrgStorageProject,omitempty"`
+	AgentCustomTag               string            `json:"agentCustomTag,omitempty"`
+	Intercom                     string            `json:"intercom,omitempty"`
+	CnvrgJobUID                  string            `json:"cnvrgJobUid,omitempty"`
+	Fixpg                        string            `json:"fixpg,omitempty"`
+	ResourcesRequestEnabled      string            `json:"resourcesRequestEnabled,omitempty"`
 }
 type CnvrgRouter struct {
 	Enabled  string `json:"enabled,omitempty"`
@@ -154,15 +166,20 @@ type CnvrgRouter struct {
 }
 
 type ControlPlan struct {
-	WebApp         WebApp         `json:"webapp,omitempty"`
-	Sidekiq        Sidekiq        `json:"sidekiq,omitempty"`
-	Searchkiq      Searchkiq      `json:"searchkiq,omitempty"`
-	Systemkiq      Systemkiq      `json:"systemkiq,omitempty"`
-	CnvrgRouter    CnvrgRouter    `json:"cnvrgRouter,omitempty"`
-	KiqPrestopHook KiqPrestopHook `json:"kiqPrestopHook,omitempty"`
-	Hyper          Hyper          `json:"hyper,omitempty"`
-	Seeder         Seeder         `json:"seeder,omitempty"`
-	Conf           Conf           `json:"conf,omitempty"`
+	WebApp      WebApp      `json:"webapp,omitempty"`
+	Sidekiq     Sidekiq     `json:"sidekiq,omitempty"`
+	Searchkiq   Searchkiq   `json:"searchkiq,omitempty"`
+	Systemkiq   Systemkiq   `json:"systemkiq,omitempty"`
+	CnvrgRouter CnvrgRouter `json:"cnvrgRouter,omitempty"`
+	Hyper       Hyper       `json:"hyper,omitempty"`
+	Seeder      Seeder      `json:"seeder,omitempty"`
+	Conf        Conf        `json:"conf,omitempty"`
+	Ldap        Ldap        `json:"ldap,omitempty"`
+	Registry    Registry    `json:"registry,omitempty"`
+	Rbac        Rbac        `json:"rbac,omitempty"`
+	SMTP        SMTP        `json:"smtp,omitempty"`
+	Tenancy     Tenancy     `json:"tenancy,omitempty"`
+	OauthProxy  OauthProxy  `json:"oauthProxy,omitempty"`
 }
 
 type Tenancy struct {
@@ -201,6 +218,10 @@ var controlPlanDefault = ControlPlan{
 		CPU:      "1750m",
 		Memory:   "3750Mi",
 		Replicas: 2,
+		PrestopHook: KiqPrestopHook{
+			Enabled:     "true",
+			KillTimeout: 60,
+		},
 	},
 
 	Searchkiq: Searchkiq{
@@ -208,6 +229,10 @@ var controlPlanDefault = ControlPlan{
 		CPU:      "750m",
 		Memory:   "750Mi",
 		Replicas: 1,
+		PrestopHook: KiqPrestopHook{
+			Enabled:     "true",
+			KillTimeout: 60,
+		},
 	},
 
 	Systemkiq: Systemkiq{
@@ -215,11 +240,10 @@ var controlPlanDefault = ControlPlan{
 		CPU:      "500m",
 		Memory:   "500Mi",
 		Replicas: 1,
-	},
-
-	KiqPrestopHook: KiqPrestopHook{
-		Enabled:     "true",
-		KillTimeout: 60,
+		PrestopHook: KiqPrestopHook{
+			Enabled:     "true",
+			KillTimeout: 60,
+		},
 	},
 
 	Hyper: Hyper{
@@ -258,7 +282,7 @@ var controlPlanDefault = ControlPlan{
 		GcpKeyfileMountPath:          "/tmp/gcp_keyfile",
 		GcpKeyfileName:               "key.json",
 		JobsStorageClass:             "",
-		FeatureFlags:                 "",
+		FeatureFlags:                 map[string]string{},
 		SentryURL:                    "https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32",
 		SecretKeyBase:                "0d2b33c2cc19cfaa838d3c354354a18fcc92beaaa8e97889ef99341c8aaf963ad3afcf0f7c20454cabb5c573c3fc35b60221034e109f4fb651ed1415bf61e9d5",
 		StsIv:                        "DeJ/CGz/Hkb/IbRe4t1xLg==",
@@ -283,57 +307,74 @@ var controlPlanDefault = ControlPlan{
 		CnvrgStorageAzureContainer:   "",
 		CnvrgStorageRegion:           "eastus",
 		CnvrgStorageProject:          "",
-		CustomAgentTag:               "false",
+		AgentCustomTag:               "latest",
 		Intercom:                     "true",
 		CnvrgJobUID:                  "1000",
 		Fixpg:                        "true",
 		ResourcesRequestEnabled:      "true",
-		Ldap: Ldap{
-			Enabled:       "false",
-			Host:          "",
-			Port:          "",
-			Account:       "userPrincipalName",
-			Base:          "", // dc=my-domain,dc=local
-			AdminUser:     "",
-			AdminPassword: "",
-			Ssl:           "", // true/false
-		},
-		Registry: Registry{
-			Name:     "cnvrg-registry",
-			URL:      "docker.io",
-			User:     "",
-			Password: "",
-		},
-		Rbac: Rbac{
-			Role:               "cnvrg-role",
-			ServiceAccountName: "cnvrg",
-			RoleBindingName:    "cnvrg-role-binding",
-		},
-		SMTP: SMTP{
-			Server:   "",
-			Port:     "",
-			Username: "",
-			Password: "",
-			Domain:   "",
-		},
-		Tenancy: Tenancy{
-			Enabled:        "false",
-			DedicatedNodes: "false",
-			Key:            "cnvrg-taint",
-			Value:          "true",
-		},
-		OauthProxy: OauthProxy{
-			Enabled:       "false",
-			Image:         "cnvrg/cnvrg-oauth-proxy:v7.0.1.c1",
-			AdminUser:     "",
-			Provider:      "",
-			EmailDomain:   "",
-			RedirectURI:   "",
-			ClientID:      "",
-			ClientSecret:  "",
-			CookieSecret:  "",
-			AzureTenant:   "",
-			OidcIssuerURL: "",
+	},
+
+	Ldap: Ldap{
+		Enabled:       "false",
+		Host:          "",
+		Port:          "",
+		Account:       "userPrincipalName",
+		Base:          "", // dc=my-domain,dc=local
+		AdminUser:     "",
+		AdminPassword: "",
+		Ssl:           "", // true/false
+	},
+
+	Registry: Registry{
+		Name:     "cnvrg-registry",
+		URL:      "docker.io",
+		User:     "",
+		Password: "",
+	},
+
+	Rbac: Rbac{
+		Role:               "cnvrg-role",
+		ServiceAccountName: "cnvrg",
+		RoleBindingName:    "cnvrg-role-binding",
+	},
+
+	SMTP: SMTP{
+		Server:   "",
+		Port:     "",
+		Username: "",
+		Password: "",
+		Domain:   "",
+	},
+
+	Tenancy: Tenancy{
+		Enabled:        "false",
+		DedicatedNodes: "false",
+		Key:            "cnvrg-taint",
+		Value:          "true",
+	},
+
+	OauthProxy: OauthProxy{
+		Enabled:       "false",
+		Image:         "cnvrg/cnvrg-oauth-proxy:v7.0.1.c1",
+		AdminUser:     "",
+		Provider:      "",
+		EmailDomain:   "",
+		RedirectURI:   "",
+		ClientID:      "",
+		ClientSecret:  "",
+		CookieSecret:  "",
+		AzureTenant:   "", // if IDP is Azure AD
+		OidcIssuerURL: "", // if IDP oidc
+		SkipAuthRegex: []string{
+			`^\/api`,
+			`^\/oauth/`,
+			`\/assets`,
+			`\/healthz`,
+			`\/public`,
+			`\/pack`,
+			`\/vscode.tar.gz`,
+			`\/gitlens.vsix`,
+			`\/ms-python-release.vsix`,
 		},
 	},
 }

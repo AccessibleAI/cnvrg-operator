@@ -65,6 +65,8 @@ spec:
                     type: object
                   conf:
                     properties:
+                      agentCustomTag:
+                        type: string
                       checkJobExpiration:
                         type: string
                       cnvrgJobUid:
@@ -89,8 +91,6 @@ spec:
                         type: string
                       cnvrgStorageType:
                         type: string
-                      customAgentTag:
-                        type: string
                       defaultComputeConfig:
                         type: string
                       defaultComputeName:
@@ -98,7 +98,9 @@ spec:
                       extractTagsFromCmd:
                         type: string
                       featureFlags:
-                        type: string
+                        additionalProperties:
+                          type: string
+                        type: object
                       fixpg:
                         type: string
                       gcpKeyfileMountPath:
@@ -111,78 +113,14 @@ spec:
                         type: string
                       jobsStorageClass:
                         type: string
-                      ldap:
-                        properties:
-                          account:
-                            type: string
-                          adminPassword:
-                            type: string
-                          adminUser:
-                            type: string
-                          base:
-                            type: string
-                          enabled:
-                            type: string
-                          host:
-                            type: string
-                          port:
-                            type: string
-                          ssl:
-                            type: string
-                        type: object
                       minioSseMasterKey:
                         type: string
-                      oauthProxy:
-                        properties:
-                          adminUser:
-                            type: string
-                          azureTenant:
-                            type: string
-                          clientId:
-                            type: string
-                          clientSecret:
-                            type: string
-                          cookieSecret:
-                            type: string
-                          emailDomain:
-                            type: string
-                          enabled:
-                            type: string
-                          image:
-                            type: string
-                          oidcIssuerUrl:
-                            type: string
-                          provider:
-                            type: string
-                          redirectUri:
-                            type: string
-                        type: object
                       passengerAppEnv:
                         type: string
                       railsEnv:
                         type: string
-                      rbac:
-                        properties:
-                          role:
-                            type: string
-                          roleBindingName:
-                            type: string
-                          serviceAccountName:
-                            type: string
-                        type: object
                       redisUrl:
                         type: string
-                      registry:
-                        properties:
-                          name:
-                            type: string
-                          password:
-                            type: string
-                          url:
-                            type: string
-                          user:
-                            type: string
-                        type: object
                       resourcesRequestEnabled:
                         type: string
                       runJobsOnSelfCluster:
@@ -191,34 +129,10 @@ spec:
                         type: string
                       sentryUrl:
                         type: string
-                      smtp:
-                        properties:
-                          domain:
-                            type: string
-                          password:
-                            type: string
-                          port:
-                            type: string
-                          server:
-                            type: string
-                          username:
-                            type: string
-                        type: object
                       stsIv:
                         type: string
                       stsKey:
                         type: string
-                      tenancy:
-                        properties:
-                          dedicatedNodes:
-                            type: string
-                          enabled:
-                            type: string
-                          key:
-                            type: string
-                          value:
-                            type: string
-                        type: object
                       useStdout:
                         type: string
                     type: object
@@ -253,12 +167,86 @@ spec:
                       token:
                         type: string
                     type: object
-                  kiqPrestopHook:
+                  ldap:
                     properties:
+                      account:
+                        type: string
+                      adminPassword:
+                        type: string
+                      adminUser:
+                        type: string
+                      base:
+                        type: string
                       enabled:
                         type: string
-                      killTimeout:
-                        type: integer
+                      host:
+                        type: string
+                      port:
+                        type: string
+                      ssl:
+                        type: string
+                    type: object
+                  oauthProxy:
+                    properties:
+                      adminUser:
+                        type: string
+                      azureTenant:
+                        type: string
+                      clientId:
+                        type: string
+                      clientSecret:
+                        type: string
+                      cookieSecret:
+                        type: string
+                      emailDomain:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      oidcIssuerUrl:
+                        type: string
+                      provider:
+                        type: string
+                      redirectUri:
+                        type: string
+                      skipAuthRegex:
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - adminUser
+                    - azureTenant
+                    - clientId
+                    - clientSecret
+                    - cookieSecret
+                    - emailDomain
+                    - enabled
+                    - image
+                    - oidcIssuerUrl
+                    - provider
+                    - redirectUri
+                    - skipAuthRegex
+                    type: object
+                  rbac:
+                    properties:
+                      role:
+                        type: string
+                      roleBindingName:
+                        type: string
+                      serviceAccountName:
+                        type: string
+                    type: object
+                  registry:
+                    properties:
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      url:
+                        type: string
+                      user:
+                        type: string
                     type: object
                   searchkiq:
                     properties:
@@ -268,6 +256,13 @@ spec:
                         type: string
                       memory:
                         type: string
+                      prestopHook:
+                        properties:
+                          enabled:
+                            type: string
+                          killTimeout:
+                            type: integer
+                        type: object
                       replicas:
                         type: integer
                     type: object
@@ -288,9 +283,29 @@ spec:
                         type: string
                       memory:
                         type: string
+                      prestopHook:
+                        properties:
+                          enabled:
+                            type: string
+                          killTimeout:
+                            type: integer
+                        type: object
                       replicas:
                         type: integer
                       split:
+                        type: string
+                    type: object
+                  smtp:
+                    properties:
+                      domain:
+                        type: string
+                      password:
+                        type: string
+                      port:
+                        type: string
+                      server:
+                        type: string
+                      username:
                         type: string
                     type: object
                   systemkiq:
@@ -301,8 +316,26 @@ spec:
                         type: string
                       memory:
                         type: string
+                      prestopHook:
+                        properties:
+                          enabled:
+                            type: string
+                          killTimeout:
+                            type: integer
+                        type: object
                       replicas:
                         type: integer
+                    type: object
+                  tenancy:
+                    properties:
+                      dedicatedNodes:
+                        type: string
+                      enabled:
+                        type: string
+                      key:
+                        type: string
+                      value:
+                        type: string
                     type: object
                   webapp:
                     properties:
@@ -329,6 +362,113 @@ spec:
                       readinessTimeoutSeconds:
                         type: integer
                       replicas:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                type: object
+              logging:
+                properties:
+                  elastalert:
+                    properties:
+                      containerPort:
+                        type: integer
+                      cpuLimit:
+                        type: string
+                      cpuRequest:
+                        type: string
+                      enabled:
+                        type: string
+                      fsGroup:
+                        type: integer
+                      image:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      runAsUser:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  enabled:
+                    type: string
+                  es:
+                    properties:
+                      cpuLimit:
+                        type: integer
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      fsGroup:
+                        type: integer
+                      image:
+                        type: string
+                      javaOpts:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      runAsUser:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  fluentd:
+                    properties:
+                      containersPath:
+                        type: string
+                      cpuRequest:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      journalPath:
+                        type: string
+                      journald:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                    type: object
+                  kibana:
+                    properties:
+                      cpuLimit:
+                        type: integer
+                      cpuRequest:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
                         type: integer
                       svcName:
                         type: string
@@ -474,6 +614,37 @@ spec:
                   svcName:
                     type: string
                   user:
+                    type: string
+                type: object
+              redis:
+                properties:
+                  appendonly:
+                    type: string
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  limits:
+                    properties:
+                      cpu:
+                        type: integer
+                      memory:
+                        type: string
+                    type: object
+                  port:
+                    type: integer
+                  requests:
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                    type: object
+                  storageClass:
+                    type: string
+                  storageSize:
+                    type: string
+                  svcName:
                     type: string
                 type: object
               storage:
