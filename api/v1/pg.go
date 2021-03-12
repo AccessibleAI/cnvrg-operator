@@ -24,6 +24,7 @@ type Pg struct {
 	MaxConnections int       `json:"maxConnections,omitempty"`
 	SharedBuffers  string    `json:"sharedBuffers,omitempty"`
 	HugePages      HugePages `json:"hugePages,omitempty"`
+	Fixpg          string    `json:"fixpg,omitempty"`
 }
 
 var pgDefault = Pg{
@@ -43,6 +44,7 @@ var pgDefault = Pg{
 	MemoryRequest:  "4Gi",
 	MaxConnections: 100,
 	SharedBuffers:  "64Mb",
+	Fixpg:          "true",
 	HugePages: HugePages{
 		Enabled: "false",
 		Size:    "2Mi",

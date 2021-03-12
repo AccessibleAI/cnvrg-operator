@@ -50,46 +50,13 @@ spec:
                 type: string
               controlPlan:
                 properties:
-                  cnvrgRouter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      nodePort:
-                        type: integer
-                      port:
-                        type: integer
-                      svcName:
-                        type: string
-                    type: object
-                  conf:
+                  baseConfig:
                     properties:
                       agentCustomTag:
                         type: string
                       checkJobExpiration:
                         type: string
                       cnvrgJobUid:
-                        type: string
-                      cnvrgStorageAccessKey:
-                        type: string
-                      cnvrgStorageAzureAccessKey:
-                        type: string
-                      cnvrgStorageAzureAccountName:
-                        type: string
-                      cnvrgStorageAzureContainer:
-                        type: string
-                      cnvrgStorageBucket:
-                        type: string
-                      cnvrgStorageEndpoint:
-                        type: string
-                      cnvrgStorageProject:
-                        type: string
-                      cnvrgStorageRegion:
-                        type: string
-                      cnvrgStorageSecretKey:
-                        type: string
-                      cnvrgStorageType:
                         type: string
                       defaultComputeConfig:
                         type: string
@@ -101,39 +68,32 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      fixpg:
-                        type: string
-                      gcpKeyfileMountPath:
-                        type: string
-                      gcpKeyfileName:
-                        type: string
-                      gcpStorageSecret:
-                        type: string
                       intercom:
                         type: string
                       jobsStorageClass:
-                        type: string
-                      minioSseMasterKey:
                         type: string
                       passengerAppEnv:
                         type: string
                       railsEnv:
                         type: string
-                      redisUrl:
-                        type: string
-                      resourcesRequestEnabled:
-                        type: string
                       runJobsOnSelfCluster:
-                        type: string
-                      secretKeyBase:
                         type: string
                       sentryUrl:
                         type: string
-                      stsIv:
-                        type: string
-                      stsKey:
-                        type: string
                       useStdout:
+                        type: string
+                    type: object
+                  cnvrgRouter:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      svcName:
                         type: string
                     type: object
                   hyper:
@@ -227,6 +187,43 @@ spec:
                     - provider
                     - redirectUri
                     - skipAuthRegex
+                    type: object
+                  objectStorage:
+                    properties:
+                      cnvrgStorageAccessKey:
+                        type: string
+                      cnvrgStorageAzureAccessKey:
+                        type: string
+                      cnvrgStorageAzureAccountName:
+                        type: string
+                      cnvrgStorageAzureContainer:
+                        type: string
+                      cnvrgStorageBucket:
+                        type: string
+                      cnvrgStorageEndpoint:
+                        type: string
+                      cnvrgStorageProject:
+                        type: string
+                      cnvrgStorageRegion:
+                        type: string
+                      cnvrgStorageSecretKey:
+                        type: string
+                      cnvrgStorageType:
+                        type: string
+                      gcpKeyfileMountPath:
+                        type: string
+                      gcpKeyfileName:
+                        type: string
+                      gcpStorageSecret:
+                        type: string
+                      minioSseMasterKey:
+                        type: string
+                      secretKeyBase:
+                        type: string
+                      stsIv:
+                        type: string
+                      stsKey:
+                        type: string
                     type: object
                   rbac:
                     properties:
@@ -579,6 +576,8 @@ spec:
                   dbname:
                     type: string
                   enabled:
+                    type: string
+                  fixpg:
                     type: string
                   fsGroup:
                     type: integer

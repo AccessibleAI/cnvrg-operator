@@ -9,7 +9,7 @@ spec:
     webapp:
       image: "cnvrg/core:3.1.5"
       enabled: "false"
-    conf:
+    baseConfig:
       featureFlags:
         flag1: "value1"
         flag2: "value1"
