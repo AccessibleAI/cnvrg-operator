@@ -20,20 +20,20 @@ spec:
       labels:
         app: {{.ControlPlan.WebApp.SvcName}}
     spec:
-      {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
+      {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
       nodeSelector:
-        {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-      - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
+      - key: "{{ .ControlPlan.Tenancy.Key }}"
         operator: "Equal"
-        value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+        value: "{{ .ControlPlan.Tenancy.Value }}"
         effect: "NoSchedule"
-      serviceAccountName: {{ .ControlPlan.Conf.Rbac.ServiceAccountName }}
+      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
       containers:
-      {{- if eq .ControlPlan.Conf.OauthProxy.Enabled "true" }}
+      {{- if eq .ControlPlan.OauthProxy.Enabled "true" }}
       - name: "cnvrg-oauth-proxy"
-        image: {{ .ControlPlan.Conf.OauthProxy.Image }}
+        image: {{ .ControlPlan.OauthProxy.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
         volumeMounts:
           - name: "oauth-proxy-config"
@@ -46,9 +46,15 @@ spec:
           value: "webapp"
         envFrom:
         - configMapRef:
-            name: env-config
+            name: cp-base-config
+        - configMapRef:
+            name: cp-networking-config
         - secretRef:
-            name: env-secrets
+            name: cp-base-secret
+        - secretRef:
+            name: cp-ldap
+        - secretRef:
+            name: cp-object-storage
         name: cnvrg-app
         ports:
           - containerPort: {{ .ControlPlan.WebApp.Port }}
@@ -62,28 +68,26 @@ spec:
           initialDelaySeconds: {{ .ControlPlan.WebApp.InitialDelaySeconds }}
           periodSeconds: {{ .ControlPlan.WebApp.ReadinessPeriodSeconds }}
           timeoutSeconds: {{ .ControlPlan.WebApp.ReadinessTimeoutSeconds }}
-        {{- if eq .ControlPlan.Conf.ResourcesRequestEnabled "true" }}
         resources:
           requests:
             cpu: "{{.ControlPlan.WebApp.CPU}}"
             memory: "{{.ControlPlan.WebApp.Memory}}"
-        {{- end }}
-        {{- if eq .ControlPlan.Conf.CnvrgStorageType "gcp" }}
+        {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
         volumeMounts:
-        - name: "{{ .ControlPlan.Conf.GcpStorageSecret }}"
-          mountPath: "{{ .ControlPlan.Conf.GcpKeyfileMountPath }}"
+        - name: "{{ .ControlPlan.ObjectStorage.GcpStorageSecret }}"
+          mountPath: "{{ .ControlPlan.ObjectStorage.GcpKeyfileMountPath }}"
           readOnly: true
         {{- end }}
-      {{- if eq .ControlPlan.Conf.OauthProxy.Enabled "true" }}
+      {{- if eq .ControlPlan.OauthProxy.Enabled "true" }}
       volumes:
       - name: "oauth-proxy-config"
-        configMap:
-         name: "oauth-proxy-config"
-      {{- end }}
-      {{- if eq .ControlPlan.Conf.CnvrgStorageType "gcp" }}
-      - name: {{ .ControlPlan.Conf.GcpStorageSecret }}
         secret:
-          secretName: {{ .ControlPlan.Conf.GcpStorageSecret }}
+         secretName: "cp-sso"
+      {{- end }}
+      {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
+      - name: {{ .ControlPlan.ObjectStorage.GcpStorageSecret }}
+        secret:
+          secretName: {{ .ControlPlan.ObjectStorage.GcpStorageSecret }}
       {{- end }}
       initContainers:
       - name: services-check
@@ -97,26 +101,22 @@ spec:
           {{- else }}
           value: "{{.Pg.SvcName}}:{{.Pg.Port}}"
           {{ end }}
-      {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.Conf.CnvrgStorageType "minio") }}
+      {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
       - name: create-cnvrg-bucket
         image: {{ .ControlPlan.Seeder.Image }}
         command: ["/bin/bash","-c", "{{ .ControlPlan.Seeder.CreateBucketCmd }}"]
         imagePullPolicy: Always
         envFrom:
-        - configMapRef:
-            name: "env-config"
         - secretRef:
-            name: "env-secrets"
+            name: cp-object-storage
       {{- end }}
-      {{- if eq .ControlPlan.Conf.Fixpg "true" }}
+      {{- if eq .ControlPlan.Pg.Fixpg "true" }}
       - name: fixpg
         image: {{.ControlPlan.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]
         envFrom:
-        - configMapRef:
-            name: "env-config"
         - secretRef:
-            name: "env-secrets"
+            name: pg-secret
         imagePullPolicy: Always
       {{- end }}
       - name: seeder
@@ -132,7 +132,7 @@ spec:
           value: {{ .CnvrgNs }}
         - name: "CNVRG_SA_NAME"
           value: "cnvrg-control-plan"
-        {{- if eq .ControlPlan.Conf.CnvrgStorageType "gcp" }}
+        {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: "{{ .ControlPlan.Conf.GcpStorageSecret }}"
         - name: "CNVRG_GCP_KEYFILE_MOUNT_PATH"

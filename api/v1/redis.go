@@ -28,11 +28,11 @@ var redisDefault = Redis{
 	Appendonly:   "yes",
 	StorageSize:  "10Gi",
 	StorageClass: "use-default",
-	Limits:       Limits{
+	Limits: Limits{
 		CPU:    1,
 		Memory: "2Gi",
 	},
-	Requests:     Requests{
+	Requests: Requests{
 		CPU:    "500m",
 		Memory: "1Gi",
 	},

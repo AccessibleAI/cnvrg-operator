@@ -3,7 +3,7 @@ package v1
 type Es struct {
 	Enabled       string `json:"enabled,omitempty"`
 	Image         string `json:"image,omitempty"`
-	Port          int `json:"port,omitempty"`
+	Port          int    `json:"port,omitempty"`
 	StorageSize   string `json:"storageSize,omitempty"`
 	SvcName       string `json:"svcName,omitempty"`
 	RunAsUser     int    `json:"runAsUser,omitempty"`
@@ -19,9 +19,9 @@ type Es struct {
 type Elastalert struct {
 	Enabled       string `json:"enabled,omitempty"`
 	Image         string `json:"image,omitempty"`
-	Port          int `json:"port,omitempty"`
+	Port          int    `json:"port,omitempty"`
 	NodePort      int    `json:"nodePort,omitempty"`
-	ContainerPort int `json:"containerPort,omitempty"`
+	ContainerPort int    `json:"containerPort,omitempty"`
 	StorageSize   string `json:"storageSize,omitempty"`
 	SvcName       string `json:"svcName,omitempty"`
 	StorageClass  string `json:"storageClass,omitempty"`
@@ -62,8 +62,8 @@ type Logging struct {
 }
 
 var loggingDefault = Logging{
-	Enabled:    "true",
-	Es:         Es{
+	Enabled: "true",
+	Es: Es{
 		Enabled:       "true",
 		Image:         "docker.io/cnvrg/cnvrg-es:v7.8.1",
 		Port:          9200,
@@ -95,7 +95,7 @@ var loggingDefault = Logging{
 		RunAsUser:     1000,
 		FsGroup:       1000,
 	},
-	Fluentd:    Fluentd{
+	Fluentd: Fluentd{
 		Enabled:        "true",
 		Image:          "fluent/fluentd-kubernetes-daemonset:v1.11-debian-elasticsearch7-1",
 		JournalPath:    "/var/log/journal",
@@ -105,7 +105,7 @@ var loggingDefault = Logging{
 		MemoryRequest:  "200Mi",
 		MemoryLimit:    "1Gi",
 	},
-	Kibana:     Kibana{
+	Kibana: Kibana{
 		Enabled:       "true",
 		SvcName:       "kibana",
 		Port:          5601,

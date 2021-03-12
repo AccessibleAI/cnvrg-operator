@@ -16,9 +16,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"os"
+	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
 	"time"
@@ -195,8 +197,16 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 				return err
 			}
 		} else {
-			manifest.Obj.SetResourceVersion(fetchInto.GetResourceVersion())
-			err := r.Update(ctx, manifest.Obj)
+			if manifest.GVR == desired.Kinds[desired.PvcGVR] {
+				// TODO: make this generic
+				continue
+			}
+			if err := mergo.Merge(fetchInto, manifest.Obj, mergo.WithOverride); err != nil {
+				log.Error(err, "can't merge")
+				return err
+			}
+			//manifest.Obj.SetResourceVersion(fetchInto.GetResourceVersion())
+			err := r.Update(ctx, fetchInto)
 			if err != nil {
 				log.Info("error updating object", "manifest", manifest.TemplatePath)
 				return err
@@ -254,7 +264,25 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 	}
 
-	cnvrgAppController := ctrl.NewControllerManagedBy(mgr).For(&mlopsv1.CnvrgApp{})
+
+	p := predicate.Funcs{
+
+		UpdateFunc: func(e event.UpdateEvent) bool {
+
+			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
+				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
+				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
+				return !reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
+			}
+
+			return true
+		},
+	}
+
+	cnvrgAppController := ctrl.
+		NewControllerManagedBy(mgr).
+		For(&mlopsv1.CnvrgApp{}).
+		WithEventFilter(p)
 
 	for _, v := range desired.Kinds {
 
@@ -272,10 +300,8 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		cnvrgAppController.Owns(u)
 	}
 
-	pred := predicate.GenerationChangedPredicate{}
 	return cnvrgAppController.
-		For(&mlopsv1.CnvrgApp{}).
-		WithEventFilter(pred).
+
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

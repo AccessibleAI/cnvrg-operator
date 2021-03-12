@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: cnvrg-control-plan
+  name: {{ .ControlPlan.Rbac.Role }}
   namespace: {{ .CnvrgNs }}
 rules:
   - apiGroups: ["*"]

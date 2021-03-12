@@ -38,11 +38,20 @@ var state = []*desired.State{
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/svc.tpl",
+		TemplatePath:   path + "/pvc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
 		Own:            true,
 	},
 }

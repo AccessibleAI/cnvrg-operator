@@ -107,7 +107,6 @@ var controlPlanConfigState = []*desired.State{
 	},
 }
 
-
 var webAppState = []*desired.State{
 	{
 		Name:           "",

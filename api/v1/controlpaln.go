@@ -320,9 +320,9 @@ var controlPlanDefault = ControlPlan{
 	},
 
 	Rbac: Rbac{
-		Role:               "cnvrg-role",
-		ServiceAccountName: "cnvrg",
-		RoleBindingName:    "cnvrg-role-binding",
+		Role:               "cnvrg-control-plan-role",
+		ServiceAccountName: "cnvrg-control-plan",
+		RoleBindingName:    "cnvrg-control-plan-binding",
 	},
 
 	SMTP: SMTP{

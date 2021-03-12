@@ -17,27 +17,27 @@ spec:
       labels:
         app: {{.Pg.SvcName}}
     spec:
-      serviceAccountName: {{ .ControlPlan.Conf.Rbac.ServiceAccountName }}
-      {{- if and (eq .ControlPlan.Conf.Tenancy.Enabled "true") (eq .ControlPlan.Conf.Tenancy.DedicatedNodes "true") }}
+      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
+      {{- if and (eq .ControlPlan.Tenancy.Enabled "true") (eq .ControlPlan.Tenancy.DedicatedNodes "true") }}
       tolerations:
-        - key: {{ .ControlPlan.Conf.Tenancy.Key }}
+        - key: {{ .ControlPlan.Tenancy.Key }}
           operator: Equal
-          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
       securityContext:
         runAsUser: {{ .Pg.RunAsUser }}
         fsGroup: {{ .Pg.FsGroup }}
-      {{- if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Conf.Tenancy.Enabled "false") }}
+      {{- if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "false") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "false") (eq .ControlPlan.Conf.Tenancy.Enabled "true") }}
+      {{- else if and (eq .Storage.Hostpath.Enabled "false") (eq .ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Conf.Tenancy.Enabled "true") }}
+        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+      {{- else if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-        {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
       {{- end }}
       containers:
         - name: postgresql

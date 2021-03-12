@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: cnvrg-control-plan
+  name: {{ .ControlPlan.Rbac.RoleBindingName }}
   namespace: {{ .CnvrgNs }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: cnvrg-control-plan
+  name: {{ .ControlPlan.Rbac.Role }}
 subjects:
   - kind: ServiceAccount
-    name: cnvrg-control-plan
+    name: {{ .ControlPlan.Rbac.ServiceAccountName }}
