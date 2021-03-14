@@ -14,16 +14,16 @@ spec:
         name: istio-operator
     spec:
       imagePullSecrets:
-        - name: {{ .ControlPlan.Conf.Registry.Name }}
+        - name: {{ .ControlPlan.Registry.Name }}
       serviceAccountName: istio-operator
-      {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
+      {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
       nodeSelector:
-        {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
+        - key: "{{ .ControlPlan.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
         - name: istio-operator

@@ -23,6 +23,7 @@ type CnvrgAppSpec struct {
 	Minio         Minio       `json:"minio,omitempty"`
 	Redis         Redis       `json:"redis,omitempty"`
 	Logging       Logging     `json:"logging,omitempty"`
+	Monitoring    Monitoring  `json:"monitoring,omitempty"`
 }
 
 type CnvrgAppStatus struct {
@@ -66,4 +67,5 @@ var DefaultSpec = CnvrgAppSpec{
 	Minio:         minioDefaults,
 	Redis:         redisDefault,
 	Logging:       loggingDefault,
+	Monitoring:    monitoringDefault,
 }

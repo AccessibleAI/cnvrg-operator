@@ -21,6 +21,7 @@ const (
 	IstioVsGVR              GVRName = "IstioVsGVR"
 	IstioGVR                GVRName = "IstioGVR"
 	IstioDestinationRuleGVR GVRName = "IstioDestinationRule"
+	IstioGwGVR              GVRName = "IstioGwGVR"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -73,6 +74,12 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 
 	IstioDestinationRuleGVR: schema.GroupVersionKind{
 		Kind:    "DestinationRule",
+		Group:   "networking.istio.io",
+		Version: "v1alpha3",
+	},
+
+	IstioGwGVR: schema.GroupVersionKind{
+		Kind:    "Gateway",
 		Group:   "networking.istio.io",
 		Version: "v1alpha3",
 	},
