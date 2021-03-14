@@ -76,17 +76,17 @@ type Monitoring struct {
 }
 
 var monitoringDefault = Monitoring{
-	Enabled:                "true",
-	PrometheusOperator:     PrometheusOperator{
+	Enabled: "true",
+	PrometheusOperator: PrometheusOperator{
 		Enabled: "true",
-		Images:  Images{
+		Images: Images{
 			OperatorImage:                 "quay.io/coreos/prometheus-operator:v0.40.0",
 			ConfigReloaderImage:           "jimmidyson/configmap-reload:v0.3.0",
 			PrometheusConfigReloaderImage: "quay.io/coreos/prometheus-config-reloader:v0.40.0",
 			KubeRbacProxyImage:            "quay.io/coreos/kube-rbac-proxy:v0.4.1",
 		},
 	},
-	Prometheus:             Prometheus{
+	Prometheus: Prometheus{
 		Enabled:       "true",
 		Image:         "quay.io/prometheus/prometheus:v2.22.2",
 		CPURequest:    1,
@@ -97,16 +97,16 @@ var monitoringDefault = Monitoring{
 		StorageSize:   "100Gi",
 		StorageClass:  "use-default",
 	},
-	NodeExporter:           NodeExporter{
+	NodeExporter: NodeExporter{
 		Enabled: "true",
 		Port:    9100,
 		Image:   "quay.io/prometheus/node-exporter:v0.18.1",
 	},
-	KubeStateMetrics:       KubeStateMetrics{
+	KubeStateMetrics: KubeStateMetrics{
 		Enabled: "true",
 		Image:   "quay.io/coreos/kube-state-metrics:v1.9.5",
 	},
-	Grafana:                Grafana{
+	Grafana: Grafana{
 		Enabled:  "true",
 		Image:    "grafana/grafana:7.2.0",
 		SvcName:  "grafana",
@@ -114,21 +114,21 @@ var monitoringDefault = Monitoring{
 		NodePort: 30012,
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{Enabled: "true"},
-	SidekiqExporter:        SidekiqExporter{
+	SidekiqExporter: SidekiqExporter{
 		Enabled: "true",
 		Image:   "docker.io/strech/sidekiq-prometheus-exporter:0.1.13",
 	},
-	MinioExporter:          MinioExporter{
+	MinioExporter: MinioExporter{
 		Enabled: "true",
 		Image:   "docker.io/cnvrg/cnvrg-boot:v0.24",
 	},
-	DcgmExporter:           DcgmExporter{
+	DcgmExporter: DcgmExporter{
 		Enabled: "true",
 		Image:   "nvidia/dcgm-exporter:1.7.2",
 		Port:    9400,
 	},
-	IdleMetricsExporter:    IdleMetricsExporter{Enabled: "true"},
-	MetricsServer:          MetricsServer{
+	IdleMetricsExporter: IdleMetricsExporter{Enabled: "true"},
+	MetricsServer: MetricsServer{
 		Enabled: "true",
 		Image:   "k8s.gcr.io/metrics-server/metrics-server:v0.3.7",
 	},

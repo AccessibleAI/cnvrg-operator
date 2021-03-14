@@ -4,33 +4,12 @@ metadata:
   name: cnvrgapp
 spec:
   cnvrgNs: "cnvrg"
-  clusterDomain: "test-op.test"
+  clusterDomain: "test-op.azops.cnvrg.io"
   controlPlan:
     webapp:
       image: "cnvrg/core:3.1.5"
-      enabled: "false"
-    baseConfig:
-      featureFlags:
-        flag1: "value1"
-        flag2: "value1"
-    tenancy:
-      enabled: "false"
     registry:
       name: "cnvrg-registry"
       url: "docker.io"
       user: "dimssss"
       password: "1e029bb4-5631-4215-8ae1-ac77b76b6517"
-  networking:
-    enabled: "true"
-    https:
-      enabled: "true"
-    ingressType: "istio"
-    istio:
-      enabled: "true"
-      ingressSvcAnnotations: "foo: bla     ;bar         : bla-bla    "
-      externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
-      ingressSvcExtraPorts: "123;3232;4343"
-  pg:
-    enabled: "false"
-  redis:
-    enabled: "false"
