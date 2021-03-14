@@ -18,8 +18,8 @@ spec:
     registry:
       name: "cnvrg-registry"
       url: "docker.io"
-      user: "dimssss-bla--test-update"
-      password: "3c21c46d-8eea-4906-9445-c9cc9e41718d"
+      user: "dimssss"
+      password: "1e029bb4-5631-4215-8ae1-ac77b76b6517"
   networking:
     enabled: "false"
     https:
