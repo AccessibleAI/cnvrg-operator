@@ -5,6 +5,7 @@ import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/minio"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/pg"
 	"github.com/cnvrg-operator/pkg/redis"
@@ -65,6 +66,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	} else {
 		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			r.updateStatusMessage(mlopsv1.STATUS_REMOVING, "removing cnvrg spec", desiredSpec, req.NamespacedName)
 			if err := r.cleanup(desiredSpec); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -103,6 +105,12 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	// Minio
+	if err := r.apply(minio.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
 	// Networking
 	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
@@ -114,6 +122,10 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 }
 
 func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgApp *mlopsv1.CnvrgApp, name types.NamespacedName) {
+	if cnvrgApp.Status.Status == mlopsv1.STATUS_REMOVING {
+		log.Info("skipping status update, current cnvrg spec under removing status...")
+		return
+	}
 	ctx := context.Background()
 	cnvrgApp.Status.Status = status
 	cnvrgApp.Status.Message = message
@@ -280,17 +292,14 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
-				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec)                                        // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
-				shouldReconcileOnFinalizerChange := reflect.DeepEqual(oldObject.ObjectMeta.Finalizers, newObject.ObjectMeta.Finalizers) // finalizers wasn't changed, assuming status update, won't reconcile
-				shouldReconcileOnDeletionTimestamp := true
-				if oldObject.ObjectMeta.DeletionTimestamp != newObject.ObjectMeta.DeletionTimestamp {
-					shouldReconcileOnDeletionTimestamp = false
+				// deleting cnvrg cr
+				if !newObject.ObjectMeta.DeletionTimestamp.IsZero(){
+					return true
 				}
+				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
 				log.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
-				log.V(1).Info("update received", "shouldReconcileOnFinalizerChange", shouldReconcileOnFinalizerChange)
-				log.V(1).Info("update received", "shouldReconcileOnDeletionTimestamp", shouldReconcileOnDeletionTimestamp)
 
-				return !shouldReconcileOnSpecChange && !shouldReconcileOnFinalizerChange && !shouldReconcileOnDeletionTimestamp
+				return !shouldReconcileOnSpecChange
 			}
 			return true
 		},

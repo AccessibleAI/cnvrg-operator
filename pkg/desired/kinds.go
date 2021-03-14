@@ -5,21 +5,22 @@ import "k8s.io/apimachinery/pkg/runtime/schema"
 type GVRName string
 
 const (
-	DeploymentGVR         GVRName = "DeploymentGVR"
-	ConfigMapGVR          GVRName = "ConfigMapGVR"
-	PvcGVR                GVRName = "PvcGVR"
-	SecretGVR             GVRName = "SecretGVR"
-	SvcGVR                GVRName = "SvcGVR"
-	SaGVR                 GVRName = "SaGVR"
-	CrdGVR                GVRName = "CrdGVR"
-	IstioGVR              GVRName = "IstioGVR"
-	PrometheusGVR         GVRName = "PrometheusGVR"
-	ClusterRoleGVR        GVRName = "ClusterRoleGVR"
-	ClusterRoleBindingGVR GVRName = "ClusterRoleBindingGVR"
-	RoleGVR               GVRName = "RoleGVR"
-	RoleBindingGVR        GVRName = "RoleBindingGVR"
-	OcpRouteGVR           GVRName = "OcpRouteGVR"
-	IstioVsGVR            GVRName = "IstioVsGVR"
+	DeploymentGVR           GVRName = "DeploymentGVR"
+	ConfigMapGVR            GVRName = "ConfigMapGVR"
+	PvcGVR                  GVRName = "PvcGVR"
+	SecretGVR               GVRName = "SecretGVR"
+	SvcGVR                  GVRName = "SvcGVR"
+	SaGVR                   GVRName = "SaGVR"
+	CrdGVR                  GVRName = "CrdGVR"
+	PrometheusGVR           GVRName = "PrometheusGVR"
+	ClusterRoleGVR          GVRName = "ClusterRoleGVR"
+	ClusterRoleBindingGVR   GVRName = "ClusterRoleBindingGVR"
+	RoleGVR                 GVRName = "RoleGVR"
+	RoleBindingGVR          GVRName = "RoleBindingGVR"
+	OcpRouteGVR             GVRName = "OcpRouteGVR"
+	IstioVsGVR              GVRName = "IstioVsGVR"
+	IstioGVR                GVRName = "IstioGVR"
+	IstioDestinationRuleGVR GVRName = "IstioDestinationRule"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -64,6 +65,17 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "install.istio.io",
 		Version: "v1alpha1",
 	},
+	IstioVsGVR: schema.GroupVersionKind{
+		Kind:    "VirtualService",
+		Group:   "networking.istio.io",
+		Version: "v1alpha3",
+	},
+
+	IstioDestinationRuleGVR: schema.GroupVersionKind{
+		Kind:    "DestinationRule",
+		Group:   "networking.istio.io",
+		Version: "v1alpha3",
+	},
 
 	ClusterRoleGVR: schema.GroupVersionKind{
 		Kind:    "ClusterRole",
@@ -89,11 +101,6 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Version: "v1",
 	},
 
-	IstioVsGVR: schema.GroupVersionKind{
-		Kind:    "VirtualService",
-		Group:   "networking.istio.io",
-		Version: "v1alpha3",
-	},
 	RoleBindingGVR: schema.GroupVersionKind{
 		Group:   "rbac.authorization.k8s.io",
 		Version: "v1",
