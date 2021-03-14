@@ -128,13 +128,67 @@ var webAppState = []*desired.State{
 	},
 }
 
+var sidekiqState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/sidekiqs/sidekiq.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+}
+
+var searchkiqState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/sidekiqs/searchkiq.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+}
+
+var systemkiqState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/sidekiqs/systemkiq.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+}
+
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, registryState...)
 	state = append(state, rbacState...)
 	state = append(state, controlPlanConfigState...)
+
 	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
 	}
+
+	if cnvrgApp.Spec.ControlPlan.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "true" {
+		state = append(state, sidekiqState...)
+	}
+
+	if cnvrgApp.Spec.ControlPlan.Searchkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "true" {
+		state = append(state, searchkiqState...)
+	}
+
+	if cnvrgApp.Spec.ControlPlan.Systemkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "true" {
+		state = append(state, systemkiqState...)
+	}
+
+	if cnvrgApp.Spec.ControlPlan.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "false" {
+		state = append(state, sidekiqState...)
+	}
+
 	return state
 }
