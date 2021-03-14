@@ -84,6 +84,12 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// set reconciling status
 	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec, req.NamespacedName)
 
+	// ControlPlan
+	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
 	// PostgreSQL
 	if err := r.apply(pg.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
@@ -92,12 +98,6 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Networking
 	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
-		return ctrl.Result{}, err
-	}
-
-	// ControlPlan
-	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
@@ -254,6 +254,8 @@ func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	log = r.Log.WithValues("initializing", "crds")
+
 	if viper.GetBool("deploy-depended-crds") == false {
 		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
 	}
@@ -264,7 +266,6 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 	}
 
-
 	p := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
@@ -272,9 +273,18 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
-				return !reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
-			}
+				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
+				shouldReconcileOnFinalizerChange := reflect.DeepEqual(oldObject.ObjectMeta.Finalizers, newObject.ObjectMeta.Finalizers) // finalizers wasn't changed, assuming status update, won't reconcile
+				shouldReconcileOnDeletionTimestamp := true
+				if oldObject.ObjectMeta.DeletionTimestamp != newObject.ObjectMeta.DeletionTimestamp {
+					shouldReconcileOnDeletionTimestamp = false
+				}
+				log.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+				log.V(1).Info("update received", "shouldReconcileOnFinalizerChange", shouldReconcileOnFinalizerChange)
+				log.V(1).Info("update received", "shouldReconcileOnDeletionTimestamp", shouldReconcileOnDeletionTimestamp)
 
+				return !shouldReconcileOnSpecChange && !shouldReconcileOnFinalizerChange && !shouldReconcileOnDeletionTimestamp
+			}
 			return true
 		},
 	}
@@ -301,7 +311,6 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	return cnvrgAppController.
-
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }

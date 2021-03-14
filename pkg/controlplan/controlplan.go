@@ -130,8 +130,8 @@ var webAppState = []*desired.State{
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	//state = append(state, registryState...)
-	//state = append(state, rbacState...)
+	state = append(state, registryState...)
+	state = append(state, rbacState...)
 	state = append(state, controlPlanConfigState...)
 	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)

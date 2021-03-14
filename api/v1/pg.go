@@ -43,7 +43,7 @@ var pgDefault = Pg{
 	CPURequest:     4,
 	MemoryRequest:  "4Gi",
 	MaxConnections: 100,
-	SharedBuffers:  "64Mb",
+	SharedBuffers:  "64MB",
 	Fixpg:          "true",
 	HugePages: HugePages{
 		Enabled: "false",
