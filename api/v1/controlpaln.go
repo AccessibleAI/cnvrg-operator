@@ -251,7 +251,7 @@ var controlPlanDefault = ControlPlan{
 	},
 
 	Seeder: Seeder{
-		Image:           "docker.io/cnvrg/cnvrg-boot:v0.25",
+		Image:           "docker.io/cnvrg/cnvrg-boot:v0.26-tenancy",
 		SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
 		CreateBucketCmd: "mb.sh",
 	},

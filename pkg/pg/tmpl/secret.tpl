@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: pg-secret
+  name: {{ .Pg.SvcName }}
   namespace: {{ .CnvrgNs }}
 data:
   POSTGRESQL_USER: {{ .Pg.User | b64enc }}

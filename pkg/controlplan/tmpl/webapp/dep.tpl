@@ -55,6 +55,8 @@ spec:
             name: cp-ldap
         - secretRef:
             name: cp-object-storage
+        - secretRef:
+            name: {{ .Pg.SvcName }}
         name: cnvrg-app
         ports:
           - containerPort: {{ .ControlPlan.WebApp.Port }}
@@ -96,8 +98,8 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.Conf.CnvrgStorageType "minio") }}
-          value: "{{.Pg.SvcName}}:{{.Pg.Port}};{{.ControlPlan.Conf.CnvrgStorageEndpoint}}/minio/health/ready"
+          {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
+          value: "{{.Pg.SvcName}}:{{.Pg.Port}};{{.ControlPlan.ObjectStorage.CnvrgStorageEndpoint}}/minio/health/ready"
           {{- else }}
           value: "{{.Pg.SvcName}}:{{.Pg.Port}}"
           {{ end }}
@@ -110,13 +112,13 @@ spec:
         - secretRef:
             name: cp-object-storage
       {{- end }}
-      {{- if eq .ControlPlan.Pg.Fixpg "true" }}
+      {{- if eq .Pg.Fixpg "true" }}
       - name: fixpg
         image: {{.ControlPlan.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]
         envFrom:
         - secretRef:
-            name: pg-secret
+            name: {{ .Pg.SvcName }}
         imagePullPolicy: Always
       {{- end }}
       - name: seeder
@@ -125,7 +127,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SEEDER_IMAGE"
-          value: "{{.ControlPlan.Seeder.Image}}"
+          value: "{{.ControlPlan.WebApp.Image}}"
         - name: "CNVRG_SEED_CMD"
           value: "{{ .ControlPlan.Seeder.SeedCmd }}"
         - name: "CNVRG_NS"
@@ -134,9 +136,9 @@ spec:
           value: "cnvrg-control-plan"
         {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
-          value: "{{ .ControlPlan.Conf.GcpStorageSecret }}"
+          value: "{{ .ControlPlan.OjbectStorage.GcpStorageSecret }}"
         - name: "CNVRG_GCP_KEYFILE_MOUNT_PATH"
-          value: "{{ .ControlPlan.Conf.GcpKeyfileMountPath }}"
+          value: "{{ .ControlPlan.OjbectStorage.GcpKeyfileMountPath }}"
         {{- end }}
 
 
