@@ -7,6 +7,7 @@ import (
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/pg"
+	"github.com/cnvrg-operator/pkg/redis"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
@@ -86,6 +87,12 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// ControlPlan
 	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
+	// Redis
+	if err := r.apply(redis.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
@@ -273,7 +280,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
-				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
+				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec)                                        // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
 				shouldReconcileOnFinalizerChange := reflect.DeepEqual(oldObject.ObjectMeta.Finalizers, newObject.ObjectMeta.Finalizers) // finalizers wasn't changed, assuming status update, won't reconcile
 				shouldReconcileOnDeletionTimestamp := true
 				if oldObject.ObjectMeta.DeletionTimestamp != newObject.ObjectMeta.DeletionTimestamp {
