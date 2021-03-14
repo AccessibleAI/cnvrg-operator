@@ -293,7 +293,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
 				// deleting cnvrg cr
-				if !newObject.ObjectMeta.DeletionTimestamp.IsZero(){
+				if !newObject.ObjectMeta.DeletionTimestamp.IsZero() {
 					return true
 				}
 				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile

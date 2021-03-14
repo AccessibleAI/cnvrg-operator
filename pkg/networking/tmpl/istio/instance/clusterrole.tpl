@@ -3,7 +3,6 @@ kind: ClusterRole
 metadata:
   name: istio-operator
 rules:
-  # istio groups
   - apiGroups:
       - authentication.istio.io
     resources:

@@ -11,19 +11,19 @@ import (
 
 const path = "/pkg/networking/tmpl"
 
-var istioState = []*desired.State{
+var istioIstanceState = []*desired.State{
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/clusterrole.tpl",
+		TemplatePath:   path + "/istio/instance/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.DeploymentGVR],
+		GVR:            desired.Kinds[desired.ClusterRoleGVR],
 		Own:            true,
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/clusterrolebinding.tpl",
+		TemplatePath:   path + "/istio/instance/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -32,7 +32,7 @@ var istioState = []*desired.State{
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/dep.tpl",
+		TemplatePath:   path + "/istio/instance/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -41,7 +41,7 @@ var istioState = []*desired.State{
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/sa.tpl",
+		TemplatePath:   path + "/istio/instance/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -50,7 +50,7 @@ var istioState = []*desired.State{
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/svc.tpl",
+		TemplatePath:   path + "/istio/instance/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -59,7 +59,7 @@ var istioState = []*desired.State{
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/istio/instance.tpl",
+		TemplatePath:   path + "/istio/instance/instance.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -68,14 +68,14 @@ var istioState = []*desired.State{
 	},
 }
 
-var ocpRoutesState = []*desired.State{
+var istioGwState = []*desired.State{
 	{
 		Name:           "",
-		TemplatePath:   path + "/route/app.tpl",
+		TemplatePath:   path + "/istio/gw/gw.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.OcpRouteGVR],
+		GVR:            desired.Kinds[desired.IstioGwGVR],
 		Own:            true,
 	},
 }
@@ -83,7 +83,52 @@ var ocpRoutesState = []*desired.State{
 var istioVsState = []*desired.State{
 	{
 		Name:           "",
-		TemplatePath:   path + "/vs/app.tpl",
+		TemplatePath:   path + "/istio/vs/app.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/vs/es.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/vs/grafana.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/vs/kibana.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/vs/minio.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/istio/vs/prom.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -98,15 +143,13 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		return state
 	}
 	if cnvrgApp.Spec.Networking.Istio.Enabled == "true" {
-		state = append(state, istioState...)
-	}
-	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
-		// set istio VSs and GWs here
+		state = append(state, istioIstanceState...)
 	}
 	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.OpenShiftIngress {
-		state = append(state, ocpRoutesState...)
+
 	}
 	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
+		state = append(state, istioGwState...)
 		state = append(state, istioVsState...)
 	}
 	return state

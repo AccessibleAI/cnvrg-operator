@@ -12,7 +12,7 @@ spec:
     global:
       istioNamespace:  {{ .CnvrgNs }}
       imagePullSecrets:
-        - {{ .ControlPlan.Conf.Registry.Name }}
+        - {{ .ControlPlan.Registry.Name }}
     meshConfig:
       rootNamespace:  {{ .CnvrgNs }}
   components:
@@ -21,27 +21,27 @@ spec:
     pilot:
       enabled: true
       k8s:
-        {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
+        {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
         nodeSelector:
-          {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+          {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
         {{- end }}
         tolerations:
-        - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
+        - key: "{{ .ControlPlan.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
     ingressGateways:
     - enabled: true
       name: istio-ingressgateway
       k8s:
-        {{- if eq .ControlPlan.Conf.Tenancy.Enabled "true" }}
+        {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
         nodeSelector:
-          {{ .ControlPlan.Conf.Tenancy.Key }}: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+          {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
         {{- end }}
         tolerations:
-        - key: "{{ .ControlPlan.Conf.Tenancy.Key }}"
+        - key: "{{ .ControlPlan.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .ControlPlan.Conf.Tenancy.Value }}"
+          value: "{{ .ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
         {{- if ne .Networking.Istio.IngressSvcAnnotations "" }}
         serviceAnnotations:

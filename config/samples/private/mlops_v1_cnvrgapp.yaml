@@ -4,7 +4,7 @@ metadata:
   name: cnvrgapp
 spec:
   cnvrgNs: "cnvrg"
-  clusterDomain: "test.operator.local"
+  clusterDomain: "test-op.test"
   controlPlan:
     webapp:
       image: "cnvrg/core:3.1.5"
@@ -21,7 +21,7 @@ spec:
       user: "dimssss"
       password: "1e029bb4-5631-4215-8ae1-ac77b76b6517"
   networking:
-    enabled: "false"
+    enabled: "true"
     https:
       enabled: "true"
     ingressType: "istio"
@@ -31,4 +31,6 @@ spec:
       externalIp: "1.2.3.4;4.2.3.4;  ;1.1.1.1"
       ingressSvcExtraPorts: "123;3232;4343"
   pg:
-    enabled: "true"
+    enabled: "false"
+  redis:
+    enabled: "false"
