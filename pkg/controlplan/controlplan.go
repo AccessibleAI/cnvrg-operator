@@ -164,6 +164,27 @@ var systemkiqState = []*desired.State{
 	},
 }
 
+var hyperState = []*desired.State{
+	{
+		Name:           "",
+		TemplatePath:   path + "/hyper/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+	{
+		Name:           "",
+		TemplatePath:   path + "/hyper/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+}
+
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, registryState...)
@@ -190,5 +211,8 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, sidekiqState...)
 	}
 
+	if cnvrgApp.Spec.ControlPlan.Hyper.Enabled == "true" {
+		state = append(state, hyperState...)
+	}
 	return state
 }
