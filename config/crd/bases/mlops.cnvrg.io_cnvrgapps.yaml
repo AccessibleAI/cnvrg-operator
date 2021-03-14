@@ -404,6 +404,8 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      patchEsNodes:
+                        type: string
                       port:
                         type: integer
                       runAsUser:

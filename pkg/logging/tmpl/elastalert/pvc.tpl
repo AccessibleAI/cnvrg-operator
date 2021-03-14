@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name:  {{.Redis.SvcName}}
+  name: {{ .Logging.Elastalert.SvcName}}
   namespace: {{ .CnvrgNs }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Redis.StorageSize }}
-  {{- if ne .Redis.StorageClass "use-default" }}
-  storageClassName: {{ .Redis.StorageClass }}
+      storage: {{ .Logging.Elastalert.StorageSize }}
+  {{- if ne .Pg.StorageClass "use-default" }}
+  storageClassName: {{ .Logging.Elastalert.StorageClass }}
   {{- else if ne .Storage.CcpStorageClass "" }}
   storageClassName: {{ .Storage.CcpStorageClass }}
   {{- end }}

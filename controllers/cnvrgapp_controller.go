@@ -5,6 +5,7 @@ import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/minio"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/pg"
@@ -87,6 +88,12 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// set reconciling status
 	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec, req.NamespacedName)
 
+	// Logging
+	if err := r.apply(logging.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
 	// ControlPlan
 	if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
@@ -110,6 +117,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
+
 
 	// Networking
 	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
@@ -136,7 +144,7 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 	// short reconciliations loop might cause status to be applied but not yet saved into BD
 	// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
 	// to avoid this error, fetch the object and compare the status
-	statusCheckAttempts := 10
+	statusCheckAttempts := 3
 	for {
 		cnvrgApp, err := r.getCnvrgSpec(name)
 		if err != nil {
