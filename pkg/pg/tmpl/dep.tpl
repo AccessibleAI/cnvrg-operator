@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Pg.SvcName}}
+  name: {{.Pg.SvcName }}
   namespace: {{ .CnvrgNs }}
   labels:
-    app: {{.Pg.SvcName}}
+    app: {{.Pg.SvcName }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Pg.SvcName}}
+      app: {{.Pg.SvcName }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: {{.Pg.SvcName}}
+        app: {{.Pg.SvcName }}
     spec:
       serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
       {{- if and (eq .ControlPlan.Tenancy.Enabled "true") (eq .ControlPlan.Tenancy.DedicatedNodes "true") }}
@@ -43,7 +43,7 @@ spec:
         - name: postgresql
           envFrom:
             - secretRef:
-                name: "pg-secret"
+                name: {{ .Pg.SvcName }}
           image: {{.Pg.Image}}
           imagePullPolicy: IfNotPresent
           ports:

@@ -9,8 +9,8 @@ spec:
   resources:
     requests:
       storage: {{ .Pg.StorageSize }}
-        {{- if ne .Pg.StorageClass "use-default" }}
-        storageClassName: {{ .Pg.StorageClass }}
-        {{- else if ne .Storage.CcpStorageClass "" }}
-        storageClassName: {{ .Storage.CcpStorageClass }}
-        {{- end }}
+  {{- if ne .Pg.StorageClass "use-default" }}
+  storageClassName: {{ .Pg.StorageClass }}
+  {{- else if ne .Storage.CcpStorageClass "" }}
+  storageClassName: {{ .Storage.CcpStorageClass }}
+  {{- end }}

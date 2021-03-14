@@ -15,6 +15,7 @@ type Es struct {
 	CPULimit      int    `json:"cpuLimit,omitempty"`
 	MemoryLimit   string `json:"memoryLimit,omitempty"`
 	JavaOpts      string `json:"javaOpts,omitempty"`
+	PatchEsNodes  string `json:"patchEsNodes,omitempty"`
 }
 type Elastalert struct {
 	Enabled       string `json:"enabled,omitempty"`
@@ -78,6 +79,7 @@ var loggingDefault = Logging{
 		CPULimit:      2,
 		MemoryLimit:   "4Gi",
 		JavaOpts:      "",
+		PatchEsNodes:  "true",
 	},
 	Elastalert: Elastalert{
 		Enabled:       "true",

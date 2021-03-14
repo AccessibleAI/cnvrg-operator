@@ -6,6 +6,8 @@ type GVRName string
 
 const (
 	DeploymentGVR           GVRName = "DeploymentGVR"
+	StatefulSetGVR          GVRName = "StatefulSetGVR"
+	DaemonSetGVR            GVRName = "DaemonSetGVR"
 	ConfigMapGVR            GVRName = "ConfigMapGVR"
 	PvcGVR                  GVRName = "PvcGVR"
 	SecretGVR               GVRName = "SecretGVR"
@@ -27,6 +29,18 @@ const (
 var Kinds = map[GVRName]schema.GroupVersionKind{
 	DeploymentGVR: schema.GroupVersionKind{
 		Kind:    "Deployment",
+		Group:   "apps",
+		Version: "v1",
+	},
+
+	StatefulSetGVR: schema.GroupVersionKind{
+		Kind:    "StatefulSet",
+		Group:   "apps",
+		Version: "v1",
+	},
+
+	DaemonSetGVR: schema.GroupVersionKind{
+		Kind:    "DaemonSet",
 		Group:   "apps",
 		Version: "v1",
 	},

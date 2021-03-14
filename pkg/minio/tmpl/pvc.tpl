@@ -13,8 +13,8 @@ spec:
   resources:
     requests:
       storage: {{ .Minio.StorageSize}}
-      {{- if ne .Minio.StorageClass "use-default" }}
-      storageClassName: {{ .Minio.StorageClass }}
-      {{- else if ne .Storage.CcpStorageClass "" }}
-      storageClassName: {{ .Storage.CcpStorageClass }}
-      {{- end }}
+  {{- if ne .Minio.StorageClass "use-default" }}
+  storageClassName: {{ .Minio.StorageClass }}
+  {{- else if ne .Storage.CcpStorageClass "" }}
+  storageClassName: {{ .Storage.CcpStorageClass }}
+  {{- end }}
