@@ -128,7 +128,7 @@ var kibana = []*desired.State{
 	},
 	{
 		Name:           "",
-		TemplatePath:   path + "/es/svc.tpl",
+		TemplatePath:   path + "/kibana/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
