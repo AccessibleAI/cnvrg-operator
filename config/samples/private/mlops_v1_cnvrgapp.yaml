@@ -4,10 +4,30 @@ metadata:
   name: cnvrgapp
 spec:
   cnvrgNs: "cnvrg"
-  clusterDomain: "test-op.azops.cnvrg.io"
+  clusterDomain: "goop.azops.cnvrg.io"
+  networking:
+    https:
+      enabled: "true"
+      certSecret: "cert-prod-wildcard"
+    istio:
+      externalIp: "10.0.0.67;10.0.0.71;10.0.0.68"
+  storage:
+    enabled: "true"
+    ccpStorageClass: "cnvrg-hostpath-storage"
+    hostpath:
+      enabled: "true"
+      nodeName: "node2"
+      defaultSc: "false"
+    nfs:
+      enabled: "true"
+      defaultSc: "true"
+      server: "node0"
+      path: "/mnt/nfs"
+  minio:
+    cpuRequest:
   controlPlan:
     webapp:
-      image: "cnvrg/core:3.1.5"
+      image: "cnvrg/app:master-5316-encode"
     registry:
       name: "cnvrg-registry"
       url: "docker.io"

@@ -4,8 +4,8 @@ metadata:
   name: {{ .Storage.Nfs.StorageClassName }}
   namespace: {{ .CnvrgNs }}
   annotations:
-    storageclass.kubernetes.io/is-default-class: {{ .Storage.Nfs.DefaultSc }}
-provisioner: {{ Storage.Nfs.Provisioner }}
+    storageclass.kubernetes.io/is-default-class: "{{ .Storage.Nfs.DefaultSc }}"
+provisioner: {{ .Storage.Nfs.Provisioner }}
 reclaimPolicy: {{ .Storage.Nfs.ReclaimPolicy }}
 {{- if eq .Storage.Nfs.ReclaimPolicy "Delete" }}
 parameters:

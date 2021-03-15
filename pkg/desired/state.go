@@ -48,6 +48,16 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"hyperServerUrl": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
 			return "http://" + cnvrgappspec.ControlPlan.Hyper.SvcName
 		},
+		"objectStorageUrl": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
+			if cnvrgappspec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
+				return cnvrgappspec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
+			}
+			if cnvrgappspec.Networking.HTTPS.Enabled == "true" {
+				return fmt.Sprintf("https://%s.%s", cnvrgappspec.Minio.SvcName, cnvrgappspec.ClusterDomain)
+			} else {
+				return fmt.Sprintf("http://%s.%s", cnvrgappspec.Minio.SvcName, cnvrgappspec.ClusterDomain)
+			}
+		},
 		"routeBy": func(cnvrgappspec mlopsv1.CnvrgAppSpec, routeBy string) string {
 			switch routeBy {
 			case "ISTIO":

@@ -9,8 +9,8 @@ data:
   STS_KEY: {{ .ControlPlan.ObjectStorage.StsKey | b64enc }}
   CNVRG_STORAGE_TYPE: {{ .ControlPlan.ObjectStorage.CnvrgStorageType | b64enc }}
   MINIO_SSE_MASTER_KEY: {{ .ControlPlan.ObjectStorage.MinioSseMasterKey | b64enc }}
-  CNVRG_STORAGE_ENDPOINT: {{ .ControlPlan.ObjectStorage.CnvrgStorageEndpoint | b64enc }}
-  ################## minio/aws storage ObjectStorageigs  ###########################
+  CNVRG_STORAGE_ENDPOINT: {{ objectStorageUrl . | b64enc }}
+  ################## minio/aws storage ObjectStorage  ###########################
   CNVRG_STORAGE_BUCKET: {{ .ControlPlan.ObjectStorage.CnvrgStorageBucket | b64enc }}
   CNVRG_STORAGE_ACCESS_KEY:  {{ .ControlPlan.ObjectStorage.CnvrgStorageAccessKey | b64enc }}
   CNVRG_STORAGE_SECRET_KEY: {{ .ControlPlan.ObjectStorage.CnvrgStorageSecretKey | b64enc }}

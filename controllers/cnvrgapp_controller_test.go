@@ -30,7 +30,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := "test-pg-no-tenancy-set"
 			ctx := context.Background()
 			createNs(ns)
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.CnvrgNs = ns
 			testSpec.Networking.Enabled = "false"
 			cnvrgApp := &mlopsv1.CnvrgApp{
@@ -65,7 +65,7 @@ var _ = Describe("CnvrgApp controller", func() {
 		It("Tenancy is set", func() {
 			ctx := context.Background()
 			ns := "tenancy-set-pg"
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.ControlPlan.Tenancy.Enabled = "true"
 			testSpec.CnvrgNs = ns
 			testSpec.Networking.Enabled = "false"
@@ -90,7 +90,7 @@ var _ = Describe("CnvrgApp controller", func() {
 		It("Tenancy is set, HostPath storage is set", func() {
 			ctx := context.Background()
 			ns := "tenancy-set-pg-hostpath"
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.ControlPlan.Tenancy.Enabled = "true"
 			testSpec.Storage.Enabled = "true"
 			testSpec.Storage.Hostpath.Enabled = "true"
@@ -121,7 +121,7 @@ var _ = Describe("CnvrgApp controller", func() {
 		It("Tenancy true, DedicatedNode true", func() {
 			ctx := context.Background()
 			ns := "tenancy-true-dedicated-true"
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.CnvrgNs = ns
 			testSpec.ControlPlan.Tenancy.Enabled = "true"
 			testSpec.ControlPlan.Tenancy.DedicatedNodes = "true"
@@ -160,7 +160,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := "istio-test"
 			createNs(ns)
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.CnvrgNs = ns
 			testSpec.Networking.Enabled = "true"
 			testSpec.Networking.Istio.Enabled = "true"
@@ -208,7 +208,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := "istio-test-with-tenancy-enabled"
 			createNs(ns)
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.CnvrgNs = ns
 			testSpec.ControlPlan.Tenancy.Enabled = "true"
 
@@ -238,7 +238,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := "istio-operator-deployment-with-tenancy-enabled"
 			createNs(ns)
-			testSpec := mlopsv1.DefaultSpec
+			testSpec := mlopsv1.DefaultSpec()
 			testSpec.CnvrgNs = ns
 			testSpec.ControlPlan.Tenancy.Enabled = "true"
 			cnvrgApp := &mlopsv1.CnvrgApp{

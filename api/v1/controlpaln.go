@@ -273,7 +273,7 @@ var controlPlanDefault = ControlPlan{
 		CnvrgStorageBucket:           "cnvrg-storage",
 		CnvrgStorageAccessKey:        "AKIAIOSFODNN7EXAMPLE",
 		CnvrgStorageSecretKey:        "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-		CnvrgStorageEndpoint:         "http://minio",
+		CnvrgStorageEndpoint:         "",
 		MinioSseMasterKey:            "my-minio-key:a310aadcefdb634b748ae31225f175e3f64591f955dfc66ccc20e128a6817ff9",
 		CnvrgStorageAzureAccessKey:   "",
 		CnvrgStorageAzureAccountName: "",
@@ -308,7 +308,7 @@ var controlPlanDefault = ControlPlan{
 
 	Rbac: Rbac{
 		Role:               "cnvrg-control-plan-role",
-		ServiceAccountName: "cnvrg-control-plan",
+		ServiceAccountName: "cnvrg",
 		RoleBindingName:    "cnvrg-control-plan-binding",
 	},
 

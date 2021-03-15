@@ -99,9 +99,9 @@ spec:
         env:
         - name: "CNVRG_SERVICE_LIST"
           {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
-          value: "{{.Pg.SvcName}}:{{.Pg.Port}};{{.ControlPlan.ObjectStorage.CnvrgStorageEndpoint}}/minio/health/ready"
+          value: "{{ .Pg.SvcName }}:{{ .Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
           {{- else }}
-          value: "{{.Pg.SvcName}}:{{.Pg.Port}}"
+          value: "{{ .Pg.SvcName }}:{{ .Pg.Port }}"
           {{ end }}
       {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
       - name: create-cnvrg-bucket
@@ -133,7 +133,7 @@ spec:
         - name: "CNVRG_NS"
           value: {{ .CnvrgNs }}
         - name: "CNVRG_SA_NAME"
-          value: "cnvrg-control-plan"
+          value: {{ .ControlPlan.Rbac.ServiceAccountName }}
         {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: "{{ .ControlPlan.OjbectStorage.GcpStorageSecret }}"
