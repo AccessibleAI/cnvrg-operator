@@ -10,6 +10,7 @@ import (
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/pg"
 	"github.com/cnvrg-operator/pkg/redis"
+	"github.com/cnvrg-operator/pkg/storage"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
@@ -88,6 +89,18 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// set reconciling status
 	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec, req.NamespacedName)
 
+	// Storage
+	if err := r.apply(storage.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
+	// Networking
+	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
 	// Logging
 	if err := r.apply(logging.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
@@ -114,13 +127,6 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Minio
 	if err := r.apply(minio.State(desiredSpec), desiredSpec); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
-		return ctrl.Result{}, err
-	}
-
-
-	// Networking
-	if err := r.apply(networking.State(desiredSpec), desiredSpec); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
 		return ctrl.Result{}, err
 	}
@@ -174,7 +180,7 @@ func (r *CnvrgAppReconciler) defineDesiredSpec(name types.NamespacedName) (*mlop
 	if cnvrgApp == nil {
 		return nil, nil
 	}
-	desiredSpec := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}
+	desiredSpec := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec()}
 	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
 		log.Error(err, "can't merge")
 		return nil, err
@@ -287,7 +293,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
 	}
 	if viper.GetBool("own-istio-resources") {
-		if err := r.apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec}); err != nil {
+		if err := r.apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultSpec()}); err != nil {
 			log.Error(err, "can't apply networking CRDs")
 			os.Exit(1)
 		}

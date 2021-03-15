@@ -24,6 +24,7 @@ const (
 	IstioGVR                GVRName = "IstioGVR"
 	IstioDestinationRuleGVR GVRName = "IstioDestinationRule"
 	IstioGwGVR              GVRName = "IstioGwGVR"
+	StorageClassGVR         GVRName = "StorageClassGVR"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -131,5 +132,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "",
 		Version: "v1",
 		Kind:    "ConfigMap",
+	},
+	StorageClassGVR: schema.GroupVersionKind{
+		Group:   "storage.k8s.io",
+		Version: "v1",
+		Kind:    "StorageClass",
 	},
 }

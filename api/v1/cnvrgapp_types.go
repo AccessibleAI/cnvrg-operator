@@ -57,15 +57,31 @@ func init() {
 	SchemeBuilder.Register(&CnvrgApp{}, &CnvrgAppList{})
 }
 
-var DefaultSpec = CnvrgAppSpec{
-	ClusterDomain: "",
-	CnvrgNs:       "cnvrg",
-	Pg:            pgDefault,
-	Storage:       storageDefault,
-	ControlPlan:   controlPlanDefault,
-	Networking:    networkingDefault,
-	Minio:         minioDefaults,
-	Redis:         redisDefault,
-	Logging:       loggingDefault,
-	Monitoring:    monitoringDefault,
+func DefaultSpec() CnvrgAppSpec {
+	return CnvrgAppSpec{
+		ClusterDomain: "",
+		CnvrgNs:       "cnvrg",
+		Pg:            pgDefault,
+		Storage:       storageDefault,
+		ControlPlan:   controlPlanDefault,
+		Networking:    networkingDefault,
+		Minio:         minioDefaults,
+		Redis:         redisDefault,
+		Logging:       loggingDefault,
+		Monitoring:    monitoringDefault,
+	}
 }
+
+//
+//var DefaultSpec = CnvrgAppSpec{
+//	ClusterDomain: "",
+//	CnvrgNs:       "cnvrg",
+//	Pg:            pgDefault,
+//	Storage:       storageDefault,
+//	ControlPlan:   controlPlanDefault,
+//	Networking:    networkingDefault,
+//	Minio:         minioDefaults,
+//	Redis:         redisDefault,
+//	Logging:       loggingDefault,
+//	Monitoring:    monitoringDefault,
+//}

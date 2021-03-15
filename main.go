@@ -151,6 +151,7 @@ func informPkger() {
 	pkger.Include("/pkg/redis/tmpl")
 	pkger.Include("/pkg/minio/tmpl")
 	pkger.Include("/pkg/logging/tmpl")
+	pkger.Include("/pkg/storage/tmpl")
 	pkger.Include("/pkg/networking/tmpl")
 	pkger.Include("/pkg/controlplan/tmpl")
 }
