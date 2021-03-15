@@ -54,7 +54,7 @@ var storageDefault = Storage{
 	},
 	Nfs: Nfs{
 		Enabled:          "false",
-		Image:            "quay.io/external_storage/nfs-client-provisioner:latest",
+		Image:            "gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0",
 		Provisioner:      "cnvrg.io/ifs",
 		StorageClassName: "cnvrg-nfs-storage",
 		Server:           "",

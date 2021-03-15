@@ -15,7 +15,9 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -251,8 +253,35 @@ func (r *CnvrgAppReconciler) apply(desiredManifests []*desired.State, desiredSpe
 
 func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 	log.Info("running finalizer cleanup")
-	ctx := context.Background()
+
 	// remove istio
+	if err := r.cleanupIstio(desiredSpec); err != nil {
+		return err
+	}
+	// remove cnvrg-db-init
+	if err := r.cleanupDbInitCm(desiredSpec); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) error {
+	log.Info("running cnvrg-db-init cleanup")
+	ctx := context.Background()
+	dbInitCm := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "cnvrg-db-init", Namespace: desiredSpec.Spec.CnvrgNs}}
+	err := r.Delete(ctx, dbInitCm)
+	if err != nil && errors.IsNotFound(err) {
+		log.Info("no need to delete cnvrg-db-init, cm not found")
+	} else {
+		log.Error(err, "error deleting cnvrg-db-init")
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) cleanupIstio(desiredSpec *mlopsv1.CnvrgApp) error {
+	log.Info("running istio cleanup")
+	ctx := context.Background()
 	istioManifests := networking.State(desiredSpec)
 	for _, m := range istioManifests {
 		// Make sure IstioOperator was deployed
