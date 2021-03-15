@@ -183,7 +183,7 @@ var controlPlanDefault = ControlPlan{
 		Replicas:                1,
 		Enabled:                 "true",
 		Image:                   "cnvrg/core:3.1.5",
-		Port:                    80,
+		Port:                    8080,
 		CPU:                     2,
 		Memory:                  "4Gi",
 		SvcName:                 "app",

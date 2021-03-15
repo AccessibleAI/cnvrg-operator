@@ -13,11 +13,6 @@ spec:
       externalIp: "10.0.0.67;10.0.0.71;10.0.0.68"
   storage:
     enabled: "true"
-    ccpStorageClass: "cnvrg-hostpath-storage"
-    hostpath:
-      enabled: "true"
-      nodeName: "node2"
-      defaultSc: "false"
     nfs:
       enabled: "true"
       defaultSc: "true"
@@ -27,7 +22,7 @@ spec:
     cpuRequest:
   controlPlan:
     webapp:
-      image: "cnvrg/app:master-5316-encode"
+      image: "cnvrg/app:DEV-8159-oauth-proxy-5005"
     registry:
       name: "cnvrg-registry"
       url: "docker.io"
