@@ -14,7 +14,7 @@ spec:
     listKind: CnvrgAppList
     plural: cnvrgapps
     singular: cnvrgapp
-  scope: Cluster
+  scope: Namespaced
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.controlPlan.webapp.image
@@ -46,13 +46,13 @@ spec:
             properties:
               clusterDomain:
                 type: string
-              cnvrgNs:
-                type: string
               controlPlan:
                 properties:
                   baseConfig:
                     properties:
                       agentCustomTag:
+                        type: string
+                      ccpStorageClass:
                         type: string
                       checkJobExpiration:
                         type: string
@@ -349,6 +349,35 @@ spec:
                         type: string
                     type: object
                 type: object
+              ingress:
+                properties:
+                  enabled:
+                    type: string
+                  https:
+                    properties:
+                      cert:
+                        type: string
+                      certSecret:
+                        type: string
+                      enabled:
+                        type: string
+                      key:
+                        type: string
+                    type: object
+                  ingressType:
+                    enum:
+                    - istio
+                    - k8singress
+                    - openshift
+                    - nodeport
+                    type: string
+                  perTryTimeout:
+                    type: string
+                  retriesAttempts:
+                    type: integer
+                  timeout:
+                    type: string
+                type: object
               logging:
                 properties:
                   elastalert:
@@ -606,67 +635,6 @@ spec:
                         type: string
                     type: object
                 type: object
-              networking:
-                properties:
-                  enabled:
-                    type: string
-                  https:
-                    properties:
-                      cert:
-                        type: string
-                      certSecret:
-                        type: string
-                      enabled:
-                        type: string
-                      key:
-                        type: string
-                    type: object
-                  ingress:
-                    properties:
-                      enabled:
-                        type: string
-                      perTryTimeout:
-                        type: string
-                      retriesAttempts:
-                        type: integer
-                      timeout:
-                        type: string
-                    type: object
-                  ingressType:
-                    enum:
-                    - istio
-                    - k8singress
-                    - openshift
-                    - nodeport
-                    type: string
-                  istio:
-                    properties:
-                      enabled:
-                        type: string
-                      externalIp:
-                        type: string
-                      gwName:
-                        type: string
-                      hub:
-                        type: string
-                      ingressSvcAnnotations:
-                        type: string
-                      ingressSvcExtraPorts:
-                        type: string
-                      loadBalancerSourceRanges:
-                        type: string
-                      mixerImage:
-                        type: string
-                      operatorImage:
-                        type: string
-                      pilotImage:
-                        type: string
-                      proxyImage:
-                        type: string
-                      tag:
-                        type: string
-                    type: object
-                type: object
               pg:
                 properties:
                   cpuRequest:
@@ -743,65 +711,6 @@ spec:
                     type: string
                   svcName:
                     type: string
-                type: object
-              storage:
-                properties:
-                  ccpStorageClass:
-                    type: string
-                  enabled:
-                    type: string
-                  hostpath:
-                    properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
-                      defaultSc:
-                        type: string
-                      enabled:
-                        type: string
-                      hostPath:
-                        type: string
-                      image:
-                        type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
-                      nodeName:
-                        type: string
-                      reclaimPolicy:
-                        type: string
-                      storageClassName:
-                        type: string
-                    type: object
-                  nfs:
-                    properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
-                      defaultSc:
-                        type: string
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
-                      path:
-                        type: string
-                      provisioner:
-                        type: string
-                      reclaimPolicy:
-                        type: string
-                      server:
-                        type: string
-                      storageClassName:
-                        type: string
-                    type: object
                 type: object
             type: object
           status:

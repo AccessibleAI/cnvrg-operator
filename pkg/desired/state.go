@@ -2,14 +2,25 @@ package desired
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/Masterminds/sprig"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/go-logr/logr"
+	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"io/ioutil"
+	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
+	"k8s.io/apimachinery/pkg/types"
+	"reflect"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
 	"strings"
 	"text/template"
@@ -18,13 +29,13 @@ import (
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
 		"httpScheme": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.Networking.HTTPS.Enabled == "true" {
+			if cnvrgappspec.Ingress.HTTPS.Enabled == "true" {
 				return "https://"
 			}
 			return "http://"
 		},
 		"appDomain": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.Networking.IngressType == mlopsv1.NodePortIngress {
+			if cnvrgappspec.Ingress.IngressType == mlopsv1.NodePortIngress {
 				return cnvrgappspec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgappspec.ControlPlan.WebApp.NodePort)
 			} else {
@@ -32,7 +43,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 		},
 		"defaultComputeClusterDomain": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.Networking.IngressType == mlopsv1.NodePortIngress {
+			if cnvrgappspec.Ingress.IngressType == mlopsv1.NodePortIngress {
 				return cnvrgappspec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgappspec.ControlPlan.WebApp.NodePort)
 			} else {
@@ -52,7 +63,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			if cnvrgappspec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
 				return cnvrgappspec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
 			}
-			if cnvrgappspec.Networking.HTTPS.Enabled == "true" {
+			if cnvrgappspec.Ingress.HTTPS.Enabled == "true" {
 				return fmt.Sprintf("https://%s.%s", cnvrgappspec.Minio.SvcName, cnvrgappspec.ClusterDomain)
 			} else {
 				return fmt.Sprintf("http://%s.%s", cnvrgappspec.Minio.SvcName, cnvrgappspec.ClusterDomain)
@@ -61,22 +72,22 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"routeBy": func(cnvrgappspec mlopsv1.CnvrgAppSpec, routeBy string) string {
 			switch routeBy {
 			case "ISTIO":
-				if cnvrgappspec.Networking.IngressType == mlopsv1.IstioIngress {
+				if cnvrgappspec.Ingress.IngressType == mlopsv1.IstioIngress {
 					return "true"
 				}
 				return "false"
 			case "OPENSHIFT":
-				if cnvrgappspec.Networking.IngressType == mlopsv1.OpenShiftIngress {
+				if cnvrgappspec.Ingress.IngressType == mlopsv1.OpenShiftIngress {
 					return "true"
 				}
 				return "false"
 			case "NGINX_INGRESS":
-				if cnvrgappspec.Networking.IngressType == mlopsv1.NginxIngress {
+				if cnvrgappspec.Ingress.IngressType == mlopsv1.NginxIngress {
 					return "true"
 				}
 				return "false"
 			case "NODE_PORT":
-				if cnvrgappspec.Networking.IngressType == mlopsv1.NodePortIngress {
+				if cnvrgappspec.Ingress.IngressType == mlopsv1.NodePortIngress {
 					return "true"
 				}
 				return "false"
@@ -132,7 +143,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 	}
 }
 
-func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
+func (s *State) GenerateDeployable(spec v1.Object) error {
 	var tpl bytes.Buffer
 	f, err := pkger.Open(s.TemplatePath)
 	if err != nil {
@@ -155,7 +166,8 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 	s.Obj.SetGroupVersionKind(s.GVR)
-	if err := s.Template.Execute(&tpl, cnvrgApp.Spec); err != nil {
+	data:= CastSpec(spec)
+	if err := s.Template.Execute(&tpl, &data); err != nil {
 		zap.S().Error(err, "rendering template error", "file", s.TemplatePath)
 		return err
 	}
@@ -169,5 +181,64 @@ func (s *State) GenerateDeployable(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 	s.Name = s.Obj.Object["metadata"].(map[string]interface{})["name"].(string)
 
+	return nil
+}
+
+func CastSpec(spec v1.Object) interface{} {
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(spec) {
+		cnvrgApp := spec.(*mlopsv1.CnvrgApp)
+		return cnvrgApp
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(spec) {
+		cnvrgInfra := spec.(*mlopsv1.CnvrgInfra)
+		return cnvrgInfra
+	}
+	return nil
+}
+
+func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
+
+	ctx := context.Background()
+	for _, manifest := range desiredManifests {
+		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
+			log.Error(err, "error generating deployable", "name", manifest.Name)
+			return err
+		}
+		if manifest.Own {
+			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, schema); err != nil {
+				log.Error(err, "error setting controller reference", "name", manifest.Name)
+				return err
+			}
+		}
+		if viper.GetBool("dry-run") {
+			log.Info("dry run enabled, skipping applying...")
+			continue
+		}
+		fetchInto := &unstructured.Unstructured{}
+		fetchInto.SetGroupVersionKind(manifest.GVR)
+		err := client.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.GetNamespace()}, fetchInto)
+		if err != nil && errors.IsNotFound(err) {
+			log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
+			if err := client.Create(ctx, manifest.Obj); err != nil {
+				log.Error(err, "error creating object", "name", manifest.Name)
+				return err
+			}
+		} else {
+			if manifest.GVR == Kinds[PvcGVR] {
+				// TODO: make this generic
+				continue
+			}
+			if err := mergo.Merge(fetchInto, manifest.Obj, mergo.WithOverride); err != nil {
+				log.Error(err, "can't merge")
+				return err
+			}
+			//manifest.Obj.SetResourceVersion(fetchInto.GetResourceVersion())
+			err := client.Update(ctx, fetchInto)
+			if err != nil {
+				log.Info("error updating object", "manifest", manifest.TemplatePath)
+				return err
+			}
+		}
+	}
 	return nil
 }

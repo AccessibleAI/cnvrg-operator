@@ -64,7 +64,7 @@ var nfsClientState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.StorageClassGVR],
-		Own:            false,
+		Own:            true,
 	},
 	{
 		Name:           "",
@@ -122,12 +122,12 @@ var nfsClientState = []*desired.State{
 	},
 }
 
-func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
+func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.Storage.Enabled == "true" && cnvrgApp.Spec.Storage.Hostpath.Enabled == "true" {
+	if cnvrgInfra.Spec.Storage.Enabled == "true" && cnvrgInfra.Spec.Storage.Hostpath.Enabled == "true" {
 		state = append(state, hostPathState...)
 	}
-	if cnvrgApp.Spec.Storage.Enabled == "true" && cnvrgApp.Spec.Storage.Nfs.Enabled == "true" {
+	if cnvrgInfra.Spec.Storage.Enabled == "true" && cnvrgInfra.Spec.Storage.Nfs.Enabled == "true" {
 		state = append(state, nfsClientState...)
 	}
 	return state

@@ -1,4 +1,4 @@
-package networking
+package ingress
 
 import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
@@ -10,63 +10,6 @@ import (
 )
 
 const path = "/pkg/networking/tmpl"
-
-var istioIstanceState = []*desired.State{
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/instance/clusterrole.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ClusterRoleGVR],
-		Own:            true,
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/instance/clusterrolebinding.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
-		Own:            true,
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/instance/dep.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.DeploymentGVR],
-		Own:            true,
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/instance/sa.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SaGVR],
-		Own:            true,
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/instance/svc.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SvcGVR],
-		Own:            true,
-	},
-	{
-		Name:           "",
-		TemplatePath:   path + "/istio/instance/instance.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.IstioGVR],
-		Own:            true,
-	},
-}
 
 var istioGwState = []*desired.State{
 	{
@@ -139,16 +82,13 @@ var istioVsState = []*desired.State{
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.Networking.Enabled == "false" {
+	if cnvrgApp.Spec.Ingress.Enabled == "false" {
 		return state
 	}
-	if cnvrgApp.Spec.Networking.Istio.Enabled == "true" {
-		state = append(state, istioIstanceState...)
-	}
-	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.OpenShiftIngress {
+	if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.OpenShiftIngress {
 
 	}
-	if cnvrgApp.Spec.Networking.IngressType == mlopsv1.IstioIngress {
+	if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.IstioIngress {
 		state = append(state, istioGwState...)
 		state = append(state, istioVsState...)
 	}

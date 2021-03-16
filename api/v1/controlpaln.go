@@ -138,6 +138,7 @@ type BaseConfig struct {
 	AgentCustomTag       string            `json:"agentCustomTag,omitempty"`
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
+	CcpStorageClass      string            `json:"ccpStorageClass,omitempty"`
 }
 type CnvrgRouter struct {
 	Enabled  string `json:"enabled,omitempty"`

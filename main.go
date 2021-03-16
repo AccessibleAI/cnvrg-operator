@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/controllers"
+	"os"
+	"strings"
+
 	"github.com/go-logr/zapr"
 	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
@@ -12,10 +13,11 @@ import (
 	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
-	"strings"
+
+	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/controllers"
 )
 
 type param struct {
@@ -119,6 +121,14 @@ func runOperator() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.CnvrgInfraReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("CnvrgInfra"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "CnvrgInfra")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
@@ -147,13 +157,14 @@ func setupCommands() {
 }
 
 func informPkger() {
-	pkger.Include("/pkg/pg/tmpl")
-	pkger.Include("/pkg/redis/tmpl")
-	pkger.Include("/pkg/minio/tmpl")
-	pkger.Include("/pkg/logging/tmpl")
-	pkger.Include("/pkg/storage/tmpl")
-	pkger.Include("/pkg/networking/tmpl")
-	pkger.Include("/pkg/controlplan/tmpl")
+	pkger.Include("/pkg/cnvrgapp/pg/tmpl")
+	pkger.Include("/pkg/cnvrgapp/redis/tmpl")
+	pkger.Include("/pkg/cnvrgapp/minio/tmpl")
+	pkger.Include("/pkg/cnvrgapp/logging/tmpl")
+	pkger.Include("/pkg/cnvrgapp/ingress/tmpl")
+	pkger.Include("/pkg/cnvrgapp/controlplan/tmpl")
+	pkger.Include("/pkg/cnvrginfra/istio/tmpl")
+	pkger.Include("/pkg/cnvrginfra/storage/tmpl")
 }
 
 func main() {
