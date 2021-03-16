@@ -1,20 +1,20 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Monitoring.Prometheus.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Monitoring.Prometheus.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
   hosts:
-  - "{{ .Monitoring.Prometheus.SvcName }}.{{ .ClusterDomain }}"
+  - "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Networking.Istio.GwName }}
+  - {{ .Spec.Ingress.IstioGwName }}
   http:
   - retries:
-      attempts: {{ .Networking.Ingress.RetriesAttempts }}
-      perTryTimeout: {{ .Networking.Ingress.PerTryTimeout }}
-    timeout: {{ .Networking.Ingress.Timeout }}
+      attempts: {{ .Spec.Ingress.RetriesAttempts }}
+      perTryTimeout: {{ .Spec.Ingress.PerTryTimeout }}
+    timeout: {{ .Spec.Ingress.Timeout }}
     route:
     - destination:
         port:
-          number: {{ .Monitoring.Prometheus.Port }}
-        host: "{{ .Monitoring.Prometheus.SvcName }}.{{ .CnvrgNs }}.svc.cluster.local"
+          number: {{ .Spec.Monitoring.Prometheus.Port }}
+        host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Namespace }}.svc.cluster.local"

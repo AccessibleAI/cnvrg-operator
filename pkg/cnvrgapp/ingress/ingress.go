@@ -3,13 +3,10 @@ package ingress
 import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
-	"github.com/markbates/pkger"
-	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"os"
 )
 
-const path = "/pkg/networking/tmpl"
+const path = "/pkg/cnvrgapp/ingress/tmpl"
 
 var istioGwState = []*desired.State{
 	{
@@ -93,27 +90,4 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, istioVsState...)
 	}
 	return state
-}
-
-func Crds() (crds []*desired.State) {
-	err := pkger.Walk(path+"/istio/crds", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		crd := &desired.State{
-
-			TemplatePath:   path,
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.CrdGVR],
-			Own:            false,
-		}
-		crds = append(crds, crd)
-		return nil
-	})
-	if err != nil {
-		zap.S().Error(err, "error loading istio crds")
-	}
-	return
 }

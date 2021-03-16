@@ -1,18 +1,18 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Minio.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Minio.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
   hosts:
-  - "{{ .Minio.SvcName}}.{{ .ClusterDomain }}"
+  - "{{ .Spec.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Networking.Istio.GwName }}
+  - {{ .Spec.Ingress.IstioGwName }}
   http:
   - retries:
-      attempts: {{ .Networking.Ingress.RetriesAttempts }}
+      attempts: {{ .Spec.Ingress.RetriesAttempts }}
       perTryTimeout: 172800s
     timeout: 864000s
     route:
     - destination:
-        host: "{{ .Minio.SvcName }}.{{ .CnvrgNs }}.svc.cluster.local"
+        host: "{{ .Spec.Minio.SvcName }}.{{ .Namespace }}.svc.cluster.local"
