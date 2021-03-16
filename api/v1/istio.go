@@ -8,7 +8,6 @@ type Istio struct {
 	ProxyImage               string `json:"proxyImage,omitempty"`
 	MixerImage               string `json:"mixerImage,omitempty"`
 	PilotImage               string `json:"pilotImage,omitempty"`
-	GwName                   string `json:"gwName,omitempty"`
 	ExternalIP               string `json:"externalIp,omitempty"`
 	IngressSvcAnnotations    string `json:"ingressSvcAnnotations,omitempty"`
 	IngressSvcExtraPorts     string `json:"ingressSvcExtraPorts,omitempty"`
@@ -23,7 +22,6 @@ var istioDefault = Istio{
 	ProxyImage:               "proxyv2",
 	MixerImage:               "mixer",
 	PilotImage:               "pilot",
-	GwName:                   "cnvrg-gateway",
 	ExternalIP:               "",
 	IngressSvcAnnotations:    "",
 	IngressSvcExtraPorts:     "",

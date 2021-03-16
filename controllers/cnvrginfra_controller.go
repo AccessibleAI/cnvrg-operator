@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/istio"
-	"github.com/cnvrg-operator/pkg/cnvrginfra/storage"
+	"github.com/cnvrg-operator/pkg/cnvrginfra/registry"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
@@ -56,7 +56,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(context.Background(), desiredSpec); err != nil {
-				cnvrgAppLog.Error(err, "failed to add finalizer")
+				cnvrgInfraLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
@@ -68,7 +68,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			}
 			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(context.Background(), desiredSpec); err != nil {
-				cnvrgAppLog.Info("error in removing finalizer, checking if cnvrgApp object still exists")
+				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgApp object still exists")
 				// if update was failed, make sure that cnvrgApp still exists
 				spec, e := r.getCnvrgInfraSpec(req.NamespacedName)
 				if spec == nil && e == nil {
@@ -83,8 +83,14 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	// set reconciling status
 	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec)
 
-	// Storage
-	if err := desired.Apply(storage.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	// infra base config
+	if err := desired.Apply(registry.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	// Istio
+	if err := desired.Apply(istio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 		return ctrl.Result{}, err
 	}
@@ -126,7 +132,7 @@ func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.Namespaced
 }
 
 func (r *CnvrgInfraReconciler) cleanup(desiredSpec *mlopsv1.CnvrgInfra) error {
-	cnvrgAppLog.Info("running finalizer cleanup")
+	cnvrgInfraLog.Info("running finalizer cleanup")
 
 	// remove istio
 	if err := r.cleanupIstio(desiredSpec); err != nil {
@@ -137,33 +143,33 @@ func (r *CnvrgInfraReconciler) cleanup(desiredSpec *mlopsv1.CnvrgInfra) error {
 }
 
 func (r *CnvrgInfraReconciler) cleanupIstio(desiredSpec *mlopsv1.CnvrgInfra) error {
-	cnvrgAppLog.Info("running istio cleanup")
+	cnvrgInfraLog.Info("running istio cleanup")
 	ctx := context.Background()
 	istioManifests := istio.State(desiredSpec)
 	for _, m := range istioManifests {
 		// Make sure IstioOperator was deployed
 		if m.GVR == desired.Kinds[desired.IstioGVR] {
 			if err := m.GenerateDeployable(desiredSpec); err != nil {
-				cnvrgAppLog.Error(err, "can't make manifest deployable")
+				cnvrgInfraLog.Error(err, "can't make manifest deployable")
 				return err
 			}
 			if err := r.Delete(ctx, m.Obj); err != nil {
 				if errors.IsNotFound(err) {
-					cnvrgAppLog.Info("istio instance not found - probably removed previously")
+					cnvrgInfraLog.Info("istio instance not found - probably removed previously")
 					return nil
 				}
 				return err
 			}
 			istioExists := true
-			cnvrgAppLog.Info("wait for istio instance removal")
+			cnvrgInfraLog.Info("wait for istio instance removal")
 			for istioExists {
-				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.Namespace}, m.Obj)
+				err := r.Get(ctx, types.NamespacedName{Name: m.Obj.GetName(), Namespace: m.Obj.GetNamespace()}, m.Obj)
 				if err != nil && errors.IsNotFound(err) {
-					cnvrgAppLog.Info("istio instance was successfully removed")
+					cnvrgInfraLog.Info("istio instance was successfully removed")
 					istioExists = false
 				}
 				if istioExists {
-					cnvrgAppLog.Info("istio instance still present, will sleep of 1 sec, and check again...")
+					cnvrgInfraLog.Info("istio instance still present, will sleep of 1 sec, and check again...")
 				}
 			}
 		}
@@ -173,14 +179,14 @@ func (r *CnvrgInfraReconciler) cleanupIstio(desiredSpec *mlopsv1.CnvrgInfra) err
 
 func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgInfra *mlopsv1.CnvrgInfra) {
 	if cnvrgInfra.Status.Status == mlopsv1.STATUS_REMOVING {
-		cnvrgAppLog.Info("skipping status update, current cnvrg spec under removing status...")
+		cnvrgInfraLog.Info("skipping status update, current cnvrg spec under removing status...")
 		return
 	}
 	ctx := context.Background()
 	cnvrgInfra.Status.Status = status
 	cnvrgInfra.Status.Message = message
 	if err := r.Status().Update(ctx, cnvrgInfra); err != nil {
-		cnvrgAppLog.Error(err, "can't update status")
+		cnvrgInfraLog.Error(err, "can't update status")
 	}
 	// This check is to make sure that the status is indeed updated
 	// short reconciliations loop might cause status to be applied but not yet saved into BD
@@ -190,19 +196,19 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 	for {
 		cnvrgInfra, err := r.getCnvrgInfraSpec(types.NamespacedName{Namespace: cnvrgInfra.Namespace, Name: cnvrgInfra.Name})
 		if err != nil {
-			cnvrgAppLog.Error(err, "can't validate status update")
+			cnvrgInfraLog.Error(err, "can't validate status update")
 		}
-		cnvrgAppLog.V(1).Info("expected status", "status", status, "message", message)
-		cnvrgAppLog.V(1).Info("current status", "status", cnvrgInfra.Status.Status, "message", cnvrgInfra.Status.Message)
+		cnvrgInfraLog.V(1).Info("expected status", "status", status, "message", message)
+		cnvrgInfraLog.V(1).Info("current status", "status", cnvrgInfra.Status.Status, "message", cnvrgInfra.Status.Message)
 		if cnvrgInfra.Status.Status == status && cnvrgInfra.Status.Message == message {
 			break
 		}
 		if statusCheckAttempts == 0 {
-			cnvrgAppLog.Info("can't verify status update, status checks attempts exceeded")
+			cnvrgInfraLog.Info("can't verify status update, status checks attempts exceeded")
 			break
 		}
 		statusCheckAttempts--
-		cnvrgAppLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
+		cnvrgInfraLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
 		time.Sleep(1 * time.Second)
 	}
 }
@@ -217,7 +223,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	if viper.GetBool("own-istio-resources") {
 		err := desired.Apply(istio.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 		if err != nil {
-			cnvrgAppLog.Error(err, "can't apply networking CRDs")
+			cnvrgInfraLog.Error(err, "can't apply networking CRDs")
 			os.Exit(1)
 		}
 	}
@@ -234,9 +240,10 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return true
 				}
 				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrginfra spec wasn't changed, assuming status update, won't reconcile
-				cnvrgAppLog.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+				cnvrgInfraLog.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
 
 				return !shouldReconcileOnSpecChange
+
 			}
 			return true
 		},

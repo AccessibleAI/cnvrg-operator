@@ -13,7 +13,7 @@ const path = "/pkg/cnvrginfra/istio/tmpl"
 
 var istioInstanceState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/instance/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -22,7 +22,7 @@ var istioInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/instance/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -31,7 +31,7 @@ var istioInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/instance/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -40,7 +40,7 @@ var istioInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/instance/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -49,7 +49,7 @@ var istioInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/instance/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -58,7 +58,7 @@ var istioInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/instance/instance.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -70,7 +70,7 @@ var istioInstanceState = []*desired.State{
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if cnvrgInfra.Spec.Istio.Enabled == "false" {
+	if cnvrgInfra.Spec.Istio.Enabled == "true" {
 		return istioInstanceState
 	}
 	return state
@@ -82,7 +82,7 @@ func Crds() (crds []*desired.State) {
 			return nil
 		}
 		crd := &desired.State{
-			Name:           "",
+
 			TemplatePath:   path,
 			Template:       nil,
 			ParsedTemplate: "",

@@ -10,7 +10,6 @@ const path = "/pkg/logging/tmpl"
 
 var es = []*desired.State{
 	{
-		Name:           "",
 		TemplatePath:   path + "/es/sts.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -19,7 +18,6 @@ var es = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
 		TemplatePath:   path + "/es/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -31,7 +29,6 @@ var es = []*desired.State{
 
 var fluentd = []*desired.State{
 	{
-		Name:           "",
 		TemplatePath:   path + "/fluentd/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -40,7 +37,6 @@ var fluentd = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
 		TemplatePath:   path + "/fluentd/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -49,7 +45,7 @@ var fluentd = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/fluentd/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -58,7 +54,7 @@ var fluentd = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/fluentd/daemonset.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -67,7 +63,7 @@ var fluentd = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/fluentd/cm.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -79,7 +75,7 @@ var fluentd = []*desired.State{
 
 var elastAlert = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/elastalert/pvc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -88,7 +84,7 @@ var elastAlert = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/elastalert/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -97,7 +93,7 @@ var elastAlert = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/elastalert/cm.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -106,7 +102,7 @@ var elastAlert = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/elastalert/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -118,7 +114,7 @@ var elastAlert = []*desired.State{
 
 var kibana = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/kibana/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -127,7 +123,7 @@ var kibana = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/kibana/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

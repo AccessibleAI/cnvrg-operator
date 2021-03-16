@@ -49,8 +49,6 @@ spec:
                     type: string
                   externalIp:
                     type: string
-                  gwName:
-                    type: string
                   hub:
                     type: string
                   ingressSvcAnnotations:
@@ -68,6 +66,17 @@ spec:
                   proxyImage:
                     type: string
                   tag:
+                    type: string
+                type: object
+              registry:
+                properties:
+                  name:
+                    type: string
+                  password:
+                    type: string
+                  url:
+                    type: string
+                  user:
                     type: string
                 type: object
               storage:
@@ -127,8 +136,6 @@ spec:
                         type: string
                     type: object
                 type: object
-            required:
-            - cnvrgInfraNs
             type: object
           status:
             properties:

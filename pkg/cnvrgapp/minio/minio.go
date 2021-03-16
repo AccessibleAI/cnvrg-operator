@@ -11,7 +11,7 @@ const path = "/pkg/minio/tmpl"
 var singleBackendMinio = []*desired.State{
 
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/pvc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -20,7 +20,7 @@ var singleBackendMinio = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -29,7 +29,7 @@ var singleBackendMinio = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -42,7 +42,7 @@ var singleBackendMinio = []*desired.State{
 var sharedBackendMinio = []*desired.State{
 
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/pvc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -51,7 +51,7 @@ var sharedBackendMinio = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -60,7 +60,7 @@ var sharedBackendMinio = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/sh-dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -69,7 +69,7 @@ var sharedBackendMinio = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/dr.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

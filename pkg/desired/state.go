@@ -18,7 +18,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
-	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
@@ -166,8 +165,7 @@ func (s *State) GenerateDeployable(spec v1.Object) error {
 		return err
 	}
 	s.Obj.SetGroupVersionKind(s.GVR)
-	data:= CastSpec(spec)
-	if err := s.Template.Execute(&tpl, &data); err != nil {
+	if err := s.Template.Execute(&tpl, spec); err != nil {
 		zap.S().Error(err, "rendering template error", "file", s.TemplatePath)
 		return err
 	}
@@ -179,20 +177,6 @@ func (s *State) GenerateDeployable(spec v1.Object) error {
 		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
 		return err
 	}
-	s.Name = s.Obj.Object["metadata"].(map[string]interface{})["name"].(string)
-
-	return nil
-}
-
-func CastSpec(spec v1.Object) interface{} {
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(spec) {
-		cnvrgApp := spec.(*mlopsv1.CnvrgApp)
-		return cnvrgApp
-	}
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(spec) {
-		cnvrgInfra := spec.(*mlopsv1.CnvrgInfra)
-		return cnvrgInfra
-	}
 	return nil
 }
 
@@ -201,12 +185,12 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 	ctx := context.Background()
 	for _, manifest := range desiredManifests {
 		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
-			log.Error(err, "error generating deployable", "name", manifest.Name)
+			log.Error(err, "error generating deployable", "name", manifest.Obj.GetName())
 			return err
 		}
 		if manifest.Own {
 			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, schema); err != nil {
-				log.Error(err, "error setting controller reference", "name", manifest.Name)
+				log.Error(err, "error setting controller reference", "name", manifest.Obj.GetName())
 				return err
 			}
 		}
@@ -216,11 +200,11 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 		}
 		fetchInto := &unstructured.Unstructured{}
 		fetchInto.SetGroupVersionKind(manifest.GVR)
-		err := client.Get(ctx, types.NamespacedName{Name: manifest.Name, Namespace: desiredSpec.GetNamespace()}, fetchInto)
+		err := client.Get(ctx, types.NamespacedName{Name: manifest.Obj.GetName(), Namespace: manifest.Obj.GetNamespace()}, fetchInto)
 		if err != nil && errors.IsNotFound(err) {
-			log.Info("creating", "name", manifest.Name, "kind", manifest.GVR.Kind)
+			log.Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
 			if err := client.Create(ctx, manifest.Obj); err != nil {
-				log.Error(err, "error creating object", "name", manifest.Name)
+				log.Error(err, "error creating object", "name", manifest.Obj.GetName())
 				return err
 			}
 		} else {

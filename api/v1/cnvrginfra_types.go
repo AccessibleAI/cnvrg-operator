@@ -5,9 +5,10 @@ import (
 )
 
 type CnvrgInfraSpec struct {
-	CnvrgInfraNs string  `json:"cnvrgInfraNs"`
-	Storage      Storage `json:"storage,omitempty"`
-	Istio        Istio   `json:"istio,omitempty"`
+	CnvrgInfraNs string   `json:"cnvrgInfraNs,omitempty"`
+	Registry     Registry `json:"registry,omitempty"`
+	Storage      Storage  `json:"storage,omitempty"`
+	Istio        Istio    `json:"istio,omitempty"`
 }
 
 type CnvrgInfraStatus struct {
@@ -45,5 +46,11 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		CnvrgInfraNs: "cnvrg-infra",
 		Storage:      storageDefault,
 		Istio:        istioDefault,
+		Registry: Registry{
+			Name:     "cnvrg-registry",
+			URL:      "docker.io",
+			User:     "",
+			Password: "",
+		},
 	}
 }

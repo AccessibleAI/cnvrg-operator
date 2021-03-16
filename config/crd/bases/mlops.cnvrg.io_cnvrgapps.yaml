@@ -70,6 +70,8 @@ spec:
                         type: object
                       intercom:
                         type: string
+                      istioGwName:
+                        type: string
                       jobsStorageClass:
                         type: string
                       passengerAppEnv:

@@ -13,7 +13,7 @@ const path = "/pkg/networking/tmpl"
 
 var istioGwState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/gw/gw.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -25,7 +25,7 @@ var istioGwState = []*desired.State{
 
 var istioVsState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/vs/app.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -34,7 +34,7 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/vs/es.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -43,7 +43,7 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/vs/grafana.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -52,7 +52,7 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/vs/kibana.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -61,7 +61,7 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/vs/minio.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -70,7 +70,7 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/istio/vs/prom.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -101,7 +101,7 @@ func Crds() (crds []*desired.State) {
 			return nil
 		}
 		crd := &desired.State{
-			Name:           "",
+
 			TemplatePath:   path,
 			Template:       nil,
 			ParsedTemplate: "",
