@@ -1,25 +1,25 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .ControlPlan.WebApp.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.ControlPlan.WebApp.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
   hosts:
-    - "{{.ControlPlan.WebApp.SvcName}}.{{ .ClusterDomain }}"
+    - "{{.Spec.ControlPlan.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-    - {{ .Networking.Istio.GwName }}
+    - {{ .Spec.Ingress.IstioGwName }}
   http:
     - retries:
-        attempts: {{ .Networking.Ingress.RetriesAttempts }}
-        perTryTimeout: {{ .Networking.Ingress.PerTryTimeout }}
-      timeout: {{ .Networking.Ingress.Timeout }}
+        attempts: {{ .Spec.Ingress.RetriesAttempts }}
+        perTryTimeout: {{ .Spec.Ingress.PerTryTimeout }}
+      timeout: {{ .Spec.Ingress.Timeout }}
       route:
         - destination:
-            host: "{{ .ControlPlan.WebApp.SvcName }}.{{ .CnvrgNs }}.svc.cluster.local"
+            host: "{{ .Spec.ControlPlan.WebApp.SvcName }}.{{ .Namespace }}.svc.cluster.local"
       headers:
         request:
           set:
-            {{- if eq .Networking.HTTPS.Enabled "true"}}
+            {{- if eq .Spec.Ingress.HTTPS.Enabled "true"}}
             x-forwarded-proto: https
             {{- else }}
             x-forwarded-proto: http

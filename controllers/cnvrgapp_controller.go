@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/pg"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/ingress"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -81,46 +81,45 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	// set reconciling status
 	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec)
 
-	//// Networking
-	//if err := r.apply(ingress.State(desiredSpec), desiredSpec); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
-	//	return ctrl.Result{}, err
-	//}
-	//
+	// Ingress
+	if err := desired.Apply(ingress.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
 	//// Logging
-	//if err := r.apply(logging.State(desiredSpec), desiredSpec); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+	//if err := desired.Apply(logging.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 	//	return ctrl.Result{}, err
 	//}
 	//
 	//// ControlPlan
-	//if err := r.apply(controlplan.State(desiredSpec), desiredSpec); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+	//if err := desired.Apply(controlplan.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 	//	return ctrl.Result{}, err
 	//}
 	//
 	//// Redis
-	//if err := r.apply(redis.State(desiredSpec), desiredSpec); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
+	//if err := desired.Apply(redis.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+	//	return ctrl.Result{}, err
+	//}
+	//
+	//// PostgreSQL
+	//if err := desired.Apply(pg.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+	//	return ctrl.Result{}, err
+	//}
+	//
+	//// Minio
+	//if err := desired.Apply(minio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 	//	return ctrl.Result{}, err
 	//}
 
-	// PostgreSQL
-	if err := desired.Apply(pg.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
-	}
-	//
-	//// Minio
-	//if err := r.apply(minio.State(desiredSpec), desiredSpec); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec, req.NamespacedName)
-	//	return ctrl.Result{}, err
-	//}
-	//
-	//r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec, req.NamespacedName)
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec)
 	return ctrl.Result{}, nil
 }
 
@@ -191,7 +190,6 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 	}
 	return &cnvrgApp, nil
 }
-
 
 func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
 	cnvrgAppLog.Info("running finalizer cleanup")
@@ -266,7 +264,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	//if viper.GetBool("own-istio-resources") {
-	//	if err := r.apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}); err != nil {
+	//	if err := desired.Apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}); err != nil {
 	//		cnvrgAppLog.Error(err, "can't apply networking CRDs")
 	//		os.Exit(1)
 	//	}

@@ -50,6 +50,7 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		ClusterDomain: "",
 		Pg:            pgDefault,
 		ControlPlan:   controlPlanDefault,
+		Ingress:       ingressDefault,
 		Minio:         minioDefaults,
 		Redis:         redisDefault,
 		Logging:       loggingDefault,

@@ -1,20 +1,20 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Logging.Kibana.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Logging.Kibana.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
   hosts:
-    - "{{.Logging.Kibana.SvcName}}.{{ .ClusterDomain }}"
+    - "{{.Spec.Logging.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Networking.Istio.GwName }}
+  - {{ .Spec.Ingress.IstioGwName }}
   http:
   - retries:
-      attempts: {{ .Networking.Ingress.RetriesAttempts }}
-      perTryTimeout: {{ .Networking.Ingress.PerTryTimeout }}
-    timeout: {{ .Networking.Ingress.Timeout }}
+      attempts: {{ .Spec.Ingress.RetriesAttempts }}
+      perTryTimeout: {{ .Spec.Ingress.PerTryTimeout }}
+    timeout: {{ .Spec.Ingress.Timeout }}
     route:
     - destination:
         port:
-          number: {{.Logging.Kibana.Port}}
-        host: "{{ .Logging.Kibana.SvcName }}.{{ .CnvrgNs }}.svc.cluster.local"
+          number: {{.Spec.Logging.Kibana.Port}}
+        host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ .Namespace }}.svc.cluster.local"

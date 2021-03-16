@@ -1,8 +1,8 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: {{ .Networking.Istio.GwName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Ingress.IstioGwName }}
+  namespace: {{ .Namespace }}
 spec:
   selector:
     istio: ingressgateway
@@ -12,24 +12,24 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-        - "*.{{ .ClusterDomain }}"
-      {{- if and (eq .Networking.HTTPS.Enabled "true") (ne .Networking.HTTPS.CertSecret "") }}
+        - "*.{{ .Spec.ClusterDomain }}"
+      {{- if and (eq .Spec.Ingress.HTTPS.Enabled "true") (ne .Spec.Ingress.HTTPS.CertSecret "") }}
       tls:
         httpsRedirect: true
     - hosts:
-        - "*.{{ .ClusterDomain }}"
+        - "*.{{ .Spec.ClusterDomain }}"
       port:
         name: https
         number: 443
         protocol: HTTPS
       tls:
         mode: SIMPLE
-        credentialName: "{{ .Networking.HTTPS.CertSecret }}"
-      {{- else if eq .Networking.HTTPS.Enabled "true" }}
+        credentialName: "{{ .Spec.Ingress.HTTPS.CertSecret }}"
+      {{- else if eq .Spec.Ingress.HTTPS.Enabled "true" }}
       tls:
         httpsRedirect: true
     - hosts:
-        - "*.{{ .ClusterDomain }}"
+        - "*.{{ .Spec.ClusterDomain }}"
       port:
         name: https
         number: 443
