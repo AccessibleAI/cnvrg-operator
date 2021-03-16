@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: istio-operator
-    namespace: {{ .CnvrgNs }}
+    namespace: {{ .Spec.CnvrgInfraNs }}
 roleRef:
   kind: ClusterRole
   name: istio-operator

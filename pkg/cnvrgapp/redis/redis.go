@@ -10,7 +10,7 @@ const path = "/pkg/redis/tmpl"
 
 var state = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/pvc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -19,7 +19,7 @@ var state = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -28,7 +28,7 @@ var state = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/cm.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -37,7 +37,7 @@ var state = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

@@ -165,6 +165,7 @@ func informPkger() {
 	pkger.Include("/pkg/cnvrgapp/controlplan/tmpl")
 	pkger.Include("/pkg/cnvrginfra/istio/tmpl")
 	pkger.Include("/pkg/cnvrginfra/storage/tmpl")
+	pkger.Include("/pkg/cnvrginfra/registry/tmpl")
 }
 
 func main() {

@@ -10,7 +10,7 @@ const path = "/pkg/controlplan/tmpl"
 
 var registryState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/registry/secret.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -22,7 +22,7 @@ var registryState = []*desired.State{
 
 var rbacState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/rbac/role.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -31,7 +31,7 @@ var rbacState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/rbac/rolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -40,7 +40,7 @@ var rbacState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/rbac/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -52,7 +52,7 @@ var rbacState = []*desired.State{
 
 var controlPlanConfigState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/cm/config-base.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -61,7 +61,7 @@ var controlPlanConfigState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/cm/config-networking.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -70,7 +70,7 @@ var controlPlanConfigState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/cm/secret-base.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -79,7 +79,7 @@ var controlPlanConfigState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/cm/secret-ldap.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -88,7 +88,7 @@ var controlPlanConfigState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/cm/secret-object-storage.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -97,7 +97,7 @@ var controlPlanConfigState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/conf/cm/secret-sso.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -109,7 +109,7 @@ var controlPlanConfigState = []*desired.State{
 
 var webAppState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/webapp/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -118,7 +118,7 @@ var webAppState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/webapp/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -130,7 +130,7 @@ var webAppState = []*desired.State{
 
 var sidekiqState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/sidekiqs/sidekiq.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -142,7 +142,7 @@ var sidekiqState = []*desired.State{
 
 var searchkiqState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/sidekiqs/searchkiq.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -154,7 +154,7 @@ var searchkiqState = []*desired.State{
 
 var systemkiqState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/sidekiqs/systemkiq.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -166,7 +166,7 @@ var systemkiqState = []*desired.State{
 
 var hyperState = []*desired.State{
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/hyper/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -175,7 +175,7 @@ var hyperState = []*desired.State{
 		Own:            true,
 	},
 	{
-		Name:           "",
+
 		TemplatePath:   path + "/hyper/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

@@ -139,6 +139,7 @@ type BaseConfig struct {
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
 	CcpStorageClass      string            `json:"ccpStorageClass,omitempty"`
+	IstioGwName          string            `json:"istioGwName,omitempty"`
 }
 type CnvrgRouter struct {
 	Enabled  string `json:"enabled,omitempty"`
@@ -267,6 +268,7 @@ var controlPlanDefault = ControlPlan{
 		AgentCustomTag:       "latest",
 		Intercom:             "true",
 		CnvrgJobUID:          "1000",
+		IstioGwName:          "cnvrg-gateway",
 	},
 
 	ObjectStorage: ObjectStorage{

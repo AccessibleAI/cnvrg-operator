@@ -7,7 +7,6 @@ import (
 )
 
 type State struct {
-	Name           string
 	TemplatePath   string
 	Template       *template.Template
 	ParsedTemplate string
