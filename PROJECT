@@ -4,4 +4,7 @@ resources:
 - group: mlops
   kind: CnvrgApp
   version: v1
+- group: mlops
+  kind: CnvrgInfra
+  version: v1
 version: "2"

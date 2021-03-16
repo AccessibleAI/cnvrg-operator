@@ -32,3 +32,23 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - cnvrginfras
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - cnvrginfras/status
+  verbs:
+  - get
+  - patch
+  - update
