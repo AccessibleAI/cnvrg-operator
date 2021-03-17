@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/istio"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/registry"
+	"github.com/cnvrg-operator/pkg/cnvrginfra/storage"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
@@ -91,6 +92,12 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 
 	// Istio
 	if err := desired.Apply(istio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	// Istio
+	if err := desired.Apply(storage.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
 		return ctrl.Result{}, err
 	}

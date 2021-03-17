@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/minio/tmpl"
+const path = "/pkg/cnvrgapp/minio/tmpl"
 
 var singleBackendMinio = []*desired.State{
 

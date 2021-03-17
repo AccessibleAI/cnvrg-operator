@@ -2,6 +2,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: hostpath-provisioner-admin
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Spec.CnvrgInfraNs }}
 imagePullSecrets:
-  - name: {{ .ControlPlan.Registry.Name }}
+  - name: {{ .Spec.Registry.Name }}

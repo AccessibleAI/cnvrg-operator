@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .ControlPlan.WebApp.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.ControlPlan.WebApp.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .ControlPlan.WebApp.SvcName }}
+    app: {{ .Spec.ControlPlan.WebApp.SvcName }}
 spec:
-  {{- if eq .Networking.IngressType "nodeport" }}
+  {{- if eq .Spec.Ingress.IngressType "nodeport" }}
   type: NodePort
   {{- end }}
   ports:
-  - port: {{.ControlPlan.WebApp.Port}}
-    {{- if eq .Networking.IngressType "nodeport" }}
-    nodePort: {{ .ControlPlan.WebApp.NodePort }}
+  - port: {{.Spec.ControlPlan.WebApp.Port}}
+    {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+    nodePort: {{ .Spec.ControlPlan.WebApp.NodePort }}
     {{- end }}
   selector:
-    app: {{ .ControlPlan.WebApp.SvcName }}
+    app: {{ .Spec.ControlPlan.WebApp.SvcName }}

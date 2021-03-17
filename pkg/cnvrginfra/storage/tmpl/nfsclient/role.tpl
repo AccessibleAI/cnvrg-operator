@@ -2,7 +2,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: leader-locking-nfs-client-provisioner
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Spec.CnvrgInfraNs }}
 rules:
   - apiGroups: [""]
     resources: ["endpoints"]

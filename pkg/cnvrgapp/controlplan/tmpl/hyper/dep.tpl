@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .ControlPlan.Hyper.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.ControlPlan.Hyper.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .ControlPlan.Hyper.SvcName }}
+    app: {{ .Spec.ControlPlan.Hyper.SvcName }}
 spec:
-  replicas: {{ .ControlPlan.Hyper.Replicas }}
+  replicas: {{ .Spec.ControlPlan.Hyper.Replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,25 +14,25 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: {{ .ControlPlan.Hyper.SvcName }}
+      app: {{ .Spec.ControlPlan.Hyper.SvcName }}
   template:
     metadata:
       labels:
-        app: {{ .ControlPlan.Hyper.SvcName }}
+        app: {{ .Spec.ControlPlan.Hyper.SvcName }}
     spec:
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
-      {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+      {{- if eq .Spec.ControlPlan.Tenancy.Enabled "true" }}
       nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: "{{ .ControlPlan.Tenancy.Key }}"
+        - key: "{{ .Spec.ControlPlan.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
-        - image: {{ .ControlPlan.Hyper.Image }}
-          name: {{ .ControlPlan.Hyper.SvcName }}
+        - image: {{ .Spec.ControlPlan.Hyper.Image }}
+          name: {{ .Spec.ControlPlan.Hyper.SvcName }}
           envFrom:
             - configMapRef:
                 name: cp-base-config
@@ -45,21 +45,21 @@ spec:
             - secretRef:
                 name: cp-object-storage
           ports:
-            - containerPort: {{ .ControlPlan.Hyper.Port }}
+            - containerPort: {{ .Spec.ControlPlan.Hyper.Port }}
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: "/?key={{.ControlPlan.Hyper.Token}}"
-              port: {{.ControlPlan.Hyper.Port}}
+              path: "/?key={{.Spec.ControlPlan.Hyper.Token}}"
+              port: {{.Spec.ControlPlan.Hyper.Port}}
               scheme: HTTP
             initialDelaySeconds: 20
             successThreshold: 1
-            periodSeconds: {{ .ControlPlan.Hyper.ReadinessPeriodSeconds }}
-            timeoutSeconds: {{ .ControlPlan.Hyper.ReadinessTimeoutSeconds }}
+            periodSeconds: {{ .Spec.ControlPlan.Hyper.ReadinessPeriodSeconds }}
+            timeoutSeconds: {{ .Spec.ControlPlan.Hyper.ReadinessTimeoutSeconds }}
           resources:
             requests:
-              cpu: {{.ControlPlan.Hyper.CPURequest}}
-              memory: {{.ControlPlan.Hyper.MemoryRequest}}
+              cpu: {{.Spec.ControlPlan.Hyper.CPURequest}}
+              memory: {{.Spec.ControlPlan.Hyper.MemoryRequest}}
             limits:
-              cpu: {{ .ControlPlan.Hyper.CPULimit }}
-              memory: {{ .ControlPlan.Hyper.MemoryLimit }}
+              cpu: {{ .Spec.ControlPlan.Hyper.CPULimit }}
+              memory: {{ .Spec.ControlPlan.Hyper.MemoryLimit }}

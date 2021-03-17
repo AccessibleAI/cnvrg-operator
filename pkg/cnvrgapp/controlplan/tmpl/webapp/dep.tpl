@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .ControlPlan.WebApp.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.ControlPlan.WebApp.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .ControlPlan.WebApp.SvcName }}
+    app: {{ .Spec.ControlPlan.WebApp.SvcName }}
 spec:
-  replicas: {{ .ControlPlan.WebApp.Replicas }}
+  replicas: {{ .Spec.ControlPlan.WebApp.Replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,33 +14,33 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: {{.ControlPlan.WebApp.SvcName}}
+      app: {{.Spec.ControlPlan.WebApp.SvcName}}
   template:
     metadata:
       labels:
-        app: {{.ControlPlan.WebApp.SvcName}}
+        app: {{.Spec.ControlPlan.WebApp.SvcName}}
     spec:
-      {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
+      {{- if eq .Spec.ControlPlan.Tenancy.Enabled "true" }}
       nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-      - key: "{{ .ControlPlan.Tenancy.Key }}"
+      - key: "{{ .Spec.ControlPlan.Tenancy.Key }}"
         operator: "Equal"
-        value: "{{ .ControlPlan.Tenancy.Value }}"
+        value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
         effect: "NoSchedule"
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
       containers:
-      {{- if eq .ControlPlan.OauthProxy.Enabled "true" }}
+      {{- if eq .Spec.ControlPlan.OauthProxy.Enabled "true" }}
       - name: "cnvrg-oauth-proxy"
-        image: {{ .ControlPlan.OauthProxy.Image }}
+        image: {{ .Spec.ControlPlan.OauthProxy.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
         volumeMounts:
           - name: "oauth-proxy-config"
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
       {{- end }}
-      - image: {{ .ControlPlan.WebApp.Image }}
+      - image: {{ .Spec.ControlPlan.WebApp.Image }}
         env:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
@@ -56,89 +56,89 @@ spec:
         - secretRef:
             name: cp-object-storage
         - secretRef:
-            name: {{ .Pg.SvcName }}
+            name: {{ .Spec.Pg.SvcName }}
         name: cnvrg-app
         ports:
-          - containerPort: {{ .ControlPlan.WebApp.Port }}
+          - containerPort: {{ .Spec.ControlPlan.WebApp.Port }}
         readinessProbe:
           httpGet:
             path: "/healthz"
-            port: {{ .ControlPlan.WebApp.Port }}
+            port: {{ .Spec.ControlPlan.WebApp.Port }}
             scheme: HTTP
           successThreshold: 1
-          failureThreshold: {{ .ControlPlan.WebApp.FailureThreshold }}
-          initialDelaySeconds: {{ .ControlPlan.WebApp.InitialDelaySeconds }}
-          periodSeconds: {{ .ControlPlan.WebApp.ReadinessPeriodSeconds }}
-          timeoutSeconds: {{ .ControlPlan.WebApp.ReadinessTimeoutSeconds }}
+          failureThreshold: {{ .Spec.ControlPlan.WebApp.FailureThreshold }}
+          initialDelaySeconds: {{ .Spec.ControlPlan.WebApp.InitialDelaySeconds }}
+          periodSeconds: {{ .Spec.ControlPlan.WebApp.ReadinessPeriodSeconds }}
+          timeoutSeconds: {{ .Spec.ControlPlan.WebApp.ReadinessTimeoutSeconds }}
         resources:
           requests:
-            cpu: "{{.ControlPlan.WebApp.CPU}}"
-            memory: "{{.ControlPlan.WebApp.Memory}}"
-        {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
+            cpu: "{{.Spec.ControlPlan.WebApp.CPU}}"
+            memory: "{{.Spec.ControlPlan.WebApp.Memory}}"
+        {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
         volumeMounts:
-        - name: "{{ .ControlPlan.ObjectStorage.GcpStorageSecret }}"
-          mountPath: "{{ .ControlPlan.ObjectStorage.GcpKeyfileMountPath }}"
+        - name: "{{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}"
+          mountPath: "{{ .Spec.ControlPlan.ObjectStorage.GcpKeyfileMountPath }}"
           readOnly: true
         {{- end }}
-      {{- if eq .ControlPlan.OauthProxy.Enabled "true" }}
+      {{- if eq .Spec.ControlPlan.OauthProxy.Enabled "true" }}
       volumes:
       - name: "oauth-proxy-config"
         secret:
          secretName: "cp-sso"
       {{- end }}
-      {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
-      - name: {{ .ControlPlan.ObjectStorage.GcpStorageSecret }}
+      {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
+      - name: {{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}
         secret:
-          secretName: {{ .ControlPlan.ObjectStorage.GcpStorageSecret }}
+          secretName: {{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}
       {{- end }}
       initContainers:
       - name: services-check
-        image: {{.ControlPlan.Seeder.Image}}
+        image: {{.Spec.ControlPlan.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py services-check"]
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
-          value: "{{ .Pg.SvcName }}:{{ .Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
+          {{- if and ( eq .Spec.Minio.Enabled "true") (eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
+          value: "{{ .Spec.Pg.SvcName }}:{{ .Spec.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
           {{- else }}
-          value: "{{ .Pg.SvcName }}:{{ .Pg.Port }}"
+          value: "{{ .Spec.Pg.SvcName }}:{{ .Spec.Pg.Port }}"
           {{ end }}
-      {{- if and ( eq .Minio.Enabled "true") (eq .ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
+      {{- if and ( eq .Spec.Minio.Enabled "true") (eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
       - name: create-cnvrg-bucket
-        image: {{ .ControlPlan.Seeder.Image }}
-        command: ["/bin/bash","-c", "{{ .ControlPlan.Seeder.CreateBucketCmd }}"]
+        image: {{ .Spec.ControlPlan.Seeder.Image }}
+        command: ["/bin/bash","-c", "{{ .Spec.ControlPlan.Seeder.CreateBucketCmd }}"]
         imagePullPolicy: Always
         envFrom:
         - secretRef:
             name: cp-object-storage
       {{- end }}
-      {{- if eq .Pg.Fixpg "true" }}
+      {{- if eq .Spec.Pg.Fixpg "true" }}
       - name: fixpg
-        image: {{.ControlPlan.Seeder.Image}}
+        image: {{.Spec.ControlPlan.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]
         envFrom:
         - secretRef:
-            name: {{ .Pg.SvcName }}
+            name: {{ .Spec.Pg.SvcName }}
         imagePullPolicy: Always
       {{- end }}
       - name: seeder
-        image: {{ .ControlPlan.Seeder.Image }}
+        image: {{ .Spec.ControlPlan.Seeder.Image }}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py seeder --mode master"]
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SEEDER_IMAGE"
-          value: "{{.ControlPlan.WebApp.Image}}"
+          value: "{{.Spec.ControlPlan.WebApp.Image}}"
         - name: "CNVRG_SEED_CMD"
-          value: "{{ .ControlPlan.Seeder.SeedCmd }}"
+          value: "{{ .Spec.ControlPlan.Seeder.SeedCmd }}"
         - name: "CNVRG_NS"
-          value: {{ .CnvrgNs }}
+          value: {{ .Namespace }}
         - name: "CNVRG_SA_NAME"
-          value: {{ .ControlPlan.Rbac.ServiceAccountName }}
-        {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
+          value: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+        {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
-          value: "{{ .ControlPlan.OjbectStorage.GcpStorageSecret }}"
+          value: "{{ .Spec.ControlPlan.OjbectStorage.GcpStorageSecret }}"
         - name: "CNVRG_GCP_KEYFILE_MOUNT_PATH"
-          value: "{{ .ControlPlan.OjbectStorage.GcpKeyfileMountPath }}"
+          value: "{{ .Spec.ControlPlan.OjbectStorage.GcpKeyfileMountPath }}"
         {{- end }}
 
 

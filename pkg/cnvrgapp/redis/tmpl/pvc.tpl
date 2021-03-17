@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name:  {{.Redis.SvcName}}
-  namespace: {{ .CnvrgNs }}
+  name:  {{.Spec.Redis.SvcName}}
+  namespace: {{ .Namespace }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Redis.StorageSize }}
-  {{- if ne .Redis.StorageClass "use-default" }}
-  storageClassName: {{ .Redis.StorageClass }}
-  {{- else if ne .Storage.CcpStorageClass "" }}
-  storageClassName: {{ .Storage.CcpStorageClass }}
+      storage: {{ .Spec.Redis.StorageSize }}
+  {{- if ne .Spec.Redis.StorageClass "use-default" }}
+  storageClassName: {{ .Spec.Redis.StorageClass }}
+  {{- else if ne .Spec.ControlPlan.BaseConfig.CcpStorageClass "" }}
+  storageClassName: {{ .Spec.ControlPlan.BaseConfig.CcpStorageClass }}
   {{- end }}

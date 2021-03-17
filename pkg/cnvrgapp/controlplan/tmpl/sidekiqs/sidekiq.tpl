@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sidekiq
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Namespace }}
   labels:
     app: sidekiq
 spec:
-  replicas: {{ .ControlPlan.Sidekiq.Replicas }}
+  replicas: {{ .Spec.ControlPlan.Sidekiq.Replicas }}
   selector:
     matchLabels:
       app: sidekiq
@@ -15,28 +15,28 @@ spec:
       labels:
         app: sidekiq
     spec:
-      {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
+      {{- if eq .Spec.ControlPlan.Tenancy.Enabled "true" }}
       nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: "{{ .ControlPlan.Tenancy.Key }}"
+        - key: "{{ .Spec.ControlPlan.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
-      terminationGracePeriodSeconds: {{ .ControlPlan.Sidekiq.KillTimeout }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+      terminationGracePeriodSeconds: {{ .Spec.ControlPlan.Sidekiq.KillTimeout }}
       containers:
         - name: sidekiq
-          image: {{ .ControlPlan.WebApp.Image}}
+          image: {{ .Spec.ControlPlan.WebApp.Image}}
           env:
             - name: "CNVRG_RUN_MODE"
               value: "sidekiq"
           imagePullPolicy: Always
-          {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
+          {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
           volumeMounts:
-            - name: "{{ .ControlPlan.ObjectStorage.GcpStorageSecret }}"
-              mountPath: "{{ .ControlPlan.ObjectStorage.GcpKeyfileMountPath }}"
+            - name: "{{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}"
+              mountPath: "{{ .Spec.ControlPlan.ObjectStorage.GcpKeyfileMountPath }}"
               readOnly: true
           {{- end }}
           envFrom:
@@ -51,25 +51,25 @@ spec:
             - secretRef:
                 name: cp-object-storage
             - secretRef:
-                name: {{ .Pg.SvcName }}
+                name: {{ .Spec.Pg.SvcName }}
           resources:
             requests:
-              cpu: {{ .ControlPlan.Sidekiq.CPU }}
-              memory: {{ .ControlPlan.Sidekiq.Memory }}
+              cpu: {{ .Spec.ControlPlan.Sidekiq.CPU }}
+              memory: {{ .Spec.ControlPlan.Sidekiq.Memory }}
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid {{ .ControlPlan.Sidekiq.KillTimeout }}"]
-      {{- if eq .ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
+                command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid {{ .Spec.ControlPlan.Sidekiq.KillTimeout }}"]
+      {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
       volumes:
-        - name: {{ .ControlPlan.ObjectStorage.GcpStorageSecret }}
+        - name: {{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}
           secret:
-            secretName: {{ .ControlPlan.ObjectStorage.GcpStorageSecret }}
+            secretName: {{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}
       {{- end }}
       initContainers:
         - name: seeder
-          image: {{.ControlPlan.Seeder.Image}}
+          image: {{.Spec.ControlPlan.Seeder.Image}}
           command: ["/bin/bash", "-c", "python3 cnvrg-boot.py seeder --mode worker"]
           env:
             - name: "CNVRG_NS"
-              value: {{ .CnvrgNs }}
+              value: {{ .Namespace }}

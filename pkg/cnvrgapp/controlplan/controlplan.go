@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/controlplan/tmpl"
+const path = "/pkg/cnvrgapp/controlplan/tmpl"
 
 var registryState = []*desired.State{
 	{

@@ -2,11 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redis-conf
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Namespace }}
 data:
   redis.conf: |
     dir /data/
-    appendonly "{{ .Redis.Appendonly }}"
+    appendonly "{{ .Spec.Redis.Appendonly }}"
     appendfilename "appendonly.aof"
     appendfsync everysec
     auto-aof-rewrite-percentage 100

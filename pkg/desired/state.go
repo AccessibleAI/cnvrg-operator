@@ -27,76 +27,76 @@ import (
 
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
-		"httpScheme": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.Ingress.HTTPS.Enabled == "true" {
+		"httpScheme": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			if cnvrgApp.Spec.Ingress.HTTPS.Enabled == "true" {
 				return "https://"
 			}
 			return "http://"
 		},
-		"appDomain": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.Ingress.IngressType == mlopsv1.NodePortIngress {
-				return cnvrgappspec.ClusterDomain + ":" +
-					strconv.Itoa(cnvrgappspec.ControlPlan.WebApp.NodePort)
+		"appDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NodePortIngress {
+				return cnvrgApp.Spec.ClusterDomain + ":" +
+					strconv.Itoa(cnvrgApp.Spec.ControlPlan.WebApp.NodePort)
 			} else {
-				return cnvrgappspec.ControlPlan.WebApp.SvcName + "." + cnvrgappspec.ClusterDomain
+				return cnvrgApp.Spec.ControlPlan.WebApp.SvcName + "." + cnvrgApp.Spec.ClusterDomain
 			}
 		},
-		"defaultComputeClusterDomain": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.Ingress.IngressType == mlopsv1.NodePortIngress {
-				return cnvrgappspec.ClusterDomain + ":" +
-					strconv.Itoa(cnvrgappspec.ControlPlan.WebApp.NodePort)
+		"defaultComputeClusterDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NodePortIngress {
+				return cnvrgApp.Spec.ClusterDomain + ":" +
+					strconv.Itoa(cnvrgApp.Spec.ControlPlan.WebApp.NodePort)
 			} else {
-				return cnvrgappspec.ClusterDomain
+				return cnvrgApp.Spec.ClusterDomain
 			}
 		},
-		"redisUrl": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			return "redis://" + cnvrgappspec.Redis.SvcName
+		"redisUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return "redis://" + cnvrgApp.Spec.Redis.SvcName
 		},
-		"esUrl": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			return "http://" + cnvrgappspec.Logging.Es.SvcName
+		"esUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return "http://" + cnvrgApp.Spec.Logging.Es.SvcName
 		},
-		"hyperServerUrl": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			return "http://" + cnvrgappspec.ControlPlan.Hyper.SvcName
+		"hyperServerUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return "http://" + cnvrgApp.Spec.ControlPlan.Hyper.SvcName
 		},
-		"objectStorageUrl": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
-				return cnvrgappspec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
+		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			if cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
+				return cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
 			}
-			if cnvrgappspec.Ingress.HTTPS.Enabled == "true" {
-				return fmt.Sprintf("https://%s.%s", cnvrgappspec.Minio.SvcName, cnvrgappspec.ClusterDomain)
+			if cnvrgApp.Spec.Ingress.HTTPS.Enabled == "true" {
+				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			} else {
-				return fmt.Sprintf("http://%s.%s", cnvrgappspec.Minio.SvcName, cnvrgappspec.ClusterDomain)
+				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			}
 		},
-		"routeBy": func(cnvrgappspec mlopsv1.CnvrgAppSpec, routeBy string) string {
+		"routeBy": func(cnvrgApp mlopsv1.CnvrgApp, routeBy string) string {
 			switch routeBy {
 			case "ISTIO":
-				if cnvrgappspec.Ingress.IngressType == mlopsv1.IstioIngress {
+				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.IstioIngress {
 					return "true"
 				}
 				return "false"
 			case "OPENSHIFT":
-				if cnvrgappspec.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.OpenShiftIngress {
 					return "true"
 				}
 				return "false"
 			case "NGINX_INGRESS":
-				if cnvrgappspec.Ingress.IngressType == mlopsv1.NginxIngress {
+				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NginxIngress {
 					return "true"
 				}
 				return "false"
 			case "NODE_PORT":
-				if cnvrgappspec.Ingress.IngressType == mlopsv1.NodePortIngress {
+				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NodePortIngress {
 					return "true"
 				}
 				return "false"
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
+		"oauthProxyConfig": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			skipAuthUrls := "["
-			for i, url := range cnvrgappspec.ControlPlan.OauthProxy.SkipAuthRegex {
-				if i == (len(cnvrgappspec.ControlPlan.OauthProxy.SkipAuthRegex) - 1) {
+			for i, url := range cnvrgApp.Spec.ControlPlan.OauthProxy.SkipAuthRegex {
+				if i == (len(cnvrgApp.Spec.ControlPlan.OauthProxy.SkipAuthRegex) - 1) {
 					skipAuthUrls += fmt.Sprintf(`"%v"`, url)
 				} else {
 					skipAuthUrls += fmt.Sprintf(`"%v", `, url)
@@ -104,17 +104,17 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			skipAuthUrls += "]"
 			proxyConf := []string{
-				fmt.Sprintf("provider = %v", cnvrgappspec.ControlPlan.OauthProxy.Provider),
-				fmt.Sprintf("http_address = 0.0.0.0:%v", cnvrgappspec.ControlPlan.WebApp.Port),
-				fmt.Sprintf("redirect_url = %v", cnvrgappspec.ControlPlan.OauthProxy.RedirectURI),
-				fmt.Sprintf("redis_connection_url = redis://%v:%v", cnvrgappspec.Redis.SvcName, cnvrgappspec.Redis.Port),
-				fmt.Sprintf("redirect_url = %v", cnvrgappspec.ControlPlan.OauthProxy.RedirectURI),
+				fmt.Sprintf("provider = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.Provider),
+				fmt.Sprintf("http_address = 0.0.0.0:%v", cnvrgApp.Spec.ControlPlan.WebApp.Port),
+				fmt.Sprintf("redirect_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.RedirectURI),
+				fmt.Sprintf("redis_connection_url = redis://%v:%v", cnvrgApp.Spec.Redis.SvcName, cnvrgApp.Spec.Redis.Port),
+				fmt.Sprintf("redirect_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.RedirectURI),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
-				fmt.Sprintf(`email_domains = ["%v"]`, cnvrgappspec.ControlPlan.OauthProxy.EmailDomain),
-				fmt.Sprintf("client_id = %v", cnvrgappspec.ControlPlan.OauthProxy.ClientID),
-				fmt.Sprintf("client_secret = %v", cnvrgappspec.ControlPlan.OauthProxy.ClientSecret),
-				fmt.Sprintf("cookie_secret = %v", cnvrgappspec.ControlPlan.OauthProxy.CookieSecret),
-				fmt.Sprintf("oidc_issuer_url = %v", cnvrgappspec.ControlPlan.OauthProxy.OidcIssuerURL),
+				fmt.Sprintf(`email_domains = ["%v"]`, cnvrgApp.Spec.ControlPlan.OauthProxy.EmailDomain),
+				fmt.Sprintf("client_id = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.ClientID),
+				fmt.Sprintf("client_secret = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.ClientSecret),
+				fmt.Sprintf("cookie_secret = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.CookieSecret),
+				fmt.Sprintf("oidc_issuer_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.OidcIssuerURL),
 				`upstreams = ["http://127.0.0.1:3000/"]`,
 				"session_store_type = redis",
 				"custom_templates_dir = /opt/app-root/src/templates",
@@ -127,17 +127,17 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 
 			return strings.Join(proxyConf, "\n")
 		},
-		"cnvrgPassengerBindAddress": func(cnvrgappspec mlopsv1.CnvrgAppSpec) string {
-			if cnvrgappspec.ControlPlan.OauthProxy.Enabled == "true" {
+		"cnvrgPassengerBindAddress": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			if cnvrgApp.Spec.ControlPlan.OauthProxy.Enabled == "true" {
 				return "127.0.0.1"
 			}
 			return "0.0.0.0"
 		},
-		"cnvrgPassengerBindPort": func(cnvrgappspec mlopsv1.CnvrgAppSpec) int {
-			if cnvrgappspec.ControlPlan.OauthProxy.Enabled == "true" {
+		"cnvrgPassengerBindPort": func(cnvrgApp mlopsv1.CnvrgApp) int {
+			if cnvrgApp.Spec.ControlPlan.OauthProxy.Enabled == "true" {
 				return 3000
 			}
-			return cnvrgappspec.ControlPlan.WebApp.Port
+			return cnvrgApp.Spec.ControlPlan.WebApp.Port
 		},
 	}
 }

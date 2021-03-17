@@ -1,11 +1,11 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: {{ .Minio.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Minio.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
-  host: "{{ .Minio.SvcName }}.{{ .CnvrgNs }}.svc.cluster.local"
+  host: "{{ .Spec.Minio.SvcName }}.{{ .Namespace }}.svc.cluster.local"
   trafficPolicy:
     loadBalancer:
       consistentHash:
-        {{ .Minio.SharedStorage.ConsistentHash.key }}: {{ .Minio.SharedStorage.ConsistentHash.Value }}
+        {{ .Spec.Minio.SharedStorage.ConsistentHash.key }}: {{ .Spec.Minio.SharedStorage.ConsistentHash.Value }}

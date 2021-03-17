@@ -1,52 +1,52 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Redis.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{.Spec.Redis.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{.Redis.SvcName }}
+    app: {{.Spec.Redis.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: {{.Redis.SvcName }}
+      app: {{.Spec.Redis.SvcName }}
   template:
     metadata:
       labels:
-        app: {{.Redis.SvcName }}
+        app: {{.Spec.Redis.SvcName }}
     spec:
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
-      {{- if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "false") }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+      {{- if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "false") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "false") (eq .ControlPlan.Tenancy.Enabled "true") }}
+        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
+      {{- else if and (eq .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "true") }}
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
+      {{- else if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: {{ .ControlPlan.Tenancy.Key }}
+        - key: {{ .Spec.ControlPlan.Tenancy.Key }}
           operator: Equal
-          value: "{{ .ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-        - image: {{ .Redis.Image }}
+        - image: {{ .Spec.Redis.Image }}
           name: redis
           command: [ "/bin/bash", "-lc", "redis-server /config/redis.conf" ]
           ports:
-            - containerPort: {{ .Redis.Port }}
+            - containerPort: {{ .Spec.Redis.Port }}
           resources:
             limits:
-              cpu: {{ .Redis.Limits.CPU }}
-              memory: {{ .Redis.Limits.Memory }}
+              cpu: {{ .Spec.Redis.Limits.CPU }}
+              memory: {{ .Spec.Redis.Limits.Memory }}
             requests:
-              cpu: {{ .Redis.Requests.CPU }}
-              memory: {{ .Redis.Requests.Memory }}
+              cpu: {{ .Spec.Redis.Requests.CPU }}
+              memory: {{ .Spec.Redis.Requests.Memory }}
           volumeMounts:
             - name: redis-data
               mountPath: /data
@@ -55,7 +55,7 @@ spec:
       volumes:
         - name: redis-data
           persistentVolumeClaim:
-            claimName: {{ .Redis.SvcName }}
+            claimName: {{ .Spec.Redis.SvcName }}
         - name: redis-config
           configMap:
             name: redis-conf

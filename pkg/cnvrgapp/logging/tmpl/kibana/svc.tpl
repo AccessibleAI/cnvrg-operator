@@ -2,19 +2,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Logging.Kibana.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Logging.Kibana.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .Logging.Kibana.SvcName }}
+    app: {{ .Spec.Logging.Kibana.SvcName }}
 spec:
-  {{- if eq .Networking.IngressType "nodeport" }}
+  {{- if eq .Spec.Ingress.IngressType "nodeport" }}
   type: NodePort
   {{- end }}
   selector:
-    app: {{ .Logging.Kibana.SvcName }}
+    app: {{ .Spec.Logging.Kibana.SvcName }}
   ports:
-    - port: {{ .Logging.Kibana.Port }}
+    - port: {{ .Spec.Logging.Kibana.Port }}
       protocol: TCP
-      {{- if eq .Networking.IngressType "nodeport" }}
-      nodePort: {{ .Logging.Kibana.NodePort }}
+      {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+      nodePort: {{ .Spec.Logging.Kibana.NodePort }}
       {{- end }}

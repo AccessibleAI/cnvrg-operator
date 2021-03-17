@@ -3,7 +3,12 @@ package controllers
 import (
 	"context"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/controlplan"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/ingress"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/logging"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/minio"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/pg"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/redis"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -89,37 +94,38 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	//// Logging
-	//if err := desired.Apply(logging.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-	//	return ctrl.Result{}, err
-	//}
-	//
-	//// ControlPlan
-	//if err := desired.Apply(controlplan.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-	//	return ctrl.Result{}, err
-	//}
-	//
-	//// Redis
-	//if err := desired.Apply(redis.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-	//	return ctrl.Result{}, err
-	//}
-	//
-	//// PostgreSQL
-	//if err := desired.Apply(pg.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-	//	return ctrl.Result{}, err
-	//}
-	//
-	//// Minio
-	//if err := desired.Apply(minio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-	//	return ctrl.Result{}, err
-	//}
+	// ControlPlan
+	if err := desired.Apply(controlplan.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	// Logging
+	if err := desired.Apply(logging.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	// Redis
+	if err := desired.Apply(redis.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	// PostgreSQL
+	if err := desired.Apply(pg.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
+
+	// Minio
+	if err := desired.Apply(minio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+		return ctrl.Result{}, err
+	}
 
 	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec)
+	cnvrgAppLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
 }
 

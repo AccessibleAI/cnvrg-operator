@@ -24,7 +24,7 @@ spec:
         protocol: HTTPS
       tls:
         mode: SIMPLE
-        credentialName: "{{ .Spec.Ingress.HTTPS.CertSecret }}"
+        credentialName: {{ .Spec.Ingress.HTTPS.CertSecret }}
       {{- else if eq .Spec.Ingress.HTTPS.Enabled "true" }}
       tls:
         httpsRedirect: true
