@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/redis/tmpl"
+const path = "/pkg/cnvrgapp/redis/tmpl"
 
 var state = []*desired.State{
 	{

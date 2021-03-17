@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: nfs-client-provisioner
-    namespace: {{ .CnvrgNs }}
+    namespace: {{ .Spec.CnvrgInfraNs }}
 roleRef:
   kind: ClusterRole
   name: nfs-client-provisioner-runner

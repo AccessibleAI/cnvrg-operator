@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .ControlPlan.Rbac.ServiceAccountName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+  namespace: {{ .Namespace }}
 imagePullSecrets:
-  - name: {{ .ControlPlan.Registry.Name }}
+  - name: {{ .Spec.ControlPlan.Registry.Name }}

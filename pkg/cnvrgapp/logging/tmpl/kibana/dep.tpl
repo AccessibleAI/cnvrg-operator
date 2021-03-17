@@ -2,43 +2,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Logging.Kibana.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Logging.Kibana.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .Logging.Kibana.SvcName }}
+    app: {{ .Spec.Logging.Kibana.SvcName }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Logging.Kibana.SvcName }}
+      app: {{ .Spec.Logging.Kibana.SvcName }}
   template:
     metadata:
       labels:
-        app: {{ .Logging.Kibana.SvcName }}
+        app: {{ .Spec.Logging.Kibana.SvcName }}
     spec:
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
-      {{ if eq .ControlPlan.Tenancy.Enabled "true" }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+      {{ if eq .Spec.ControlPlan.Tenancy.Enabled "true" }}
       nodeSelector: 
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: {{ .ControlPlan.Tenancy.Key }}
+        - key: {{ .Spec.ControlPlan.Tenancy.Key }}
           operator: Equal
-          value: "{{ .ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
-        - name: {{ .Logging.Kibana.SvcName }}
-          image: {{ .Logging.Kibana.Image }}
+        - name: {{ .Spec.Logging.Kibana.SvcName }}
+          image: {{ .Spec.Logging.Kibana.Image }}
           env:
           - name: ELASTICSEARCH_URL
-            value: {{ printf "http://%s.%s.svc.cluster.local:%s" .Logging.Kibana.SvcName .CnvrgNs .Logging.Es.Port }}
+            value: {{ printf "http://%s.%s.svc.cluster.local:%s" .Spec.Logging.Kibana.SvcName .Namespace .Spec.Logging.Es.Port }}
           ports:
-          - containerPort: {{ .Logging.Kibana.Port }}
+          - containerPort: {{ .Spec.Logging.Kibana.Port }}
           resources:
             limits:
-              cpu: {{ .Logging.Kibana.CPULimit }}
-              memory: {{ .Logging.Kibana.MemoryLimit }}
+              cpu: {{ .Spec.Logging.Kibana.CPULimit }}
+              memory: {{ .Spec.Logging.Kibana.MemoryLimit }}
             requests:
-              cpu: {{ .Logging.Kibana.CPURequest }}
-              memory: {{ .Logging.Kibana.MemoryRequest }}
+              cpu: {{ .Spec.Logging.Kibana.CPURequest }}
+              memory: {{ .Spec.Logging.Kibana.MemoryRequest }}
 

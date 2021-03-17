@@ -68,6 +68,8 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
+                      hostpathNode:
+                        type: string
                       intercom:
                         type: string
                       jobsStorageClass:
@@ -446,25 +448,6 @@ spec:
                       storageSize:
                         type: string
                       svcName:
-                        type: string
-                    type: object
-                  fluentd:
-                    properties:
-                      containersPath:
-                        type: string
-                      cpuRequest:
-                        type: string
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      journalPath:
-                        type: string
-                      journald:
-                        type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
                         type: string
                     type: object
                   kibana:

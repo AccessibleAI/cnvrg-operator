@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: hostpath-provisioner-admin
-    namespace: {{ .CnvrgNs }}
+    namespace: {{ .Spec.CnvrgInfraNs }}
 roleRef:
   kind: ClusterRole
   name: hostpath-provisioner

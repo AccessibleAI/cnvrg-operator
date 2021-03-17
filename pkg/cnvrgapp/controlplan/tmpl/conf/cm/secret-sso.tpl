@@ -2,6 +2,6 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: cp-sso
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Namespace }}
 data:
   conf: {{ oauthProxyConfig . | b64enc }}

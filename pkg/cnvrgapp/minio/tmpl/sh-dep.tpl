@@ -1,39 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Minio.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Minio.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .Minio.SvcName }}
+    app: {{ .Spec.Minio.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: {{ .Minio.SvcName }}
-  replicas: {{ .Minio.Replicas }}
+      app: {{ .Spec.Minio.SvcName }}
+  replicas: {{ .Spec.Minio.Replicas }}
   template:
     metadata:
       labels:
-        app: {{ .Minio.SvcName }}
+        app: {{ .Spec.Minio.SvcName }}
     spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
-      {{- if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "false") }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+      {{- if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "false") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "false") (eq .ControlPlan.Tenancy.Enabled "true") }}
+        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
+      {{- else if and (eq .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "true") }}
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
+      {{- else if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: {{ .ControlPlan.Tenancy.Key }}
+        - key: {{ .Spec.ControlPlan.Tenancy.Key }}
           operator: Equal
-          value: "{{ .ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
         - args:
@@ -107,7 +107,7 @@ spec:
             - name: DNS_AGENT
             - name: ISTIO_KUBE_APP_PROBERS
               value: '{"/app-health/minio/livez":{"httpGet":{"path":"/minio/health/live","port":9000}},"/app-health/minio/readyz":{"httpGet":{"path":"/minio/health/ready","port":9000}}}'
-          image: "{{ .Networking.Istio.Hub }}/{{ .Networking.Istio.ProxyImage }}:{{ .Networking.Istio.Tag }}"
+          image: "{{ .Spec.Ingress.Istio.Hub }}/{{ .Spec.Ingress.Istio.ProxyImage }}:{{ .Spec.Ingress.Istio.Tag }}"
           imagePullPolicy: Always
           name: istio-proxy
           ports:
@@ -149,7 +149,7 @@ spec:
             - mountPath: /etc/istio/pod
               name: istio-podinfo
         - name: minio
-          image: {{.Minio.Image}}
+          image: {{.Spec.Minio.Image}}
           args:
             - gateway
             - nas
@@ -171,26 +171,26 @@ spec:
                   name: cp-object-storage
                   key: CNVRG_STORAGE_SECRET_KEY
           ports:
-            - containerPort: {{ .Minio.Port }}
+            - containerPort: {{ .Spec.Minio.Port }}
           volumeMounts:
             - name: minio-storage
               mountPath: /data
           readinessProbe:
             httpGet:
               path: /minio/health/ready
-              port: {{ .Minio.Port }}
+              port: {{ .Spec.Minio.Port }}
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /minio/health/live
-              port: {{ .Minio.Port }}
+              port: {{ .Spec.Minio.Port }}
             initialDelaySeconds: 60
             periodSeconds: 20
           resources:
             requests:
-              cpu: {{ .Minio.CPURequest }}
-              memory: {{ .Minio.MemoryRequest }}
+              cpu: {{ .Spec.Minio.CPURequest }}
+              memory: {{ .Spec.Minio.MemoryRequest }}
       initContainers:
         - args:
             - istio-iptables
@@ -212,7 +212,7 @@ spec:
             - 15090,15021,15020
           env:
             - name: DNS_AGENT
-          image: "{{ .Networking.Istio.Hub }}/{{ .Networking.Istio.ProxyImage }}:{{ .Networking.Istio.Tag }}"
+          image: "{{ .Spec.Ingress.Istio.Hub }}/{{ .Spec.Ingress.Istio.ProxyImage }}:{{ .Spec.Ingress.Istio.Tag }}"
           imagePullPolicy: Always
           name: istio-init
           resources:
@@ -238,7 +238,7 @@ spec:
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            {{- if eq .Minio.SharedStorage.UseExistingClaim "" }}
+            {{- if eq .Spec.Minio.SharedStorage.UseExistingClaim "" }}
             claimName: {{Minio.SvcName}}
             {{- else }}
             claimName: {{ Minio.SharedStorage.SseExistingClaim }}

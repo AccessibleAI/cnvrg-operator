@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Minio.SvcName }}
-  namespace: {{ .CnvrgNs  }}
+  name: {{ .Spec.Minio.SvcName }}
+  namespace: {{ .Namespace  }}
 spec:
   accessModes:
-    {{- if eq .Minio.SharedStorage.Enabled "true" }}
+    {{- if eq .Spec.Minio.SharedStorage.Enabled "true" }}
     - ReadWriteMany
     {{- else }}
     - ReadWriteOnce
     {{- end }}
   resources:
     requests:
-      storage: {{ .Minio.StorageSize}}
-  {{- if ne .Minio.StorageClass "use-default" }}
-  storageClassName: {{ .Minio.StorageClass }}
-  {{- else if ne .Storage.CcpStorageClass "" }}
-  storageClassName: {{ .Storage.CcpStorageClass }}
+      storage: {{ .Spec.Minio.StorageSize}}
+  {{- if ne .Spec.Minio.StorageClass "use-default" }}
+  storageClassName: {{ .Spec.Minio.StorageClass }}
+  {{- else if ne .Spec.ControlPlan.BaseConfig.CcpStorageClass "" }}
+  storageClassName: {{ .Spec.ControlPlan.BaseConfig.CcpStorageClass }}
   {{- end }}

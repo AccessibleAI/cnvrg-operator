@@ -2,12 +2,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: elastalert-config
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Namespace }}
 data:
   config.json: |
     {
       "appName": "elastalert-server",
-      "port": {{ .Logging.Elastalert.ContainerPort }},
+      "port": {{ .Spec.Logging.Elastalert.ContainerPort }},
       "wsport": 3333,
       "elastalertPath": "/opt/elastalert",
       "verbose": true,
@@ -35,8 +35,8 @@ data:
         "relative": true,
         "path": "/server_data"
       },
-      "es_host": "{{ .Logging.Es.SvcName }}",
-      "es_port": {{ .Logging.Es.Port }},
+      "es_host": "{{ .Spec.Logging.Es.SvcName }}",
+      "es_port": {{ .Spec.Logging.Es.Port }},
       "writeback_index": "elastalert_status"
     }
   config.yaml: |
@@ -45,8 +45,8 @@ data:
       minutes: 1
     buffer_time:
       minutes: 15
-    es_host: {{ .Logging.Es.SvcName }}
-    es_port: {{ .Logging.Es.Port}}
+    es_host: {{ .Spec.Logging.Es.SvcName }}
+    es_port: {{ .Spec.Logging.Es.Port}}
     use_ssl: False
     verify_certs: False
     writeback_index: elastalert_status

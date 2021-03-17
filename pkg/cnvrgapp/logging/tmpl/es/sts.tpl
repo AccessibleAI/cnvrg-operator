@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Logging.Es.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Logging.Es.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
-  serviceName: {{ .Logging.Es.SvcName }}
+  serviceName: {{ .Spec.Logging.Es.SvcName }}
   selector:
     matchLabels:
-      app: {{ .Logging.Es.SvcName }}
+      app: {{ .Spec.Logging.Es.SvcName }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: {{ .Logging.Es.SvcName }}
+        app: {{ .Spec.Logging.Es.SvcName }}
     spec:
-      {{- if eq .Logging.Es.PatchEsNodes "true" }}
+      {{- if eq .Spec.Logging.Es.PatchEsNodes "true" }}
       initContainers:
       - name: "maxmap"
         image: "docker.io/cnvrg/cnvrg-tools:v0.3"
@@ -25,28 +25,28 @@ spec:
           runAsUser: 0
       {{- end }}
       securityContext:
-        runAsUser: {{ .Logging.Es.RunAsUser }}
-        fsGroup: {{ .Logging.Es.FsGroup }}
-      serviceAccountName: {{ .ControlPlan.Rbac.ServiceAccountName }}
-      {{- if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "false") }}
+        runAsUser: {{ .Spec.Logging.Es.RunAsUser }}
+        fsGroup: {{ .Spec.Logging.Es.FsGroup }}
+      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
+      {{- if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "false") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "false") (eq .ControlPlan.Tenancy.Enabled "true") }}
+        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
+      {{- else if and (eq .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
-      {{- else if and (eq .Storage.Hostpath.Enabled "true") (eq .ControlPlan.Tenancy.Enabled "true") }}
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
+      {{- else if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Storage.Hostpath.NodeName }}"
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
+        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
+        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: {{ .ControlPlan.Tenancy.Key }}
+        - key: {{ .Spec.ControlPlan.Tenancy.Key }}
           operator: Equal
-          value: "{{ .ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
       - name: elastic
-        image: {{ .Logging.Es.Image }}
+        image: {{ .Spec.Logging.Es.Image }}
         env:
         - name: "ES_CLUSTER_NAME"
           value: "cnvrg-es"
@@ -65,27 +65,27 @@ spec:
         - name: "ES_PATH_LOGS"
           value: "/usr/share/elasticsearch/data/logs"
         - name: "ES_JAVA_OPTS"
-          value: "{{ .Logging.Es.JavaOpts }}"
+          value: "{{ .Spec.Logging.Es.JavaOpts }}"
         ports:
-        - containerPort: {{ .Logging.Es.Port }}
+        - containerPort: {{ .Spec.Logging.Es.Port }}
         resources:
           limits:
-            cpu: {{ .Logging.Es.CPULimit }}
-            memory: {{ .Logging.Es.MemoryLimit }}
+            cpu: {{ .Spec.Logging.Es.CPULimit }}
+            memory: {{ .Spec.Logging.Es.MemoryLimit }}
           requests:
-            cpu: {{ .Logging.Es.CPURequest }}
-            memory: {{ .Logging.Es.MemoryRequest }}
+            cpu: {{ .Spec.Logging.Es.CPURequest }}
+            memory: {{ .Spec.Logging.Es.MemoryRequest }}
         readinessProbe:
           httpGet:
             path: /_cluster/health
-            port: {{ .Logging.Es.Port }}
+            port: {{ .Spec.Logging.Es.Port }}
           initialDelaySeconds: 30
           periodSeconds: 20
           failureThreshold: 5
         livenessProbe:
           httpGet:
             path: /_cluster/health
-            port: {{ .Logging.Es.Port }}
+            port: {{ .Spec.Logging.Es.Port }}
           initialDelaySeconds: 5
           periodSeconds: 20
           failureThreshold: 5
@@ -99,9 +99,9 @@ spec:
       accessModes: [ ReadWriteOnce ]
       resources:
         requests:
-          storage: {{ .Logging.Es.StorageSize }}
-      {{- if ne .Logging.Es.StorageClass "use-default" }}
-      storageClassName: {{ .Logging.Es.StorageClass }}
-      {{- else if ne .Storage.CcpStorageClass "" }}
-      storageClassName: {{ .Storage.CcpStorageClass }}
+          storage: {{ .Spec.Logging.Es.StorageSize }}
+      {{- if ne .Spec.Logging.Es.StorageClass "use-default" }}
+      storageClassName: {{ .Spec.Logging.Es.StorageClass }}
+      {{- else if ne .Spec.ControlPlan.BaseConfig.CcpStorageClass "" }}
+      storageClassName: {{ .Spec.ControlPlan.BaseConfig.CcpStorageClass }}
       {{- end }}

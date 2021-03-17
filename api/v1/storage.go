@@ -1,9 +1,9 @@
 package v1
 
 type Storage struct {
-	Enabled         string   `json:"enabled,omitempty"`
-	Hostpath        Hostpath `json:"hostpath,omitempty"`
-	Nfs             Nfs      `json:"nfs,omitempty"`
+	Enabled  string   `json:"enabled,omitempty"`
+	Hostpath Hostpath `json:"hostpath,omitempty"`
+	Nfs      Nfs      `json:"nfs,omitempty"`
 }
 
 type Hostpath struct {
@@ -36,7 +36,7 @@ type Nfs struct {
 }
 
 var storageDefault = Storage{
-	Enabled:         "false",
+	Enabled: "false",
 	Hostpath: Hostpath{
 		Enabled:          "false",
 		Image:            "quay.io/kubevirt/hostpath-provisioner",

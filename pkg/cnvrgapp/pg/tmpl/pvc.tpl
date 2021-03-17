@@ -12,5 +12,5 @@ spec:
   {{- if ne .Spec.Pg.StorageClass "use-default" }}
   storageClassName: {{ .Spec.Pg.StorageClass }}
   {{- else if ne .Spec.ControlPlan.BaseConfig.CcpStorageClass "" }}
-  storageClassName: {{ .Spec.Storage.CcpStorageClass }}
+  storageClassName: {{ .Spec.Spec.ControlPlan.BaseConfig.CcpStorageClass }}
   {{- end }}

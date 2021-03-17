@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: nfs-client-provisioner
-  namespace: {{ .CnvrgNs }}
+  namespace: {{ .Spec.CnvrgInfraNs }}
 spec:
   replicas: 1
   selector:
@@ -15,38 +15,29 @@ spec:
       labels:
         app: nfs-client-provisioner
     spec:
-      {{- if eq .ControlPlan.Tenancy.Enabled "true" }}
-      nodeSelector:
-        {{ .ControlPlan.Tenancy.Key }}: "{{ .ControlPlan.Tenancy.Value }}"
-      {{- end }}
-      tolerations:
-        - key: "{{ .ControlPlan.Tenancy.Key }}"
-          operator: "Equal"
-          value: "{{ .ControlPlan.Tenancy.Value }}"
-          effect: "NoSchedule"
       serviceAccountName: nfs-client-provisioner
       containers:
         - name: nfs-client-provisioner
-          image: {{ .Storage.Nfs.Image }}
+          image: {{ .Spec.Storage.Nfs.Image }}
           volumeMounts:
             - name: nfs-client-root
               mountPath: /persistentvolumes
           env:
             - name: PROVISIONER_NAME
-              value: {{ .Storage.Nfs.Provisioner }}
+              value: {{ .Spec.Storage.Nfs.Provisioner }}
             - name: NFS_SERVER
-              value: {{ .Storage.Nfs.Server }}
+              value: {{ .Spec.Storage.Nfs.Server }}
             - name: NFS_PATH
-              value: "{{ .Storage.Nfs.Path }}"
+              value: "{{ .Spec.Storage.Nfs.Path }}"
           resources:
             limits:
-              cpu: {{ .Storage.Nfs.CPULimit }}
-              memory: {{ .Storage.Nfs.MemoryLimit }}
+              cpu: {{ .Spec.Storage.Nfs.CPULimit }}
+              memory: {{ .Spec.Storage.Nfs.MemoryLimit }}
             requests:
-              cpu: {{ .Storage.Nfs.CPURequest }}
-              memory: {{ .Storage.Nfs.MemoryRequest }}
+              cpu: {{ .Spec.Storage.Nfs.CPURequest }}
+              memory: {{ .Spec.Storage.Nfs.MemoryRequest }}
       volumes:
         - name: nfs-client-root
           nfs:
-            server: {{ .Storage.Nfs.Server }}
-            path: {{ .Storage.Nfs.Path }}
+            server: {{ .Spec.Storage.Nfs.Server }}
+            path: {{ .Spec.Storage.Nfs.Path }}

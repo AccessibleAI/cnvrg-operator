@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Logging.Elastalert.SvcName}}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Logging.Elastalert.SvcName}}
+  namespace: {{ .Namespace }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Logging.Elastalert.StorageSize }}
-  {{- if ne .Pg.StorageClass "use-default" }}
-  storageClassName: {{ .Logging.Elastalert.StorageClass }}
-  {{- else if ne .Storage.CcpStorageClass "" }}
-  storageClassName: {{ .Storage.CcpStorageClass }}
+      storage: {{ .Spec.Logging.Elastalert.StorageSize }}
+  {{- if ne .Spec.Pg.StorageClass "use-default" }}
+  storageClassName: {{ .Spec.Logging.Elastalert.StorageClass }}
+  {{- else if ne .Spec.ControlPlan.BaseConfig.CcpStorageClass "" }}
+  storageClassName: {{ .Spec.ControlPlan.BaseConfig.CcpStorageClass }}
   {{- end }}

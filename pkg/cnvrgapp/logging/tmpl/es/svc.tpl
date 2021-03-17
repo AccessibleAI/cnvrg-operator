@@ -2,18 +2,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Logging.Es.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.Logging.Es.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .Logging.Es.SvcName }}
+    app: {{ .Spec.Logging.Es.SvcName }}
 spec:
-  {{- if eq .Networking.IngressType "nodeport" }}
+  {{- if eq .Spec.Ingress.IngressType "nodeport" }}
   type: NodePort
   {{- end }}
   ports:
-  - port: {{ .Logging.Es.Port}}
-    {{- if eq .Networking.IngressType "nodeport" }}
-    nodePort: {{ .Logging.Es.NodePort }}
+  - port: {{ .Spec.Logging.Es.Port}}
+    {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+    nodePort: {{ .Spec.Logging.Es.NodePort }}
     {{- end }}
   selector:
-    app: {{ .Logging.Es.SvcName }}
+    app: {{ .Spec.Logging.Es.SvcName }}

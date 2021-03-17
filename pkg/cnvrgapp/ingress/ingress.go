@@ -22,7 +22,6 @@ var istioGwState = []*desired.State{
 
 var istioVsState = []*desired.State{
 	{
-
 		TemplatePath:   path + "/istio/vs/app.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -31,7 +30,6 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-
 		TemplatePath:   path + "/istio/vs/es.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -40,7 +38,6 @@ var istioVsState = []*desired.State{
 		Own:            true,
 	},
 	{
-
 		TemplatePath:   path + "/istio/vs/grafana.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

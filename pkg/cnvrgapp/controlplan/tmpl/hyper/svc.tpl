@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .ControlPlan.Hyper.SvcName }}
-  namespace: {{ .CnvrgNs }}
+  name: {{ .Spec.ControlPlan.Hyper.SvcName }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ .ControlPlan.Hyper.SvcName }}
+    app: {{ .Spec.ControlPlan.Hyper.SvcName }}
 spec:
   ports:
-    - port: {{ .ControlPlan.Hyper.Port }}
+    - port: {{ .Spec.ControlPlan.Hyper.Port }}
   selector:
-    app: {{ .ControlPlan.Hyper.SvcName }}
+    app: {{ .Spec.ControlPlan.Hyper.SvcName }}

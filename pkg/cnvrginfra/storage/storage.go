@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/storage/tmpl"
+const path = "/pkg/cnvrginfra/storage/tmpl"
 
 var hostPathState = []*desired.State{
 	{
@@ -18,7 +18,7 @@ var hostPathState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/hostpath/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -27,7 +27,7 @@ var hostPathState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/hostpath/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -36,7 +36,7 @@ var hostPathState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/hostpath/daemonset.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -45,7 +45,7 @@ var hostPathState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/hostpath/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -57,7 +57,7 @@ var hostPathState = []*desired.State{
 
 var nfsClientState = []*desired.State{
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/class.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -66,7 +66,7 @@ var nfsClientState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -75,7 +75,7 @@ var nfsClientState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -84,7 +84,7 @@ var nfsClientState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/rolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -93,7 +93,7 @@ var nfsClientState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -102,7 +102,7 @@ var nfsClientState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/role.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -111,7 +111,7 @@ var nfsClientState = []*desired.State{
 		Own:            true,
 	},
 	{
-		
+
 		TemplatePath:   path + "/nfsclient/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

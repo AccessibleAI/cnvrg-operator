@@ -33,16 +33,7 @@ type Elastalert struct {
 	RunAsUser     int    `json:"runAsUser,omitempty"`
 	FsGroup       int    `json:"fsGroup,omitempty"`
 }
-type Fluentd struct {
-	Enabled        string `json:"enabled,omitempty"`
-	Image          string `json:"image,omitempty"`
-	JournalPath    string `json:"journalPath,omitempty"`
-	ContainersPath string `json:"containersPath,omitempty"`
-	Journald       string `json:"journald,omitempty"`
-	CPURequest     string `json:"cpuRequest,omitempty"`
-	MemoryRequest  string `json:"memoryRequest,omitempty"`
-	MemoryLimit    string `json:"memoryLimit,omitempty"`
-}
+
 type Kibana struct {
 	Enabled       string `json:"enabled,omitempty"`
 	SvcName       string `json:"svcName,omitempty"`
@@ -58,7 +49,6 @@ type Logging struct {
 	Enabled    string     `json:"enabled,omitempty"`
 	Es         Es         `json:"es,omitempty"`
 	Elastalert Elastalert `json:"elastalert,omitempty"`
-	Fluentd    Fluentd    `json:"fluentd,omitempty"`
 	Kibana     Kibana     `json:"kibana,omitempty"`
 }
 
@@ -96,16 +86,6 @@ var loggingDefault = Logging{
 		MemoryLimit:   "800Mi",
 		RunAsUser:     1000,
 		FsGroup:       1000,
-	},
-	Fluentd: Fluentd{
-		Enabled:        "true",
-		Image:          "fluent/fluentd-kubernetes-daemonset:v1.11-debian-elasticsearch7-1",
-		JournalPath:    "/var/log/journal",
-		ContainersPath: "/var/lib/docker/containers",
-		Journald:       "false",
-		CPURequest:     "300m",
-		MemoryRequest:  "200Mi",
-		MemoryLimit:    "1Gi",
 	},
 	Kibana: Kibana{
 		Enabled:       "true",

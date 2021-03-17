@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/logging/tmpl"
+const path = "/pkg/cnvrgapp/logging/tmpl"
 
 var es = []*desired.State{
 	{
@@ -23,52 +23,6 @@ var es = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SvcGVR],
-		Own:            true,
-	},
-}
-
-var fluentd = []*desired.State{
-	{
-		TemplatePath:   path + "/fluentd/clusterrole.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ClusterRoleGVR],
-		Own:            true,
-	},
-	{
-		TemplatePath:   path + "/fluentd/clusterrolebinding.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
-		Own:            true,
-	},
-	{
-
-		TemplatePath:   path + "/fluentd/sa.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SaGVR],
-		Own:            true,
-	},
-	{
-
-		TemplatePath:   path + "/fluentd/daemonset.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.DaemonSetGVR],
-		Own:            true,
-	},
-	{
-
-		TemplatePath:   path + "/fluentd/cm.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ConfigMapGVR],
 		Own:            true,
 	},
 }
@@ -138,9 +92,6 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Es.Enabled == "true" {
 		state = append(state, es...)
-	}
-	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Fluentd.Enabled == "true" {
-		state = append(state, fluentd...)
 	}
 	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Elastalert.Enabled == "true" {
 		state = append(state, elastAlert...)

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Redis.SvcName}}
-  namespace: {{ .CnvrgNs }}
+  name: {{.Spec.Redis.SvcName}}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{.Redis.SvcName }}
+    app: {{.Spec.Redis.SvcName }}
 spec:
   ports:
   - name: redis
-    port: {{ .Redis.Port }}
+    port: {{ .Spec.Redis.Port }}
   selector:
-    app: {{ .Redis.SvcName }}
+    app: {{ .Spec.Redis.SvcName }}

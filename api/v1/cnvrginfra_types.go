@@ -46,6 +46,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		CnvrgInfraNs: "cnvrg-infra",
 		Storage:      storageDefault,
 		Istio:        istioDefault,
+
 		Registry: Registry{
 			Name:     "cnvrg-registry",
 			URL:      "docker.io",

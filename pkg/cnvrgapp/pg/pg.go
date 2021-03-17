@@ -18,42 +18,42 @@ var state = []*desired.State{
 		GVR:            desired.Kinds[desired.PvcGVR],
 		Own:            true,
 	},
-	//{
-	//
-	//	TemplatePath:   path + "/dep.tpl",
-	//	Template:       nil,
-	//	ParsedTemplate: "",
-	//	Obj:            &unstructured.Unstructured{},
-	//	GVR:            desired.Kinds[desired.DeploymentGVR],
-	//	Own:            true,
-	//},
-	//{
-	//
-	//	TemplatePath:   path + "/secret.tpl",
-	//	Template:       nil,
-	//	ParsedTemplate: "",
-	//	Obj:            &unstructured.Unstructured{},
-	//	GVR:            desired.Kinds[desired.SecretGVR],
-	//	Own:            true,
-	//},
-	//{
-	//
-	//	TemplatePath:   path + "/pvc.tpl",
-	//	Template:       nil,
-	//	ParsedTemplate: "",
-	//	Obj:            &unstructured.Unstructured{},
-	//	GVR:            desired.Kinds[desired.PvcGVR],
-	//	Own:            true,
-	//},
-	//{
-	//
-	//	TemplatePath:   path + "/svc.tpl",
-	//	Template:       nil,
-	//	ParsedTemplate: "",
-	//	Obj:            &unstructured.Unstructured{},
-	//	GVR:            desired.Kinds[desired.SvcGVR],
-	//	Own:            true,
-	//},
+	{
+
+		TemplatePath:   path + "/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/secret.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
 }
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
