@@ -96,16 +96,12 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, err
 	}
 
-	//if err := r.getActualCnvrgAppInstances(); err != nil {
-	//	return ctrl.Result{}, err
-	//}
-
 	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgInfra)
-
+	cnvrgInfraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
 }
 
-func (r *CnvrgInfraReconciler) getActualCnvrgAppInstances() ([]mlopsv1.CnvrgAppInstance, error) {
+func (r *CnvrgInfraReconciler) getCnvrgAppInstances() ([]mlopsv1.CnvrgAppInstance, error) {
 	var cnvrgAppInstances []mlopsv1.CnvrgAppInstance
 	cnvrgApps := &mlopsv1.CnvrgAppList{}
 	if err := r.List(context.Background(), cnvrgApps); err != nil {
@@ -157,11 +153,12 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
-	cnvrgAppInstances, err := r.getActualCnvrgAppInstances()
+	cnvrgAppInstances, err := r.getCnvrgAppInstances()
 	if err != nil {
 		return false, err
 	}
 	desiredSpec.CnvrgAppInstances = cnvrgAppInstances
+
 
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride); err != nil {
@@ -187,24 +184,6 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	cnvrgInfraLog.Info("states are equals, no need to sync")
 	return equal, nil
 }
-
-//func (r *CnvrgInfraReconciler) defineDesiredSpec(name types.NamespacedName) (*mlopsv1.CnvrgInfra, error) {
-//	cnvrgApp, err := r.getCnvrgInfraSpec(name)
-//	if err != nil {
-//		return nil, err
-//	}
-//	// probably cnvrgapp was removed
-//	if cnvrgApp == nil {
-//		return nil, nil
-//	}
-//	desiredSpec := mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}
-//	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
-//		cnvrgInfraLog.Error(err, "can't merge")
-//		return nil, err
-//	}
-//	cnvrgInfraLog = r.Log.WithValues("name", name, "ns", desiredSpec.Namespace)
-//	return &desiredSpec, nil
-//}
 
 func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.NamespacedName) (*mlopsv1.CnvrgInfra, error) {
 	ctx := context.Background()
@@ -318,9 +297,24 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	p := predicate.Funcs{
+		CreateFunc: func(e event.CreateEvent) bool {
+			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.Object) {
+				return true
+			}
+			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.Object) {
+				return true
+			}
+			return false
+		},
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
 
+			// do not run reconcile on cnvrgapp change
+			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
+				return false
+			}
+
+			// run reconcile only changing cnvrginfra/object marked for deletion
 			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgInfra)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgInfra)
@@ -341,6 +335,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	cnvrgInfraController := ctrl.
 		NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgInfra{}).
+		Owns(&mlopsv1.CnvrgApp{}).
 		WithEventFilter(p)
 
 	for _, v := range desired.Kinds {
