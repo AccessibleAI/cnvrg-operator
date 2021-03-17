@@ -1,5 +1,0 @@
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgInfra
-metadata:
-  name: cnvrginfra-sample
-

@@ -28,7 +28,8 @@ import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 )
 
-// CnvrgInfraReconciler reconciles a CnvrgInfra object
+const CnvrginfraFinalizer = "cnvrginfra.mlops.cnvrg.io/finalizer"
+
 type CnvrgInfraReconciler struct {
 	client.Client
 	Log    logr.Logger
@@ -44,33 +45,41 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	cnvrgInfraLog = r.Log.WithValues("name", req.NamespacedName)
 	cnvrgInfraLog.Info("starting cnvrginfra reconciliation")
 
-	desiredSpec, err := r.defineDesiredSpec(req.NamespacedName)
+	equal, err := r.syncCnvrgInfraSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	if desiredSpec == nil {
+	if !equal {
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if cnvrgInfra == nil {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
 	// Setup finalizer
-	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), desiredSpec); err != nil {
+	if cnvrgInfra.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
+			cnvrgInfra.ObjectMeta.Finalizers = append(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
+			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
 				cnvrgInfraLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
-		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			r.updateStatusMessage(mlopsv1.STATUS_REMOVING, "removing cnvrg spec", desiredSpec)
-			if err := r.cleanup(desiredSpec); err != nil {
+		if containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
+			r.updateStatusMessage(mlopsv1.STATUS_REMOVING, "removing cnvrg spec", cnvrgInfra)
+			if err := r.cleanup(cnvrgInfra); err != nil {
 				return ctrl.Result{}, err
 			}
-			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), desiredSpec); err != nil {
+			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
+			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
 				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgApp object still exists")
-				// if update was failed, make sure that cnvrgApp still exists
+				// if update was failed, make sure that cnvrgInfra still exists
 				spec, e := r.getCnvrgInfraSpec(req.NamespacedName)
 				if spec == nil && e == nil {
 					return ctrl.Result{}, nil // probably spec was deleted, stop reconcile
@@ -81,48 +90,121 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, nil
 	}
 
-	// set reconciling status
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec)
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgInfra)
 
-	// infra base config
-	if err := desired.Apply(registry.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
+	if err := r.applyManifests(cnvrgInfra); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	// Istio
-	if err := desired.Apply(istio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
-	}
+	//if err := r.getActualCnvrgAppInstances(); err != nil {
+	//	return ctrl.Result{}, err
+	//}
 
-	// Istio
-	if err := desired.Apply(storage.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
-	}
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgInfra)
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec)
 	return ctrl.Result{}, nil
 }
 
-func (r *CnvrgInfraReconciler) defineDesiredSpec(name types.NamespacedName) (*mlopsv1.CnvrgInfra, error) {
-	cnvrgApp, err := r.getCnvrgInfraSpec(name)
-	if err != nil {
+func (r *CnvrgInfraReconciler) getActualCnvrgAppInstances() ([]mlopsv1.CnvrgAppInstance, error) {
+	var cnvrgAppInstances []mlopsv1.CnvrgAppInstance
+	cnvrgApps := &mlopsv1.CnvrgAppList{}
+	if err := r.List(context.Background(), cnvrgApps); err != nil {
 		return nil, err
 	}
-	// probably cnvrgapp was removed
-	if cnvrgApp == nil {
-		return nil, nil
+	for _, cnvrgApp := range cnvrgApps.Items {
+		cnvrgAppInstances = append(cnvrgAppInstances, mlopsv1.CnvrgAppInstance{
+			Name:      cnvrgApp.Name,
+			Namespace: cnvrgApp.Namespace,
+		})
 	}
-	desiredSpec := mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}
-	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
-		cnvrgInfraLog.Error(err, "can't merge")
-		return nil, err
-	}
-	cnvrgInfraLog = r.Log.WithValues("name", name, "ns", desiredSpec.Namespace)
-	return &desiredSpec, nil
+	return cnvrgAppInstances, nil
 }
+
+func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+
+	// infra base config
+	if err := desired.Apply(registry.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
+		return err
+	}
+	// Istio
+	if err := desired.Apply(istio.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
+		return err
+	}
+	// Storage
+	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bool, error) {
+
+	cnvrgInfraLog.Info("synchronizing cnvrgInfra spec")
+
+	// Fetch current cnvrgInfra spec
+	cnvrgInfra, err := r.getCnvrgInfraSpec(name)
+	if err != nil {
+		return false, err
+	}
+	if cnvrgInfra == nil {
+		return false, nil // probably cnvrgapp was removed
+	}
+	cnvrgInfraLog = r.Log.WithValues("name", name, "ns", cnvrgInfra.Namespace)
+
+	// Get default cnvrgInfra spec
+	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
+	cnvrgAppInstances, err := r.getActualCnvrgAppInstances()
+	if err != nil {
+		return false, err
+	}
+	desiredSpec.CnvrgAppInstances = cnvrgAppInstances
+
+	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
+	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride); err != nil {
+		cnvrgInfraLog.Error(err, "can't merge")
+		return false, err
+	}
+
+	// Compare desiredSpec and current cnvrgInfra spec,
+	// if they are not equal, update the cnvrgInfra spec with desiredSpec,
+	// and return true for triggering new reconciliation
+	equal := reflect.DeepEqual(desiredSpec, cnvrgInfra.Spec)
+	if !equal {
+		cnvrgInfraLog.Info("states are not equals, syncing and requeuing")
+		cnvrgInfra.Spec = desiredSpec
+		if err := r.Update(context.Background(), cnvrgInfra); err != nil && errors.IsConflict(err) {
+			cnvrgAppLog.Info("conflict updating cnvrgInfra object, requeue for reconciliations...")
+			return true, nil
+		} else if err != nil {
+			return false, err
+		}
+		return equal, nil
+	}
+	cnvrgInfraLog.Info("states are equals, no need to sync")
+	return equal, nil
+}
+
+//func (r *CnvrgInfraReconciler) defineDesiredSpec(name types.NamespacedName) (*mlopsv1.CnvrgInfra, error) {
+//	cnvrgApp, err := r.getCnvrgInfraSpec(name)
+//	if err != nil {
+//		return nil, err
+//	}
+//	// probably cnvrgapp was removed
+//	if cnvrgApp == nil {
+//		return nil, nil
+//	}
+//	desiredSpec := mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}
+//	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
+//		cnvrgInfraLog.Error(err, "can't merge")
+//		return nil, err
+//	}
+//	cnvrgInfraLog = r.Log.WithValues("name", name, "ns", desiredSpec.Namespace)
+//	return &desiredSpec, nil
+//}
 
 func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.NamespacedName) (*mlopsv1.CnvrgInfra, error) {
 	ctx := context.Background()
@@ -138,25 +220,25 @@ func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.Namespaced
 	return &cnvrgInfra, nil
 }
 
-func (r *CnvrgInfraReconciler) cleanup(desiredSpec *mlopsv1.CnvrgInfra) error {
+func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 	cnvrgInfraLog.Info("running finalizer cleanup")
 
 	// remove istio
-	if err := r.cleanupIstio(desiredSpec); err != nil {
+	if err := r.cleanupIstio(cnvrgInfra); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *CnvrgInfraReconciler) cleanupIstio(desiredSpec *mlopsv1.CnvrgInfra) error {
+func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 	cnvrgInfraLog.Info("running istio cleanup")
 	ctx := context.Background()
-	istioManifests := istio.State(desiredSpec)
+	istioManifests := istio.State(cnvrgInfra)
 	for _, m := range istioManifests {
 		// Make sure IstioOperator was deployed
 		if m.GVR == desired.Kinds[desired.IstioGVR] {
-			if err := m.GenerateDeployable(desiredSpec); err != nil {
+			if err := m.GenerateDeployable(cnvrgInfra); err != nil {
 				cnvrgInfraLog.Error(err, "can't make manifest deployable")
 				return err
 			}
@@ -247,7 +329,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return true
 				}
 				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrginfra spec wasn't changed, assuming status update, won't reconcile
-				cnvrgInfraLog.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+				cnvrgInfraLog.V(1).Info("cnvrginfra update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
 
 				return !shouldReconcileOnSpecChange
 

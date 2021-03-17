@@ -41,6 +41,15 @@ spec:
             type: object
           spec:
             properties:
+              cnvrgAppInstances:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                  type: object
+                type: array
               cnvrgInfraNs:
                 type: string
               istio:

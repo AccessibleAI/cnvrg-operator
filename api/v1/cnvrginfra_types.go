@@ -5,10 +5,11 @@ import (
 )
 
 type CnvrgInfraSpec struct {
-	CnvrgInfraNs string   `json:"cnvrgInfraNs,omitempty"`
-	Registry     Registry `json:"registry,omitempty"`
-	Storage      Storage  `json:"storage,omitempty"`
-	Istio        Istio    `json:"istio,omitempty"`
+	CnvrgInfraNs      string             `json:"cnvrgInfraNs,omitempty"`
+	CnvrgAppInstances []CnvrgAppInstance `json:"cnvrgAppInstances,omitempty"`
+	Registry          Registry           `json:"registry,omitempty"`
+	Storage           Storage            `json:"storage,omitempty"`
+	Istio             Istio              `json:"istio,omitempty"`
 }
 
 type CnvrgInfraStatus struct {
@@ -37,16 +38,21 @@ type CnvrgInfraList struct {
 	Items           []CnvrgInfra `json:"items"`
 }
 
+type CnvrgAppInstance struct {
+	Name      string `json:"name,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
+}
+
 func init() {
 	SchemeBuilder.Register(&CnvrgInfra{}, &CnvrgInfraList{})
 }
 
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	return CnvrgInfraSpec{
-		CnvrgInfraNs: "cnvrg-infra",
-		Storage:      storageDefault,
-		Istio:        istioDefault,
-
+		CnvrgInfraNs:      "cnvrg-infra",
+		CnvrgAppInstances: []CnvrgAppInstance{},
+		Storage:           storageDefault,
+		Istio:             istioDefault,
 		Registry: Registry{
 			Name:     "cnvrg-registry",
 			URL:      "docker.io",

@@ -13,7 +13,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -225,56 +224,8 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 	return nil
 }
 
-//
-//func (r *CnvrgAppReconciler) cleanupIstio(desiredSpec *mlopsv1.CnvrgApp) error {
-//	cnvrgAppLog.Info("running istio cleanup")
-//	ctx := context.Background()
-//	istioManifests := istio.State(desiredSpec)
-//	for _, m := range istioManifests {
-//		// Make sure IstioOperator was deployed
-//		if m.GVR == desired.Kinds[desired.IstioGVR] {
-//			if err := m.GenerateDeployable(desiredSpec); err != nil {
-//				cnvrgAppLog.Error(err, "can't make manifest deployable")
-//				return err
-//			}
-//			if err := r.Delete(ctx, m.Obj); err != nil {
-//				if errors.IsNotFound(err) {
-//					cnvrgAppLog.Info("istio instance not found - probably removed previously")
-//					return nil
-//				}
-//				return err
-//			}
-//
-//			istioExists := true
-//			cnvrgAppLog.Info("wait for istio instance removal")
-//			for istioExists {
-//				err := r.Get(ctx, types.NamespacedName{Name: m.Name, Namespace: desiredSpec.Spec.CnvrgNs}, m.Obj)
-//				if err != nil && errors.IsNotFound(err) {
-//					cnvrgAppLog.Info("istio instance was successfully removed")
-//					istioExists = false
-//				}
-//				if istioExists {
-//					cnvrgAppLog.Info("istio instance still present, will sleep of 1 sec, and check again...")
-//				}
-//			}
-//		}
-//	}
-//	return nil
-//}
-
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	cnvrgAppLog = r.Log.WithValues("initializing", "crds")
-
-	if viper.GetBool("deploy-depended-crds") == false {
-		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
-	}
-
-	//if viper.GetBool("own-istio-resources") {
-	//	if err := desired.Apply(networking.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}); err != nil {
-	//		cnvrgAppLog.Error(err, "can't apply networking CRDs")
-	//		os.Exit(1)
-	//	}
-	//}
 
 	p := predicate.Funcs{
 
