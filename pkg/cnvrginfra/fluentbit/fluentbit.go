@@ -16,6 +16,7 @@ var fluentbitState = []*desired.State{
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.ConfigMapGVR],
 		Own:            true,
+		Override:       true,
 	},
 	{
 		TemplatePath:   path + "/ds.tpl",
@@ -53,7 +54,7 @@ var fluentbitState = []*desired.State{
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if cnvrgInfra.Spec.Fluentbit.Enabled == "true" {
+	if cnvrgInfra.Spec.Fluentbit.Enabled == "true" && len(cnvrgInfra.Spec.CnvrgAppInstances) > 0 {
 		state = append(state, fluentbitState...)
 	}
 	return state

@@ -13,4 +13,5 @@ type State struct {
 	Obj            *unstructured.Unstructured
 	GVR            schema.GroupVersionKind
 	Own            bool
+	Override       bool
 }

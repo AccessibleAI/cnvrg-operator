@@ -23,36 +23,40 @@ spec:
         prometheus.io/path: /api/v1/metrics/prometheus
     spec:
       containers:
-      - name: fluent-bit
-        image: fluent/fluent-bit:1.5
-        imagePullPolicy: Always
-        ports:
-          - containerPort: 2020
-        volumeMounts:
-        - name: varlog
-          mountPath: /var/log
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-        - name: fluent-bit-config
-          mountPath: /fluent-bit/etc/
+        - name: fluent-bit
+          image: cnvrg/cnvrg-fluentbit:v1.7.2
+          imagePullPolicy: Always
+          command:
+            - /bin/bash
+            - -c
+            - /opt/app-root/fluentbit -c /opt/app-root/etc/fluent-bit.conf & inotifywait -e close_write /opt/app-root/etc/fluent-bit.conf
+          ports:
+            - containerPort: 2020
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: fluent-bit-config
+              mountPath: /opt/app-root/etc/
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: varlog
-        hostPath:
-          path: /var/log
-      - name: varlibdockercontainers
-        hostPath:
-          path: /var/lib/docker/containers
-      - name: fluent-bit-config
-        configMap:
-          name: fluent-bit-config
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: fluent-bit-config
+          configMap:
+            name: fluent-bit-config
       serviceAccountName: fluent-bit
       tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
-      - operator: "Exists"
-        effect: "NoExecute"
-      - operator: "Exists"
-        effect: "NoSchedule"
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - operator: "Exists"
+          effect: "NoExecute"
+        - operator: "Exists"
+          effect: "NoSchedule"

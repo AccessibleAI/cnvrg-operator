@@ -19,6 +19,9 @@ data:
     @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-input.conf
     @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-filter.conf
     @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-output.conf
+    {{- end }}
+
+  {{- range $_, $cnvrgAppInstance := .Spec.CnvrgAppInstances }}
 
   {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-input.conf: |
     [INPUT]
@@ -56,7 +59,7 @@ data:
         Index           cnvrg
         Logstash_Prefix cnvrg
 
-    {{- end }}
+  {{- end }}
 
   parsers.conf: |
     [PARSER]
