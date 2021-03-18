@@ -9,4 +9,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: fluent-bit
-  namespace: cnvrg-infra
+  namespace: {{ .Spec.CnvrgInfraNs }}

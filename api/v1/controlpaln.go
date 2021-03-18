@@ -255,7 +255,7 @@ var controlPlanDefault = ControlPlan{
 
 	BaseConfig: BaseConfig{
 		JobsStorageClass:     "",
-		FeatureFlags:         map[string]string{},
+		FeatureFlags:         nil,
 		SentryURL:            "https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32",
 		PassengerAppEnv:      "app",
 		RailsEnv:             "app",

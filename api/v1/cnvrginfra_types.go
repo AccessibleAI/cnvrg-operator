@@ -10,6 +10,7 @@ type CnvrgInfraSpec struct {
 	Registry          Registry           `json:"registry,omitempty"`
 	Storage           Storage            `json:"storage,omitempty"`
 	Istio             Istio              `json:"istio,omitempty"`
+	Fluentbit         Fluentbit          `json:"fluentbit,omitempty"`
 }
 
 type CnvrgInfraStatus struct {
@@ -58,6 +59,10 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 			URL:      "docker.io",
 			User:     "",
 			Password: "",
+		},
+		Fluentbit: Fluentbit{
+			Enabled: "true",
+			Image:   "fluent/fluent-bit:1.5",
 		},
 	}
 }

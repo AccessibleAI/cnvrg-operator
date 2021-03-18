@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fluent-bit-config
-  namespace: cnvrg-infra
+  namespace: {{ .Spec.CnvrgInfraNs }}
   labels:
     k8s-app: fluent-bit
 data:
@@ -15,40 +15,40 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
+    {{- range $_, $cnvrgAppInstance := .Spec.CnvrgAppInstances }}
+    @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-input.conf
+    @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-filter.conf
+    @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-output.conf
 
-    @INCLUDE input-kubernetes.conf
-    @INCLUDE filter-kubernetes.conf
-    @INCLUDE output-elasticsearch.conf
-
-  input-kubernetes.conf: |
+  {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-input.conf: |
     [INPUT]
         Name              tail
-        Tag               kube.test2.*
-        Path              /var/log/containers/*_test2_*.log
+        Tag               kube.{{ $cnvrgAppInstance.Namespace }}.*
+        Path              /var/log/containers/*_{{ $cnvrgAppInstance.Namespace }}_*.log
         Parser            docker
         DB                /var/log/flb_kube.db
         Mem_Buf_Limit     5MB
         Skip_Long_Lines   On
         Refresh_Interval  10
 
-  filter-kubernetes.conf: |
+  {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-filter.conf: |
     [FILTER]
         Name                kubernetes
-        Match               kube.test2.*
+        Match               kube.{{ $cnvrgAppInstance.Namespace }}.*
         Kube_URL            https://kubernetes.default.svc:443
         Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.test2.var.log.containers.
+        Kube_Tag_Prefix     kube.{{ $cnvrgAppInstance.Namespace }}.var.log.containers.
         Merge_Log           On
         Merge_Log_Key       log_processed
         K8S-Logging.Parser  On
         K8S-Logging.Exclude Off
 
-  output-elasticsearch.conf: |
+  {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-output.conf: |
     [OUTPUT]
         Name            es
-        Match           kube.test2.*
-        Host            elasticsearch.cnvrg.svc.cluster.local
+        Match           kube.{{ $cnvrgAppInstance.Namespace }}.*
+        Host            elasticsearch.{{ $cnvrgAppInstance.Namespace }}.svc.cluster.local
         Port            9200
         Logstash_Format Off
         Replace_Dots    On
@@ -56,9 +56,7 @@ data:
         Index           cnvrg
         Logstash_Prefix cnvrg
 
-    [OUTPUT]
-        Name            stdout
-        Match           kube.test2.*
+    {{- end }}
 
   parsers.conf: |
     [PARSER]

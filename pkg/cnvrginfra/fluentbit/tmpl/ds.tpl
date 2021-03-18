@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: fluent-bit
-  namespace: cnvrg-infra
+  namespace: {{ .Spec.CnvrgInfraNs }}
   labels:
     k8s-app: fluent-bit-logging
     version: v1
