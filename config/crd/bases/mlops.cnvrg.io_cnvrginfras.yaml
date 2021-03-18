@@ -52,6 +52,13 @@ spec:
                 type: array
               cnvrgInfraNs:
                 type: string
+              fluentbit:
+                properties:
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                type: object
               istio:
                 properties:
                   enabled:

@@ -2,28 +2,30 @@ package controllers
 
 import (
 	"context"
+	"github.com/cnvrg-operator/pkg/cnvrginfra/fluentbit"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/istio"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/registry"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/storage"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/util/retry"
 	"os"
 	"reflect"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
-	"time"
-
-	"github.com/go-logr/logr"
-	"k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 )
@@ -61,7 +63,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
-	// Setup finalizer
+	// setup finalizer
 	if cnvrgInfra.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
 			cnvrgInfra.ObjectMeta.Finalizers = append(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
@@ -92,7 +94,13 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 
 	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgInfra)
 
+	// apply manifests
 	if err := r.applyManifests(cnvrgInfra); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// infra reconciler trigger configmap
+	if err := r.createInfraReconcilerTriggerCm(cnvrgInfra); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -117,6 +125,12 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances() ([]mlopsv1.CnvrgAppInstanc
 }
 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+
+	// Fluentbit
+	if err := desired.Apply(fluentbit.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
+		return err
+	}
 
 	// infra base config
 	if err := desired.Apply(registry.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
@@ -159,7 +173,6 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	}
 	desiredSpec.CnvrgAppInstances = cnvrgAppInstances
 
-
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride); err != nil {
 		cnvrgInfraLog.Error(err, "can't merge")
@@ -181,6 +194,22 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		}
 		return equal, nil
 	}
+
+	// make sure cnvrgAppInstances are synced
+	equal = reflect.DeepEqual(desiredSpec.CnvrgAppInstances, cnvrgAppInstances)
+	if !equal {
+		cnvrgInfraLog.Info("states are not equals (invalid cnvrgAppInstances), syncing and requeuing")
+		// cnvrgApp instances must be calculated at runtime
+		cnvrgInfra.Spec.CnvrgAppInstances = cnvrgAppInstances
+		if err := r.Update(context.Background(), cnvrgInfra); err != nil && errors.IsConflict(err) {
+			cnvrgAppLog.Info("conflict updating cnvrgInfra object, requeue for reconciliations...")
+			return true, nil
+		} else if err != nil {
+			return false, err
+		}
+		return equal, nil
+	}
+
 	cnvrgInfraLog.Info("states are equals, no need to sync")
 	return equal, nil
 }
@@ -253,32 +282,52 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 	ctx := context.Background()
 	cnvrgInfra.Status.Status = status
 	cnvrgInfra.Status.Message = message
-	if err := r.Status().Update(ctx, cnvrgInfra); err != nil {
+	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		err := r.Status().Update(ctx, cnvrgInfra)
+		return err
+	})
+	if err != nil {
 		cnvrgInfraLog.Error(err, "can't update status")
 	}
-	// This check is to make sure that the status is indeed updated
-	// short reconciliations loop might cause status to be applied but not yet saved into BD
-	// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
-	// to avoid this error, fetch the object and compare the status
-	statusCheckAttempts := 3
-	for {
-		cnvrgInfra, err := r.getCnvrgInfraSpec(types.NamespacedName{Namespace: cnvrgInfra.Namespace, Name: cnvrgInfra.Name})
-		if err != nil {
-			cnvrgInfraLog.Error(err, "can't validate status update")
-		}
-		cnvrgInfraLog.V(1).Info("expected status", "status", status, "message", message)
-		cnvrgInfraLog.V(1).Info("current status", "status", cnvrgInfra.Status.Status, "message", cnvrgInfra.Status.Message)
-		if cnvrgInfra.Status.Status == status && cnvrgInfra.Status.Message == message {
-			break
-		}
-		if statusCheckAttempts == 0 {
-			cnvrgInfraLog.Info("can't verify status update, status checks attempts exceeded")
-			break
-		}
-		statusCheckAttempts--
-		cnvrgInfraLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
-		time.Sleep(1 * time.Second)
+	//// This check is to make sure that the status is indeed updated
+	//// short reconciliations loop might cause status to be applied but not yet saved into BD
+	//// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
+	//// to avoid this error, fetch the object and compare the status
+	//statusCheckAttempts := 3
+	//for {
+	//	cnvrgInfra, err := r.getCnvrgInfraSpec(types.NamespacedName{Namespace: cnvrgInfra.Namespace, Name: cnvrgInfra.Name})
+	//	if err != nil {
+	//		cnvrgInfraLog.Error(err, "can't validate status update")
+	//	}
+	//	cnvrgInfraLog.V(1).Info("expected status", "status", status, "message", message)
+	//	cnvrgInfraLog.V(1).Info("current status", "status", cnvrgInfra.Status.Status, "message", cnvrgInfra.Status.Message)
+	//	if cnvrgInfra.Status.Status == status && cnvrgInfra.Status.Message == message {
+	//		break
+	//	}
+	//	if statusCheckAttempts == 0 {
+	//		cnvrgInfraLog.Info("can't verify status update, status checks attempts exceeded")
+	//		break
+	//	}
+	//	statusCheckAttempts--
+	//	cnvrgInfraLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
+	//	time.Sleep(1 * time.Second)
+	//}
+}
+
+func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+	cm := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "infra-reconciler-trigger-cm", Namespace: cnvrgInfra.Spec.CnvrgInfraNs}}
+	if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
+		cnvrgInfraLog.Error(err, "failed to set ControllerReference on infra-reconciler-trigger-cm")
+		return err
 	}
+	if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
+		cnvrgInfraLog.Info("infra-reconciler-trigger-cm already exists")
+	} else if err != nil {
+		cnvrgInfraLog.Error(err, "error creating infra-reconciler-trigger-cm")
+		return err
+	}
+
+	return nil
 }
 
 func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -297,22 +346,8 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	p := predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool {
-			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.Object) {
-				return true
-			}
-			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.Object) {
-				return true
-			}
-			return false
-		},
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
-
-			// do not run reconcile on cnvrgapp change
-			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
-				return false
-			}
 
 			// run reconcile only changing cnvrginfra/object marked for deletion
 			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.ObjectOld) {
@@ -335,7 +370,6 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	cnvrgInfraController := ctrl.
 		NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgInfra{}).
-		Owns(&mlopsv1.CnvrgApp{}).
 		WithEventFilter(p)
 
 	for _, v := range desired.Kinds {

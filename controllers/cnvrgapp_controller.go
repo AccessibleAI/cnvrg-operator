@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/controlplan"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/ingress"
@@ -13,12 +14,14 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
+	"gopkg.in/d4l3k/messagediff.v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/util/retry"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -26,7 +29,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
-	"time"
 )
 
 const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
@@ -48,31 +50,39 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	cnvrgAppLog = r.Log.WithValues("name", req.NamespacedName)
 	cnvrgAppLog.Info("starting cnvrgapp reconciliation")
 
-	desiredSpec, err := r.defineDesiredSpec(req.NamespacedName)
+	equal, err := r.syncCnvrgAppSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	if desiredSpec == nil {
+	if !equal {
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if cnvrgApp == nil {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
 	// Setup finalizer
-	if desiredSpec.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			desiredSpec.ObjectMeta.Finalizers = append(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), desiredSpec); err != nil {
+	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			if err := r.Update(context.Background(), cnvrgApp); err != nil {
 				cnvrgAppLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
-		if containsString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			r.updateStatusMessage(mlopsv1.STATUS_REMOVING, "removing cnvrg spec", desiredSpec)
-			if err := r.cleanup(desiredSpec); err != nil {
+		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			r.updateStatusMessage(mlopsv1.STATUS_REMOVING, "removing cnvrg spec", cnvrgApp)
+			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
-			desiredSpec.ObjectMeta.Finalizers = removeString(desiredSpec.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), desiredSpec); err != nil {
+			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			if err := r.Update(context.Background(), cnvrgApp); err != nil {
 				cnvrgAppLog.Info("error in removing finalizer, checking if cnvrgApp object still exists")
 				// if update was failed, make sure that cnvrgApp still exists
 				spec, e := r.getCnvrgAppSpec(req.NamespacedName)
@@ -85,47 +95,56 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", desiredSpec)
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgApp)
+
+	if err := r.applyManifests(cnvrgApp); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp)
+	cnvrgAppLog.Info("successfully reconciled")
+	return ctrl.Result{}, nil
+}
+
+func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// Ingress
-	if err := desired.Apply(ingress.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
+	if err := desired.Apply(ingress.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
 	}
 
 	// ControlPlan
-	if err := desired.Apply(controlplan.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
+	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
 	}
 
 	// Logging
-	if err := desired.Apply(logging.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
+	if err := desired.Apply(logging.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
 	}
 
 	// Redis
-	if err := desired.Apply(redis.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
+	if err := desired.Apply(redis.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
 	}
 
 	// PostgreSQL
-	if err := desired.Apply(pg.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
+	if err := desired.Apply(pg.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
 	}
 
 	// Minio
-	if err := desired.Apply(minio.State(desiredSpec), desiredSpec, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), desiredSpec)
-		return ctrl.Result{}, err
+	if err := desired.Apply(minio.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", desiredSpec)
-	cnvrgAppLog.Info("successfully reconciled")
-	return ctrl.Result{}, nil
+	return nil
 }
 
 func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgApp *mlopsv1.CnvrgApp) {
@@ -136,32 +155,96 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 	ctx := context.Background()
 	cnvrgApp.Status.Status = status
 	cnvrgApp.Status.Message = message
-	if err := r.Status().Update(ctx, cnvrgApp); err != nil {
+	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		err := r.Status().Update(ctx, cnvrgApp)
+		return err
+	})
+	if err != nil {
 		cnvrgAppLog.Error(err, "can't update status")
 	}
-	// This check is to make sure that the status is indeed updated
-	// short reconciliations loop might cause status to be applied but not yet saved into BD
-	// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
-	// to avoid this error, fetch the object and compare the status
-	statusCheckAttempts := 3
-	for {
-		cnvrgApp, err := r.getCnvrgAppSpec(types.NamespacedName{Namespace: cnvrgApp.Namespace, Name: cnvrgApp.Name})
-		if err != nil {
-			cnvrgAppLog.Error(err, "can't validate status update")
-		}
-		cnvrgAppLog.V(1).Info("expected status", "status", status, "message", message)
-		cnvrgAppLog.V(1).Info("current status", "status", cnvrgApp.Status.Status, "message", cnvrgApp.Status.Message)
-		if cnvrgApp.Status.Status == status && cnvrgApp.Status.Message == message {
-			break
-		}
-		if statusCheckAttempts == 0 {
-			cnvrgAppLog.Info("can't verify status update, status checks attempts exceeded")
-			break
-		}
-		statusCheckAttempts--
-		cnvrgAppLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
-		time.Sleep(1 * time.Second)
+
+	//// This check is to make sure that the status is indeed updated
+	//// short reconciliations loop might cause status to be applied but not yet saved into BD
+	//// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
+	//// to avoid this error, fetch the object and compare the status
+	//statusCheckAttempts := 3
+	//for {
+	//	cnvrgApp, err := r.getCnvrgAppSpec(types.NamespacedName{Namespace: cnvrgApp.Namespace, Name: cnvrgApp.Name})
+	//	if err != nil {
+	//		cnvrgAppLog.Error(err, "can't validate status update")
+	//	}
+	//	cnvrgAppLog.V(1).Info("expected status", "status", status, "message", message)
+	//	cnvrgAppLog.V(1).Info("current status", "status", cnvrgApp.Status.Status, "message", cnvrgApp.Status.Message)
+	//	if cnvrgApp.Status.Status == status && cnvrgApp.Status.Message == message {
+	//		break
+	//	}
+	//	if statusCheckAttempts == 0 {
+	//		cnvrgAppLog.Info("can't verify status update, status checks attempts exceeded")
+	//		break
+	//	}
+	//	statusCheckAttempts--
+	//	cnvrgAppLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
+	//	time.Sleep(1 * time.Second)
+	//}
+}
+
+func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, error) {
+
+	cnvrgAppLog.Info("synchronizing cnvrgApp spec")
+
+	// Fetch current cnvrgApp spec
+	cnvrgApp, err := r.getCnvrgAppSpec(name)
+	if err != nil {
+		return false, err
 	}
+	if cnvrgApp == nil {
+		return false, nil // probably cnvrgapp was removed
+	}
+	cnvrgAppLog = r.Log.WithValues("name", name, "ns", cnvrgApp.Namespace)
+
+	// Get default cnvrgApp spec
+	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
+
+	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
+	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride); err != nil {
+		cnvrgAppLog.Error(err, "can't merge")
+		return false, err
+	}
+
+	//b, err := json.Marshal(desiredSpec)
+	//fmt.Println(string(b))
+	//b1, err := json.Marshal(cnvrgApp.Spec)
+	//fmt.Println(string(b1))
+
+	actualSpec := cnvrgApp.Spec
+	//x := reflect.TypeOf(actualSpec)
+	//x1 := reflect.TypeOf(desiredSpec)
+	//fmt.Println(x)
+	//fmt.Println(x1)
+
+
+
+	diff, equal := messagediff.PrettyDiff(desiredSpec, actualSpec)
+	fmt.Println(diff)
+	// Compare desiredSpec and current cnvrgApp spec,
+	// if they are not equal, update the cnvrgApp spec with desiredSpec,
+	// and return true for triggering new reconciliation
+
+	equal = reflect.DeepEqual(desiredSpec, actualSpec)
+	if !equal {
+		cnvrgAppLog.Info("states are not equals, syncing and requeuing")
+		cnvrgApp.Spec = desiredSpec
+		if err := r.Update(context.Background(), cnvrgApp); err != nil && errors.IsConflict(err) {
+			cnvrgAppLog.Info("conflict updating cnvrgApp object, requeue for reconciliations...")
+			return true, nil
+		} else if err != nil {
+			return false, err
+		}
+		return equal, nil
+	}
+
+	cnvrgAppLog.Info("states are equals, no need to sync")
+	return equal, nil
 }
 
 func (r *CnvrgAppReconciler) defineDesiredSpec(name types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
