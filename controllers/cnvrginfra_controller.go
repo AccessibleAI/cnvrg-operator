@@ -116,10 +116,12 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances() ([]mlopsv1.CnvrgAppInstanc
 		return nil, err
 	}
 	for _, cnvrgApp := range cnvrgApps.Items {
-		cnvrgAppInstances = append(cnvrgAppInstances, mlopsv1.CnvrgAppInstance{
-			Name:      cnvrgApp.Name,
-			Namespace: cnvrgApp.Namespace,
-		})
+		if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() { // make sure the object is not in removing
+			cnvrgAppInstances = append(cnvrgAppInstances, mlopsv1.CnvrgAppInstance{
+				Name:      cnvrgApp.Name,
+				Namespace: cnvrgApp.Namespace,
+			})
+		}
 	}
 	return cnvrgAppInstances, nil
 }
@@ -315,15 +317,17 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 }
 
 func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv1.CnvrgInfra) error {
-	cm := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "infra-reconciler-trigger-cm", Namespace: cnvrgInfra.Spec.CnvrgInfraNs}}
+	cm := &v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Name: cnvrgInfra.Spec.InfraReconcilerCm, Namespace: cnvrgInfra.Spec.CnvrgInfraNs},
+	}
 	if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
-		cnvrgInfraLog.Error(err, "failed to set ControllerReference on infra-reconciler-trigger-cm")
+		cnvrgInfraLog.Error(err, "failed to set ControllerReference", "cm", cnvrgInfra.Spec.InfraReconcilerCm)
 		return err
 	}
 	if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-		cnvrgInfraLog.Info("infra-reconciler-trigger-cm already exists")
+		cnvrgInfraLog.Info("already exists", "cm", cnvrgInfra.Spec.InfraReconcilerCm)
 	} else if err != nil {
-		cnvrgInfraLog.Error(err, "error creating infra-reconciler-trigger-cm")
+		cnvrgInfraLog.Error(err, "error creating", "cm", cnvrgInfra.Spec.InfraReconcilerCm)
 		return err
 	}
 
