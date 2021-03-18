@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/controlplan"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/ingress"
@@ -14,7 +13,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
-	"gopkg.in/d4l3k/messagediff.v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -101,6 +99,10 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp)
 	cnvrgAppLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
@@ -141,6 +143,57 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	// Minio
 	if err := desired.Apply(minio.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, op string) error {
+
+	cnvrgAppInfra := &mlopsv1.CnvrgInfraList{}
+
+	if err := r.List(context.Background(), cnvrgAppInfra); err != nil {
+		cnvrgAppLog.Error(err, "can't list CnvrgInfra objects")
+		return err
+	}
+
+	if len(cnvrgAppInfra.Items) == 0 {
+		cnvrgAppLog.Info("no CnvrgInfra objects was deployed, skipping infra reconciler")
+		return nil
+	}
+
+	name := types.NamespacedName{
+		Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
+		Namespace: cnvrgAppInfra.Items[0].Spec.CnvrgInfraNs,
+	}
+
+	cm := &v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
+			Namespace: cnvrgAppInfra.Items[0].Spec.CnvrgInfraNs},
+	}
+
+	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
+		cnvrgAppLog.Info("infra reconciler cm does not exists, skipping", name, name)
+		return nil
+	} else if err != nil {
+		cnvrgAppLog.Error(err, "can't get cm", "name", name)
+		return err
+	}
+
+	if op == "add" {
+		if cm.Data == nil {
+			cm.Data = map[string]string{cnvrgApp.Namespace: cnvrgApp.Name}
+		} else {
+			cm.Data[cnvrgApp.Namespace] = cnvrgApp.Name
+		}
+	}
+	if op == "remove" {
+		delete(cm.Data, cnvrgApp.Namespace)
+	}
+	if err := r.Update(context.Background(), cm); err != nil {
+		cnvrgAppLog.Error(err, "can't update cm", "cm", name)
 		return err
 	}
 
@@ -211,26 +264,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 		return false, err
 	}
 
-	//b, err := json.Marshal(desiredSpec)
-	//fmt.Println(string(b))
-	//b1, err := json.Marshal(cnvrgApp.Spec)
-	//fmt.Println(string(b1))
-
-	actualSpec := cnvrgApp.Spec
-	//x := reflect.TypeOf(actualSpec)
-	//x1 := reflect.TypeOf(desiredSpec)
-	//fmt.Println(x)
-	//fmt.Println(x1)
-
-
-
-	diff, equal := messagediff.PrettyDiff(desiredSpec, actualSpec)
-	fmt.Println(diff)
-	// Compare desiredSpec and current cnvrgApp spec,
-	// if they are not equal, update the cnvrgApp spec with desiredSpec,
-	// and return true for triggering new reconciliation
-
-	equal = reflect.DeepEqual(desiredSpec, actualSpec)
+	equal := reflect.DeepEqual(desiredSpec, cnvrgApp.Spec)
 	if !equal {
 		cnvrgAppLog.Info("states are not equals, syncing and requeuing")
 		cnvrgApp.Spec = desiredSpec
@@ -247,24 +281,6 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	return equal, nil
 }
 
-func (r *CnvrgAppReconciler) defineDesiredSpec(name types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
-	cnvrgApp, err := r.getCnvrgAppSpec(name)
-	if err != nil {
-		return nil, err
-	}
-	// probably cnvrgapp was removed
-	if cnvrgApp == nil {
-		return nil, nil
-	}
-	desiredSpec := mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}
-	if err := mergo.Merge(&desiredSpec, cnvrgApp, mergo.WithOverride); err != nil {
-		cnvrgAppLog.Error(err, "can't merge")
-		return nil, err
-	}
-	cnvrgAppLog = r.Log.WithValues("name", name, "ns", desiredSpec.Namespace)
-	return &desiredSpec, nil
-}
-
 func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
 	ctx := context.Background()
 	var cnvrgApp mlopsv1.CnvrgApp
@@ -279,17 +295,20 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 	return &cnvrgApp, nil
 }
 
-func (r *CnvrgAppReconciler) cleanup(desiredSpec *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
+
 	cnvrgAppLog.Info("running finalizer cleanup")
 
-	// remove istio
-	//if err := r.cleanupIstio(desiredSpec); err != nil {
-	//	return err
-	//}
 	// remove cnvrg-db-init
-	if err := r.cleanupDbInitCm(desiredSpec); err != nil {
+	if err := r.cleanupDbInitCm(cnvrgApp); err != nil {
 		return err
 	}
+
+	// update infra reconciler cm
+	if err := r.triggerInfraReconciler(cnvrgApp, "remove"); err != nil {
+		return err
+	}
+
 	return nil
 }
 

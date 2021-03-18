@@ -6,6 +6,7 @@ import (
 
 type CnvrgInfraSpec struct {
 	CnvrgInfraNs      string             `json:"cnvrgInfraNs,omitempty"`
+	InfraReconcilerCm string             `json:"infraReconcilerCm,omitempty"`
 	CnvrgAppInstances []CnvrgAppInstance `json:"cnvrgAppInstances,omitempty"`
 	Registry          Registry           `json:"registry,omitempty"`
 	Storage           Storage            `json:"storage,omitempty"`
@@ -51,6 +52,7 @@ func init() {
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	return CnvrgInfraSpec{
 		CnvrgInfraNs:      "cnvrg-infra",
+		InfraReconcilerCm: "infra-reconciler-cm",
 		CnvrgAppInstances: []CnvrgAppInstance{},
 		Storage:           storageDefault,
 		Istio:             istioDefault,

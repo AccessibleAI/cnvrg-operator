@@ -59,6 +59,8 @@ spec:
                   image:
                     type: string
                 type: object
+              infraReconcilerCm:
+                type: string
               istio:
                 properties:
                   enabled:
