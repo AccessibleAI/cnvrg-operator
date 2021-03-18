@@ -208,16 +208,24 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 				return err
 			}
 		} else {
+
 			if manifest.GVR == Kinds[PvcGVR] {
 				// TODO: make this generic
 				continue
 			}
+
 			if err := mergo.Merge(fetchInto, manifest.Obj, mergo.WithOverride); err != nil {
 				log.Error(err, "can't merge")
 				return err
 			}
-			//manifest.Obj.SetResourceVersion(fetchInto.GetResourceVersion())
-			err := client.Update(ctx, fetchInto)
+
+			finalObjToApply := fetchInto
+
+			if manifest.Override {
+				finalObjToApply = manifest.Obj // if override true, do not merge object with existing state
+			}
+
+			err := client.Update(ctx, finalObjToApply)
 			if err != nil {
 				log.Info("error updating object", "manifest", manifest.TemplatePath)
 				return err
