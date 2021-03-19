@@ -54,8 +54,10 @@ var fluentbitState = []*desired.State{
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if cnvrgInfra.Spec.Fluentbit.Enabled == "true" && len(cnvrgInfra.Spec.CnvrgAppInstances) > 0 {
+
+	if cnvrgInfra.Spec.Fluentbit.Enabled == "true" {
 		state = append(state, fluentbitState...)
 	}
+
 	return state
 }
