@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/controlplan"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/ingress"
@@ -13,7 +14,8 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
-	v1 "k8s.io/api/core/v1"
+	v1apps "k8s.io/api/apps/v1"
+	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -27,6 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
+	"time"
 )
 
 const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
@@ -93,19 +96,154 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, "reconciling", cnvrgApp)
+	ready, percentageReady, err := r.getControlPlanReadinessStatus(cnvrgApp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if percentageReady == 100 {
+		percentageReady = 99
+	}
+	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, fmt.Sprintf("reconciling... (%d%%)", percentageReady), cnvrgApp)
 
 	if err := r.applyManifests(cnvrgApp); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
+	// get control plan readiness
+	ready, percentageReady, err = r.getControlPlanReadinessStatus(cnvrgApp)
+	if err != nil {
 		return ctrl.Result{}, err
 	}
 
-	r.updateStatusMessage(mlopsv1.STATUS_HEALTHY, "successfully reconciled", cnvrgApp)
-	cnvrgAppLog.Info("successfully reconciled")
-	return ctrl.Result{}, nil
+	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", percentageReady)
+	cnvrgAppLog.Info(statusMsg)
+
+	if ready {
+		r.updateStatusMessage(mlopsv1.STATUS_READY, statusMsg, cnvrgApp)
+		if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	} else {
+		requeueAfter, err := time.ParseDuration("30s")
+		if err != nil {
+			cnvrgAppLog.Error(err, "wrong duration for requeueAfter")
+			return ctrl.Result{}, err
+		}
+		cnvrgAppLog.Info("stack not ready yet, requeuing...")
+		return ctrl.Result{RequeueAfter: requeueAfter}, nil
+	}
+}
+
+func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
+
+	readyState := make(map[string]bool)
+
+	// check webapp status
+	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["webApp"] = ready
+	}
+
+	// check sidekiq status
+	if cnvrgApp.Spec.ControlPlan.Sidekiq.Enabled == "true" {
+		name := types.NamespacedName{Name: "sidekiq", Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["sidekiq"] = ready
+	}
+
+	// check searchkiq status
+	if cnvrgApp.Spec.ControlPlan.Searchkiq.Enabled == "true" {
+		name := types.NamespacedName{Name: "searchkiq", Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["searchkiq"] = ready
+	}
+
+	// check systemkiq status
+	if cnvrgApp.Spec.ControlPlan.Systemkiq.Enabled == "true" {
+		name := types.NamespacedName{Name: "systemkiq", Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["searchkiq"] = ready
+	}
+
+	// check postgres status
+	if cnvrgApp.Spec.Pg.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Pg.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["pg"] = ready
+	}
+
+	// check minio status
+	if cnvrgApp.Spec.Minio.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Minio.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["minio"] = ready
+	}
+
+	// check redis status
+	if cnvrgApp.Spec.Redis.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Redis.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["redis"] = ready
+	}
+
+	// check es status
+	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Es.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Es.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckStatefulSetReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["es"] = ready
+	}
+
+	// check kibana status
+	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Kibana.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Kibana.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["kibana"] = ready
+	}
+
+	percentageReady := 0
+
+	readyCount := 0
+
+	for _, ready := range readyState {
+		if ready {
+			readyCount++
+		}
+	}
+
+	if len(readyState) > 0 {
+		percentageReady = readyCount * 100 / len(readyState)
+	}
+
+	return readyCount == len(readyState), percentageReady, nil
 }
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
@@ -168,7 +306,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		Namespace: cnvrgAppInfra.Items[0].Spec.CnvrgInfraNs,
 	}
 
-	cm := &v1.ConfigMap{
+	cm := &v1core.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
 			Namespace: cnvrgAppInfra.Items[0].Spec.CnvrgInfraNs},
@@ -315,7 +453,7 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) error {
 	cnvrgAppLog.Info("running cnvrg-db-init cleanup")
 	ctx := context.Background()
-	dbInitCm := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "cnvrg-db-init", Namespace: desiredSpec.Namespace}}
+	dbInitCm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "cnvrg-db-init", Namespace: desiredSpec.Namespace}}
 	err := r.Delete(ctx, dbInitCm)
 	if err != nil && errors.IsNotFound(err) {
 		cnvrgAppLog.Info("no need to delete cnvrg-db-init, cm not found")
@@ -373,6 +511,41 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return cnvrgAppController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
 		Complete(r)
+}
+
+func (r *CnvrgAppReconciler) CheckDeploymentReadiness(name types.NamespacedName) (bool, error) {
+	ctx := context.Background()
+	deployment := &v1apps.Deployment{}
+
+	if err := r.Get(ctx, name, deployment); err != nil && errors.IsNotFound(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	if deployment.Status.Replicas == deployment.Status.ReadyReplicas {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (r *CnvrgAppReconciler) CheckStatefulSetReadiness(name types.NamespacedName) (bool, error) {
+
+	ctx := context.Background()
+	sts := &v1apps.StatefulSet{}
+
+	if err := r.Get(ctx, name, sts); err != nil && errors.IsNotFound(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	if sts.Status.Replicas == sts.Status.ReadyReplicas {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func containsString(slice []string, s string) bool {

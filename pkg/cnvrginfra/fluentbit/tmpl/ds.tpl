@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: fluent-bit
-          image: cnvrg/cnvrg-fluentbit:v1.7.2
+          image: {{ .Spec.Fluentbit.Image }}
           imagePullPolicy: Always
           command:
             - /bin/bash

@@ -109,48 +109,51 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	return ctrl.Result{}, nil
 }
 
-func (r *CnvrgInfraReconciler) getCnvrgAppInstances() ([]mlopsv1.CnvrgAppInstance, error) {
+func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.CnvrgAppInstance, error) {
 	var cnvrgAppInstances []mlopsv1.CnvrgAppInstance
-	cnvrgApps := &mlopsv1.CnvrgAppList{}
-	if err := r.List(context.Background(), cnvrgApps); err != nil {
+	cmName := types.NamespacedName{Namespace: infra.Spec.CnvrgInfraNs, Name: infra.Spec.InfraReconcilerCm}
+	cnvrgAppCm := &v1.ConfigMap{}
+	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil {
 		return nil, err
 	}
-	for _, cnvrgApp := range cnvrgApps.Items {
-		if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() { // make sure the object is not in removing
-			cnvrgAppInstances = append(cnvrgAppInstances, mlopsv1.CnvrgAppInstance{
-				Name:      cnvrgApp.Name,
-				Namespace: cnvrgApp.Namespace,
-			})
-		}
+	for cnvrgAppNamespace, cnvrgAppName := range cnvrgAppCm.Data {
+		cnvrgAppInstances = append(cnvrgAppInstances, mlopsv1.CnvrgAppInstance{
+			Name:      cnvrgAppName,
+			Namespace: cnvrgAppNamespace,
+		})
 	}
+
 	return cnvrgAppInstances, nil
 }
 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
+	var reconcileResult error
+
 	// Fluentbit
 	if err := desired.Apply(fluentbit.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
-		return err
+		reconcileResult = err
 	}
 
 	// infra base config
 	if err := desired.Apply(registry.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
-		return err
+		reconcileResult = err
 	}
 	// Istio
 	if err := desired.Apply(istio.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
-		return err
+		reconcileResult = err
 	}
+
 	// Storage
 	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
-		return err
+		reconcileResult = err
 	}
 
-	return nil
+	return reconcileResult
 }
 
 func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bool, error) {
@@ -169,7 +172,7 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
-	cnvrgAppInstances, err := r.getCnvrgAppInstances()
+	cnvrgAppInstances, err := r.getCnvrgAppInstances(cnvrgInfra)
 	if err != nil {
 		return false, err
 	}

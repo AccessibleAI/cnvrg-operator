@@ -64,7 +64,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		},
 		Fluentbit: Fluentbit{
 			Enabled: "true",
-			Image:   "fluent/fluent-bit:1.5",
+			Image:   "cnvrg/cnvrg-tools:v0.10",
 		},
 	}
 }
