@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/fluentbit"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/istio"
+	"github.com/cnvrg-operator/pkg/cnvrginfra/monitoring"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/registry"
 	"github.com/cnvrg-operator/pkg/cnvrginfra/storage"
 	"github.com/cnvrg-operator/pkg/desired"
@@ -112,8 +113,16 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.CnvrgAppInstance, error) {
 	var cnvrgAppInstances []mlopsv1.CnvrgAppInstance
 	cmName := types.NamespacedName{Namespace: infra.Spec.CnvrgInfraNs, Name: infra.Spec.InfraReconcilerCm}
+	if cmName.Name == "" {
+		cmName.Name = mlopsv1.DefaultCnvrgInfraSpec().InfraReconcilerCm
+	}
+	if cmName.Namespace == "" {
+		cmName.Namespace = mlopsv1.DefaultCnvrgInfraSpec().CnvrgInfraNs
+	}
 	cnvrgAppCm := &v1.ConfigMap{}
-	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil {
+	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
+		return cnvrgAppInstances, nil
+	} else if err != nil {
 		return nil, err
 	}
 	for cnvrgAppNamespace, cnvrgAppName := range cnvrgAppCm.Data {
@@ -132,6 +141,12 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// Fluentbit
 	if err := desired.Apply(fluentbit.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
+	// Monitoring
+	if err := desired.Apply(monitoring.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -347,7 +362,15 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	if viper.GetBool("own-istio-resources") {
 		err := desired.Apply(istio.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 		if err != nil {
-			cnvrgInfraLog.Error(err, "can't apply networking CRDs")
+			cnvrgInfraLog.Error(err, "can't apply istio CRDs")
+			os.Exit(1)
+		}
+	}
+
+	if viper.GetBool("own-prometheus-resources") {
+		err := desired.Apply(monitoring.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+		if err != nil {
+			cnvrgInfraLog.Error(err, "can't apply prometheus CRDs")
 			os.Exit(1)
 		}
 	}

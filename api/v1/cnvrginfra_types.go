@@ -8,6 +8,7 @@ type CnvrgInfraSpec struct {
 	CnvrgInfraNs      string             `json:"cnvrgInfraNs,omitempty"`
 	InfraReconcilerCm string             `json:"infraReconcilerCm,omitempty"`
 	CnvrgAppInstances []CnvrgAppInstance `json:"cnvrgAppInstances,omitempty"`
+	Monitoring        Monitoring         `json:"monitoring,omitempty"`
 	Registry          Registry           `json:"registry,omitempty"`
 	Storage           Storage            `json:"storage,omitempty"`
 	Istio             Istio              `json:"istio,omitempty"`
@@ -56,6 +57,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		CnvrgAppInstances: []CnvrgAppInstance{},
 		Storage:           storageDefault,
 		Istio:             istioDefault,
+		Monitoring:        monitoringDefault,
 		Registry: Registry{
 			Name:     "cnvrg-registry",
 			URL:      "docker.io",

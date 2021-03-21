@@ -86,6 +86,58 @@ spec:
                   tag:
                     type: string
                 type: object
+              monitoring:
+                properties:
+                  enabled:
+                    type: string
+                  kubeStateMetrics:
+                    description: NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                  kubeletServiceMonitor:
+                    type: string
+                  prometheus:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  prometheusOperator:
+                    properties:
+                      enabled:
+                        type: string
+                      images:
+                        properties:
+                          configReloaderImage:
+                            type: string
+                          kubeRbacProxyImage:
+                            type: string
+                          operatorImage:
+                            type: string
+                          prometheusConfigReloaderImage:
+                            type: string
+                        type: object
+                    type: object
+                type: object
               registry:
                 properties:
                   name:

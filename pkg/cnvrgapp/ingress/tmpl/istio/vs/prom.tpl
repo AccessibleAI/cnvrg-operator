@@ -1,11 +1,11 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Spec.Monitoring.Prometheus.SvcName }}
+  name: {{ .Spec.Prometheus.SvcName }}
   namespace: {{ .Namespace }}
 spec:
   hosts:
-  - "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"
+  - "{{ .Spec.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"
   gateways:
   - {{ .Spec.Ingress.IstioGwName }}
   http:
@@ -16,5 +16,5 @@ spec:
     route:
     - destination:
         port:
-          number: {{ .Spec.Monitoring.Prometheus.Port }}
-        host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Namespace }}.svc.cluster.local"
+          number: {{ .Spec.Prometheus.Port }}
+        host: "{{ .Spec.Prometheus.SvcName }}.{{ .Namespace }}.svc.cluster.local"

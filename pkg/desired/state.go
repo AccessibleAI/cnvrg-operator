@@ -139,6 +139,37 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return cnvrgApp.Spec.ControlPlan.WebApp.Port
 		},
+		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return fmt.Sprintf(`
+- job_name: 'federate'
+  scrape_interval: 10s
+  honor_labels: true
+  metrics_path: '/federate'
+  params:
+    'match[]':
+      - '{namespace="%s"}'
+  static_configs:
+    - targets:
+      - 'prometheus-operated.cnvrg-infra.svc.cluster.local:9090'
+`, cnvrgApp.Namespace)
+		},
+		"grafanaDataSource": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return fmt.Sprintf(`
+{
+    "apiVersion": 1,
+    "datasources": [
+        {
+            "access": "proxy",
+            "editable": false,
+            "name": "prometheus",
+            "orgId": 1,
+            "type": "prometheus",
+            "url": "http://%s.%s.svc:%d",
+            "version": 1
+        }
+    ]
+}`, cnvrgApp.Spec.Prometheus.SvcName, cnvrgApp.Namespace, cnvrgApp.Spec.Prometheus.Port)
+		},
 	}
 }
 

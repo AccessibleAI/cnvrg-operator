@@ -9,11 +9,14 @@ import (
 	"github.com/cnvrg-operator/pkg/cnvrgapp/logging"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/minio"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/pg"
+	"github.com/cnvrg-operator/pkg/cnvrgapp/prometheus"
 	"github.com/cnvrg-operator/pkg/cnvrgapp/redis"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
+	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -22,6 +25,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
+	"os"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -248,6 +253,18 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
+	// prometheus
+	if err := desired.Apply(prometheus.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
+	}
+
+	// grafana dashboard
+	if err := r.createGrafanaDashboards(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		return err
+	}
+
 	// Ingress
 	if err := desired.Apply(ingress.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
@@ -285,6 +302,57 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	return nil
+}
+
+func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
+	if cnvrgApp.Spec.Grafana.Enabled != "true" {
+		cnvrgAppLog.Info("grafana disabled, skipping dashboard creation")
+		return nil
+	}
+
+	dashboardsPath := "/pkg/cnvrgapp/prometheus/tmpl/grafana/dashboards-data"
+	err := pkger.Walk(dashboardsPath, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		f, err := pkger.Open(path)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading path", "path", path)
+			return err
+		}
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", path)
+			return err
+		}
+
+		cm := &v1core.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      strings.TrimSuffix(info.Name(), filepath.Ext(info.Name())),
+				Namespace: cnvrgApp.Namespace,
+			},
+			Data: map[string]string{info.Name(): string(b)},
+		}
+		if err := ctrl.SetControllerReference(cnvrgApp, cm, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
+			return err
+		}
+		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
+			cnvrgAppLog.Info("grafana dashboard already exists", "file", path)
+			return nil
+		} else if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", path)
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, op string) error {

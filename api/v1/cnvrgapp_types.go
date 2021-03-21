@@ -12,7 +12,8 @@ type CnvrgAppSpec struct {
 	Minio         Minio       `json:"minio,omitempty"`
 	Redis         Redis       `json:"redis,omitempty"`
 	Logging       Logging     `json:"logging,omitempty"`
-	Monitoring    Monitoring  `json:"monitoring,omitempty"`
+	Prometheus    Prometheus  `json:"prometheus,omitempty"`
+	Grafana       Grafana     `json:"grafana,omitempty"`
 }
 
 type CnvrgAppStatus struct {
@@ -54,6 +55,7 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Minio:         minioDefaults,
 		Redis:         redisDefault,
 		Logging:       loggingDefault,
-		Monitoring:    monitoringDefault,
+		Prometheus:    prometheusDefault,
+		Grafana:       grafanaDefault,
 	}
 }

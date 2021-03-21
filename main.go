@@ -157,16 +157,22 @@ func setupCommands() {
 }
 
 func informPkger() {
+	// cnvrginfra
+	pkger.Include("/pkg/cnvrginfra/fluentbit/tmpl")
+	pkger.Include("/pkg/cnvrginfra/istio/tmpl")
+	pkger.Include("/pkg/cnvrginfra/storage/tmpl")
+	pkger.Include("/pkg/cnvrginfra/registry/tmpl")
+	pkger.Include("/pkg/cnvrginfra/monitoring/tmpl")
+
+	// cnvrgapp
 	pkger.Include("/pkg/cnvrgapp/pg/tmpl")
 	pkger.Include("/pkg/cnvrgapp/redis/tmpl")
 	pkger.Include("/pkg/cnvrgapp/minio/tmpl")
 	pkger.Include("/pkg/cnvrgapp/logging/tmpl")
 	pkger.Include("/pkg/cnvrgapp/ingress/tmpl")
 	pkger.Include("/pkg/cnvrgapp/controlplan/tmpl")
-	pkger.Include("/pkg/cnvrginfra/fluentbit/tmpl")
-	pkger.Include("/pkg/cnvrginfra/istio/tmpl")
-	pkger.Include("/pkg/cnvrginfra/storage/tmpl")
-	pkger.Include("/pkg/cnvrginfra/registry/tmpl")
+	pkger.Include("/pkg/cnvrgapp/prometheus/tmpl")
+
 }
 
 func main() {

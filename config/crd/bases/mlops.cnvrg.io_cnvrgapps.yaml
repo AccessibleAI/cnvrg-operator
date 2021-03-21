@@ -351,6 +351,19 @@ spec:
                         type: string
                     type: object
                 type: object
+              grafana:
+                properties:
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  nodePort:
+                    type: integer
+                  port:
+                    type: integer
+                  svcName:
+                    type: string
+                type: object
               ingress:
                 properties:
                   enabled:
@@ -509,117 +522,6 @@ spec:
                   svcName:
                     type: string
                 type: object
-              monitoring:
-                properties:
-                  dcgmExporter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      port:
-                        type: integer
-                    type: object
-                  defaultServiceMonitors:
-                    properties:
-                      enabled:
-                        type: string
-                    type: object
-                  enabled:
-                    type: string
-                  grafana:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      nodePort:
-                        type: integer
-                      port:
-                        type: integer
-                      svcName:
-                        type: string
-                    type: object
-                  idleMetricsExporter:
-                    properties:
-                      enabled:
-                        type: string
-                    type: object
-                  kubeStateMetrics:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                    type: object
-                  metricsServer:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                    type: object
-                  minioExporter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                    type: object
-                  nodeExporter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      port:
-                        type: integer
-                    type: object
-                  prometheus:
-                    properties:
-                      cpuRequest:
-                        type: integer
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      memoryRequest:
-                        type: string
-                      nodePort:
-                        type: integer
-                      port:
-                        type: integer
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
-                  prometheusOperator:
-                    properties:
-                      enabled:
-                        type: string
-                      images:
-                        properties:
-                          configReloaderImage:
-                            type: string
-                          kubeRbacProxyImage:
-                            type: string
-                          operatorImage:
-                            type: string
-                          prometheusConfigReloaderImage:
-                            type: string
-                        type: object
-                    type: object
-                  sidekiqExporter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                    type: object
-                type: object
               pg:
                 properties:
                   cpuRequest:
@@ -664,6 +566,27 @@ spec:
                   svcName:
                     type: string
                   user:
+                    type: string
+                type: object
+              prometheus:
+                properties:
+                  cpuRequest:
+                    type: integer
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  memoryRequest:
+                    type: string
+                  nodePort:
+                    type: integer
+                  port:
+                    type: integer
+                  storageClass:
+                    type: string
+                  storageSize:
+                    type: string
+                  svcName:
                     type: string
                 type: object
               redis:
