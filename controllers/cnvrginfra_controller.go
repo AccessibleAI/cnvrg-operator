@@ -10,9 +10,12 @@ import (
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"io/ioutil"
 	v1 "k8s.io/api/core/v1"
+	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -20,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
 	"os"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -151,6 +155,12 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		reconcileResult = err
 	}
 
+	// grafana dashboards
+	if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
+		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
 	// infra base config
 	if err := desired.Apply(registry.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgInfra)
@@ -169,6 +179,56 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	return reconcileResult
+}
+
+func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+	if cnvrgInfra.Spec.Monitoring.Enabled != "true" {
+		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
+		return nil
+	}
+	dashboardsPath := "/pkg/cnvrginfra/monitoring/tmpl/grafana/dashboards-data"
+	err := pkger.Walk(dashboardsPath, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		f, err := pkger.Open(path)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading path", "path", path)
+			return err
+		}
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", path)
+			return err
+		}
+
+		cm := &v1core.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      strings.TrimSuffix(info.Name(), filepath.Ext(info.Name())),
+				Namespace: cnvrgInfra.Spec.CnvrgInfraNs,
+			},
+			Data: map[string]string{info.Name(): string(b)},
+		}
+		if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
+			return err
+		}
+		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
+			cnvrgAppLog.Info("grafana dashboard already exists", "file", path)
+			return nil
+		} else if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", path)
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bool, error) {

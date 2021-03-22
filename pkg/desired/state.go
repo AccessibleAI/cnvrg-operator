@@ -170,6 +170,23 @@ func cnvrgTemplateFuncs() map[string]interface{} {
     ]
 }`, cnvrgApp.Spec.Prometheus.SvcName, cnvrgApp.Namespace, cnvrgApp.Spec.Prometheus.Port)
 		},
+		"grafanaInfraDataSource": func(cnvrgInfra mlopsv1.CnvrgInfra) string {
+			return fmt.Sprintf(`
+{
+    "apiVersion": 1,
+    "datasources": [
+        {
+            "access": "proxy",
+            "editable": false,
+            "name": "prometheus",
+            "orgId": 1,
+            "type": "prometheus",
+            "url": "http://%s.%s.svc:%d",
+            "version": 1
+        }
+    ]
+}`, cnvrgInfra.Spec.Monitoring.Prometheus.SvcName, cnvrgInfra.Spec.CnvrgInfraNs, cnvrgInfra.Spec.Monitoring.Prometheus.Port)
+		},
 	}
 }
 

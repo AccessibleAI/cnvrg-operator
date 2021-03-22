@@ -88,8 +88,33 @@ spec:
                 type: object
               monitoring:
                 properties:
+                  dcgmExporter:
+                    description: DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
+                      SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
+                      MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      port:
+                        type: integer
+                    type: object
                   enabled:
                     type: string
+                  grafana:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
                   kubeStateMetrics:
                     description: NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
                     properties:

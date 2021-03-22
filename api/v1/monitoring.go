@@ -69,11 +69,11 @@ type Monitoring struct {
 	KubeletServiceMonitor string             `json:"kubeletServiceMonitor,omitempty"`
 	//NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
 	KubeStateMetrics KubeStateMetrics `json:"kubeStateMetrics,omitempty"`
-	//Grafana                Grafana                `json:"grafana,omitempty"`
+	Grafana          Grafana          `json:"grafana,omitempty"`
 	//DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
 	//SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
 	//MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
-	//DcgmExporter           DcgmExporter           `json:"dcgmExporter,omitempty"`
+	DcgmExporter DcgmExporter `json:"dcgmExporter,omitempty"`
 	//IdleMetricsExporter    IdleMetricsExporter    `json:"idleMetricsExporter,omitempty"`
 	//MetricsServer          MetricsServer          `json:"metricsServer,omitempty"`
 }
@@ -99,7 +99,10 @@ var prometheusDefault = Prometheus{
 }
 
 var monitoringDefault = Monitoring{
-	Enabled: "true",
+	Enabled:               "true",
+	KubeletServiceMonitor: "true",
+	Prometheus:            prometheusDefault,
+	Grafana:               grafanaDefault,
 	PrometheusOperator: PrometheusOperator{
 		Enabled: "true",
 		Images: Images{
@@ -108,8 +111,6 @@ var monitoringDefault = Monitoring{
 			KubeRbacProxyImage:            "quay.io/brancz/kube-rbac-proxy:v0.8.0",
 		},
 	},
-	Prometheus:            prometheusDefault,
-	KubeletServiceMonitor: "true",
 	KubeStateMetrics: KubeStateMetrics{
 		Enabled: "true",
 		Image:   "quay.io/coreos/kube-state-metrics:v1.9.7",
@@ -123,13 +124,7 @@ var monitoringDefault = Monitoring{
 	//	Enabled: "true",
 	//	Image:   "quay.io/coreos/kube-state-metrics:v1.9.5",
 	//},
-	//Grafana: Grafana{
-	//	Enabled:  "true",
-	//	Image:    "grafana/grafana:7.2.0",
-	//	SvcName:  "grafana",
-	//	Port:     3000,
-	//	NodePort: 30012,
-	//},
+
 	//DefaultServiceMonitors: DefaultServiceMonitors{Enabled: "true"},
 	//SidekiqExporter: SidekiqExporter{
 	//	Enabled: "true",

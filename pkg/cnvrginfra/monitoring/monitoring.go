@@ -151,6 +151,49 @@ var kubeStateMetricsState = []*desired.State{
 	},
 }
 
+var grafanaState = []*desired.State{
+	{
+		TemplatePath:   path + "/grafana/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/grafana/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/grafana/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/grafana/datasource.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/grafana/dashboards.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ConfigMapGVR],
+		Own:            true,
+	},
+}
+
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	var state []*desired.State
@@ -169,6 +212,10 @@ func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.KubeStateMetrics.Enabled == "true" {
 		state = append(state, kubeStateMetricsState...)
+	}
+
+	if cnvrgInfra.Spec.Monitoring.Enabled == "true" {
+		state = append(state, grafanaState...)
 	}
 
 	return state
