@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Spec.Minio.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
   labels:
     app: {{ .Spec.Minio.SvcName }}
 spec:

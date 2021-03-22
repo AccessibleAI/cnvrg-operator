@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: 1.9.7
   name: kube-state-metrics
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

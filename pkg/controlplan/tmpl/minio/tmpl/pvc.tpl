@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .Spec.Minio.SvcName }}
-  namespace: {{ .Namespace  }}
+  namespace: {{ ns .  }}
 spec:
   accessModes:
     {{- if eq .Spec.Minio.SharedStorage.Enabled "true" }}

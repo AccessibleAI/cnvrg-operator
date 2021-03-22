@@ -26,18 +26,22 @@ import (
 	"text/template"
 )
 
+func getNs(obj interface{}) string {
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
+		return cnvrgInfra.Spec.InfraNamespace
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
+		return cnvrgApp.Namespace
+	}
+	return ""
+}
+
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
 		"ns": func(obj interface{}) string {
-			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-				cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-				return cnvrgInfra.Spec.InfraNamespace
-			}
-			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-				cnvrgApp := obj.(*mlopsv1.CnvrgApp)
-				return cnvrgApp.Namespace
-			}
-			return ""
+			return getNs(obj)
 		},
 		"httpScheme": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
@@ -163,7 +167,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
   static_configs:
     - targets:
       - 'prometheus-operated.cnvrg-infra.svc.cluster.local:9090'
-`, cnvrgApp.Namespace)
+`, getNs(cnvrgApp))
 		},
 		"grafanaDataSource": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return fmt.Sprintf(`
@@ -197,7 +201,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
             "version": 1
         }
     ]
-}`, cnvrgInfra.Spec.Monitoring.Prometheus.SvcName, cnvrgInfra.Namespace, cnvrgInfra.Spec.Monitoring.Prometheus.Port)
+}`, cnvrgInfra.Spec.Monitoring.Prometheus.SvcName, cnvrgInfra.Spec.InfraNamespace, cnvrgInfra.Spec.Monitoring.Prometheus.Port)
 		},
 	}
 }

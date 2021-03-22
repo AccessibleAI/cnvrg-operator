@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Spec.Logging.Kibana.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
   labels:
     app: {{ .Spec.Logging.Kibana.SvcName }}
 spec:
@@ -31,7 +31,7 @@ spec:
           image: {{ .Spec.Logging.Kibana.Image }}
           env:
           - name: ELASTICSEARCH_URL
-            value: {{ printf "http://%s.%s.svc.cluster.local:%s" .Spec.Logging.Kibana.SvcName .Namespace .Spec.Logging.Es.Port }}
+            value: {{ printf "http://%s.%s.svc.cluster.local:%s" .Spec.Logging.Kibana.SvcName ns . .Spec.Logging.Es.Port }}
           ports:
           - containerPort: {{ .Spec.Logging.Kibana.Port }}
           resources:

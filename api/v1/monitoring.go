@@ -110,7 +110,7 @@ var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 	Grafana:    grafanaDefault,
 }
 
-var monitoringDefault = CnvrgInfraMonitoring{
+var infraMonitoringDefault = CnvrgInfraMonitoring{
 	Enabled:               "true",
 	KubeletServiceMonitor: "true",
 	Prometheus:            prometheusDefault,

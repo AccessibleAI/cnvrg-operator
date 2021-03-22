@@ -1,12 +1,11 @@
 package registry
 
 import (
-	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/cnvrginfra/registry/tmpl"
+const path = "/pkg/registry/tmpl"
 
 var registryState = []*desired.State{
 	{
@@ -19,8 +18,6 @@ var registryState = []*desired.State{
 	},
 }
 
-func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
-	var state []*desired.State
-	state = append(state, registryState...)
-	return state
+func State() []*desired.State {
+	return registryState
 }

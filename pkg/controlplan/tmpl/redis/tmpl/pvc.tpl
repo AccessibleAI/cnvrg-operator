@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name:  {{.Spec.Redis.SvcName}}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   accessModes:
     - ReadWriteOnce

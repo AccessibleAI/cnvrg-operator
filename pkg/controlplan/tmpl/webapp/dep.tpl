@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Spec.ControlPlan.WebApp.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
   labels:
     app: {{ .Spec.ControlPlan.WebApp.SvcName }}
 spec:
@@ -131,7 +131,7 @@ spec:
         - name: "CNVRG_SEED_CMD"
           value: "{{ .Spec.ControlPlan.Seeder.SeedCmd }}"
         - name: "CNVRG_NS"
-          value: {{ .Namespace }}
+          value: {{ ns . }}
         - name: "CNVRG_SA_NAME"
           value: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
         {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cp-base-config
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 data:
   DEFAULT_COMPUTE_CLUSTER_DOMAIN: "{{ defaultComputeClusterDomain .}}"
   DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ .Spec.Ingress.HTTPS.Enabled }}"
@@ -15,7 +15,7 @@ data:
   CHECK_JOB_EXPIRATION: "{{ .Spec.ControlPlan.BaseConfig.CheckJobExpiration }}"
   USE_STDOUT: "{{ .Spec.ControlPlan.BaseConfig.UseStdout }}"
   EXTRACT_TAGS_FROM_CMD: "{{ .Spec.ControlPlan.BaseConfig.ExtractTagsFromCmd }}"
-  KUBE_NAMESPACE: "{{ .Namespace }}"
+  KUBE_NAMESPACE: "{{ ns . }}"
   SHOW_INTERCOM: "{{ .Spec.ControlPlan.BaseConfig.Intercom }}"
   SPLIT_SIDEKIQ: "{{ .Spec.ControlPlan.Sidekiq.Split }}"
   CNVRG_PASSENGER_MAX_POOL_SIZE: "{{ .Spec.ControlPlan.WebApp.PassengerMaxPoolSize }}"

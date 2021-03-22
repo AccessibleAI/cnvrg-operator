@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: nfs-client-provisioner
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   replicas: 1
   selector:

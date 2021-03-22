@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: cp-ldap
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 data:
   LDAP_ACTIVE: {{ .Spec.ControlPlan.Ldap.Enabled | b64enc }}
   LDAP_HOST: {{ .Spec.ControlPlan.Ldap.Host | b64enc }}

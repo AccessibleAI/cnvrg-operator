@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: cp-object-storage
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 data:
   SECRET_KEY_BASE: {{ .Spec.ControlPlan.ObjectStorage.SecretKeyBase | b64enc }}
   STS_IV: {{ .Spec.ControlPlan.ObjectStorage.StsIv | b64enc }}

@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: {{ .Spec.Minio.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   hosts:
   - "{{ .Spec.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"
@@ -15,4 +15,4 @@ spec:
     timeout: 864000s
     route:
     - destination:
-        host: "{{ .Spec.Minio.SvcName }}.{{ .Namespace }}.svc.cluster.local"
+        host: "{{ .Spec.Minio.SvcName }}.{{ ns . }}.svc.cluster.local"

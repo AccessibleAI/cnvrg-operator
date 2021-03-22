@@ -1,8 +1,7 @@
 package v1
 
 type Fluentbit struct {
-	Enabled string `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Image string `json:"image,omitempty"`
 }
 
 type Es struct {
@@ -65,8 +64,7 @@ type CnvrgInfraLogging struct {
 }
 
 var fluentbitDefault = Fluentbit{
-	Enabled: "true",
-	Image:   "cnvrg/cnvrg-fluentbit",
+	Image: "cnvrg/cnvrg-fluentbit:v1.7.2",
 }
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{

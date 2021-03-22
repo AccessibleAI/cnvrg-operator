@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: hostpath-provisioner-admin
-    namespace: {{ .Namespace }}
+    namespace: {{ ns . }}
 roleRef:
   kind: ClusterRole
   name: hostpath-provisioner

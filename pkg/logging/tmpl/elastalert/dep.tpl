@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Spec.Logging.Elastalert.SvcName }}
   name: {{ .Spec.Logging.Elastalert.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   replicas: 1
   selector:

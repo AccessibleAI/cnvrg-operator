@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: v1.9.7
   name: kube-state-metrics
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   replicas: 1
   selector:

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redis-conf
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 data:
   redis.conf: |
     dir /data/

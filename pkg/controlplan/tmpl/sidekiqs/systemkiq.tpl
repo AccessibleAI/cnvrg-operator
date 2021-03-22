@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: systemkiq
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
   labels:
     app: systemkiq
 spec:
@@ -74,4 +74,4 @@ spec:
           command: ["/bin/bash", "-c", "python3 cnvrg-boot.py seeder --mode worker"]
           env:
             - name: "CNVRG_NS"
-              value: {{ .Namespace }}
+              value: {{ ns . }}

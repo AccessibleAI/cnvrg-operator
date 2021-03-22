@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: {{.Spec.Logging.Es.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   hosts:
     - "{{.Spec.Logging.Es.SvcName}}.{{ .Spec.ClusterDomain }}"
@@ -17,4 +17,4 @@ spec:
         - destination:
             port:
               number: {{ .Spec.Logging.Es.Port}}
-            host: "{{ .Spec.Logging.Es.SvcName }}.{{ .Namespace }}.svc.cluster.local"
+            host: "{{ .Spec.Logging.Es.SvcName }}.{{ ns . }}.svc.cluster.local"

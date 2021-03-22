@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: hostpath-provisioner
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
   labels:
     k8s-app: hostpath-provisioner
 spec:

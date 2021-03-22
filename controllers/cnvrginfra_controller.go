@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
+	"github.com/cnvrg-operator/pkg/registry"
+	"github.com/cnvrg-operator/pkg/storage"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
@@ -141,17 +143,17 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	var reconcileResult error
 
-	//// Fluentbit
-	//if err := desired.Apply(fluentbit.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
+	// logging
+	if err := desired.Apply(logging.InfraLoggingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
-	//// Monitoring
-	//if err := desired.Apply(monitoring.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
+	// Monitoring
+	if err := desired.Apply(monitoring.InfraMonitoringState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
 	//// grafana dashboards
 	//if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
@@ -159,23 +161,23 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	//	reconcileResult = err
 	//}
 
-	//// infra base config
-	//if err := desired.Apply(registry.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
+	// infra base config
+	if err := desired.Apply(registry.State(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
 	// Istio
 	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
-	//
-	//// Storage
-	//if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
+
+	// Storage
+	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
 	return reconcileResult
 }
@@ -257,8 +259,13 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		cnvrgInfraLog.Error(err, "can't merge")
 		return false, err
 	}
-	diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
-	fmt.Println(diff)
+
+	if viper.GetBool("verbose") {
+		cnvrgInfraLog.V(1).Info("printing the diff between desiredSpec and actual")
+		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
+		cnvrgInfraLog.V(1).Info(diff)
+	}
+
 	// Compare desiredSpec and current cnvrgInfra spec,
 	// if they are not equal, update the cnvrgInfra spec with desiredSpec,
 	// and return true for triggering new reconciliation

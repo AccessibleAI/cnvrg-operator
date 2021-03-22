@@ -2,9 +2,9 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: {{ .Spec.Minio.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
-  host: "{{ .Spec.Minio.SvcName }}.{{ .Namespace }}.svc.cluster.local"
+  host: "{{ .Spec.Minio.SvcName }}.{{ ns . }}.svc.cluster.local"
   trafficPolicy:
     loadBalancer:
       consistentHash:

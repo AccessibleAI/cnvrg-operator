@@ -41,6 +41,8 @@ spec:
             type: object
           spec:
             properties:
+              clusterDomain:
+                type: string
               cnvrgAppInstances:
                 items:
                   properties:
@@ -60,8 +62,6 @@ spec:
                     type: string
                   fluentbit:
                     properties:
-                      enabled:
-                        type: string
                       image:
                         type: string
                     type: object

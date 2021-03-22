@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cp-networking-config
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 data:
   APP_DOMAIN: "{{ appDomain . }}"
   DEFAULT_URL: "{{ httpScheme . }}{{ appDomain . }}"

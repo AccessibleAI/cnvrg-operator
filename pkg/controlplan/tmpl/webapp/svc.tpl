@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Spec.ControlPlan.WebApp.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
   labels:
     app: {{ .Spec.ControlPlan.WebApp.SvcName }}
 spec:

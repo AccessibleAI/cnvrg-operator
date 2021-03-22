@@ -12,4 +12,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kube-state-metrics
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}

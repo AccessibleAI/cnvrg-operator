@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const path = "/pkg/cnvrginfra/monitoring/tmpl"
+const path = "/pkg/monitoring/tmpl"
 
 var prometheusOperatorState = []*desired.State{
 	{
@@ -54,17 +54,17 @@ var prometheusOperatorState = []*desired.State{
 	},
 }
 
-var prometheusInstanceState = []*desired.State{
+var infraPrometheusInstanceState = []*desired.State{
 	{
-		TemplatePath:   path + "/prometheus/instance/sa.tpl",
+		TemplatePath:   path + "/prometheus/cluster-res/kubelet.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SaGVR],
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/clusterrole.tpl",
+		TemplatePath:   path + "/prometheus/cluster-res/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -72,11 +72,19 @@ var prometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/clusterrolebinding.tpl",
+		TemplatePath:   path + "/prometheus/cluster-res/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
 		Own:            true,
 	},
 	{
@@ -87,15 +95,20 @@ var prometheusInstanceState = []*desired.State{
 		GVR:            desired.Kinds[desired.PrometheusGVR],
 		Own:            true,
 	},
-}
-
-var kubeletServiceMonitorInstanceState = []*desired.State{
 	{
-		TemplatePath:   path + "/prometheus/servicemonitors/kubelet.tpl",
+		TemplatePath:   path + "/prometheus/instance/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
 		Own:            true,
 	},
 }
@@ -202,13 +215,13 @@ func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, prometheusOperatorState...)
 	}
 
-	if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.Prometheus.Enabled == "true" {
-		state = append(state, prometheusInstanceState...)
-	}
+	//if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.Prometheus.Enabled == "true" {
+	//	state = append(state, prometheusInstanceState...)
+	//}
 
-	if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.KubeletServiceMonitor == "true" {
-		state = append(state, kubeletServiceMonitorInstanceState...)
-	}
+	//if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.KubeletServiceMonitor == "true" {
+	//	state = append(state, kubeletServiceMonitorInstanceState...)
+	//}
 
 	if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.KubeStateMetrics.Enabled == "true" {
 		state = append(state, kubeStateMetricsState...)
@@ -218,6 +231,20 @@ func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, grafanaState...)
 	}
 
+	return state
+}
+
+func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
+	var state []*desired.State
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.PrometheusOperator.Enabled == "true" {
+		state = append(state, prometheusOperatorState...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.Prometheus.Enabled == "true" {
+		state = append(state, infraPrometheusInstanceState...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.KubeStateMetrics.Enabled == "true" {
+		state = append(state, kubeStateMetricsState...)
+	}
 	return state
 }
 

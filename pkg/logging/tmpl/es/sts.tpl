@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ .Spec.Logging.Es.SvcName }}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   serviceName: {{ .Spec.Logging.Es.SvcName }}
   selector:

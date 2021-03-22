@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: elastalert-config
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 data:
   config.json: |
     {

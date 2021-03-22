@@ -5,6 +5,7 @@ import (
 )
 
 type CnvrgInfraSpec struct {
+	ClusterDomain     string               `json:"clusterDomain,omitempty"`
 	InfraNamespace    string               `json:"infraNamespace,omitempty"`
 	InfraReconcilerCm string               `json:"infraReconcilerCm,omitempty"`
 	CnvrgAppInstances []CnvrgAppInstance   `json:"cnvrgAppInstances,omitempty"`
@@ -45,14 +46,17 @@ func init() {
 }
 
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
-	return CnvrgInfraSpec{
+	infraDefault := CnvrgInfraSpec{
+		ClusterDomain:     "",
 		InfraNamespace:    "cnvrg-infra",
 		InfraReconcilerCm: "infra-reconciler-cm",
 		CnvrgAppInstances: []CnvrgAppInstance{},
 		Storage:           storageDefault,
 		Networking:        cnvrgInfraNetworkingDefault,
-		Monitoring:        monitoringDefault,
+		Monitoring:        infraMonitoringDefault,
 		Logging:           cnvrgInfraLoggingDefault,
 		Registry:          registryDefault,
 	}
+	infraDefault.Monitoring.Prometheus.SvcName = "infra-prometheus"
+	return infraDefault
 }

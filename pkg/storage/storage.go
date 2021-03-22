@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/cnvrginfra/storage/tmpl"
+const path = "/pkg/storage/tmpl"
 
 var hostPathState = []*desired.State{
 	{

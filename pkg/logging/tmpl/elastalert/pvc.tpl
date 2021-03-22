@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .Spec.Logging.Elastalert.SvcName}}
-  namespace: {{ .Namespace }}
+  namespace: {{ ns . }}
 spec:
   accessModes:
     - ReadWriteOnce
