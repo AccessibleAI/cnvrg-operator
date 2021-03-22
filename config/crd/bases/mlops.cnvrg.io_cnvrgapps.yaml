@@ -148,6 +148,43 @@ spec:
                       ssl:
                         type: string
                     type: object
+                  minio:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      replicas:
+                        type: integer
+                      sharedStorage:
+                        properties:
+                          consistentHash:
+                            properties:
+                              key:
+                                type: string
+                              value:
+                                type: string
+                            type: object
+                          enabled:
+                            type: string
+                          useExistingClaim:
+                            type: string
+                        type: object
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
                   oauthProxy:
                     properties:
                       adminUser:
@@ -227,6 +264,52 @@ spec:
                       stsKey:
                         type: string
                     type: object
+                  pg:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      dbname:
+                        type: string
+                      enabled:
+                        type: string
+                      fixpg:
+                        type: string
+                      fsGroup:
+                        type: integer
+                      hugePages:
+                        properties:
+                          enabled:
+                            type: string
+                          memory:
+                            type: string
+                          size:
+                            type: string
+                        type: object
+                      image:
+                        type: string
+                      maxConnections:
+                        type: integer
+                      memoryRequest:
+                        type: string
+                      pass:
+                        type: string
+                      port:
+                        type: integer
+                      runAsUser:
+                        type: integer
+                      secretName:
+                        type: string
+                      sharedBuffers:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      user:
+                        type: string
+                    type: object
                   rbac:
                     properties:
                       role:
@@ -234,6 +317,37 @@ spec:
                       roleBindingName:
                         type: string
                       serviceAccountName:
+                        type: string
+                    type: object
+                  redis:
+                    properties:
+                      appendonly:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: integer
+                          memory:
+                            type: string
+                        type: object
+                      port:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
                         type: string
                     type: object
                   registry:
@@ -351,50 +465,6 @@ spec:
                         type: string
                     type: object
                 type: object
-              grafana:
-                properties:
-                  enabled:
-                    type: string
-                  image:
-                    type: string
-                  nodePort:
-                    type: integer
-                  port:
-                    type: integer
-                  svcName:
-                    type: string
-                type: object
-              ingress:
-                properties:
-                  enabled:
-                    type: string
-                  https:
-                    properties:
-                      cert:
-                        type: string
-                      certSecret:
-                        type: string
-                      enabled:
-                        type: string
-                      key:
-                        type: string
-                    type: object
-                  ingressType:
-                    enum:
-                    - istio
-                    - k8singress
-                    - openshift
-                    - nodeport
-                    type: string
-                  istioGwName:
-                    type: string
-                  perTryTimeout:
-                    type: string
-                  retriesAttempts:
-                    type: integer
-                  timeout:
-                    type: string
-                type: object
               logging:
                 properties:
                   elastalert:
@@ -485,141 +555,79 @@ spec:
                         type: string
                     type: object
                 type: object
-              minio:
+              monitoring:
                 properties:
-                  cpuRequest:
-                    type: integer
                   enabled:
                     type: string
-                  image:
-                    type: string
-                  memoryRequest:
-                    type: string
-                  nodePort:
-                    type: integer
-                  port:
-                    type: integer
-                  replicas:
-                    type: integer
-                  sharedStorage:
-                    properties:
-                      consistentHash:
-                        properties:
-                          key:
-                            type: string
-                          value:
-                            type: string
-                        type: object
-                      enabled:
-                        type: string
-                      useExistingClaim:
-                        type: string
-                    type: object
-                  storageClass:
-                    type: string
-                  storageSize:
-                    type: string
-                  svcName:
-                    type: string
-                type: object
-              pg:
-                properties:
-                  cpuRequest:
-                    type: integer
-                  dbname:
-                    type: string
-                  enabled:
-                    type: string
-                  fixpg:
-                    type: string
-                  fsGroup:
-                    type: integer
-                  hugePages:
+                  grafana:
                     properties:
                       enabled:
                         type: string
-                      memory:
+                      image:
                         type: string
-                      size:
-                        type: string
-                    type: object
-                  image:
-                    type: string
-                  maxConnections:
-                    type: integer
-                  memoryRequest:
-                    type: string
-                  pass:
-                    type: string
-                  port:
-                    type: integer
-                  runAsUser:
-                    type: integer
-                  secretName:
-                    type: string
-                  sharedBuffers:
-                    type: string
-                  storageClass:
-                    type: string
-                  storageSize:
-                    type: string
-                  svcName:
-                    type: string
-                  user:
-                    type: string
-                type: object
-              prometheus:
-                properties:
-                  cpuRequest:
-                    type: integer
-                  enabled:
-                    type: string
-                  image:
-                    type: string
-                  memoryRequest:
-                    type: string
-                  nodePort:
-                    type: integer
-                  port:
-                    type: integer
-                  storageClass:
-                    type: string
-                  storageSize:
-                    type: string
-                  svcName:
-                    type: string
-                type: object
-              redis:
-                properties:
-                  appendonly:
-                    type: string
-                  enabled:
-                    type: string
-                  image:
-                    type: string
-                  limits:
-                    properties:
-                      cpu:
+                      nodePort:
                         type: integer
-                      memory:
+                      port:
+                        type: integer
+                      svcName:
                         type: string
                     type: object
-                  port:
-                    type: integer
-                  requests:
+                  prometheus:
                     properties:
-                      cpu:
+                      cpuRequest:
+                        type: integer
+                      enabled:
                         type: string
-                      memory:
+                      image:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
                         type: string
                     type: object
-                  storageClass:
-                    type: string
-                  storageSize:
-                    type: string
-                  svcName:
-                    type: string
                 type: object
+              networking:
+                properties:
+                  https:
+                    properties:
+                      cert:
+                        type: string
+                      certSecret:
+                        type: string
+                      enabled:
+                        type: string
+                      key:
+                        type: string
+                    type: object
+                  ingress:
+                    properties:
+                      ingressType:
+                        enum:
+                        - istio
+                        - k8singress
+                        - openshift
+                        - nodeport
+                        type: string
+                      istioGwName:
+                        type: string
+                      perTryTimeout:
+                        type: string
+                      retriesAttempts:
+                        type: integer
+                      timeout:
+                        type: string
+                    type: object
+                type: object
+            required:
+            - monitoring
             type: object
           status:
             properties:

@@ -1,5 +1,139 @@
 package v1
 
+type ConsistentHash struct {
+	Key   string `json:"key,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+type SharedStorage struct {
+	Enabled          string         `json:"enabled,omitempty"`
+	UseExistingClaim string         `json:"useExistingClaim,omitempty"`
+	ConsistentHash   ConsistentHash `json:"consistentHash,omitempty"`
+}
+type Minio struct {
+	Enabled       string        `json:"enabled,omitempty"`
+	Replicas      int           `json:"replicas,omitempty"`
+	Image         string        `json:"image,omitempty"`
+	Port          int           `json:"port,omitempty"`
+	StorageSize   string        `json:"storageSize,omitempty"`
+	SvcName       string        `json:"svcName,omitempty"`
+	NodePort      int           `json:"nodePort,omitempty"`
+	StorageClass  string        `json:"storageClass,omitempty"`
+	CPURequest    int           `json:"cpuRequest,omitempty"`
+	MemoryRequest string        `json:"memoryRequest,omitempty"`
+	SharedStorage SharedStorage `json:"sharedStorage,omitempty"`
+}
+
+var minioDefaults = Minio{
+	Enabled:       "true",
+	Replicas:      1,
+	Image:         "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
+	Port:          9000,
+	StorageSize:   "100Gi",
+	SvcName:       "minio",
+	NodePort:      30090,
+	StorageClass:  "use-default",
+	CPURequest:    1,
+	MemoryRequest: "2Gi",
+	SharedStorage: SharedStorage{
+		Enabled:          "enabled",
+		UseExistingClaim: "",
+		ConsistentHash: ConsistentHash{
+			Key:   "httpQueryParameterName",
+			Value: "uploadId",
+		},
+	},
+}
+
+type Limits struct {
+	CPU    int    `json:"cpu,omitempty"`
+	Memory string `json:"memory,omitempty"`
+}
+type Requests struct {
+	CPU    string `json:"cpu,omitempty"`
+	Memory string `json:"memory,omitempty"`
+}
+type Redis struct {
+	Enabled      string   `json:"enabled,omitempty"`
+	Image        string   `json:"image,omitempty"`
+	SvcName      string   `json:"svcName,omitempty"`
+	Port         int      `json:"port,omitempty"`
+	Appendonly   string   `json:"appendonly,omitempty"`
+	StorageSize  string   `json:"storageSize,omitempty"`
+	StorageClass string   `json:"storageClass,omitempty"`
+	Limits       Limits   `json:"limits,omitempty"`
+	Requests     Requests `json:"requests,omitempty"`
+}
+
+var redisDefault = Redis{
+	Enabled:      "true",
+	Image:        "docker.io/cnvrg/cnvrg-redis:v3.0.5.c2",
+	SvcName:      "redis",
+	Port:         6379,
+	Appendonly:   "yes",
+	StorageSize:  "10Gi",
+	StorageClass: "use-default",
+	Limits: Limits{
+		CPU:    1,
+		Memory: "2Gi",
+	},
+	Requests: Requests{
+		CPU:    "500m",
+		Memory: "1Gi",
+	},
+}
+
+type HugePages struct {
+	Enabled string `json:"enabled,omitempty"`
+	Size    string `json:"size,omitempty"`
+	Memory  string `json:"memory,omitempty"`
+}
+
+type Pg struct {
+	Enabled        string    `json:"enabled,omitempty"`
+	SecretName     string    `json:"secretName,omitempty"`
+	Image          string    `json:"image,omitempty"`
+	Port           int       `json:"port,omitempty"`
+	StorageSize    string    `json:"storageSize,omitempty"`
+	SvcName        string    `json:"svcName,omitempty"`
+	Dbname         string    `json:"dbname,omitempty"`
+	Pass           string    `json:"pass,omitempty"`
+	User           string    `json:"user,omitempty"`
+	RunAsUser      int       `json:"runAsUser,omitempty"`
+	FsGroup        int       `json:"fsGroup,omitempty"`
+	StorageClass   string    `json:"storageClass,omitempty"`
+	CPURequest     int       `json:"cpuRequest,omitempty"`
+	MemoryRequest  string    `json:"memoryRequest,omitempty"`
+	MaxConnections int       `json:"maxConnections,omitempty"`
+	SharedBuffers  string    `json:"sharedBuffers,omitempty"`
+	HugePages      HugePages `json:"hugePages,omitempty"`
+	Fixpg          string    `json:"fixpg,omitempty"`
+}
+
+var pgDefault = Pg{
+	Enabled:        "true",
+	SecretName:     "cnvrg-pg-secret",
+	Image:          "centos/postgresql-12-centos7",
+	Port:           5432,
+	StorageSize:    "80Gi",
+	SvcName:        "postgres",
+	Dbname:         "cnvrg_production",
+	Pass:           "pg_pass",
+	User:           "cnvrg",
+	RunAsUser:      26,
+	FsGroup:        26,
+	StorageClass:   "use-default",
+	CPURequest:     4,
+	MemoryRequest:  "4Gi",
+	MaxConnections: 100,
+	SharedBuffers:  "64MB",
+	Fixpg:          "true",
+	HugePages: HugePages{
+		Enabled: "false",
+		Size:    "2Mi",
+		Memory:  "",
+	},
+}
+
 type WebApp struct {
 	Replicas                int    `json:"replicas,omitempty"`
 	Enabled                 string `json:"enabled,omitempty"`
@@ -38,12 +172,14 @@ type Systemkiq struct {
 	Replicas    int    `json:"replicas,omitempty"`
 	KillTimeout int    `json:"killTimeout,omitempty"`
 }
+
 type Registry struct {
 	Name     string `json:"name,omitempty"`
 	URL      string `json:"url,omitempty"`
 	User     string `json:"user,omitempty"`
 	Password string `json:"password,omitempty"`
 }
+
 type Hyper struct {
 	Enabled                 string `json:"enabled,omitempty"`
 	Image                   string `json:"image,omitempty"`
@@ -165,6 +301,9 @@ type ControlPlan struct {
 	Tenancy       Tenancy       `json:"tenancy,omitempty"`
 	OauthProxy    OauthProxy    `json:"oauthProxy,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
+	Pg            Pg            `json:"pg,omitempty"`
+	Minio         Minio         `json:"minio,omitempty"`
+	Redis         Redis         `json:"redis,omitempty"`
 }
 
 type Tenancy struct {
@@ -179,7 +318,17 @@ type Cnvrg struct {
 	Value string `json:"value"`
 }
 
+var registryDefault = Registry{
+	Name:     "cnvrg-registry",
+	URL:      "docker.io",
+	User:     "",
+	Password: "",
+}
+
 var controlPlanDefault = ControlPlan{
+	Pg:    pgDefault,
+	Minio: minioDefaults,
+	Redis: redisDefault,
 
 	WebApp: WebApp{
 		Replicas:                1,
@@ -303,12 +452,7 @@ var controlPlanDefault = ControlPlan{
 		Ssl:           "", // true/false
 	},
 
-	Registry: Registry{
-		Name:     "cnvrg-registry",
-		URL:      "docker.io",
-		User:     "",
-		Password: "",
-	},
+	Registry: registryDefault,
 
 	Rbac: Rbac{
 		Role:               "cnvrg-control-plan-role",

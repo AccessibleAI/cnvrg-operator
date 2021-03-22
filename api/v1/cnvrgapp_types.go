@@ -5,21 +5,11 @@ import (
 )
 
 type CnvrgAppSpec struct {
-	ClusterDomain string      `json:"clusterDomain,omitempty"`
-	ControlPlan   ControlPlan `json:"controlPlan,omitempty"`
-	Ingress       Ingress     `json:"ingress,omitempty"`
-	Pg            Pg          `json:"pg,omitempty"`
-	Minio         Minio       `json:"minio,omitempty"`
-	Redis         Redis       `json:"redis,omitempty"`
-	Logging       Logging     `json:"logging,omitempty"`
-	Prometheus    Prometheus  `json:"prometheus,omitempty"`
-	Grafana       Grafana     `json:"grafana,omitempty"`
-}
-
-type CnvrgAppStatus struct {
-	Status   OperatorStatus `json:"status,omitempty"`
-	Message  string         `json:"message,omitempty"`
-	Progress string         `json:"progress,omitempty"`
+	ClusterDomain string             `json:"clusterDomain,omitempty"`
+	ControlPlan   ControlPlan        `json:"controlPlan,omitempty"`
+	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
+	Logging       CnvrgAppLogging    `json:"logging,omitempty"`
+	Monitoring    CnvrgAppMonitoring `json:"monitoring"`
 }
 
 // +kubebuilder:object:root=true
@@ -31,8 +21,8 @@ type CnvrgApp struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   CnvrgAppSpec   `json:"spec,omitempty"`
-	Status CnvrgAppStatus `json:"status,omitempty"`
+	Spec   CnvrgAppSpec `json:"spec,omitempty"`
+	Status Status       `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -49,13 +39,9 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain: "",
-		Pg:            pgDefault,
 		ControlPlan:   controlPlanDefault,
-		Ingress:       ingressDefault,
-		Minio:         minioDefaults,
-		Redis:         redisDefault,
-		Logging:       loggingDefault,
-		Prometheus:    prometheusDefault,
-		Grafana:       grafanaDefault,
+		Logging:       cnvrgAppLoggingDefault,
+		Networking:    cnvrgAppNetworkingDefault,
+		Monitoring:    cnvrgAppMonitoringDefault,
 	}
 }

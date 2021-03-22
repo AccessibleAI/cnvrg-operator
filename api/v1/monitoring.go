@@ -62,7 +62,7 @@ type MetricsServer struct {
 	Image   string `json:"image,omitempty"`
 }
 
-type Monitoring struct {
+type CnvrgInfraMonitoring struct {
 	Enabled               string             `json:"enabled,omitempty"`
 	PrometheusOperator    PrometheusOperator `json:"prometheusOperator,omitempty"`
 	Prometheus            Prometheus         `json:"prometheus,omitempty"`
@@ -76,6 +76,12 @@ type Monitoring struct {
 	DcgmExporter DcgmExporter `json:"dcgmExporter,omitempty"`
 	//IdleMetricsExporter    IdleMetricsExporter    `json:"idleMetricsExporter,omitempty"`
 	//MetricsServer          MetricsServer          `json:"metricsServer,omitempty"`
+}
+
+type CnvrgAppMonitoring struct {
+	Enabled    string     `json:"enabled,omitempty"`
+	Prometheus Prometheus `json:"prometheus,omitempty"`
+	Grafana    Grafana    `json:"grafana,omitempty"`
 }
 
 var grafanaDefault = Grafana{
@@ -98,7 +104,13 @@ var prometheusDefault = Prometheus{
 	StorageClass:  "use-default",
 }
 
-var monitoringDefault = Monitoring{
+var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
+	Enabled:    "true",
+	Prometheus: prometheusDefault,
+	Grafana:    grafanaDefault,
+}
+
+var monitoringDefault = CnvrgInfraMonitoring{
 	Enabled:               "true",
 	KubeletServiceMonitor: "true",
 	Prometheus:            prometheusDefault,

@@ -1,5 +1,10 @@
 package v1
 
+type Fluentbit struct {
+	Enabled string `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
 type Es struct {
 	Enabled       string `json:"enabled,omitempty"`
 	Image         string `json:"image,omitempty"`
@@ -17,6 +22,7 @@ type Es struct {
 	JavaOpts      string `json:"javaOpts,omitempty"`
 	PatchEsNodes  string `json:"patchEsNodes,omitempty"`
 }
+
 type Elastalert struct {
 	Enabled       string `json:"enabled,omitempty"`
 	Image         string `json:"image,omitempty"`
@@ -45,14 +51,25 @@ type Kibana struct {
 	CPULimit      int    `json:"cpuLimit,omitempty"`
 	MemoryLimit   string `json:"memoryLimit,omitempty"`
 }
-type Logging struct {
+
+type CnvrgAppLogging struct {
 	Enabled    string     `json:"enabled,omitempty"`
 	Es         Es         `json:"es,omitempty"`
 	Elastalert Elastalert `json:"elastalert,omitempty"`
 	Kibana     Kibana     `json:"kibana,omitempty"`
 }
 
-var loggingDefault = Logging{
+type CnvrgInfraLogging struct {
+	Enabled   string    `json:"enabled,omitempty"`
+	Fluentbit Fluentbit `json:"fluentbit,omitempty"`
+}
+
+var fluentbitDefault = Fluentbit{
+	Enabled: "true",
+	Image:   "cnvrg/cnvrg-fluentbit",
+}
+
+var cnvrgAppLoggingDefault = CnvrgAppLogging{
 	Enabled: "true",
 	Es: Es{
 		Enabled:       "true",
@@ -98,4 +115,9 @@ var loggingDefault = Logging{
 		CPULimit:      1,
 		MemoryLimit:   "2Gi",
 	},
+}
+
+var cnvrgInfraLoggingDefault = CnvrgInfraLogging{
+	Enabled:   "true",
+	Fluentbit: fluentbitDefault,
 }
