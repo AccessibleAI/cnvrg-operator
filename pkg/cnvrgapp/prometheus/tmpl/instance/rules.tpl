@@ -5,7 +5,7 @@ metadata:
     app: cnvrg-ccp-prometheus
     role: alert-rules
   name: prometheus-k8s-rules
-  namespace: {{ .Spec.CnvrgInfraNs }}
+  namespace: {{ .Namespace }}
 spec:
   groups:
   - name: k8s.rules

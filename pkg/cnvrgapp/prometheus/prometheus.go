@@ -65,6 +65,14 @@ var prometheusState = []*desired.State{
 		GVR:            desired.Kinds[desired.SvcGVR],
 		Own:            true,
 	},
+	{
+		TemplatePath:   path + "/instance/rules.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PrometheusRuleGVR],
+		Own:            true,
+	},
 }
 
 var grafanaState = []*desired.State{
