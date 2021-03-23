@@ -114,6 +114,12 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"hyperServerUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return "http://" + cnvrgApp.Spec.ControlPlan.Hyper.SvcName
 		},
+		"esFullInternalUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return fmt.Sprintf("http://%s.%s.svc.cluster.local:%d",
+				cnvrgApp.Spec.Logging.Es.SvcName,
+				cnvrgApp.Namespace,
+				cnvrgApp.Spec.Logging.Es.Port)
+		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
 				return cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint

@@ -6,6 +6,7 @@ import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -253,6 +254,12 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// Logging
+	if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
 	// ControlPlan
 	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
@@ -274,29 +281,6 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	//
 
 	//
-	//// Logging
-	//if err := desired.Apply(logging.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
-	//
-	//// Redis
-	//if err := desired.Apply(redis.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
-
-	//// PostgreSQL
-	//if err := desired.Apply(controlplan.PostgreSQLState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
-	//
-	//// Minio
-	//if err := desired.Apply(minio.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
 
 	return nil
 }
@@ -364,13 +348,14 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 
 	name := types.NamespacedName{
 		Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
-		Namespace: cnvrgAppInfra.Items[0].Namespace,
+		Namespace: cnvrgAppInfra.Items[0].Spec.InfraNamespace,
 	}
 
 	cm := &v1core.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
-			Namespace: cnvrgAppInfra.Items[0].Namespace},
+			Name:      name.Name,
+			Namespace: name.Namespace,
+		},
 	}
 
 	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {

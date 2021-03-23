@@ -25,6 +25,14 @@ var es = []*desired.State{
 		GVR:            desired.Kinds[desired.SvcGVR],
 		Own:            true,
 	},
+	{
+		TemplatePath:   path + "/es/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
 }
 
 var elastAlert = []*desired.State{
@@ -83,6 +91,14 @@ var kibana = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/kibana/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
 		Own:            true,
 	},
 }

@@ -109,7 +109,6 @@ var controlPlanConfigState = []*desired.State{
 
 var webAppState = []*desired.State{
 	{
-
 		TemplatePath:   path + "/webapp/dep.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -118,7 +117,6 @@ var webAppState = []*desired.State{
 		Own:            true,
 	},
 	{
-
 		TemplatePath:   path + "/webapp/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",

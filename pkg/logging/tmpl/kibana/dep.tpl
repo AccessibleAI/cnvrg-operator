@@ -31,7 +31,7 @@ spec:
           image: {{ .Spec.Logging.Kibana.Image }}
           env:
           - name: ELASTICSEARCH_URL
-            value: {{ printf "http://%s.%s.svc.cluster.local:%s" .Spec.Logging.Kibana.SvcName ns . .Spec.Logging.Es.Port }}
+            value: {{ esFullInternalUrl .}}
           ports:
           - containerPort: {{ .Spec.Logging.Kibana.Port }}
           resources:

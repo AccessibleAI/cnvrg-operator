@@ -7,12 +7,12 @@ metadata:
   labels:
     app: {{ .Spec.Logging.Es.SvcName }}
 spec:
-  {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+  {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
   type: NodePort
   {{- end }}
   ports:
   - port: {{ .Spec.Logging.Es.Port}}
-    {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+    {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
     nodePort: {{ .Spec.Logging.Es.NodePort }}
     {{- end }}
   selector:

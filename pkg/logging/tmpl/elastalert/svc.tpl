@@ -7,14 +7,14 @@ metadata:
   labels:
     app: {{ .Spec.Logging.Elastalert.SvcName }}
 spec:
-  {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+  {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
   type: NodePort
   {{- end }}
   ports:
     - port: {{ .Spec.Logging.Elastalert.Port }}
       protocol: TCP
       targetPort: {{ .Spec.Logging.Elastalert.ContainerPort}}
-      {{- if eq .Spec.Ingress.IngressType "nodeport" }}
+      {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
       nodePort: {{ .Spec.Logging.Elastalert.NodePort }}
       {{- end }}
   selector:

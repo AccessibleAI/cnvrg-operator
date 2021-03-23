@@ -7,12 +7,12 @@ spec:
   hosts:
     - "{{.Spec.Logging.Es.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-    - {{ .Spec.Ingress.IstioGwName }}
+    - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
     - retries:
-        attempts: {{ .Spec.Ingress.RetriesAttempts }}
-        perTryTimeout: {{ .Spec.Ingress.PerTryTimeout }}
-      timeout: {{ .Spec.Ingress.Timeout }}
+        attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}
+        perTryTimeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+      timeout: {{ .Spec.Networking.Ingress.Timeout }}
       route:
         - destination:
             port:
