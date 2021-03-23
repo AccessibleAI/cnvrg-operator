@@ -7,19 +7,19 @@ spec:
   hosts:
     - "{{.Spec.ControlPlan.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-    - {{ .Spec.Ingress.IstioGwName }}
+    - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
     - retries:
-        attempts: {{ .Spec.Ingress.RetriesAttempts }}
-        perTryTimeout: {{ .Spec.Ingress.PerTryTimeout }}
-      timeout: {{ .Spec.Ingress.Timeout }}
+        attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}
+        perTryTimeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+      timeout: {{ .Spec.Networking.Ingress.Timeout }}
       route:
         - destination:
             host: "{{ .Spec.ControlPlan.WebApp.SvcName }}.{{ ns . }}.svc.cluster.local"
       headers:
         request:
           set:
-            {{- if eq .Spec.Ingress.HTTPS.Enabled "true"}}
+            {{- if eq .Spec.Networking.HTTPS.Enabled "true"}}
             x-forwarded-proto: https
             {{- else }}
             x-forwarded-proto: http

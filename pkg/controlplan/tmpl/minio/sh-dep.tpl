@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Spec.Minio.SvcName }}
+  name: {{ .Spec.ControlPlan.Minio.SvcName }}
   namespace: {{ ns . }}
   labels:
-    app: {{ .Spec.Minio.SvcName }}
+    app: {{ .Spec.ControlPlan.Minio.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: {{ .Spec.Minio.SvcName }}
-  replicas: {{ .Spec.Minio.Replicas }}
+      app: {{ .Spec.ControlPlan.Minio.SvcName }}
+  replicas: {{ .Spec.ControlPlan.Minio.Replicas }}
   template:
     metadata:
       labels:
-        app: {{ .Spec.Minio.SvcName }}
+        app: {{ .Spec.ControlPlan.Minio.SvcName }}
     spec:
       securityContext:
         runAsUser: 1000
@@ -107,7 +107,7 @@ spec:
             - name: DNS_AGENT
             - name: ISTIO_KUBE_APP_PROBERS
               value: '{"/app-health/minio/livez":{"httpGet":{"path":"/minio/health/live","port":9000}},"/app-health/minio/readyz":{"httpGet":{"path":"/minio/health/ready","port":9000}}}'
-          image: "{{ .Spec.Ingress.Istio.Hub }}/{{ .Spec.Ingress.Istio.ProxyImage }}:{{ .Spec.Ingress.Istio.Tag }}"
+          image: "{{ .Spec.Networking.Ingress.Istio.Hub }}/{{ .Spec.Networking.Ingress.Istio.ProxyImage }}:{{ .Spec.Networking.Ingress.Istio.Tag }}"
           imagePullPolicy: Always
           name: istio-proxy
           ports:
@@ -149,7 +149,7 @@ spec:
             - mountPath: /etc/istio/pod
               name: istio-podinfo
         - name: minio
-          image: {{.Spec.Minio.Image}}
+          image: {{.Spec.ControlPlan.Minio.Image}}
           args:
             - gateway
             - nas
@@ -171,26 +171,26 @@ spec:
                   name: cp-object-storage
                   key: CNVRG_STORAGE_SECRET_KEY
           ports:
-            - containerPort: {{ .Spec.Minio.Port }}
+            - containerPort: {{ .Spec.ControlPlan.Minio.Port }}
           volumeMounts:
             - name: minio-storage
               mountPath: /data
           readinessProbe:
             httpGet:
               path: /minio/health/ready
-              port: {{ .Spec.Minio.Port }}
+              port: {{ .Spec.ControlPlan.Minio.Port }}
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /minio/health/live
-              port: {{ .Spec.Minio.Port }}
+              port: {{ .Spec.ControlPlan.Minio.Port }}
             initialDelaySeconds: 60
             periodSeconds: 20
           resources:
             requests:
-              cpu: {{ .Spec.Minio.CPURequest }}
-              memory: {{ .Spec.Minio.MemoryRequest }}
+              cpu: {{ .Spec.ControlPlan.Minio.CPURequest }}
+              memory: {{ .Spec.ControlPlan.Minio.MemoryRequest }}
       initContainers:
         - args:
             - istio-iptables
@@ -212,7 +212,7 @@ spec:
             - 15090,15021,15020
           env:
             - name: DNS_AGENT
-          image: "{{ .Spec.Ingress.Istio.Hub }}/{{ .Spec.Ingress.Istio.ProxyImage }}:{{ .Spec.Ingress.Istio.Tag }}"
+          image: "{{ .Spec.Networking.Ingress.Istio.Hub }}/{{ .Spec.Networking.Ingress.Istio.ProxyImage }}:{{ .Spec.Networking.Ingress.Istio.Tag }}"
           imagePullPolicy: Always
           name: istio-init
           resources:
@@ -238,7 +238,7 @@ spec:
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            {{- if eq .Spec.Minio.SharedStorage.UseExistingClaim "" }}
+            {{- if eq .Spec.ControlPlan.Minio.SharedStorage.UseExistingClaim "" }}
             claimName: {{Minio.SvcName}}
             {{- else }}
             claimName: {{ Minio.SharedStorage.SseExistingClaim }}

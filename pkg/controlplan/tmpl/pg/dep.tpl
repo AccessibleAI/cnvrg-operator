@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Spec.Pg.SvcName }}
+  name: {{.Spec.ControlPlan.Pg.SvcName }}
   namespace: {{ ns . }}
   labels:
-    app: {{.Spec.Pg.SvcName }}
+    app: {{.Spec.ControlPlan.Pg.SvcName }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Spec.Pg.SvcName }}
+      app: {{.Spec.ControlPlan.Pg.SvcName }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: {{.Spec.Pg.SvcName }}
+        app: {{.Spec.ControlPlan.Pg.SvcName }}
     spec:
       serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
       {{- if and (eq .Spec.ControlPlan.Tenancy.Enabled "true") (eq .Spec.ControlPlan.Tenancy.DedicatedNodes "true") }}
@@ -26,8 +26,8 @@ spec:
           effect: "NoSchedule"
       {{- end }}
       securityContext:
-        runAsUser: {{ .Spec.Pg.RunAsUser }}
-        fsGroup: {{ .Spec.Pg.FsGroup }}
+        runAsUser: {{ .Spec.ControlPlan.Pg.RunAsUser }}
+        fsGroup: {{ .Spec.ControlPlan.Pg.FsGroup }}
       {{- if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "false") }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
@@ -43,11 +43,11 @@ spec:
         - name: postgresql
           envFrom:
             - secretRef:
-                name: {{ .Spec.Pg.SvcName }}
-          image: {{.Spec.Pg.Image}}
+                name: {{ .Spec.ControlPlan.Pg.SvcName }}
+          image: {{.Spec.ControlPlan.Pg.Image}}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: {{.Spec.Pg.Port}}
+            - containerPort: {{.Spec.ControlPlan.Pg.Port}}
               protocol: TCP
           livenessProbe:
             exec:
@@ -71,31 +71,31 @@ spec:
               name: postgres-data
             - mountPath: /dev/shm
               name: dshm
-            {{- if eq .Spec.Pg.HugePages.Enabled "true" -}}
+            {{- if eq .Spec.ControlPlan.Pg.HugePages.Enabled "true" -}}
             - mountPath: "/hugepages"
               name: "hugepage"
             {{- end}}
           resources:
-            {{- if eq .Spec.Pg.HugePages.Enabled "true" }}
+            {{- if eq .Spec.ControlPlan.Pg.HugePages.Enabled "true" }}
             limits:
               {{- if eq .HugePages.memory ""}}
-              hugepages-{{ .Spec.Pg.HugePages.Size }}: {{ .Spec.Pg.MemoryRequest }}
+              hugepages-{{ .Spec.ControlPlan.Pg.HugePages.Size }}: {{ .Spec.ControlPlan.Pg.MemoryRequest }}
               {{- else }}
-              hugepages-{{ .Spec.Pg.HugePages.Size }}: {{ .Spec.Pg.HugePages.Memory }}
+              hugepages-{{ .Spec.ControlPlan.Pg.HugePages.Size }}: {{ .Spec.ControlPlan.Pg.HugePages.Memory }}
               {{- end }}
             {{- end}}
             requests:
-              cpu: {{ .Spec.Pg.CPURequest }}
-              memory: {{ .Spec.Pg.MemoryRequest }}
+              cpu: {{ .Spec.ControlPlan.Pg.CPURequest }}
+              memory: {{ .Spec.ControlPlan.Pg.MemoryRequest }}
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: {{.Spec.Pg.SvcName}}
+            claimName: {{.Spec.ControlPlan.Pg.SvcName}}
         - name: dshm
           emptyDir:
             medium: Memory
             sizeLimit: 2Gi
-        {{- if eq .Spec.Pg.HugePages.Enabled "true" }}
+        {{- if eq .Spec.ControlPlan.Pg.HugePages.Enabled "true" }}
         - name: "hugepage"
           emptyDir:
             medium: HugePages

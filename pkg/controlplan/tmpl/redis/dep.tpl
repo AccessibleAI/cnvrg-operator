@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Spec.Redis.SvcName }}
+  name: {{.Spec.ControlPlan.Redis.SvcName }}
   namespace: {{ ns . }}
   labels:
-    app: {{.Spec.Redis.SvcName }}
+    app: {{.Spec.ControlPlan.Redis.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: {{.Spec.Redis.SvcName }}
+      app: {{.Spec.ControlPlan.Redis.SvcName }}
   template:
     metadata:
       labels:
-        app: {{.Spec.Redis.SvcName }}
+        app: {{.Spec.ControlPlan.Redis.SvcName }}
     spec:
       serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
       {{- if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "false") }}
@@ -35,18 +35,18 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-        - image: {{ .Spec.Redis.Image }}
+        - image: {{ .Spec.ControlPlan.Redis.Image }}
           name: redis
           command: [ "/bin/bash", "-lc", "redis-server /config/redis.conf" ]
           ports:
-            - containerPort: {{ .Spec.Redis.Port }}
+            - containerPort: {{ .Spec.ControlPlan.Redis.Port }}
           resources:
             limits:
-              cpu: {{ .Spec.Redis.Limits.CPU }}
-              memory: {{ .Spec.Redis.Limits.Memory }}
+              cpu: {{ .Spec.ControlPlan.Redis.Limits.CPU }}
+              memory: {{ .Spec.ControlPlan.Redis.Limits.Memory }}
             requests:
-              cpu: {{ .Spec.Redis.Requests.CPU }}
-              memory: {{ .Spec.Redis.Requests.Memory }}
+              cpu: {{ .Spec.ControlPlan.Redis.Requests.CPU }}
+              memory: {{ .Spec.ControlPlan.Redis.Requests.Memory }}
           volumeMounts:
             - name: redis-data
               mountPath: /data
@@ -55,7 +55,7 @@ spec:
       volumes:
         - name: redis-data
           persistentVolumeClaim:
-            claimName: {{ .Spec.Redis.SvcName }}
+            claimName: {{ .Spec.ControlPlan.Redis.SvcName }}
         - name: redis-config
           configMap:
             name: redis-conf

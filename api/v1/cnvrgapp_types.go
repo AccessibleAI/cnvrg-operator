@@ -9,7 +9,7 @@ type CnvrgAppSpec struct {
 	ControlPlan   ControlPlan        `json:"controlPlan,omitempty"`
 	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
 	Logging       CnvrgAppLogging    `json:"logging,omitempty"`
-	Monitoring    CnvrgAppMonitoring `json:"monitoring"`
+	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
 }
 
 // +kubebuilder:object:root=true

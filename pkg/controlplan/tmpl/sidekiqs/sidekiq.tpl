@@ -51,7 +51,7 @@ spec:
             - secretRef:
                 name: cp-object-storage
             - secretRef:
-                name: {{ .Spec.Pg.SvcName }}
+                name: {{ .Spec.ControlPlan.Pg.SvcName }}
           resources:
             requests:
               cpu: {{ .Spec.ControlPlan.Sidekiq.CPU }}

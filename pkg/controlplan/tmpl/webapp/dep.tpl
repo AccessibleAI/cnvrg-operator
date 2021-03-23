@@ -56,7 +56,7 @@ spec:
         - secretRef:
             name: cp-object-storage
         - secretRef:
-            name: {{ .Spec.Pg.SvcName }}
+            name: {{ .Spec.ControlPlan.Pg.SvcName }}
         name: cnvrg-app
         ports:
           - containerPort: {{ .Spec.ControlPlan.WebApp.Port }}
@@ -98,12 +98,12 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( eq .Spec.Minio.Enabled "true") (eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
-          value: "{{ .Spec.Pg.SvcName }}:{{ .Spec.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
+          {{- if and ( eq .Spec.ControlPlan.Minio.Enabled "true") (eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
+          value: "{{ .Spec.ControlPlan.Pg.SvcName }}:{{ .Spec.ControlPlan.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
           {{- else }}
-          value: "{{ .Spec.Pg.SvcName }}:{{ .Spec.Pg.Port }}"
+          value: "{{ .Spec.ControlPlan.Pg.SvcName }}:{{ .Spec.ControlPlan.Pg.Port }}"
           {{ end }}
-      {{- if and ( eq .Spec.Minio.Enabled "true") (eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
+      {{- if and ( eq .Spec.ControlPlan.Minio.Enabled "true") (eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "minio") }}
       - name: create-cnvrg-bucket
         image: {{ .Spec.ControlPlan.Seeder.Image }}
         command: ["/bin/bash","-c", "{{ .Spec.ControlPlan.Seeder.CreateBucketCmd }}"]
@@ -112,13 +112,13 @@ spec:
         - secretRef:
             name: cp-object-storage
       {{- end }}
-      {{- if eq .Spec.Pg.Fixpg "true" }}
+      {{- if eq .Spec.ControlPlan.Pg.Fixpg "true" }}
       - name: fixpg
         image: {{.Spec.ControlPlan.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]
         envFrom:
         - secretRef:
-            name: {{ .Spec.Pg.SvcName }}
+            name: {{ .Spec.ControlPlan.Pg.SvcName }}
         imagePullPolicy: Always
       {{- end }}
       - name: seeder

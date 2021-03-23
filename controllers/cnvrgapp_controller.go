@@ -4,10 +4,14 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
+	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -16,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -173,35 +178,35 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 		readyState["searchkiq"] = ready
 	}
 
-	//// check postgres status
-	//if cnvrgApp.Spec.Pg.Enabled == "true" {
-	//	name := types.NamespacedName{Name: cnvrgApp.Spec.Pg.SvcName, Namespace: cnvrgApp.Namespace}
-	//	ready, err := r.CheckDeploymentReadiness(name)
-	//	if err != nil {
-	//		return false, 0, err
-	//	}
-	//	readyState["pg"] = ready
-	//}
-	//
-	//// check minio status
-	//if cnvrgApp.Spec.Minio.Enabled == "true" {
-	//	name := types.NamespacedName{Name: cnvrgApp.Spec.Minio.SvcName, Namespace: cnvrgApp.Namespace}
-	//	ready, err := r.CheckDeploymentReadiness(name)
-	//	if err != nil {
-	//		return false, 0, err
-	//	}
-	//	readyState["minio"] = ready
-	//}
-	//
-	//// check redis status
-	//if cnvrgApp.Spec.Redis.Enabled == "true" {
-	//	name := types.NamespacedName{Name: cnvrgApp.Spec.Redis.SvcName, Namespace: cnvrgApp.Namespace}
-	//	ready, err := r.CheckDeploymentReadiness(name)
-	//	if err != nil {
-	//		return false, 0, err
-	//	}
-	//	readyState["redis"] = ready
-	//}
+	// check postgres status
+	if cnvrgApp.Spec.ControlPlan.Pg.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Pg.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["pg"] = ready
+	}
+
+	// check minio status
+	if cnvrgApp.Spec.ControlPlan.Minio.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Minio.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["minio"] = ready
+	}
+
+	// check redis status
+	if cnvrgApp.Spec.ControlPlan.Redis.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Redis.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, err
+		}
+		readyState["redis"] = ready
+	}
 
 	// check es status
 	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Es.Enabled == "true" {
@@ -242,29 +247,32 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
+	// networking
+	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
+	// ControlPlan
+	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
 	//// prometheus
 	//if err := desired.Apply(prometheus.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 	//	return err
 	//}
 
-	// grafana dashboard
-	if err := r.createGrafanaDashboards(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
+	//// grafana dashboard
+	//if err := r.createGrafanaDashboards(cnvrgApp); err != nil {
+	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+	//	return err
+	//}
 
-	//// Ingress
-	//if err := desired.Apply(ingress.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
 	//
-	//// ControlPlan
-	//if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
+
 	//
 	//// Logging
 	//if err := desired.Apply(logging.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
@@ -279,7 +287,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	//}
 
 	//// PostgreSQL
-	//if err := desired.Apply(pg.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	//if err := desired.Apply(controlplan.PostgreSQLState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 	//	return err
 	//}
@@ -294,51 +302,47 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
-	//if cnvrgApp.Spec.Grafana.Enabled != "true" {
-	//	cnvrgAppLog.Info("grafana disabled, skipping dashboard creation")
-	//	return nil
-	//}
-	//
-	//dashboardsPath := "/pkg/cnvrgapp/prometheus/tmpl/grafana/dashboards-data"
-	//err := pkger.Walk(dashboardsPath, func(path string, info os.FileInfo, err error) error {
-	//	if info.IsDir() {
-	//		return nil
-	//	}
-	//	f, err := pkger.Open(path)
-	//	if err != nil {
-	//		cnvrgAppLog.Error(err, "error reading path", "path", path)
-	//		return err
-	//	}
-	//	b, err := ioutil.ReadAll(f)
-	//	if err != nil {
-	//		cnvrgAppLog.Error(err, "error reading", "file", path)
-	//		return err
-	//	}
-	//
-	//	cm := &v1core.ConfigMap{
-	//		ObjectMeta: metav1.ObjectMeta{
-	//			Name:      strings.TrimSuffix(info.Name(), filepath.Ext(info.Name())),
-	//			Namespace: cnvrgApp.Namespace,
-	//		},
-	//		Data: map[string]string{info.Name(): string(b)},
-	//	}
-	//	if err := ctrl.SetControllerReference(cnvrgApp, cm, r.Scheme); err != nil {
-	//		cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
-	//		return err
-	//	}
-	//	if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-	//		cnvrgAppLog.Info("grafana dashboard already exists", "file", path)
-	//		return nil
-	//	} else if err != nil {
-	//		cnvrgAppLog.Error(err, "error reading", "file", path)
-	//		return err
-	//	}
-	//
-	//	return nil
-	//})
-	//if err != nil {
-	//	return err
-	//}
+
+	if cnvrgApp.Spec.Monitoring.Enabled != "true" {
+		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
+		return nil
+	}
+
+	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
+
+	for _, dashboard := range desired.GrafanaAppDashboards {
+		if dashboard == "node-exporter.json" {
+			fmt.Println("as")
+		}
+		f, err := pkger.Open(basePath + dashboard)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)
+			return err
+		}
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			return err
+		}
+		cm := &v1core.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      strings.TrimSuffix(filepath.Base(f.Name()), filepath.Ext(f.Name())),
+				Namespace: cnvrgApp.Namespace,
+			},
+			Data: map[string]string{filepath.Base(f.Name()): string(b)},
+		}
+		if err := ctrl.SetControllerReference(cnvrgApp, cm, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
+			return err
+		}
+		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
+			cnvrgAppLog.Info("grafana dashboard already exists", "file", dashboard)
+			continue
+		} else if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			return err
+		}
+	}
 
 	return nil
 

@@ -7,7 +7,7 @@ data:
   APP_DOMAIN: "{{ appDomain . }}"
   DEFAULT_URL: "{{ httpScheme . }}{{ appDomain . }}"
   DEFAULT_COMPUTE_CLUSTER_DOMAIN: "{{ defaultComputeClusterDomain .}}"
-  DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ .Spec.Ingress.HTTPS.Enabled }}"
+  DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ .Spec.Networking.HTTPS.Enabled }}"
   REDIS_URL: "{{ redisUrl . }}"
   ELASTICSEARCH_URL: "{{ esUrl . }}"
   HYPER_SERVER_URL: "{{ hyperServerUrl .}}"

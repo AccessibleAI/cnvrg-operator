@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Spec.Minio.SvcName }}
+  name: {{ .Spec.ControlPlan.Minio.SvcName }}
   namespace: {{ ns . }}
   labels:
-    app: {{ .Spec.Minio.SvcName }}
+    app: {{ .Spec.ControlPlan.Minio.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: {{ .Spec.Minio.SvcName }}
-  replicas: {{ .Spec.Minio.Replicas }}
+      app: {{ .Spec.ControlPlan.Minio.SvcName }}
+  replicas: {{ .Spec.ControlPlan.Minio.Replicas }}
   template:
     metadata:
       labels:
-        app: {{ .Spec.Minio.SvcName }}
+        app: {{ .Spec.ControlPlan.Minio.SvcName }}
     spec:
       securityContext:
         runAsUser: 1000
@@ -37,7 +37,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: minio
-          image: {{ .Spec.Minio.Image }}
+          image: {{ .Spec.ControlPlan.Minio.Image }}
           args:
             - gateway
             - nas
@@ -59,27 +59,27 @@ spec:
                   name: cp-object-storage
                   key: CNVRG_STORAGE_SECRET_KEY
           ports:
-            - containerPort: {{ .Spec.Minio.Port }}
+            - containerPort: {{ .Spec.ControlPlan.Minio.Port }}
           volumeMounts:
             - name: minio-storage
               mountPath: /data
           readinessProbe:
             httpGet:
               path: /minio/health/ready
-              port: {{ .Spec.Minio.Port }}
+              port: {{ .Spec.ControlPlan.Minio.Port }}
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /minio/health/live
-              port: {{ .Spec.Minio.Port }}
+              port: {{ .Spec.ControlPlan.Minio.Port }}
             initialDelaySeconds: 60
             periodSeconds: 20
           resources:
             requests:
-              cpu: {{ .Spec.Minio.CPURequest }}
-              memory: {{ .Spec.Minio.MemoryRequest }}
+              cpu: {{ .Spec.ControlPlan.Minio.CPURequest }}
+              memory: {{ .Spec.ControlPlan.Minio.MemoryRequest }}
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            claimName: {{ .Spec.Minio.SvcName }}
+            claimName: {{ .Spec.ControlPlan.Minio.SvcName }}

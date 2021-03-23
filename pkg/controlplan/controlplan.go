@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/cnvrgapp/controlplan/tmpl"
+const path = "/pkg/controlplan/tmpl"
 
 var registryState = []*desired.State{
 	{
@@ -126,6 +126,14 @@ var webAppState = []*desired.State{
 		GVR:            desired.Kinds[desired.SvcGVR],
 		Own:            true,
 	},
+	{
+		TemplatePath:   path + "/webapp/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
 }
 
 var sidekiqState = []*desired.State{
@@ -185,11 +193,202 @@ var hyperState = []*desired.State{
 	},
 }
 
+var pgState = []*desired.State{
+	{
+
+		TemplatePath:   path + "/pg/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/pg/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/pg/secret.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/pg/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/pg/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+}
+
+var redisState = []*desired.State{
+	{
+
+		TemplatePath:   path + "/redis/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/redis/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/redis/cm.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ConfigMapGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/redis/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+}
+
+var singleBackendMinio = []*desired.State{
+
+	{
+
+		TemplatePath:   path + "/minio/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/minio/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/minio/dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/minio/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+}
+
+var sharedBackendMinio = []*desired.State{
+
+	{
+
+		TemplatePath:   path + "/minio/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+
+	{
+
+		TemplatePath:   path + "/minio/pvc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/minio/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/minio/sh-dep.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DeploymentGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/minio/dr.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioDestinationRuleGVR],
+		Own:            true,
+	},
+}
+
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, registryState...)
 	state = append(state, rbacState...)
 	state = append(state, controlPlanConfigState...)
+
+	if cnvrgApp.Spec.ControlPlan.Pg.Enabled == "true" {
+		state = append(state, pgState...)
+	}
+
+	if cnvrgApp.Spec.ControlPlan.Redis.Enabled == "true" {
+		state = append(state, redisState...)
+	}
+
+	if cnvrgApp.Spec.ControlPlan.Minio.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Minio.SharedStorage.Enabled == "true" {
+		state = append(state, sharedBackendMinio...)
+	} else {
+		state = append(state, singleBackendMinio...)
+	}
 
 	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
