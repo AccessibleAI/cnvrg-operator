@@ -284,6 +284,7 @@ func (in *CnvrgInfraMonitoring) DeepCopyInto(out *CnvrgInfraMonitoring) {
 	*out = *in
 	out.PrometheusOperator = in.PrometheusOperator
 	out.Prometheus = in.Prometheus
+	out.NodeExporter = in.NodeExporter
 	out.KubeStateMetrics = in.KubeStateMetrics
 	out.Grafana = in.Grafana
 	out.DcgmExporter = in.DcgmExporter

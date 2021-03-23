@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: cnvrg-infra-prometheus
+  name: node-exporter
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cnvrg-infra-prometheus
+  name: node-exporter
 subjects:
 - kind: ServiceAccount
-  name: cnvrg-prometheus
+  name: node-exporter
   namespace: {{ ns . }}

@@ -1,5 +1,5 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cnvrg-prometheus
+  name: node-exporter
   namespace: {{ ns . }}

@@ -24,7 +24,6 @@ type Prometheus struct {
 
 type NodeExporter struct {
 	Enabled string `json:"enabled,omitempty"`
-	Port    int    `json:"port,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 type KubeStateMetrics struct {
@@ -67,9 +66,9 @@ type CnvrgInfraMonitoring struct {
 	PrometheusOperator    PrometheusOperator `json:"prometheusOperator,omitempty"`
 	Prometheus            Prometheus         `json:"prometheus,omitempty"`
 	KubeletServiceMonitor string             `json:"kubeletServiceMonitor,omitempty"`
-	//NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
-	KubeStateMetrics KubeStateMetrics `json:"kubeStateMetrics,omitempty"`
-	Grafana          Grafana          `json:"grafana,omitempty"`
+	NodeExporter          NodeExporter       `json:"nodeExporter,omitempty"`
+	KubeStateMetrics      KubeStateMetrics   `json:"kubeStateMetrics,omitempty"`
+	Grafana               Grafana            `json:"grafana,omitempty"`
 	//DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
 	//SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
 	//MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
@@ -127,11 +126,10 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 		Enabled: "true",
 		Image:   "quay.io/coreos/kube-state-metrics:v1.9.7",
 	},
-	//NodeExporter: NodeExporter{
-	//	Enabled: "true",
-	//	Port:    9100,
-	//	Image:   "quay.io/prometheus/node-exporter:v0.18.1",
-	//},
+	NodeExporter: NodeExporter{
+		Enabled: "true",
+		Image:   "quay.io/prometheus/node-exporter:v1.0.1",
+	},
 	//KubeStateMetrics: KubeStateMetrics{
 	//	Enabled: "true",
 	//	Image:   "quay.io/coreos/kube-state-metrics:v1.9.5",

@@ -96,7 +96,6 @@ spec:
                         type: string
                     type: object
                   kubeStateMetrics:
-                    description: NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
                     properties:
                       enabled:
                         type: string
@@ -105,6 +104,13 @@ spec:
                     type: object
                   kubeletServiceMonitor:
                     type: string
+                  nodeExporter:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
                   prometheus:
                     properties:
                       cpuRequest:

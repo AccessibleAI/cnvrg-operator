@@ -111,6 +111,14 @@ var infraPrometheusInstanceState = []*desired.State{
 		GVR:            desired.Kinds[desired.IstioVsGVR],
 		Own:            true,
 	},
+	{
+		TemplatePath:   path + "/prometheus/instance/rules.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PrometheusRuleGVR],
+		Own:            true,
+	},
 }
 
 var kubeStateMetricsState = []*desired.State{
@@ -215,6 +223,62 @@ var grafanaState = []*desired.State{
 	},
 }
 
+var nodeExporterState = []*desired.State{
+	{
+		TemplatePath:   path + "/node-exporter/clusterrole.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ClusterRoleGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/node-exporter/clusterrolebinding.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/node-exporter/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/node-exporter/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/node-exporter/ds.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DaemonSetGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/node-exporter/servicemonitor.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+}
+
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	var state []*desired.State
@@ -255,6 +319,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	}
 	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.Grafana.Enabled == "true" {
 		state = append(state, grafanaState...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.NodeExporter.Enabled == "true" {
+		state = append(state, nodeExporterState...)
 	}
 	return state
 }

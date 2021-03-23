@@ -1,10 +1,10 @@
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
-  name: cnvrg-infra-prometheus
+  name: cnvrg-prometheus
   namespace: {{ ns . }}
   labels:
-    app: cnvrg-infra-prometheus
+    app: cnvrg-prometheus
 spec:
   storage:
     disableMountSubPath: true
@@ -24,13 +24,13 @@ spec:
       memory: {{ .Spec.Monitoring.Prometheus.MemoryRequest }}
   ruleSelector:
     matchLabels:
-      app: cnvrg-infra-prometheus
+      app: cnvrg-prometheus
       role: alert-rules
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
-  serviceAccountName: cnvrg-infra-prometheus
+  serviceAccountName: cnvrg-prometheus
   podMonitorNamespaceSelector: {}
   podMonitorSelector: {}
   probeNamespaceSelector: {}

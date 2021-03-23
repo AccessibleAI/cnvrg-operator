@@ -53,6 +53,7 @@ var GrafanaInfraDashboards = append([]string{
 	"prometheus.json",
 	"proxy.json",
 	"scheduler.json",
+	"node-exporter.json",
 }, GrafanaAppDashboards...)
 
 func getNs(obj interface{}) string {
