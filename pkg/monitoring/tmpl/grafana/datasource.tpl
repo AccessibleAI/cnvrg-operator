@@ -5,5 +5,5 @@ metadata:
   namespace: {{ ns . }}
 type: Opaque
 data:
-  datasources.yaml: {{ grafanaDataSource . | b64enc }}
+  datasources.yaml: {{ grafanaDataSource .Spec.Monitoring.Prometheus.SvcName (ns .) .Spec.Monitoring.Prometheus.Port  | b64enc }}
 

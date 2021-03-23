@@ -17,4 +17,4 @@ spec:
     - destination:
         port:
           number: {{ .Spec.Monitoring.Prometheus.Port }}
-        host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ ns . }}.svc"
+        host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ ns . }}.svc.cluster.local"

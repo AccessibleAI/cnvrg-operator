@@ -26,6 +26,35 @@ import (
 	"text/template"
 )
 
+var GrafanaAppDashboards = []string{
+	"k8s-resources-namespace.json",
+	"k8s-resources-pod.json",
+	"k8s-resources-workload.json",
+	"k8s-resources-workloads-namespace.json",
+	"namespace-by-pod.json",
+	"namespace-by-workload.json",
+	"persistentvolumesusage.json",
+	"pod-total.json",
+	"statefulset.json",
+	"workload-total.json",
+}
+
+var GrafanaInfraDashboards = append([]string{
+	"apiserver.json",
+	"cluster-total.json",
+	"controller-manager.json",
+	"k8s-resources-cluster.json",
+	"k8s-resources-node.json",
+	"kubelet.json",
+	"node-cluster-rsrc-use.json",
+	"node-rsrc-use.json",
+	"nodes.json",
+	"prometheus-remote-write.json",
+	"prometheus.json",
+	"proxy.json",
+	"scheduler.json",
+}, GrafanaAppDashboards...)
+
 func getNs(obj interface{}) string {
 	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
 		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
@@ -36,6 +65,16 @@ func getNs(obj interface{}) string {
 		return cnvrgApp.Namespace
 	}
 	return ""
+}
+
+func getGrafanaDashboards(obj interface{}) []string {
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+		return GrafanaInfraDashboards
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		return GrafanaAppDashboards
+	}
+	return nil
 }
 
 func cnvrgTemplateFuncs() map[string]interface{} {
@@ -169,7 +208,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
       - 'prometheus-operated.cnvrg-infra.svc.cluster.local:9090'
 `, getNs(cnvrgApp))
 		},
-		"grafanaDataSource": func(cnvrgApp mlopsv1.CnvrgApp) string {
+		"grafanaDataSource": func(promSvc string, ns string, promPort int) string {
 			return fmt.Sprintf(`
 {
     "apiVersion": 1,
@@ -184,24 +223,10 @@ func cnvrgTemplateFuncs() map[string]interface{} {
             "version": 1
         }
     ]
-}`, cnvrgApp.Spec.Monitoring.Prometheus.SvcName, cnvrgApp.Namespace, cnvrgApp.Spec.Monitoring.Prometheus.Port)
+}`, promSvc, ns, promPort)
 		},
-		"grafanaInfraDataSource": func(cnvrgInfra mlopsv1.CnvrgInfra) string {
-			return fmt.Sprintf(`
-{
-    "apiVersion": 1,
-    "datasources": [
-        {
-            "access": "proxy",
-            "editable": false,
-            "name": "prometheus",
-            "orgId": 1,
-            "type": "prometheus",
-            "url": "http://%s.%s.svc:%d",
-            "version": 1
-        }
-    ]
-}`, cnvrgInfra.Spec.Monitoring.Prometheus.SvcName, cnvrgInfra.Spec.InfraNamespace, cnvrgInfra.Spec.Monitoring.Prometheus.Port)
+		"grafanaDashboards": func(obj interface{}) []string {
+			return getGrafanaDashboards(obj)
 		},
 	}
 }

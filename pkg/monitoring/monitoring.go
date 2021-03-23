@@ -205,6 +205,14 @@ var grafanaState = []*desired.State{
 		GVR:            desired.Kinds[desired.ConfigMapGVR],
 		Own:            true,
 	},
+	{
+		TemplatePath:   path + "/grafana/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
 }
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
@@ -244,6 +252,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	}
 	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.KubeStateMetrics.Enabled == "true" {
 		state = append(state, kubeStateMetricsState...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.Grafana.Enabled == "true" {
+		state = append(state, grafanaState...)
 	}
 	return state
 }

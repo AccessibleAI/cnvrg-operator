@@ -71,21 +71,29 @@ var httpsDefault = HTTPS{
 	CertSecret: "",
 }
 
-var ingressDefault = Ingress{
+var ingressAppDefault = Ingress{
 	IngressType:     IstioIngress,
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
-	IstioGwName:     "cnvrg-gateway",
+	IstioGwName:     "cnvrg-app-gateway",
+}
+
+var ingressInfraDefault = Ingress{
+	IngressType:     IstioIngress,
+	Timeout:         "18000s",
+	RetriesAttempts: 5,
+	PerTryTimeout:   "3600s",
+	IstioGwName:     "cnvrg-infra-gateway",
 }
 
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
-	Ingress: ingressDefault,
+	Ingress: ingressAppDefault,
 	HTTPS:   httpsDefault,
 }
 
 var cnvrgInfraNetworkingDefault = CnvrgInfraNetworking{
-	Ingress: ingressDefault,
+	Ingress: ingressInfraDefault,
 	Istio:   istioDefault,
 	HTTPS:   httpsDefault,
 }

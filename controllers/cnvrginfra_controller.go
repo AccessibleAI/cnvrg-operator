@@ -155,11 +155,11 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		reconcileResult = err
 	}
 
-	//// grafana dashboards
-	//if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
+	// grafana dashboards
+	if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
 	// infra base config
 	if err := desired.Apply(registry.State(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
@@ -183,49 +183,42 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 }
 
 func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+
 	if cnvrgInfra.Spec.Monitoring.Enabled != "true" {
 		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
 		return nil
 	}
-	dashboardsPath := "/pkg/cnvrginfra/monitoring/tmpl/grafana/dashboards-data"
-	err := pkger.Walk(dashboardsPath, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		f, err := pkger.Open(path)
+
+	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
+	for _, dashboard := range desired.GrafanaInfraDashboards {
+		f, err := pkger.Open(basePath + dashboard)
 		if err != nil {
-			cnvrgAppLog.Error(err, "error reading path", "path", path)
+			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)
 			return err
 		}
 		b, err := ioutil.ReadAll(f)
 		if err != nil {
-			cnvrgAppLog.Error(err, "error reading", "file", path)
+			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
 			return err
 		}
-
 		cm := &v1core.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      strings.TrimSuffix(info.Name(), filepath.Ext(info.Name())),
+				Name:      strings.TrimSuffix(filepath.Base(f.Name()), filepath.Ext(f.Name())),
 				Namespace: cnvrgInfra.Spec.InfraNamespace,
 			},
-			Data: map[string]string{info.Name(): string(b)},
+			Data: map[string]string{filepath.Base(f.Name()): string(b)},
 		}
 		if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
 			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
 			return err
 		}
 		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-			cnvrgAppLog.Info("grafana dashboard already exists", "file", path)
+			cnvrgAppLog.Info("grafana dashboard already exists", "file", dashboard)
 			return nil
 		} else if err != nil {
-			cnvrgAppLog.Error(err, "error reading", "file", path)
+			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
 			return err
 		}
-
-		return nil
-	})
-	if err != nil {
-		return err
 	}
 
 	return nil

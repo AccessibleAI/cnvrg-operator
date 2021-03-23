@@ -12,5 +12,5 @@ spec:
       port: {{ .Spec.Monitoring.Prometheus.Port }}
       targetPort: web
   selector:
-    prometheus: cnvrg-ccp-prometheus
+    app: prometheus
 

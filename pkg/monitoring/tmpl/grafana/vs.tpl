@@ -1,20 +1,20 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Spec.Grafana.SvcName }}
+  name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
 spec:
   hosts:
-    - "{{.Spec.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.Monitoring.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Spec.Ingress.IstioGwName }}
+  - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
   - retries:
-      attempts: {{ .Spec.Ingress.RetriesAttempts }}
-      perTryTimeout: {{ .Spec.Ingress.PerTryTimeout }}
-    timeout: {{ .Spec.Ingress.Timeout }}
+      attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}
+      perTryTimeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+    timeout: {{ .Spec.Networking.Ingress.Timeout }}
     route:
     - destination:
-        host: "{{ .Spec.Grafana.SvcName }}.{{ ns . }}.svc.cluster.local"
+        host: "{{ .Spec.Monitoring.Grafana.SvcName }}.{{ ns . }}.svc.cluster.local"
         port:
-          number: {{ .Spec.Grafana.Port }}
+          number: {{ .Spec.Monitoring.Grafana.Port }}
