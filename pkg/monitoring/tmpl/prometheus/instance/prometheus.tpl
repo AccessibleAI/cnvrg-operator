@@ -37,3 +37,8 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   version: v2.22.1
+  {{- if isAppSpec . }}
+  additionalScrapeConfigs:
+    name: prom-static-config
+    key: prometheus-additional.yaml
+  {{- end }}

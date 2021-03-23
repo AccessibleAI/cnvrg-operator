@@ -279,27 +279,80 @@ var nodeExporterState = []*desired.State{
 	},
 }
 
-func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
+var appPrometheusInstance = []*desired.State{
+	{
+		TemplatePath:   path + "/prometheus/instance/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/prometheus.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PrometheusGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/vs.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/namespace-res/role.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.RoleGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/namespace-res/rolebinding.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.RoleBindingGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/namespace-res/staticconfig.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/rules.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.PrometheusRuleGVR],
+		Own:            true,
+	},
+}
+
+func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	var state []*desired.State
-
-	if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.PrometheusOperator.Enabled == "true" {
-		state = append(state, prometheusOperatorState...)
+	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Prometheus.Enabled == "true" {
+		state = append(state, appPrometheusInstance...)
 	}
-
-	//if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.Prometheus.Enabled == "true" {
-	//	state = append(state, prometheusInstanceState...)
-	//}
-
-	//if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.KubeletServiceMonitor == "true" {
-	//	state = append(state, kubeletServiceMonitorInstanceState...)
-	//}
-
-	if cnvrgInfra.Spec.Monitoring.Enabled == "true" && cnvrgInfra.Spec.Monitoring.KubeStateMetrics.Enabled == "true" {
-		state = append(state, kubeStateMetricsState...)
-	}
-
-	if cnvrgInfra.Spec.Monitoring.Enabled == "true" {
+	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Grafana.Enabled == "true" {
 		state = append(state, grafanaState...)
 	}
 

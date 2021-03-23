@@ -201,7 +201,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return cnvrgApp.Spec.ControlPlan.WebApp.Port
 		},
-		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp) string {
+		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
 			return fmt.Sprintf(`
 - job_name: 'federate'
   scrape_interval: 10s
@@ -212,8 +212,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
       - '{namespace="%s"}'
   static_configs:
     - targets:
-      - 'prometheus-operated.cnvrg-infra.svc.cluster.local:9090'
-`, getNs(cnvrgApp))
+      - '%s'
+`, ns, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
 		},
 		"grafanaDataSource": func(promSvc string, ns string, promPort int) string {
 			return fmt.Sprintf(`
@@ -234,6 +234,12 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		},
 		"grafanaDashboards": func(obj interface{}) []string {
 			return getGrafanaDashboards(obj)
+		},
+		"isAppSpec": func(obj interface{}) bool {
+			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+				return false
+			}
+			return true
 		},
 	}
 }

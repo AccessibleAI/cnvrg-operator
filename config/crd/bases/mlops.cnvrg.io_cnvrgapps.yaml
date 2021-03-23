@@ -593,6 +593,10 @@ spec:
                       svcName:
                         type: string
                     type: object
+                  upstreamPrometheus:
+                    type: string
+                required:
+                - upstreamPrometheus
                 type: object
               networking:
                 properties:

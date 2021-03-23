@@ -78,9 +78,10 @@ type CnvrgInfraMonitoring struct {
 }
 
 type CnvrgAppMonitoring struct {
-	Enabled    string     `json:"enabled,omitempty"`
-	Prometheus Prometheus `json:"prometheus,omitempty"`
-	Grafana    Grafana    `json:"grafana,omitempty"`
+	Enabled            string     `json:"enabled,omitempty"`
+	UpstreamPrometheus string     `json:"upstreamPrometheus"`
+	Prometheus         Prometheus `json:"prometheus,omitempty"`
+	Grafana            Grafana    `json:"grafana,omitempty"`
 }
 
 var grafanaDefault = Grafana{
@@ -104,9 +105,10 @@ var prometheusDefault = Prometheus{
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
-	Enabled:    "true",
-	Prometheus: prometheusDefault,
-	Grafana:    grafanaDefault,
+	Enabled:            "true",
+	UpstreamPrometheus: "prometheus.cnvrg-infra.svc.cluster.local:9090",
+	Prometheus:         prometheusDefault,
+	Grafana:            grafanaDefault,
 }
 
 var infraMonitoringDefault = CnvrgInfraMonitoring{
