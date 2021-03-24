@@ -56,14 +56,6 @@ var prometheusOperatorState = []*desired.State{
 
 var infraPrometheusInstanceState = []*desired.State{
 	{
-		TemplatePath:   path + "/prometheus/instance/infra/kubelet.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
-		Own:            true,
-	},
-	{
 		TemplatePath:   path + "/prometheus/instance/infra/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -95,14 +87,22 @@ var infraPrometheusInstanceState = []*desired.State{
 		GVR:            desired.Kinds[desired.PrometheusGVR],
 		Own:            true,
 	},
-	//{
-	//	TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
-	//	Template:       nil,
-	//	ParsedTemplate: "",
-	//	Obj:            &unstructured.Unstructured{},
-	//	GVR:            desired.Kinds[desired.SvcGVR],
-	//	Own:            true,
-	//},
+	{
+		TemplatePath:   path + "/prometheus/instance/infra/kubelet.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
 	{
 		TemplatePath:   path + "/prometheus/instance/infra/vs.tpl",
 		Template:       nil,
@@ -328,14 +328,14 @@ var ccpPrometheusInstance = []*desired.State{
 		GVR:            desired.Kinds[desired.IstioVsGVR],
 		Own:            true,
 	},
-	{
-		TemplatePath:   path + "/prometheus/instance/ccp/rules.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.PrometheusRuleGVR],
-		Own:            true,
-	},
+	//{
+	//	TemplatePath:   path + "/prometheus/instance/ccp/rules.tpl",
+	//	Template:       nil,
+	//	ParsedTemplate: "",
+	//	Obj:            &unstructured.Unstructured{},
+	//	GVR:            desired.Kinds[desired.PrometheusRuleGVR],
+	//	Own:            true,
+	//},
 	{
 		TemplatePath:   path + "/prometheus/instance/ccp/staticconfig.tpl",
 		Template:       nil,

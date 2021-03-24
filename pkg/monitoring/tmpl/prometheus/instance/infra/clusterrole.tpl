@@ -14,12 +14,12 @@ rules:
     - list
     - watch
 - apiGroups:
-  - ""
+    - ""
   resources:
-  - nodes/metrics
+    - nodes/metrics
   verbs:
-  - get
+    - get
 - nonResourceURLs:
-  - /metrics
+    - /metrics
   verbs:
-  - get
+    - get

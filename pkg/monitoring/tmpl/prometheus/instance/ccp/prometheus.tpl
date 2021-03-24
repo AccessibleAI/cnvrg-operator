@@ -31,13 +31,21 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: cnvrg-ccp-prometheus
-  serviceMonitorNamespaceSelector: {}
-  podMonitorNamespaceSelector: {}
-  probeNamespaceSelector: {}
+  podMonitorNamespaceSelector:
+    matchLabels:
+      namespace: {{ ns . }}
+  podMonitorSelector:
+    matchLabels:
+      namespace: {{ ns . }}
+  probeNamespaceSelector:
+    matchLabels:
+      namespace: {{ ns . }}
+  serviceMonitorNamespaceSelector:
+    matchLabels:
+      namespace: {{ ns . }}
   serviceMonitorSelector:
     matchLabels:
-      cnvrg-infra-prometheus: "bla"
-  podMonitorSelector: {}
+      namespace: {{ ns . }}
   version: v2.22.1
   additionalScrapeConfigs:
     name: prom-static-config
