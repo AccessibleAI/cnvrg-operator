@@ -17,8 +17,6 @@ spec:
         storageClassName: {{ .Spec.Monitoring.Prometheus.StorageClass }}
         {{- end }}
   image: {{ .Spec.Monitoring.Prometheus.Image }}
-  replicaExternalLabelName: ""
-  prometheusExternalLabelName: ""
   replicas: 1
   resources:
     requests:

@@ -95,14 +95,14 @@ var infraPrometheusInstanceState = []*desired.State{
 		GVR:            desired.Kinds[desired.PrometheusGVR],
 		Own:            true,
 	},
-	{
-		TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SvcGVR],
-		Own:            true,
-	},
+	//{
+	//	TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
+	//	Template:       nil,
+	//	ParsedTemplate: "",
+	//	Obj:            &unstructured.Unstructured{},
+	//	GVR:            desired.Kinds[desired.SvcGVR],
+	//	Own:            true,
+	//},
 	{
 		TemplatePath:   path + "/prometheus/instance/infra/vs.tpl",
 		Template:       nil,
