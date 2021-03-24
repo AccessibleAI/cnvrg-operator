@@ -9,4 +9,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: cnvrg-operator
-  namespace: cnvrg
+  namespace: cnvrg-infra

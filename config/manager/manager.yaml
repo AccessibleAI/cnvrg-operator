@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cnvrg-operator
-  namespace: cnvrg
+  namespace: cnvrg-infra
   labels:
     control-plane: cnvrg-operator
 spec:
@@ -15,19 +15,15 @@ spec:
       labels:
         control-plane: cnvrg-operator
     spec:
-      serviceAccountName: cnvrg
+      serviceAccountName: cnvrg-operator
       containers:
-      - command:
-        - /manager
-        args:
-        - --enable-leader-election
-        image: controller:latest
-        name: manager
+      - image: controller:latest
+        name: cnvrg-operator
         resources:
           limits:
-            cpu: 100m
-            memory: 30Mi
+            cpu: 1000m
+            memory: 1000Mi
           requests:
-            cpu: 100m
-            memory: 20Mi
+            cpu: 500m
+            memory: 200Mi
       terminationGracePeriodSeconds: 10
