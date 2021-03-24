@@ -1,6 +1,5 @@
 
-# Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
@@ -38,7 +37,7 @@ uninstall: manifests
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
-	cd config/manager && kustomize edit set image controller=${IMG}
+	cd config/manager && kustomize edit set image controller=docker.io/cnvrg/cnvrg-operator:${TAG}
 	kustomize build config/default | kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
@@ -58,12 +57,12 @@ generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Build the docker image
-docker-build: test
-		docker build . -t ${IMG}
+docker-build:
+		docker build . -t docker.io/cnvrg/cnvrg-operator:${TAG}
 
 # Push the docker image
 docker-push:
-	docker push ${IMG}
+	docker push docker.io/cnvrg/cnvrg-operator:${TAG}
 
 # find or download controller-gen
 # download controller-gen if necessary

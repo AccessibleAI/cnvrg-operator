@@ -51,7 +51,7 @@ type CnvrgInfraNetworking struct {
 }
 
 var istioDefault = Istio{
-	Enabled:                  "false",
+	Enabled:                  "true",
 	OperatorImage:            "docker.io/istio/operator:1.8.1",
 	Hub:                      "docker.io/istio",
 	Tag:                      "1.8.1",
