@@ -328,14 +328,6 @@ var ccpPrometheusInstance = []*desired.State{
 		GVR:            desired.Kinds[desired.IstioVsGVR],
 		Own:            true,
 	},
-	//{
-	//	TemplatePath:   path + "/prometheus/instance/ccp/rules.tpl",
-	//	Template:       nil,
-	//	ParsedTemplate: "",
-	//	Obj:            &unstructured.Unstructured{},
-	//	GVR:            desired.Kinds[desired.PrometheusRuleGVR],
-	//	Own:            true,
-	//},
 	{
 		TemplatePath:   path + "/prometheus/instance/ccp/staticconfig.tpl",
 		Template:       nil,
@@ -374,7 +366,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, grafanaState...)
 	}
 	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.NodeExporter.Enabled == "true" {
-		//state = append(state, nodeExporterState...)
+		state = append(state, nodeExporterState...)
 	}
 	return state
 }

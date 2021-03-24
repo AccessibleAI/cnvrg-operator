@@ -4,6 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/version: v1.0.1
+    cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   name: node-exporter
   namespace: {{ ns . }}
 spec:

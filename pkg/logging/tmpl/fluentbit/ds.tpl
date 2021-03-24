@@ -53,10 +53,4 @@ spec:
             name: fluent-bit-config
       serviceAccountName: fluent-bit
       tolerations:
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: NoSchedule
-        - operator: "Exists"
-          effect: "NoExecute"
-        - operator: "Exists"
-          effect: "NoSchedule"
+        - operator: Exists

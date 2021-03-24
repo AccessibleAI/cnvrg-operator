@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     k8s-app: kubelet
-    cnvrg-infra-prometheus: "true"
+    cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   name: kubelet
   namespace: {{ ns . }}
 spec:

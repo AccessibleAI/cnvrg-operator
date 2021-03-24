@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
+	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
@@ -246,25 +249,23 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
-	//// controlplan
-	//if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
-	//
+	// controlplan
+	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
 
-	//
-	//// networking
-	//if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
-	//
-	//// logging
-	//if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-	//	return err
-	//}
+	// networking
+	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
+	// logging
+	if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
 
 	// grafana dashboards
 	if err := r.createGrafanaDashboards(cnvrgApp); err != nil {

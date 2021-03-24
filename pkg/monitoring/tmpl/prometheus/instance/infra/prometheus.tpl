@@ -35,5 +35,7 @@ spec:
   podMonitorSelector: {}
   probeNamespaceSelector: {}
   serviceMonitorNamespaceSelector: {}
-  serviceMonitorSelector: {}
+  serviceMonitorSelector:
+    matchLabels:
+      cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   version: v2.22.1

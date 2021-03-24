@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: 1.9.7
-    cnvrg-infra-prometheus: "true"
+    cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   name: kube-state-metrics
   namespace: {{ ns . }}
 spec:
