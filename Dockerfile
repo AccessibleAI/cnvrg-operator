@@ -17,13 +17,13 @@ COPY pkg/ pkg/
 
 # Build
 #RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o manager main.go
+RUN go get github.com/markbates/pkger/cmd/pkger
+RUN pkger && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator main.go pkged.go
+RUN ls -all
 
-# Use distroless as minimal base image to package the manager binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
-WORKDIR /
-COPY --from=builder /workspace/manager .
-USER nonroot:nonroot
 
-ENTRYPOINT ["/manager"]
+FROM ubuntu:20.04
+WORKDIR /opt/app-root
+COPY --from=builder /workspace/cnvrg-operator .
+
+ENTRYPOINT ["/opt/app-root/cnvrg-operator", "run"]

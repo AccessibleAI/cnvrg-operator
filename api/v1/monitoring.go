@@ -21,9 +21,9 @@ type Prometheus struct {
 	StorageSize   string `json:"storageSize,omitempty"`
 	StorageClass  string `json:"storageClass,omitempty"`
 }
+
 type NodeExporter struct {
 	Enabled string `json:"enabled,omitempty"`
-	Port    int    `json:"port,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 type KubeStateMetrics struct {
@@ -60,76 +60,100 @@ type MetricsServer struct {
 	Enabled string `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
-type Monitoring struct {
-	Enabled                string                 `json:"enabled,omitempty"`
-	PrometheusOperator     PrometheusOperator     `json:"prometheusOperator,omitempty"`
-	Prometheus             Prometheus             `json:"prometheus,omitempty"`
-	NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
-	KubeStateMetrics       KubeStateMetrics       `json:"kubeStateMetrics,omitempty"`
-	Grafana                Grafana                `json:"grafana,omitempty"`
-	DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
-	SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
-	MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
-	DcgmExporter           DcgmExporter           `json:"dcgmExporter,omitempty"`
-	IdleMetricsExporter    IdleMetricsExporter    `json:"idleMetricsExporter,omitempty"`
-	MetricsServer          MetricsServer          `json:"metricsServer,omitempty"`
+
+type CnvrgInfraMonitoring struct {
+	Enabled               string             `json:"enabled,omitempty"`
+	PrometheusOperator    PrometheusOperator `json:"prometheusOperator,omitempty"`
+	Prometheus            Prometheus         `json:"prometheus,omitempty"`
+	KubeletServiceMonitor string             `json:"kubeletServiceMonitor,omitempty"`
+	NodeExporter          NodeExporter       `json:"nodeExporter,omitempty"`
+	KubeStateMetrics      KubeStateMetrics   `json:"kubeStateMetrics,omitempty"`
+	Grafana               Grafana            `json:"grafana,omitempty"`
+	//DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
+	//SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
+	//MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
+	DcgmExporter DcgmExporter `json:"dcgmExporter,omitempty"`
+	//IdleMetricsExporter    IdleMetricsExporter    `json:"idleMetricsExporter,omitempty"`
+	//MetricsServer          MetricsServer          `json:"metricsServer,omitempty"`
 }
 
-var monitoringDefault = Monitoring{
-	Enabled: "true",
+type CnvrgAppMonitoring struct {
+	Enabled            string     `json:"enabled,omitempty"`
+	UpstreamPrometheus string     `json:"upstreamPrometheus"`
+	Prometheus         Prometheus `json:"prometheus,omitempty"`
+	Grafana            Grafana    `json:"grafana,omitempty"`
+}
+
+var grafanaDefault = Grafana{
+	Enabled:  "true",
+	Image:    "grafana/grafana:7.3.4",
+	SvcName:  "grafana",
+	Port:     3000,
+	NodePort: 30012,
+}
+
+var prometheusDefault = Prometheus{
+	Enabled:       "true",
+	Image:         "quay.io/prometheus/prometheus:v2.22.1",
+	CPURequest:    1,
+	MemoryRequest: "1Gi",
+	SvcName:       "prometheus",
+	Port:          9090,
+	NodePort:      30909,
+	StorageSize:   "100Gi",
+	StorageClass:  "use-default",
+}
+
+var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
+	Enabled:            "true",
+	UpstreamPrometheus: "prometheus-operated.cnvrg-infra.svc.cluster.local:9090",
+	Prometheus:         prometheusDefault,
+	Grafana:            grafanaDefault,
+}
+
+var infraMonitoringDefault = CnvrgInfraMonitoring{
+	Enabled:               "true",
+	KubeletServiceMonitor: "true",
+	Prometheus:            prometheusDefault,
+	Grafana:               grafanaDefault,
 	PrometheusOperator: PrometheusOperator{
 		Enabled: "true",
 		Images: Images{
-			OperatorImage:                 "quay.io/coreos/prometheus-operator:v0.40.0",
-			ConfigReloaderImage:           "jimmidyson/configmap-reload:v0.3.0",
-			PrometheusConfigReloaderImage: "quay.io/coreos/prometheus-config-reloader:v0.40.0",
-			KubeRbacProxyImage:            "quay.io/coreos/kube-rbac-proxy:v0.4.1",
+			OperatorImage:                 "quay.io/prometheus-operator/prometheus-operator:v0.44.1",
+			PrometheusConfigReloaderImage: "quay.io/prometheus-operator/prometheus-config-reloader:v0.44.1",
+			KubeRbacProxyImage:            "quay.io/brancz/kube-rbac-proxy:v0.8.0",
 		},
-	},
-	Prometheus: Prometheus{
-		Enabled:       "true",
-		Image:         "quay.io/prometheus/prometheus:v2.22.2",
-		CPURequest:    1,
-		MemoryRequest: "1Gi",
-		SvcName:       "prometheus",
-		Port:          9090,
-		NodePort:      30909,
-		StorageSize:   "100Gi",
-		StorageClass:  "use-default",
-	},
-	NodeExporter: NodeExporter{
-		Enabled: "true",
-		Port:    9100,
-		Image:   "quay.io/prometheus/node-exporter:v0.18.1",
 	},
 	KubeStateMetrics: KubeStateMetrics{
 		Enabled: "true",
-		Image:   "quay.io/coreos/kube-state-metrics:v1.9.5",
+		Image:   "quay.io/coreos/kube-state-metrics:v1.9.7",
 	},
-	Grafana: Grafana{
-		Enabled:  "true",
-		Image:    "grafana/grafana:7.2.0",
-		SvcName:  "grafana",
-		Port:     3000,
-		NodePort: 30012,
-	},
-	DefaultServiceMonitors: DefaultServiceMonitors{Enabled: "true"},
-	SidekiqExporter: SidekiqExporter{
+	NodeExporter: NodeExporter{
 		Enabled: "true",
-		Image:   "docker.io/strech/sidekiq-prometheus-exporter:0.1.13",
+		Image:   "quay.io/prometheus/node-exporter:v1.0.1",
 	},
-	MinioExporter: MinioExporter{
-		Enabled: "true",
-		Image:   "docker.io/cnvrg/cnvrg-boot:v0.24",
-	},
-	DcgmExporter: DcgmExporter{
-		Enabled: "true",
-		Image:   "nvidia/dcgm-exporter:1.7.2",
-		Port:    9400,
-	},
-	IdleMetricsExporter: IdleMetricsExporter{Enabled: "true"},
-	MetricsServer: MetricsServer{
-		Enabled: "true",
-		Image:   "k8s.gcr.io/metrics-server/metrics-server:v0.3.7",
-	},
+	//KubeStateMetrics: KubeStateMetrics{
+	//	Enabled: "true",
+	//	Image:   "quay.io/coreos/kube-state-metrics:v1.9.5",
+	//},
+
+	//DefaultServiceMonitors: DefaultServiceMonitors{Enabled: "true"},
+	//SidekiqExporter: SidekiqExporter{
+	//	Enabled: "true",
+	//	Image:   "docker.io/strech/sidekiq-prometheus-exporter:0.1.13",
+	//},
+	//MinioExporter: MinioExporter{
+	//	Enabled: "true",
+	//	Image:   "docker.io/cnvrg/cnvrg-boot:v0.24",
+	//},
+	//DcgmExporter: DcgmExporter{
+	//	Enabled: "true",
+	//	Image:   "nvidia/dcgm-exporter:1.7.2",
+	//	Port:    9400,
+	//},
+	//IdleMetricsExporter: IdleMetricsExporter{Enabled: "true"},
+	//MetricsServer: MetricsServer{
+	//	Enabled: "true",
+	//	Image:   "k8s.gcr.io/metrics-server/metrics-server:v0.3.7",
+	//},
 }

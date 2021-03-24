@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/controlplan"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/ingress"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/logging"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/minio"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/pg"
-	"github.com/cnvrg-operator/pkg/cnvrgapp/redis"
+	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/logging"
+	"github.com/cnvrg-operator/pkg/monitoring"
+	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
+	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
+	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -78,7 +79,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	} else {
 		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			r.updateStatusMessage(mlopsv1.STATUS_REMOVING, "removing cnvrg spec", cnvrgApp)
+			r.updateStatusMessage(mlopsv1.StatusRemoving, "removing cnvrg spec", cnvrgApp)
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -103,7 +104,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if percentageReady == 100 {
 		percentageReady = 99
 	}
-	r.updateStatusMessage(mlopsv1.STATUS_RECONCILING, fmt.Sprintf("reconciling... (%d%%)", percentageReady), cnvrgApp)
+	r.updateStatusMessage(mlopsv1.StatusReconciling, fmt.Sprintf("reconciling... (%d%%)", percentageReady), cnvrgApp)
 
 	if err := r.applyManifests(cnvrgApp); err != nil {
 		return ctrl.Result{}, err
@@ -119,7 +120,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	cnvrgAppLog.Info(statusMsg)
 
 	if ready {
-		r.updateStatusMessage(mlopsv1.STATUS_READY, statusMsg, cnvrgApp)
+		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
 		if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -180,8 +181,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check postgres status
-	if cnvrgApp.Spec.Pg.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.Pg.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.ControlPlan.Pg.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Pg.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -190,8 +191,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check minio status
-	if cnvrgApp.Spec.Minio.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.Minio.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.ControlPlan.Minio.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Minio.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -200,8 +201,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check redis status
-	if cnvrgApp.Spec.Redis.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.Redis.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.ControlPlan.Redis.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Redis.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -248,43 +249,83 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
-	// Ingress
-	if err := desired.Apply(ingress.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
-		return err
-	}
-
-	// ControlPlan
+	// controlplan
 	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
-	// Logging
-	if err := desired.Apply(logging.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+	// networking
+	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
-	// Redis
-	if err := desired.Apply(redis.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+	// logging
+	if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
-	// PostgreSQL
-	if err := desired.Apply(pg.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+	// grafana dashboards
+	if err := r.createGrafanaDashboards(cnvrgApp); err != nil {
 		return err
 	}
 
-	// Minio
-	if err := desired.Apply(minio.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.STATUS_ERROR, err.Error(), cnvrgApp)
+	// monitoring
+	if err := desired.Apply(monitoring.AppMonitoringState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
 	return nil
+}
+
+func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
+
+	if cnvrgApp.Spec.Monitoring.Enabled != "true" {
+		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
+		return nil
+	}
+
+	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
+
+	for _, dashboard := range desired.GrafanaAppDashboards {
+		if dashboard == "node-exporter.json" {
+			fmt.Println("as")
+		}
+		f, err := pkger.Open(basePath + dashboard)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)
+			return err
+		}
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			return err
+		}
+		cm := &v1core.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      strings.TrimSuffix(filepath.Base(f.Name()), filepath.Ext(f.Name())),
+				Namespace: cnvrgApp.Namespace,
+			},
+			Data: map[string]string{filepath.Base(f.Name()): string(b)},
+		}
+		if err := ctrl.SetControllerReference(cnvrgApp, cm, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
+			return err
+		}
+		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
+			cnvrgAppLog.Info("grafana dashboard already exists", "file", dashboard)
+			continue
+		} else if err != nil {
+			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			return err
+		}
+	}
+
+	return nil
+
 }
 
 func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, op string) error {
@@ -303,13 +344,14 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 
 	name := types.NamespacedName{
 		Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
-		Namespace: cnvrgAppInfra.Items[0].Spec.CnvrgInfraNs,
+		Namespace: cnvrgAppInfra.Items[0].Spec.InfraNamespace,
 	}
 
 	cm := &v1core.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
-			Namespace: cnvrgAppInfra.Items[0].Spec.CnvrgInfraNs},
+			Name:      name.Name,
+			Namespace: name.Namespace,
+		},
 	}
 
 	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
@@ -339,7 +381,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 }
 
 func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgApp *mlopsv1.CnvrgApp) {
-	if cnvrgApp.Status.Status == mlopsv1.STATUS_REMOVING {
+	if cnvrgApp.Status.Status == mlopsv1.StatusRemoving {
 		cnvrgAppLog.Info("skipping status update, current cnvrg spec under removing status...")
 		return
 	}

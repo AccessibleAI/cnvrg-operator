@@ -41,6 +41,8 @@ spec:
             type: object
           spec:
             properties:
+              clusterDomain:
+                type: string
               cnvrgAppInstances:
                 items:
                   properties:
@@ -50,41 +52,159 @@ spec:
                       type: string
                   type: object
                 type: array
-              cnvrgInfraNs:
+              infraNamespace:
                 type: string
-              fluentbit:
-                properties:
-                  enabled:
-                    type: string
-                  image:
-                    type: string
-                type: object
               infraReconcilerCm:
                 type: string
-              istio:
+              logging:
                 properties:
                   enabled:
                     type: string
-                  externalIp:
+                  fluentbit:
+                    properties:
+                      image:
+                        type: string
+                    type: object
+                type: object
+              monitoring:
+                properties:
+                  dcgmExporter:
+                    description: DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
+                      SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
+                      MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      port:
+                        type: integer
+                    type: object
+                  enabled:
                     type: string
-                  hub:
+                  grafana:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                  kubeStateMetrics:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                  kubeletServiceMonitor:
                     type: string
-                  ingressSvcAnnotations:
-                    type: string
-                  ingressSvcExtraPorts:
-                    type: string
-                  loadBalancerSourceRanges:
-                    type: string
-                  mixerImage:
-                    type: string
-                  operatorImage:
-                    type: string
-                  pilotImage:
-                    type: string
-                  proxyImage:
-                    type: string
-                  tag:
-                    type: string
+                  nodeExporter:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                  prometheus:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  prometheusOperator:
+                    properties:
+                      enabled:
+                        type: string
+                      images:
+                        properties:
+                          configReloaderImage:
+                            type: string
+                          kubeRbacProxyImage:
+                            type: string
+                          operatorImage:
+                            type: string
+                          prometheusConfigReloaderImage:
+                            type: string
+                        type: object
+                    type: object
+                type: object
+              networking:
+                properties:
+                  https:
+                    properties:
+                      cert:
+                        type: string
+                      certSecret:
+                        type: string
+                      enabled:
+                        type: string
+                      key:
+                        type: string
+                    type: object
+                  ingress:
+                    properties:
+                      ingressType:
+                        enum:
+                        - istio
+                        - k8singress
+                        - openshift
+                        - nodeport
+                        type: string
+                      istioGwName:
+                        type: string
+                      perTryTimeout:
+                        type: string
+                      retriesAttempts:
+                        type: integer
+                      timeout:
+                        type: string
+                    type: object
+                  istio:
+                    properties:
+                      enabled:
+                        type: string
+                      externalIp:
+                        type: string
+                      hub:
+                        type: string
+                      ingressSvcAnnotations:
+                        type: string
+                      ingressSvcExtraPorts:
+                        type: string
+                      loadBalancerSourceRanges:
+                        type: string
+                      mixerImage:
+                        type: string
+                      operatorImage:
+                        type: string
+                      pilotImage:
+                        type: string
+                      proxyImage:
+                        type: string
+                      tag:
+                        type: string
+                    type: object
                 type: object
               registry:
                 properties:

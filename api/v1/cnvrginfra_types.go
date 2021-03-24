@@ -5,32 +5,28 @@ import (
 )
 
 type CnvrgInfraSpec struct {
-	CnvrgInfraNs      string             `json:"cnvrgInfraNs,omitempty"`
-	InfraReconcilerCm string             `json:"infraReconcilerCm,omitempty"`
-	CnvrgAppInstances []CnvrgAppInstance `json:"cnvrgAppInstances,omitempty"`
-	Registry          Registry           `json:"registry,omitempty"`
-	Storage           Storage            `json:"storage,omitempty"`
-	Istio             Istio              `json:"istio,omitempty"`
-	Fluentbit         Fluentbit          `json:"fluentbit,omitempty"`
-}
-
-type CnvrgInfraStatus struct {
-	Status   OperatorStatus `json:"status,omitempty"`
-	Message  string         `json:"message,omitempty"`
-	Progress string         `json:"progress,omitempty"`
+	ClusterDomain     string               `json:"clusterDomain,omitempty"`
+	InfraNamespace    string               `json:"infraNamespace,omitempty"`
+	InfraReconcilerCm string               `json:"infraReconcilerCm,omitempty"`
+	CnvrgAppInstances []CnvrgAppInstance   `json:"cnvrgAppInstances,omitempty"`
+	Monitoring        CnvrgInfraMonitoring `json:"monitoring,omitempty"`
+	Networking        CnvrgInfraNetworking `json:"networking,omitempty"`
+	Logging           CnvrgInfraLogging    `json:"logging,omitempty"`
+	Registry          Registry             `json:"registry,omitempty"`
+	Storage           Storage              `json:"storage,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
-// +kubebuilder:resource:scope=Cluster
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster
 type CnvrgInfra struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   CnvrgInfraSpec   `json:"spec,omitempty"`
-	Status CnvrgInfraStatus `json:"status,omitempty"`
+	Spec   CnvrgInfraSpec `json:"spec,omitempty"`
+	Status Status         `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -50,21 +46,17 @@ func init() {
 }
 
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
-	return CnvrgInfraSpec{
-		CnvrgInfraNs:      "cnvrg-infra",
+	infraDefault := CnvrgInfraSpec{
+		ClusterDomain:     "",
+		InfraNamespace:    "cnvrg-infra",
 		InfraReconcilerCm: "infra-reconciler-cm",
 		CnvrgAppInstances: []CnvrgAppInstance{},
 		Storage:           storageDefault,
-		Istio:             istioDefault,
-		Registry: Registry{
-			Name:     "cnvrg-registry",
-			URL:      "docker.io",
-			User:     "",
-			Password: "",
-		},
-		Fluentbit: Fluentbit{
-			Enabled: "true",
-			Image:   "cnvrg/cnvrg-tools:v0.10",
-		},
+		Networking:        cnvrgInfraNetworkingDefault,
+		Monitoring:        infraMonitoringDefault,
+		Logging:           cnvrgInfraLoggingDefault,
+		Registry:          registryDefault,
 	}
+	//infraDefault.Monitoring.Prometheus.SvcName = "infra-prometheus"
+	return infraDefault
 }

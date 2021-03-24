@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
+	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
@@ -25,16 +26,71 @@ import (
 	"text/template"
 )
 
+var GrafanaAppDashboards = []string{
+	"k8s-resources-namespace.json",
+	"k8s-resources-pod.json",
+	"k8s-resources-workload.json",
+	"k8s-resources-workloads-namespace.json",
+	"namespace-by-pod.json",
+	"namespace-by-workload.json",
+	"persistentvolumesusage.json",
+	"pod-total.json",
+	"statefulset.json",
+	"workload-total.json",
+}
+
+var GrafanaInfraDashboards = append([]string{
+	"apiserver.json",
+	"cluster-total.json",
+	"controller-manager.json",
+	"k8s-resources-cluster.json",
+	"k8s-resources-node.json",
+	"kubelet.json",
+	"node-cluster-rsrc-use.json",
+	"node-rsrc-use.json",
+	"nodes.json",
+	"prometheus-remote-write.json",
+	"prometheus.json",
+	"proxy.json",
+	"scheduler.json",
+	"node-exporter.json",
+}, GrafanaAppDashboards...)
+
+func getNs(obj interface{}) string {
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
+		return cnvrgInfra.Spec.InfraNamespace
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
+		return cnvrgApp.Namespace
+	}
+	return ""
+}
+
+func getGrafanaDashboards(obj interface{}) []string {
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+		return GrafanaInfraDashboards
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		return GrafanaAppDashboards
+	}
+	return nil
+}
+
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
+		"ns": func(obj interface{}) string {
+			return getNs(obj)
+		},
 		"httpScheme": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.Ingress.HTTPS.Enabled == "true" {
+			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
 				return "https://"
 			}
 			return "http://"
 		},
 		"appDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NodePortIngress {
+			if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgApp.Spec.ControlPlan.WebApp.NodePort)
 			} else {
@@ -42,7 +98,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 		},
 		"defaultComputeClusterDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NodePortIngress {
+			if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgApp.Spec.ControlPlan.WebApp.NodePort)
 			} else {
@@ -50,7 +106,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 		},
 		"redisUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			return "redis://" + cnvrgApp.Spec.Redis.SvcName
+			return "redis://" + cnvrgApp.Spec.ControlPlan.Redis.SvcName
 		},
 		"esUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return "http://" + cnvrgApp.Spec.Logging.Es.SvcName
@@ -58,35 +114,41 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"hyperServerUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return "http://" + cnvrgApp.Spec.ControlPlan.Hyper.SvcName
 		},
+		"esFullInternalUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
+			return fmt.Sprintf("http://%s.%s.svc.cluster.local:%d",
+				cnvrgApp.Spec.Logging.Es.SvcName,
+				cnvrgApp.Namespace,
+				cnvrgApp.Spec.Logging.Es.Port)
+		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
 				return cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
 			}
-			if cnvrgApp.Spec.Ingress.HTTPS.Enabled == "true" {
-				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
+				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.ControlPlan.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			} else {
-				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.ControlPlan.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			}
 		},
 		"routeBy": func(cnvrgApp mlopsv1.CnvrgApp, routeBy string) string {
 			switch routeBy {
 			case "ISTIO":
-				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.IstioIngress {
+				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
 					return "true"
 				}
 				return "false"
 			case "OPENSHIFT":
-				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
 					return "true"
 				}
 				return "false"
 			case "NGINX_INGRESS":
-				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NginxIngress {
+				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NginxIngress {
 					return "true"
 				}
 				return "false"
 			case "NODE_PORT":
-				if cnvrgApp.Spec.Ingress.IngressType == mlopsv1.NodePortIngress {
+				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
 					return "true"
 				}
 				return "false"
@@ -107,7 +169,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf("provider = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.Provider),
 				fmt.Sprintf("http_address = 0.0.0.0:%v", cnvrgApp.Spec.ControlPlan.WebApp.Port),
 				fmt.Sprintf("redirect_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.RedirectURI),
-				fmt.Sprintf("redis_connection_url = redis://%v:%v", cnvrgApp.Spec.Redis.SvcName, cnvrgApp.Spec.Redis.Port),
+				fmt.Sprintf("redis_connection_url = redis://%v:%v", cnvrgApp.Spec.ControlPlan.Redis.SvcName, cnvrgApp.Spec.ControlPlan.Redis.Port),
 				fmt.Sprintf("redirect_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.RedirectURI),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
 				fmt.Sprintf(`email_domains = ["%v"]`, cnvrgApp.Spec.ControlPlan.OauthProxy.EmailDomain),
@@ -138,6 +200,47 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				return 3000
 			}
 			return cnvrgApp.Spec.ControlPlan.WebApp.Port
+		},
+		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
+			return fmt.Sprintf(`
+- job_name: 'federate'
+  scrape_interval: 10s
+  honor_labels: true
+  honor_timestamps: false
+  metrics_path: '/federate'
+  params:
+    'match[]':
+      - '{namespace="%s"}'
+  static_configs:
+    - targets:
+      - '%s'
+`, ns, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
+		},
+		"grafanaDataSource": func(promSvc string, ns string, promPort int) string {
+			return fmt.Sprintf(`
+{
+    "apiVersion": 1,
+    "datasources": [
+        {
+            "access": "proxy",
+            "editable": false,
+            "name": "prometheus",
+            "orgId": 1,
+            "type": "prometheus",
+            "url": "http://%s.%s.svc:%d",
+            "version": 1
+        }
+    ]
+}`, promSvc, ns, promPort)
+		},
+		"grafanaDashboards": func(obj interface{}) []string {
+			return getGrafanaDashboards(obj)
+		},
+		"isAppSpec": func(obj interface{}) bool {
+			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+				return false
+			}
+			return true
 		},
 	}
 }

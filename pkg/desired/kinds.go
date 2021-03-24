@@ -15,6 +15,8 @@ const (
 	SaGVR                   GVRName = "SaGVR"
 	CrdGVR                  GVRName = "CrdGVR"
 	PrometheusGVR           GVRName = "PrometheusGVR"
+	ServiceMonitorGVR       GVRName = "ServiceMonitorGVR"
+	PrometheusRuleGVR       GVRName = "PrometheusRuleGVR"
 	ClusterRoleGVR          GVRName = "ClusterRoleGVR"
 	ClusterRoleBindingGVR   GVRName = "ClusterRoleBindingGVR"
 	RoleGVR                 GVRName = "RoleGVR"
@@ -137,5 +139,20 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "storage.k8s.io",
 		Version: "v1",
 		Kind:    "StorageClass",
+	},
+	PrometheusGVR: schema.GroupVersionKind{
+		Group:   "monitoring.coreos.com",
+		Version: "v1",
+		Kind:    "Prometheus",
+	},
+	ServiceMonitorGVR: schema.GroupVersionKind{
+		Group:   "monitoring.coreos.com",
+		Version: "v1",
+		Kind:    "ServiceMonitor",
+	},
+	PrometheusRuleGVR: schema.GroupVersionKind{
+		Group:   "monitoring.coreos.com",
+		Version: "v1",
+		Kind:    "PrometheusRule",
 	},
 }

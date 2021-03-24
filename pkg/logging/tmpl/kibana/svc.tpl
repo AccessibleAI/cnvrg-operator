@@ -1,0 +1,20 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Spec.Logging.Kibana.SvcName }}
+  namespace: {{ ns . }}
+  labels:
+    app: {{ .Spec.Logging.Kibana.SvcName }}
+spec:
+  {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
+  type: NodePort
+  {{- end }}
+  selector:
+    app: {{ .Spec.Logging.Kibana.SvcName }}
+  ports:
+    - port: {{ .Spec.Logging.Kibana.Port }}
+      protocol: TCP
+      {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
+      nodePort: {{ .Spec.Logging.Kibana.NodePort }}
+      {{- end }}
