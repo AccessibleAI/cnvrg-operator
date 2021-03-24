@@ -106,7 +106,7 @@ var prometheusDefault = Prometheus{
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 	Enabled:            "true",
-	UpstreamPrometheus: "prometheus.cnvrg-infra.svc.cluster.local:9090",
+	UpstreamPrometheus: "prometheus-operated.cnvrg-infra.svc.cluster.local:9090",
 	Prometheus:         prometheusDefault,
 	Grafana:            grafanaDefault,
 }

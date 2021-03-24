@@ -8,5 +8,5 @@ roleRef:
   name: cnvrg-infra-prometheus
 subjects:
 - kind: ServiceAccount
-  name: cnvrg-prometheus
+  name: cnvrg-infra-prometheus
   namespace: {{ ns . }}

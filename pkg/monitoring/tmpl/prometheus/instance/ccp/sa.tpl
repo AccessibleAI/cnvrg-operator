@@ -1,5 +1,5 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: grafana
+  name: cnvrg-ccp-prometheus
   namespace: {{ ns . }}

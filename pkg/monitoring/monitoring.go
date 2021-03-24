@@ -56,7 +56,7 @@ var prometheusOperatorState = []*desired.State{
 
 var infraPrometheusInstanceState = []*desired.State{
 	{
-		TemplatePath:   path + "/prometheus/cluster-res/kubelet.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/kubelet.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -64,7 +64,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/cluster-res/clusterrole.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/clusterrole.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -72,7 +72,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/cluster-res/clusterrolebinding.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/clusterrolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -80,7 +80,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/sa.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -88,7 +88,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/prometheus.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/prometheus.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -96,7 +96,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/svc.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -104,7 +104,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/vs.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/vs.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -112,7 +112,7 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/rules.tpl",
+		TemplatePath:   path + "/prometheus/instance/infra/rules.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -279,9 +279,9 @@ var nodeExporterState = []*desired.State{
 	},
 }
 
-var appPrometheusInstance = []*desired.State{
+var ccpPrometheusInstance = []*desired.State{
 	{
-		TemplatePath:   path + "/prometheus/instance/sa.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -289,7 +289,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/prometheus.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/prometheus.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -297,7 +297,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/svc.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -305,7 +305,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/vs.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/vs.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -313,7 +313,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/namespace-res/role.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/role.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -321,7 +321,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/namespace-res/rolebinding.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/rolebinding.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -329,7 +329,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/namespace-res/staticconfig.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/staticconfig.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -337,7 +337,7 @@ var appPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/rules.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/rules.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
@@ -350,7 +350,7 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	var state []*desired.State
 	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Prometheus.Enabled == "true" {
-		state = append(state, appPrometheusInstance...)
+		state = append(state, ccpPrometheusInstance...)
 	}
 	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Grafana.Enabled == "true" {
 		state = append(state, grafanaState...)
@@ -374,7 +374,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, grafanaState...)
 	}
 	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.NodeExporter.Enabled == "true" {
-		state = append(state, nodeExporterState...)
+		//state = append(state, nodeExporterState...)
 	}
 	return state
 }
