@@ -206,6 +206,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 - job_name: 'federate'
   scrape_interval: 10s
   honor_labels: true
+  honor_timestamps: false
   metrics_path: '/federate'
   params:
     'match[]':

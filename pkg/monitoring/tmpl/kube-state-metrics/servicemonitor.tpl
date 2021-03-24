@@ -4,6 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: 1.9.7
+    cnvrg-infra-prometheus: "true"
   name: kube-state-metrics
   namespace: {{ ns . }}
 spec:
@@ -26,6 +27,9 @@ spec:
     tlsConfig:
       insecureSkipVerify: true
   jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+      - {{ ns . }}
   selector:
     matchLabels:
       app.kubernetes.io/name: kube-state-metrics

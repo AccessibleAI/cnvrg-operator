@@ -281,6 +281,22 @@ var nodeExporterState = []*desired.State{
 
 var ccpPrometheusInstance = []*desired.State{
 	{
+		TemplatePath:   path + "/prometheus/instance/ccp/role.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.RoleGVR],
+		Own:            false,
+	},
+	{
+		TemplatePath:   path + "/prometheus/instance/ccp/rolebinding.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.RoleBindingGVR],
+		Own:            false,
+	},
+	{
 		TemplatePath:   path + "/prometheus/instance/ccp/sa.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -313,19 +329,11 @@ var ccpPrometheusInstance = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/ccp/role.tpl",
+		TemplatePath:   path + "/prometheus/instance/ccp/rules.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.RoleGVR],
-		Own:            true,
-	},
-	{
-		TemplatePath:   path + "/prometheus/instance/ccp/rolebinding.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.RoleBindingGVR],
+		GVR:            desired.Kinds[desired.PrometheusRuleGVR],
 		Own:            true,
 	},
 	{
@@ -334,14 +342,6 @@ var ccpPrometheusInstance = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.SecretGVR],
-		Own:            true,
-	},
-	{
-		TemplatePath:   path + "/prometheus/instance/ccp/rules.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.PrometheusRuleGVR],
 		Own:            true,
 	},
 }

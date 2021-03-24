@@ -17,6 +17,8 @@ spec:
         storageClassName: {{ .Spec.Monitoring.Prometheus.StorageClass }}
         {{- end }}
   image: {{ .Spec.Monitoring.Prometheus.Image }}
+  replicaExternalLabelName: ""
+  prometheusExternalLabelName: ""
   replicas: 1
   resources:
     requests:
@@ -34,7 +36,9 @@ spec:
   serviceMonitorNamespaceSelector: {}
   podMonitorNamespaceSelector: {}
   probeNamespaceSelector: {}
-  serviceMonitorSelector: {}
+  serviceMonitorSelector:
+    matchLabels:
+      cnvrg-infra-prometheus: "bla"
   podMonitorSelector: {}
   version: v2.22.1
   additionalScrapeConfigs:
