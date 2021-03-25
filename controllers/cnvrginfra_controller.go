@@ -145,36 +145,42 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	var reconcileResult error
 
 	// Storage
+	cnvrgInfraLog.Info("applying storage")
 	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// logging
+	cnvrgInfraLog.Info("applying logging")
 	if err := desired.Apply(logging.InfraLoggingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// Monitoring
+	cnvrgInfraLog.Info("applying monitoring")
 	if err := desired.Apply(monitoring.InfraMonitoringState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// grafana dashboards
+	cnvrgInfraLog.Info("applying grafana dashboards")
 	if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// infra base config
+	cnvrgInfraLog.Info("applying base config")
 	if err := desired.Apply(registry.State(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// Istio
+	cnvrgInfraLog.Info("applying istio")
 	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
@@ -217,7 +223,7 @@ func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.Cnvrg
 			return err
 		}
 		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-			cnvrgAppLog.Info("grafana dashboard already exists", "file", dashboard)
+			cnvrgAppLog.V(1).Info("grafana dashboard already exists", "file", dashboard)
 			continue
 		} else if err != nil {
 			cnvrgAppLog.Error(err, "error reading", "file", dashboard)

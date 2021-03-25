@@ -250,29 +250,34 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// controlplan
+	cnvrgAppLog.Info("applying controlplan")
 	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
 	// networking
+	cnvrgAppLog.Info("applying networking")
 	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
 	// logging
+	cnvrgAppLog.Info("applying logging")
 	if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
 	// grafana dashboards
+	cnvrgAppLog.Info("applying grafana dashboards ")
 	if err := r.createGrafanaDashboards(cnvrgApp); err != nil {
 		return err
 	}
 
 	// monitoring
+	cnvrgAppLog.Info("applying monitoring")
 	if err := desired.Apply(monitoring.AppMonitoringState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
@@ -316,7 +321,7 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 			return err
 		}
 		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-			cnvrgAppLog.Info("grafana dashboard already exists", "file", dashboard)
+			cnvrgAppLog.V(1).Info("grafana dashboard already exists", "file", dashboard)
 			continue
 		} else if err != nil {
 			cnvrgAppLog.Error(err, "error reading", "file", dashboard)

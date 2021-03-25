@@ -273,7 +273,7 @@ func (s *State) GenerateDeployable(spec v1.Object) error {
 		return err
 	}
 	s.ParsedTemplate = tpl.String()
-	zap.S().Infof("parsing: %v ", s.TemplatePath)
+	zap.S().Debug("parsing: %v ", s.TemplatePath)
 	zap.S().Debug("template: " + s.TemplatePath + "\n" + s.ParsedTemplate)
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
@@ -305,7 +305,7 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 		fetchInto.SetGroupVersionKind(manifest.GVR)
 		err := client.Get(ctx, types.NamespacedName{Name: manifest.Obj.GetName(), Namespace: manifest.Obj.GetNamespace()}, fetchInto)
 		if err != nil && errors.IsNotFound(err) {
-			log.Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
+			log.V(1).Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
 			if err := client.Create(ctx, manifest.Obj); err != nil {
 				log.Error(err, "error creating object", "name", manifest.Obj.GetName())
 				return err

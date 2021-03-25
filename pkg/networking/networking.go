@@ -99,7 +99,7 @@ func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 }
 
 func IstioCrds() (crds []*desired.State) {
-	err := pkger.Walk(path+"/crds", func(path string, info os.FileInfo, err error) error {
+	err := pkger.Walk(path+"/istio/crds", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}

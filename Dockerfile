@@ -19,11 +19,7 @@ COPY pkg/ pkg/
 #RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
 RUN go get github.com/markbates/pkger/cmd/pkger
 RUN pkger && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator main.go pkged.go
-RUN ls -all
-
 
 FROM ubuntu:20.04
 WORKDIR /opt/app-root
 COPY --from=builder /workspace/cnvrg-operator .
-
-ENTRYPOINT ["/opt/app-root/cnvrg-operator", "run"]

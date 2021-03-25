@@ -18,7 +18,11 @@ spec:
       serviceAccountName: cnvrg-operator
       containers:
       - image: controller:latest
+        command:
+          - /opt/app-root/cnvrg-operator
+          - run
         name: cnvrg-operator
+        imagePullPolicy: Always
         resources:
           limits:
             cpu: 1000m
