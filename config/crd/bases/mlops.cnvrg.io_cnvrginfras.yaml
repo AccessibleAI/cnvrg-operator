@@ -85,6 +85,13 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      oauthProxy:
+                        properties:
+                          skipAuthRegex:
+                            items:
+                              type: string
+                            type: array
+                        type: object
                       port:
                         type: integer
                       svcName:
@@ -211,6 +218,33 @@ spec:
                     type: string
                   user:
                     type: string
+                type: object
+              sso:
+                properties:
+                  adminUser:
+                    type: string
+                  azureTenant:
+                    type: string
+                  clientId:
+                    type: string
+                  clientSecret:
+                    type: string
+                  cookieSecret:
+                    type: string
+                  emailDomain:
+                    type: string
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  oidcIssuerUrl:
+                    type: string
+                  provider:
+                    type: string
+                  redisConnectionUrl:
+                    type: string
+                required:
+                - redisConnectionUrl
                 type: object
               storage:
                 properties:

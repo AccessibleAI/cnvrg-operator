@@ -79,6 +79,37 @@ func getGrafanaDashboards(obj interface{}) []string {
 	return nil
 }
 
+func getSSOConfig(obj interface{}) *mlopsv1.SSO {
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+		return &obj.(*mlopsv1.CnvrgInfra).Spec.SSO
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		return &obj.(*mlopsv1.CnvrgApp).Spec.SSO
+	}
+	return nil
+}
+
+func getSSORedirectUrl(obj interface{}, svc string) string {
+	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+		infra := obj.(*mlopsv1.CnvrgInfra)
+		if infra.Spec.Networking.HTTPS.Enabled == "true" {
+			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
+		} else {
+			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
+		}
+
+	}
+	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		app := obj.(*mlopsv1.CnvrgApp)
+		if app.Spec.Networking.HTTPS.Enabled == "true" {
+			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
+		} else {
+			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
+		}
+	}
+	return ""
+}
+
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
 		"ns": func(obj interface{}) string {
@@ -156,10 +187,11 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(cnvrgApp mlopsv1.CnvrgApp) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string) string {
+			sso := getSSOConfig(obj)
 			skipAuthUrls := "["
-			for i, url := range cnvrgApp.Spec.ControlPlan.OauthProxy.SkipAuthRegex {
-				if i == (len(cnvrgApp.Spec.ControlPlan.OauthProxy.SkipAuthRegex) - 1) {
+			for i, url := range skipAuthRegex {
+				if i == (len(skipAuthRegex) - 1) {
 					skipAuthUrls += fmt.Sprintf(`"%v"`, url)
 				} else {
 					skipAuthUrls += fmt.Sprintf(`"%v", `, url)
@@ -167,23 +199,22 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			skipAuthUrls += "]"
 			proxyConf := []string{
-				fmt.Sprintf("provider = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.Provider),
-				fmt.Sprintf("http_address = 0.0.0.0:%v", cnvrgApp.Spec.ControlPlan.WebApp.Port),
-				fmt.Sprintf("redirect_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.RedirectURI),
-				fmt.Sprintf("redis_connection_url = redis://%v:%v", cnvrgApp.Spec.ControlPlan.Redis.SvcName, cnvrgApp.Spec.ControlPlan.Redis.Port),
-				fmt.Sprintf("redirect_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.RedirectURI),
+				fmt.Sprintf(`provider = "%v"`, sso.Provider),
+				fmt.Sprintf(`http_address = "0.0.0.0:8080"`),
+				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
+				fmt.Sprintf(`redis_connection_url = "%v"`, sso.RedisConnectionUrl),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
-				fmt.Sprintf(`email_domains = ["%v"]`, cnvrgApp.Spec.ControlPlan.OauthProxy.EmailDomain),
-				fmt.Sprintf("client_id = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.ClientID),
-				fmt.Sprintf("client_secret = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.ClientSecret),
-				fmt.Sprintf("cookie_secret = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.CookieSecret),
-				fmt.Sprintf("oidc_issuer_url = %v", cnvrgApp.Spec.ControlPlan.OauthProxy.OidcIssuerURL),
+				fmt.Sprintf(`email_domains = ["%v"]`, sso.EmailDomain),
+				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
+				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
+				fmt.Sprintf(`cookie_secret = "%v"`, sso.CookieSecret),
+				fmt.Sprintf(`oidc_issuer_url = "%v"`, sso.OidcIssuerURL),
 				`upstreams = ["http://127.0.0.1:3000/"]`,
-				"session_store_type = redis",
-				"custom_templates_dir = /opt/app-root/src/templates",
+				`session_store_type = "redis"`,
+				`custom_templates_dir = "/opt/app-root/src/templates"`,
 				"ssl_insecure_skip_verify = true",
-				"cookie_name = _oauth2_proxy",
-				"cookie_expire = 168h",
+				`cookie_name = "_oauth2_proxy"`,
+				`cookie_expire = "168h"`,
 				"cookie_secure = false",
 				"cookie_httponly = true",
 			}
@@ -191,13 +222,13 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return strings.Join(proxyConf, "\n")
 		},
 		"cnvrgPassengerBindAddress": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.ControlPlan.OauthProxy.Enabled == "true" {
+			if cnvrgApp.Spec.SSO.Enabled == "true" {
 				return "127.0.0.1"
 			}
 			return "0.0.0.0"
 		},
 		"cnvrgPassengerBindPort": func(cnvrgApp mlopsv1.CnvrgApp) int {
-			if cnvrgApp.Spec.ControlPlan.OauthProxy.Enabled == "true" {
+			if cnvrgApp.Spec.SSO.Enabled == "true" {
 				return 3000
 			}
 			return cnvrgApp.Spec.ControlPlan.WebApp.Port

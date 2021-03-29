@@ -96,15 +96,6 @@ var controlPlanConfigState = []*desired.State{
 		GVR:            desired.Kinds[desired.SecretGVR],
 		Own:            true,
 	},
-	{
-
-		TemplatePath:   path + "/conf/cm/secret-sso.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SecretGVR],
-		Own:            true,
-	},
 }
 
 var webAppState = []*desired.State{
@@ -130,6 +121,15 @@ var webAppState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.IstioVsGVR],
+		Own:            true,
+	},
+	{
+
+		TemplatePath:   path + "/webapp/secret-sso.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
 		Own:            true,
 	},
 }

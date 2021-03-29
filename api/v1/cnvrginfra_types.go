@@ -14,6 +14,7 @@ type CnvrgInfraSpec struct {
 	Logging           CnvrgInfraLogging    `json:"logging,omitempty"`
 	Registry          Registry             `json:"registry,omitempty"`
 	Storage           Storage              `json:"storage,omitempty"`
+	SSO               SSO                  `json:"sso,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -51,6 +52,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		InfraNamespace:    "cnvrg-infra",
 		InfraReconcilerCm: "infra-reconciler-cm",
 		CnvrgAppInstances: []CnvrgAppInstance{},
+		SSO:               ssoDefault,
 		Storage:           storageDefault,
 		Networking:        cnvrgInfraNetworkingDefault,
 		Monitoring:        infraMonitoringDefault,

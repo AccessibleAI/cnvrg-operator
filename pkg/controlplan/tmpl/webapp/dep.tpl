@@ -31,9 +31,9 @@ spec:
         effect: "NoSchedule"
       serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
       containers:
-      {{- if eq .Spec.ControlPlan.OauthProxy.Enabled "true" }}
+      {{- if eq .Spec.SSO.Enabled "true" }}
       - name: "cnvrg-oauth-proxy"
-        image: {{ .Spec.ControlPlan.OauthProxy.Image }}
+        image: {{ .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
         volumeMounts:
           - name: "oauth-proxy-config"
@@ -80,11 +80,11 @@ spec:
           mountPath: "{{ .Spec.ControlPlan.ObjectStorage.GcpKeyfileMountPath }}"
           readOnly: true
         {{- end }}
-      {{- if eq .Spec.ControlPlan.OauthProxy.Enabled "true" }}
+      {{- if eq .Spec.SSO.Enabled "true" }}
       volumes:
       - name: "oauth-proxy-config"
         secret:
-         secretName: "cp-sso"
+         secretName: "cp-sso-app"
       {{- end }}
       {{- if eq .Spec.ControlPlan.ObjectStorage.CnvrgStorageType "gcp" }}
       - name: {{ .Spec.ControlPlan.ObjectStorage.GcpStorageSecret }}

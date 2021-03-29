@@ -185,48 +185,6 @@ spec:
                       svcName:
                         type: string
                     type: object
-                  oauthProxy:
-                    properties:
-                      adminUser:
-                        type: string
-                      azureTenant:
-                        type: string
-                      clientId:
-                        type: string
-                      clientSecret:
-                        type: string
-                      cookieSecret:
-                        type: string
-                      emailDomain:
-                        type: string
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      oidcIssuerUrl:
-                        type: string
-                      provider:
-                        type: string
-                      redirectUri:
-                        type: string
-                      skipAuthRegex:
-                        items:
-                          type: string
-                        type: array
-                    required:
-                    - adminUser
-                    - azureTenant
-                    - clientId
-                    - clientSecret
-                    - cookieSecret
-                    - emailDomain
-                    - enabled
-                    - image
-                    - oidcIssuerUrl
-                    - provider
-                    - redirectUri
-                    - skipAuthRegex
-                    type: object
                   objectStorage:
                     properties:
                       cnvrgStorageAccessKey:
@@ -451,6 +409,13 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      oauthProxy:
+                        properties:
+                          skipAuthRegex:
+                            items:
+                              type: string
+                            type: array
+                        type: object
                       passengerMaxPoolSize:
                         type: integer
                       port:
@@ -463,6 +428,8 @@ spec:
                         type: integer
                       svcName:
                         type: string
+                    required:
+                    - oauthProxy
                     type: object
                 type: object
               logging:
@@ -567,6 +534,13 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      oauthProxy:
+                        properties:
+                          skipAuthRegex:
+                            items:
+                              type: string
+                            type: array
+                        type: object
                       port:
                         type: integer
                       svcName:
@@ -629,6 +603,33 @@ spec:
                       timeout:
                         type: string
                     type: object
+                type: object
+              sso:
+                properties:
+                  adminUser:
+                    type: string
+                  azureTenant:
+                    type: string
+                  clientId:
+                    type: string
+                  clientSecret:
+                    type: string
+                  cookieSecret:
+                    type: string
+                  emailDomain:
+                    type: string
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  oidcIssuerUrl:
+                    type: string
+                  provider:
+                    type: string
+                  redisConnectionUrl:
+                    type: string
+                required:
+                - redisConnectionUrl
                 type: object
             type: object
           status:

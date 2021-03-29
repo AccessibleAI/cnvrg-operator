@@ -19,8 +19,8 @@ data:
   SHOW_INTERCOM: "{{ .Spec.ControlPlan.BaseConfig.Intercom }}"
   SPLIT_SIDEKIQ: "{{ .Spec.ControlPlan.Sidekiq.Split }}"
   CNVRG_PASSENGER_MAX_POOL_SIZE: "{{ .Spec.ControlPlan.WebApp.PassengerMaxPoolSize }}"
-  OAUTH_PROXY_ENABLED: "{{ .Spec.ControlPlan.OauthProxy.Enabled }}"
-  OAUTH_ADMIN_USER: "{{ .Spec.ControlPlan.OauthProxy.AdminUser }}"
+  OAUTH_PROXY_ENABLED: "{{ .Spec.SSO.Enabled }}"
+  OAUTH_ADMIN_USER: "{{ .Spec.SSO.AdminUser }}"
   CNVRG_PASSENGER_BIND_ADDRESS: "{{ cnvrgPassengerBindAddress . }}"
   CNVRG_PASSENGER_BIND_PORT: "{{ cnvrgPassengerBindPort . }}"
   CNVRG_JOB_UID: "{{ .Spec.ControlPlan.BaseConfig.CnvrgJobUID }}"
@@ -29,7 +29,7 @@ data:
   {{- end }}
   {{- range $featureFlagName, $featureFlagValue := .Spec.ControlPlan.BaseConfig.FeatureFlags }}
   {{$featureFlagName}}: "{{$featureFlagValue}}"
-  {{- end}}
+  {{- end }}
 
 
 

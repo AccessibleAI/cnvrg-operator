@@ -31,6 +31,18 @@ spec:
             value: Admin
           - name: GF_SECURITY_ALLOW_EMBEDDING
             value: "true"
+          {{- if eq .Spec.SSO.Enabled "true" }}
+          - name: GF_SERVER_HTTP_ADDR
+            value: "127.0.0.1"
+          - name: GF_SERVER_HTTP_PORT
+            value: "3000"
+          {{- end }}
+          {{- if ne .Spec.SSO.Enabled "true" }}
+          - name: GF_SERVER_HTTP_ADDR
+            value: "0.0.0.0"
+          - name: GF_SERVER_HTTP_PORT
+            value: "8080"
+          {{- end }}
         ports:
         - containerPort: 3000
           name: http

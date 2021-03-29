@@ -10,6 +10,7 @@ type CnvrgAppSpec struct {
 	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
 	Logging       CnvrgAppLogging    `json:"logging,omitempty"`
 	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
+	SSO           SSO                `json:"sso,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -43,5 +44,6 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Logging:       cnvrgAppLoggingDefault,
 		Networking:    cnvrgAppNetworkingDefault,
 		Monitoring:    cnvrgAppMonitoringDefault,
+		SSO:           ssoDefault,
 	}
 }

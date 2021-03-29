@@ -135,19 +135,20 @@ var pgDefault = Pg{
 }
 
 type WebApp struct {
-	Replicas                int    `json:"replicas,omitempty"`
-	Enabled                 string `json:"enabled,omitempty"`
-	Image                   string `json:"image,omitempty"`
-	Port                    int    `json:"port,omitempty"`
-	CPU                     int    `json:"cpu,omitempty"`
-	Memory                  string `json:"memory,omitempty"`
-	SvcName                 string `json:"svcName,omitempty"`
-	NodePort                int    `json:"nodePort,omitempty"`
-	PassengerMaxPoolSize    int    `json:"passengerMaxPoolSize,omitempty"`
-	InitialDelaySeconds     int    `json:"initialDelaySeconds,omitempty"`
-	ReadinessPeriodSeconds  int    `json:"readinessPeriodSeconds,omitempty"`
-	ReadinessTimeoutSeconds int    `json:"readinessTimeoutSeconds,omitempty"`
-	FailureThreshold        int    `json:"failureThreshold,omitempty"`
+	Replicas                int                   `json:"replicas,omitempty"`
+	Enabled                 string                `json:"enabled,omitempty"`
+	Image                   string                `json:"image,omitempty"`
+	Port                    int                   `json:"port,omitempty"`
+	CPU                     int                   `json:"cpu,omitempty"`
+	Memory                  string                `json:"memory,omitempty"`
+	SvcName                 string                `json:"svcName,omitempty"`
+	NodePort                int                   `json:"nodePort,omitempty"`
+	PassengerMaxPoolSize    int                   `json:"passengerMaxPoolSize,omitempty"`
+	InitialDelaySeconds     int                   `json:"initialDelaySeconds,omitempty"`
+	ReadinessPeriodSeconds  int                   `json:"readinessPeriodSeconds,omitempty"`
+	ReadinessTimeoutSeconds int                   `json:"readinessTimeoutSeconds,omitempty"`
+	FailureThreshold        int                   `json:"failureThreshold,omitempty"`
+	OauthProxy              OauthProxyServiceConf `json:"oauthProxy"`
 }
 
 type Sidekiq struct {
@@ -224,21 +225,6 @@ type SMTP struct {
 	Domain   string `json:"domain,omitempty"`
 }
 
-type OauthProxy struct {
-	Enabled       string   `json:"enabled"`
-	Image         string   `json:"image"`
-	AdminUser     string   `json:"adminUser"`
-	Provider      string   `json:"provider"`
-	EmailDomain   string   `json:"emailDomain"`
-	RedirectURI   string   `json:"redirectUri"`
-	ClientID      string   `json:"clientId"`
-	ClientSecret  string   `json:"clientSecret"`
-	CookieSecret  string   `json:"cookieSecret"`
-	AzureTenant   string   `json:"azureTenant"`
-	OidcIssuerURL string   `json:"oidcIssuerUrl"`
-	SkipAuthRegex []string `json:"skipAuthRegex"`
-}
-
 type ObjectStorage struct {
 	CnvrgStorageType             string `json:"cnvrgStorageType,omitempty"`
 	CnvrgStorageBucket           string `json:"cnvrgStorageBucket,omitempty"`
@@ -299,7 +285,6 @@ type ControlPlan struct {
 	Rbac          Rbac          `json:"rbac,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
 	Tenancy       Tenancy       `json:"tenancy,omitempty"`
-	OauthProxy    OauthProxy    `json:"oauthProxy,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
 	Pg            Pg            `json:"pg,omitempty"`
 	Minio         Minio         `json:"minio,omitempty"`
@@ -344,6 +329,20 @@ var controlPlanDefault = ControlPlan{
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
 		FailureThreshold:        4,
+		OauthProxy: OauthProxyServiceConf{
+			SkipAuthRegex: []string{
+				`^\/api`,
+				`^\/oauth/`,
+				`\/assets`,
+				`\/healthz`,
+				`\/public`,
+				`\/pack`,
+				`\/vscode.tar.gz`,
+				`\/gitlens.vsix`,
+				`\/ms-python-release.vsix`,
+				`^\/api\/health`,
+			},
+		},
 	},
 
 	Sidekiq: Sidekiq{
@@ -473,30 +472,5 @@ var controlPlanDefault = ControlPlan{
 		DedicatedNodes: "false",
 		Key:            "cnvrg-taint",
 		Value:          "true",
-	},
-
-	OauthProxy: OauthProxy{
-		Enabled:       "false",
-		Image:         "cnvrg/cnvrg-oauth-proxy:v7.0.1.c1",
-		AdminUser:     "",
-		Provider:      "",
-		EmailDomain:   "",
-		RedirectURI:   "",
-		ClientID:      "",
-		ClientSecret:  "",
-		CookieSecret:  "",
-		AzureTenant:   "", // if IDP is Azure AD
-		OidcIssuerURL: "", // if IDP oidc
-		SkipAuthRegex: []string{
-			`^\/api`,
-			`^\/oauth/`,
-			`\/assets`,
-			`\/healthz`,
-			`\/public`,
-			`\/pack`,
-			`\/vscode.tar.gz`,
-			`\/gitlens.vsix`,
-			`\/ms-python-release.vsix`,
-		},
 	},
 }

@@ -31,11 +31,12 @@ type KubeStateMetrics struct {
 	Image   string `json:"image,omitempty"`
 }
 type Grafana struct {
-	Enabled  string `json:"enabled,omitempty"`
-	Image    string `json:"image,omitempty"`
-	SvcName  string `json:"svcName,omitempty"`
-	Port     int    `json:"port,omitempty"`
-	NodePort int    `json:"nodePort,omitempty"`
+	Enabled    string                `json:"enabled,omitempty"`
+	Image      string                `json:"image,omitempty"`
+	SvcName    string                `json:"svcName,omitempty"`
+	Port       int                   `json:"port,omitempty"`
+	NodePort   int                   `json:"nodePort,omitempty"`
+	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
 }
 type DefaultServiceMonitors struct {
 	Enabled string `json:"enabled,omitempty"`
@@ -88,8 +89,14 @@ var grafanaDefault = Grafana{
 	Enabled:  "true",
 	Image:    "grafana/grafana:7.3.4",
 	SvcName:  "grafana",
-	Port:     3000,
+	Port:     8080,
 	NodePort: 30012,
+	OauthProxy: OauthProxyServiceConf{
+		SkipAuthRegex: []string{
+			`^\/static/`,
+			`\/api\/health`,
+		},
+	},
 }
 
 var prometheusDefault = Prometheus{
