@@ -51,7 +51,6 @@ type MinioExporter struct {
 type DcgmExporter struct {
 	Enabled string `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
-	Port    int    `json:"port,omitempty"`
 }
 type IdleMetricsExporter struct {
 	Enabled string `json:"enabled,omitempty"`
@@ -69,10 +68,11 @@ type CnvrgInfraMonitoring struct {
 	NodeExporter          NodeExporter       `json:"nodeExporter,omitempty"`
 	KubeStateMetrics      KubeStateMetrics   `json:"kubeStateMetrics,omitempty"`
 	Grafana               Grafana            `json:"grafana,omitempty"`
+	DcgmExporter          DcgmExporter       `json:"dcgmExporter,omitempty"`
 	//DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
 	//SidekiqExporter        SidekiqExporter        `json:"sidekiqExporter,omitempty"`
 	//MinioExporter          MinioExporter          `json:"minioExporter,omitempty"`
-	DcgmExporter DcgmExporter `json:"dcgmExporter,omitempty"`
+
 	//IdleMetricsExporter    IdleMetricsExporter    `json:"idleMetricsExporter,omitempty"`
 	//MetricsServer          MetricsServer          `json:"metricsServer,omitempty"`
 }
@@ -132,6 +132,10 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 		Enabled: "true",
 		Image:   "quay.io/prometheus/node-exporter:v1.0.1",
 	},
+	DcgmExporter: DcgmExporter{
+		Enabled: "true",
+		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
+	},
 	//KubeStateMetrics: KubeStateMetrics{
 	//	Enabled: "true",
 	//	Image:   "quay.io/coreos/kube-state-metrics:v1.9.5",
@@ -146,11 +150,7 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	//	Enabled: "true",
 	//	Image:   "docker.io/cnvrg/cnvrg-boot:v0.24",
 	//},
-	//DcgmExporter: DcgmExporter{
-	//	Enabled: "true",
-	//	Image:   "nvidia/dcgm-exporter:1.7.2",
-	//	Port:    9400,
-	//},
+
 	//IdleMetricsExporter: IdleMetricsExporter{Enabled: "true"},
 	//MetricsServer: MetricsServer{
 	//	Enabled: "true",

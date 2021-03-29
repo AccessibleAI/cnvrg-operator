@@ -71,19 +71,19 @@ spec:
               name: postgres-data
             - mountPath: /dev/shm
               name: dshm
-            {{- if eq .Spec.ControlPlan.Pg.HugePages.Enabled "true" -}}
+            {{- if eq .Spec.ControlPlan.Pg.HugePages.Enabled "true" }}
             - mountPath: "/hugepages"
               name: "hugepage"
-            {{- end}}
+            {{- end }}
           resources:
             {{- if eq .Spec.ControlPlan.Pg.HugePages.Enabled "true" }}
             limits:
-              {{- if eq .HugePages.memory ""}}
+              {{- if eq .Spec.ControlPlan.Pg.HugePages.Memory ""}}
               hugepages-{{ .Spec.ControlPlan.Pg.HugePages.Size }}: {{ .Spec.ControlPlan.Pg.MemoryRequest }}
               {{- else }}
               hugepages-{{ .Spec.ControlPlan.Pg.HugePages.Size }}: {{ .Spec.ControlPlan.Pg.HugePages.Memory }}
               {{- end }}
-            {{- end}}
+            {{- end }}
             requests:
               cpu: {{ .Spec.ControlPlan.Pg.CPURequest }}
               memory: {{ .Spec.ControlPlan.Pg.MemoryRequest }}

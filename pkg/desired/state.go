@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
+	"os"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -280,6 +281,10 @@ func (s *State) GenerateDeployable(spec v1.Object) error {
 		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
 		return err
 	}
+	if err := s.dumpTemplateToFile(); err != nil {
+		zap.S().Error(err, "dumping template file", "file", s.TemplatePath)
+		return err
+	}
 	return nil
 }
 
@@ -334,6 +339,35 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 				return err
 			}
 		}
+	}
+	return nil
+}
+
+func (s *State) dumpTemplateToFile() error {
+	templatesDumpDir := viper.GetString("templates-dump-dir")
+	if templatesDumpDir != "" {
+		if _, err := os.Stat(templatesDumpDir); os.IsNotExist(err) {
+			if err = os.Mkdir(templatesDumpDir, 0775); err != nil {
+				zap.S().Error(err, "can't create templates dump dir for templates debugging")
+				return err
+			}
+		}
+
+		filePath := templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
+		templateFile, err := os.Create(filePath)
+		if err != nil {
+			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
+			return err
+		}
+		if _, err = templateFile.Write([]byte(s.ParsedTemplate)); err != nil {
+			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
+			return err
+		}
+		if err := templateFile.Close(); err != nil {
+			zap.S().Errorf("%v can't close file", err)
+			return err
+		}
+
 	}
 	return nil
 }

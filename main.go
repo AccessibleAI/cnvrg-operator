@@ -37,6 +37,7 @@ var (
 		{name: "health-probe-addr", shorthand: "", value: ":8081", usage: "The address the health probes endpoints (/healthz, /readyz) binds to."},
 		{name: "enable-leader-election", shorthand: "", value: false, usage: "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager."},
 		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
+		{name: "templates-dump-dir", shorthand: "", value: "", usage: "destination dir for rendering templates for debugging"},
 		{name: "verbose", shorthand: "v", value: false, usage: "Verbose output"},
 		{name: "deploy-depended-crds", shorthand: "", value: true, usage: "Deploy depended (external) CRDs automatically"},
 		{name: "own-istio-resources", shorthand: "", value: true, usage: "Watch for istio resources"},

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/logging"
@@ -198,9 +197,6 @@ func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.Cnvrg
 
 	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
 	for _, dashboard := range desired.GrafanaInfraDashboards {
-		if dashboard == "node-exporter.json" {
-			fmt.Println("as")
-		}
 		f, err := pkger.Open(basePath + dashboard)
 		if err != nil {
 			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)

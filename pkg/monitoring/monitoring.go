@@ -88,14 +88,6 @@ var infraPrometheusInstanceState = []*desired.State{
 		Own:            true,
 	},
 	{
-		TemplatePath:   path + "/prometheus/instance/infra/kubelet.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
-		Own:            true,
-	},
-	{
 		TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -338,6 +330,87 @@ var ccpPrometheusInstance = []*desired.State{
 	},
 }
 
+var defaultServiceMonitors = []*desired.State{
+	{
+		TemplatePath:   path + "/default-servicemonitors/apiserver.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/default-servicemonitors/controller-manager.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/default-servicemonitors/coredns.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/default-servicemonitors/kubelet.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+	{
+		TemplatePath:   path + "/default-servicemonitors/scheduler.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+}
+
+var dcgmExporter = []*desired.State{
+	{
+		TemplatePath:   path + "/dcgm-exporter/ds.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.DaemonSetGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/dcgm-exporter/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/dcgm-exporter/servicemonitor.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+		Own:            true,
+	},
+
+	{
+		TemplatePath:   path + "/dcgm-exporter/svc.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SvcGVR],
+		Own:            true,
+	},
+}
+
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	var state []*desired.State
@@ -367,6 +440,12 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	}
 	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.NodeExporter.Enabled == "true" {
 		state = append(state, nodeExporterState...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" {
+		state = append(state, defaultServiceMonitors...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.DcgmExporter.Enabled == "true" {
+		state = append(state, dcgmExporter...)
 	}
 	return state
 }
