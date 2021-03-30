@@ -29,7 +29,6 @@ type Ingress struct {
 	Timeout         string      `json:"timeout,omitempty"`
 	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
-	IstioGwName     string      `json:"istioGwName,omitempty"`
 }
 
 type HTTPS struct {
@@ -76,7 +75,6 @@ var ingressAppDefault = Ingress{
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
-	IstioGwName:     "cnvrg-app-gateway",
 }
 
 var ingressInfraDefault = Ingress{
@@ -84,7 +82,6 @@ var ingressInfraDefault = Ingress{
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
-	IstioGwName:     "cnvrg-infra-gateway",
 }
 
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{

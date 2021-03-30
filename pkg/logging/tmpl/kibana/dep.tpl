@@ -16,22 +16,40 @@ spec:
       labels:
         app: {{ .Spec.Logging.Kibana.SvcName }}
     spec:
-      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
-      {{ if eq .Spec.ControlPlan.Tenancy.Enabled "true" }}
-      nodeSelector: 
-        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
+      serviceAccountName: {{ .Spec.Logging.Kibana.ServiceAccount }}
+      {{- if eq .Spec.SSO.Enabled "true" }}
+      volumes:
+        - name: "oauth-proxy-config"
+          secret:
+            secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
       {{- end }}
-      tolerations:
-        - key: {{ .Spec.ControlPlan.Tenancy.Key }}
-          operator: Equal
-          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
-          effect: "NoSchedule"
       containers:
+        {{- if eq .Spec.SSO.Enabled "true" }}
+        - name: "cnvrg-oauth-proxy"
+          image: {{ .Spec.SSO.Image }}
+          command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+          volumeMounts:
+            - name: "oauth-proxy-config"
+              mountPath: "/opt/app-root/conf/proxy-config"
+              readOnly: true
+        {{- end }}
         - name: {{ .Spec.Logging.Kibana.SvcName }}
           image: {{ .Spec.Logging.Kibana.Image }}
           env:
           - name: ELASTICSEARCH_URL
             value: {{ esFullInternalUrl .}}
+          {{- if eq .Spec.SSO.Enabled "true" }}
+          - name: SERVER_HOST
+            value: "127.0.0.1"
+          - name: SERVER_PORT
+            value: "3000"
+          {{- end }}
+          {{- if ne .Spec.SSO.Enabled "true" }}
+          - name: SERVER_HOST
+            value: "0.0.0.0"
+          - name: SERVER_PORT
+            value: "{{ .Spec.Logging.Kibana.Port }}"
+          {{- end }}
           ports:
           - containerPort: {{ .Spec.Logging.Kibana.Port }}
           resources:

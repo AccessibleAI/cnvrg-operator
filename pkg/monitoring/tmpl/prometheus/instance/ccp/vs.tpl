@@ -7,7 +7,7 @@ spec:
   hosts:
   - "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Spec.Networking.Ingress.IstioGwName }}
+  - {{ istioGwName .}}
   http:
   - retries:
       attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}

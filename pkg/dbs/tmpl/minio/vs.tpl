@@ -7,7 +7,7 @@ spec:
   hosts:
   - "{{ .Spec.Dbs.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Spec.Networking.Ingress.IstioGwName }}
+  - {{ istioGwName .}}
   http:
   - retries:
       attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}

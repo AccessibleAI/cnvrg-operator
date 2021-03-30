@@ -120,6 +120,17 @@ var fluentbitState = []*desired.State{
 	},
 }
 
+var kibanaOauthProxy = []*desired.State{
+	{
+		TemplatePath:   path + "/kibana/oauth.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+}
+
 func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
@@ -128,6 +139,9 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	}
 	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Kibana.Enabled == "true" {
 		state = append(state, kibana...)
+	}
+	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.SSO.Enabled == "true" && cnvrgApp.Spec.Logging.Kibana.Enabled == "true" {
+		state = append(state, kibanaOauthProxy...)
 	}
 
 	return state

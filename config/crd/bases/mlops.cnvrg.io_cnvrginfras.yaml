@@ -219,8 +219,6 @@ spec:
                         - openshift
                         - nodeport
                         type: string
-                      istioGwName:
-                        type: string
                       perTryTimeout:
                         type: string
                       retriesAttempts:

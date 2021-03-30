@@ -61,6 +61,5 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Registry:          registryDefault,
 		Dbs:               infraDbsDefaults,
 	}
-	//infraDefault.Monitoring.Prometheus.SvcName = "infra-prometheus"
 	return infraDefault
 }

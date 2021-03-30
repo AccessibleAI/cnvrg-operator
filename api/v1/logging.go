@@ -22,15 +22,17 @@ type Elastalert struct {
 }
 
 type Kibana struct {
-	Enabled       string `json:"enabled,omitempty"`
-	SvcName       string `json:"svcName,omitempty"`
-	Port          int    `json:"port,omitempty"`
-	Image         string `json:"image,omitempty"`
-	NodePort      int    `json:"nodePort,omitempty"`
-	CPURequest    string `json:"cpuRequest,omitempty"`
-	MemoryRequest string `json:"memoryRequest,omitempty"`
-	CPULimit      int    `json:"cpuLimit,omitempty"`
-	MemoryLimit   string `json:"memoryLimit,omitempty"`
+	Enabled        string                `json:"enabled,omitempty"`
+	ServiceAccount string                `json:"serviceAccount,omitempty"`
+	SvcName        string                `json:"svcName,omitempty"`
+	Port           int                   `json:"port,omitempty"`
+	Image          string                `json:"image,omitempty"`
+	NodePort       int                   `json:"nodePort,omitempty"`
+	CPURequest     string                `json:"cpuRequest,omitempty"`
+	MemoryRequest  string                `json:"memoryRequest,omitempty"`
+	CPULimit       int                   `json:"cpuLimit,omitempty"`
+	MemoryLimit    string                `json:"memoryLimit,omitempty"`
+	OauthProxy     OauthProxyServiceConf `json:"oauthProxy,omitempty"`
 }
 
 type CnvrgAppLogging struct {
@@ -67,15 +69,17 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		FsGroup:       1000,
 	},
 	Kibana: Kibana{
-		Enabled:       "true",
-		SvcName:       "kibana",
-		Port:          5601,
-		Image:         "docker.elastic.co/kibana/kibana-oss:7.8.1",
-		NodePort:      30601,
-		CPURequest:    "100m",
-		MemoryRequest: "100Mi",
-		CPULimit:      1,
-		MemoryLimit:   "2Gi",
+		Enabled:        "true",
+		ServiceAccount: "default",
+		SvcName:        "kibana",
+		Port:           8080,
+		Image:          "docker.elastic.co/kibana/kibana-oss:7.8.1",
+		NodePort:       30601,
+		CPURequest:     "100m",
+		MemoryRequest:  "100Mi",
+		CPULimit:       1,
+		MemoryLimit:    "2Gi",
+		OauthProxy:     OauthProxyServiceConf{SkipAuthRegex: nil},
 	},
 }
 

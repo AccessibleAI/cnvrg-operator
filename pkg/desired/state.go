@@ -274,6 +274,9 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return true
 		},
+		"istioGwName": func(obj interface{}) string {
+			return fmt.Sprintf("isito-gw-%v", getNs(obj))
+		},
 	}
 }
 
