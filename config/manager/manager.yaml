@@ -21,6 +21,7 @@ spec:
         command:
           - /opt/app-root/cnvrg-operator
           - run
+          - --max-concurrent-reconciles 3
         name: cnvrg-operator
         imagePullPolicy: Always
         resources:

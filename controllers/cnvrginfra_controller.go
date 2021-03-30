@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/dbs"
 	"github.com/cnvrg-operator/pkg/desired"
@@ -491,8 +492,8 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		u.SetGroupVersionKind(v)
 		cnvrgInfraController.Owns(u)
 	}
-
+	cnvrgInfraLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
 	return cnvrgInfraController.
-		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
+		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
 		Complete(r)
 }

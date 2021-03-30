@@ -562,9 +562,9 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		u.SetGroupVersionKind(v)
 		cnvrgAppController.Owns(u)
 	}
-
+	cnvrgAppLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
 	return cnvrgAppController.
-		WithOptions(controller.Options{MaxConcurrentReconciles: 1}).
+		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
 		Complete(r)
 }
 

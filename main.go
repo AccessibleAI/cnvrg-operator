@@ -43,6 +43,7 @@ var (
 		{name: "own-istio-resources", shorthand: "", value: true, usage: "Watch for istio resources"},
 		{name: "own-openshift-resources", shorthand: "", value: false, usage: "Watch for OpenShift resources"},
 		{name: "own-prometheus-resources", shorthand: "", value: true, usage: "Watch for Prometheus resources"},
+		{name: "max-concurrent-reconciles", shorthand: "", value: 1, usage: "Max concurrent reconciles"},
 	}
 )
 
