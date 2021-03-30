@@ -33,6 +33,14 @@ var esState = []*desired.State{
 		GVR:            desired.Kinds[desired.IstioVsGVR],
 		Own:            true,
 	},
+	{
+		TemplatePath:   path + "/es/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
 }
 
 var pgState = []*desired.State{

@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Spec.Dbs.Es.SvcName }}
     spec:
+      serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
       {{- if eq .Spec.Dbs.Es.PatchEsNodes "true" }}
       initContainers:
       - name: "maxmap"
@@ -27,7 +28,6 @@ spec:
       securityContext:
         runAsUser: {{ .Spec.Dbs.Es.RunAsUser }}
         fsGroup: {{ .Spec.Dbs.Es.FsGroup }}
-      serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
       containers:
       - name: elastic
         image: {{ .Spec.Dbs.Es.Image }}

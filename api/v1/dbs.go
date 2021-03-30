@@ -166,7 +166,7 @@ var redisDefault = Redis{
 
 var esDefault = Es{
 	Enabled:        "true",
-	ServiceAccount: "default",
+	ServiceAccount: "es",
 	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1",
 	Port:           9200,
 	StorageSize:    "30Gi",
