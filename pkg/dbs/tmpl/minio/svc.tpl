@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Spec.ControlPlan.Minio.SvcName }}
+  name: {{ .Spec.Dbs.Minio.SvcName }}
   namespace: {{ ns .  }}
   labels:
-    app: {{ .Spec.ControlPlan.Minio.SvcName }}
+    app: {{ .Spec.Dbs.Minio.SvcName }}
 spec:
   {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
   type: NodePort
@@ -12,9 +12,9 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: {{ .Spec.ControlPlan.Minio.Port }}
+    targetPort: {{ .Spec.Dbs.Minio.Port }}
     {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
-    nodePort: {{ .Spec.ControlPlan.Minio.NodePort }}
+    nodePort: {{ .Spec.Dbs.Minio.NodePort }}
     {{- end }}
   selector:
-    app: {{ .Spec.ControlPlan.Minio.SvcName }}
+    app: {{ .Spec.Dbs.Minio.SvcName }}

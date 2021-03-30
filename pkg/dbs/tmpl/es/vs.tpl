@@ -1,11 +1,11 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{.Spec.Logging.Es.SvcName }}
+  name: {{.Spec.Dbs.Es.SvcName }}
   namespace: {{ ns . }}
 spec:
   hosts:
-    - "{{.Spec.Logging.Es.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.Dbs.Es.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
@@ -16,5 +16,5 @@ spec:
       route:
         - destination:
             port:
-              number: {{ .Spec.Logging.Es.Port}}
-            host: "{{ .Spec.Logging.Es.SvcName }}.{{ ns . }}.svc.cluster.local"
+              number: {{ .Spec.Dbs.Es.Port}}
+            host: "{{ .Spec.Dbs.Es.SvcName }}.{{ ns . }}.svc.cluster.local"

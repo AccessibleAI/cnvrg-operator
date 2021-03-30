@@ -35,8 +35,8 @@ data:
         "relative": true,
         "path": "/server_data"
       },
-      "es_host": "{{ .Spec.Logging.Es.SvcName }}",
-      "es_port": {{ .Spec.Logging.Es.Port }},
+      "es_host": "{{ .Spec.Dbs.Es.SvcName }}",
+      "es_port": {{ .Spec.Dbs.Es.Port }},
       "writeback_index": "elastalert_status"
     }
   config.yaml: |
@@ -45,8 +45,8 @@ data:
       minutes: 1
     buffer_time:
       minutes: 15
-    es_host: {{ .Spec.Logging.Es.SvcName }}
-    es_port: {{ .Spec.Logging.Es.Port}}
+    es_host: {{ .Spec.Dbs.Es.SvcName }}
+    es_port: {{ .Spec.Dbs.Es.Port}}
     use_ssl: False
     verify_certs: False
     writeback_index: elastalert_status

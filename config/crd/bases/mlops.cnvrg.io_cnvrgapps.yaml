@@ -148,43 +148,6 @@ spec:
                       ssl:
                         type: string
                     type: object
-                  minio:
-                    properties:
-                      cpuRequest:
-                        type: integer
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      memoryRequest:
-                        type: string
-                      nodePort:
-                        type: integer
-                      port:
-                        type: integer
-                      replicas:
-                        type: integer
-                      sharedStorage:
-                        properties:
-                          consistentHash:
-                            properties:
-                              key:
-                                type: string
-                              value:
-                                type: string
-                            type: object
-                          enabled:
-                            type: string
-                          useExistingClaim:
-                            type: string
-                        type: object
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
                   objectStorage:
                     properties:
                       cnvrgStorageAccessKey:
@@ -222,52 +185,6 @@ spec:
                       stsKey:
                         type: string
                     type: object
-                  pg:
-                    properties:
-                      cpuRequest:
-                        type: integer
-                      dbname:
-                        type: string
-                      enabled:
-                        type: string
-                      fixpg:
-                        type: string
-                      fsGroup:
-                        type: integer
-                      hugePages:
-                        properties:
-                          enabled:
-                            type: string
-                          memory:
-                            type: string
-                          size:
-                            type: string
-                        type: object
-                      image:
-                        type: string
-                      maxConnections:
-                        type: integer
-                      memoryRequest:
-                        type: string
-                      pass:
-                        type: string
-                      port:
-                        type: integer
-                      runAsUser:
-                        type: integer
-                      secretName:
-                        type: string
-                      sharedBuffers:
-                        type: string
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
-                        type: string
-                      user:
-                        type: string
-                    type: object
                   rbac:
                     properties:
                       role:
@@ -275,37 +192,6 @@ spec:
                       roleBindingName:
                         type: string
                       serviceAccountName:
-                        type: string
-                    type: object
-                  redis:
-                    properties:
-                      appendonly:
-                        type: string
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      limits:
-                        properties:
-                          cpu:
-                            type: integer
-                          memory:
-                            type: string
-                        type: object
-                      port:
-                        type: integer
-                      requests:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
                         type: string
                     type: object
                   registry:
@@ -428,8 +314,204 @@ spec:
                         type: integer
                       svcName:
                         type: string
+                    type: object
+                type: object
+              dbs:
+                properties:
+                  es:
+                    properties:
+                      cpuLimit:
+                        type: integer
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      fsGroup:
+                        type: integer
+                      image:
+                        type: string
+                      javaOpts:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      patchEsNodes:
+                        type: string
+                      port:
+                        type: integer
+                      runAsUser:
+                        type: integer
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      tolerations:
+                        additionalProperties:
+                          type: string
+                        type: object
                     required:
-                    - oauthProxy
+                    - serviceAccount
+                    type: object
+                  minio:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      replicas:
+                        type: integer
+                      serviceAccount:
+                        type: string
+                      sharedStorage:
+                        properties:
+                          consistentHash:
+                            properties:
+                              key:
+                                type: string
+                              value:
+                                type: string
+                            type: object
+                          enabled:
+                            type: string
+                          useExistingClaim:
+                            type: string
+                        type: object
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      tolerations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    required:
+                    - serviceAccount
+                    type: object
+                  pg:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      dbname:
+                        type: string
+                      enabled:
+                        type: string
+                      fixpg:
+                        type: string
+                      fsGroup:
+                        type: integer
+                      hugePages:
+                        properties:
+                          enabled:
+                            type: string
+                          memory:
+                            type: string
+                          size:
+                            type: string
+                        type: object
+                      image:
+                        type: string
+                      maxConnections:
+                        type: integer
+                      memoryRequest:
+                        type: string
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      pass:
+                        type: string
+                      port:
+                        type: integer
+                      runAsUser:
+                        type: integer
+                      secretName:
+                        type: string
+                      serviceAccount:
+                        type: string
+                      sharedBuffers:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      tolerations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      user:
+                        type: string
+                    required:
+                    - serviceAccount
+                    type: object
+                  redis:
+                    properties:
+                      appendonly:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: integer
+                          memory:
+                            type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      tolerations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    required:
+                    - serviceAccount
                     type: object
                 type: object
               logging:
@@ -467,39 +549,6 @@ spec:
                     type: object
                   enabled:
                     type: string
-                  es:
-                    properties:
-                      cpuLimit:
-                        type: integer
-                      cpuRequest:
-                        type: integer
-                      enabled:
-                        type: string
-                      fsGroup:
-                        type: integer
-                      image:
-                        type: string
-                      javaOpts:
-                        type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
-                      nodePort:
-                        type: integer
-                      patchEsNodes:
-                        type: string
-                      port:
-                        type: integer
-                      runAsUser:
-                        type: integer
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
                   kibana:
                     properties:
                       cpuLimit:
@@ -628,8 +677,6 @@ spec:
                     type: string
                   redisConnectionUrl:
                     type: string
-                required:
-                - redisConnectionUrl
                 type: object
             type: object
           status:

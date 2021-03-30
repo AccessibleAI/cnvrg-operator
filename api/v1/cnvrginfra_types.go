@@ -14,6 +14,7 @@ type CnvrgInfraSpec struct {
 	Logging           CnvrgInfraLogging    `json:"logging,omitempty"`
 	Registry          Registry             `json:"registry,omitempty"`
 	Storage           Storage              `json:"storage,omitempty"`
+	Dbs               InfraDbs             `json:"dbs,omitempty"`
 	SSO               SSO                  `json:"sso,omitempty"`
 }
 
@@ -58,6 +59,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Monitoring:        infraMonitoringDefault,
 		Logging:           cnvrgInfraLoggingDefault,
 		Registry:          registryDefault,
+		Dbs:               infraDbsDefaults,
 	}
 	//infraDefault.Monitoring.Prometheus.SvcName = "infra-prometheus"
 	return infraDefault

@@ -66,7 +66,7 @@ func getNs(obj interface{}) string {
 		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
 		return cnvrgApp.Namespace
 	}
-	return ""
+	return "cnvrg-infra"
 }
 
 func getGrafanaDashboards(obj interface{}) []string {
@@ -138,28 +138,28 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 		},
 		"redisUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			return "redis://" + cnvrgApp.Spec.ControlPlan.Redis.SvcName
+			return "redis://" + cnvrgApp.Spec.Dbs.Redis.SvcName
 		},
 		"esUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			return "http://" + cnvrgApp.Spec.Logging.Es.SvcName
+			return "http://" + cnvrgApp.Spec.Dbs.Es.SvcName
 		},
 		"hyperServerUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return "http://" + cnvrgApp.Spec.ControlPlan.Hyper.SvcName
 		},
 		"esFullInternalUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return fmt.Sprintf("http://%s.%s.svc.cluster.local:%d",
-				cnvrgApp.Spec.Logging.Es.SvcName,
+				cnvrgApp.Spec.Dbs.Es.SvcName,
 				cnvrgApp.Namespace,
-				cnvrgApp.Spec.Logging.Es.Port)
+				cnvrgApp.Spec.Dbs.Es.Port)
 		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
 				return cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
 			}
 			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
-				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.ControlPlan.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			} else {
-				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.ControlPlan.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			}
 		},
 		"routeBy": func(cnvrgApp mlopsv1.CnvrgApp, routeBy string) string {
@@ -189,7 +189,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		},
 		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string) string {
 			sso := getSSOConfig(obj)
-			skipAuthUrls := "["
+			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/static/`)
 			for i, url := range skipAuthRegex {
 				if i == (len(skipAuthRegex) - 1) {
 					skipAuthUrls += fmt.Sprintf(`"%v"`, url)
@@ -209,7 +209,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
 				fmt.Sprintf(`cookie_secret = "%v"`, sso.CookieSecret),
 				fmt.Sprintf(`oidc_issuer_url = "%v"`, sso.OidcIssuerURL),
-				`upstreams = ["http://127.0.0.1:3000/"]`,
+				`upstreams = ["http://127.0.0.1:3000/", "file:///var/www/static/#/static/"]`,
 				`session_store_type = "redis"`,
 				`custom_templates_dir = "/opt/app-root/src/templates"`,
 				"ssl_insecure_skip_verify = true",
@@ -277,7 +277,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 	}
 }
 
-func (s *State) GenerateDeployable(spec v1.Object) error {
+func (s *State) GenerateDeployable(templateData interface{}) error {
 	var tpl bytes.Buffer
 	f, err := pkger.Open(s.TemplatePath)
 	if err != nil {
@@ -300,7 +300,7 @@ func (s *State) GenerateDeployable(spec v1.Object) error {
 		return err
 	}
 	s.Obj.SetGroupVersionKind(s.GVR)
-	if err := s.Template.Execute(&tpl, spec); err != nil {
+	if err := s.Template.Execute(&tpl, templateData); err != nil {
 		zap.S().Error(err, "rendering template error", "file", s.TemplatePath)
 		return err
 	}
@@ -323,10 +323,12 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 
 	ctx := context.Background()
 	for _, manifest := range desiredManifests {
+
 		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
 			log.Error(err, "error generating deployable", "name", manifest.Obj.GetName())
 			return err
 		}
+
 		if manifest.Own {
 			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, schema); err != nil {
 				log.Error(err, "error setting controller reference", "name", manifest.Obj.GetName())

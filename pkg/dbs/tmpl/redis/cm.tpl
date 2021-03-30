@@ -6,7 +6,7 @@ metadata:
 data:
   redis.conf: |
     dir /data/
-    appendonly "{{ .Spec.ControlPlan.Redis.Appendonly }}"
+    appendonly "{{ .Spec.Dbs.Redis.Appendonly }}"
     appendfilename "appendonly.aof"
     appendfsync everysec
     auto-aof-rewrite-percentage 100

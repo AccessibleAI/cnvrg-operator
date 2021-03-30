@@ -86,17 +86,12 @@ type CnvrgAppMonitoring struct {
 }
 
 var grafanaDefault = Grafana{
-	Enabled:  "true",
-	Image:    "grafana/grafana:7.3.4",
-	SvcName:  "grafana",
-	Port:     8080,
-	NodePort: 30012,
-	OauthProxy: OauthProxyServiceConf{
-		SkipAuthRegex: []string{
-			`^\/static/`,
-			`\/api\/health`,
-		},
-	},
+	Enabled:    "true",
+	Image:      "grafana/grafana:7.3.4",
+	SvcName:    "grafana",
+	Port:       8080,
+	NodePort:   30012,
+	OauthProxy: OauthProxyServiceConf{SkipAuthRegex: []string{`\/api\/health`}},
 }
 
 var prometheusDefault = Prometheus{

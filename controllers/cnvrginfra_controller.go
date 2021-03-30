@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/dbs"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
@@ -181,6 +182,13 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	// Istio
 	cnvrgInfraLog.Info("applying istio")
 	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
+	// redis
+	cnvrgInfraLog.Info("applying redis")
+	if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}

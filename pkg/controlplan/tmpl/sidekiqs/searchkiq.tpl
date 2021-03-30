@@ -53,7 +53,7 @@ spec:
           - secretRef:
               name: cp-object-storage
           - secretRef:
-              name: {{ .Spec.ControlPlan.Pg.SvcName }}
+              name: {{ .Spec.Dbs.Pg.SvcName }}
         resources:
           requests:
             cpu: {{ .Spec.ControlPlan.Searchkiq.CPU }}

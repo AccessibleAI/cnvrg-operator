@@ -52,6 +52,52 @@ spec:
                       type: string
                   type: object
                 type: array
+              dbs:
+                properties:
+                  redis:
+                    properties:
+                      appendonly:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: integer
+                          memory:
+                            type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      tolerations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    required:
+                    - serviceAccount
+                    type: object
+                type: object
               infraNamespace:
                 type: string
               infraReconcilerCm:
@@ -243,8 +289,6 @@ spec:
                     type: string
                   redisConnectionUrl:
                     type: string
-                required:
-                - redisConnectionUrl
                 type: object
               storage:
                 properties:

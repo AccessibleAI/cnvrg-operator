@@ -7,6 +7,7 @@ import (
 type CnvrgAppSpec struct {
 	ClusterDomain string             `json:"clusterDomain,omitempty"`
 	ControlPlan   ControlPlan        `json:"controlPlan,omitempty"`
+	Dbs           AppDbs             `json:"dbs,omitempty"`
 	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
 	Logging       CnvrgAppLogging    `json:"logging,omitempty"`
 	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
@@ -41,6 +42,7 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain: "",
 		ControlPlan:   controlPlanDefault,
+		Dbs:           appDbsDefaults,
 		Logging:       cnvrgAppLoggingDefault,
 		Networking:    cnvrgAppNetworkingDefault,
 		Monitoring:    cnvrgAppMonitoringDefault,

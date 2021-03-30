@@ -411,6 +411,17 @@ var dcgmExporter = []*desired.State{
 	},
 }
 
+var grafanaOauthProxy = []*desired.State{
+	{
+		TemplatePath:   path + "/grafana/oauth.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SecretGVR],
+		Own:            true,
+	},
+}
+
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	var state []*desired.State
@@ -419,6 +430,9 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	}
 	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Grafana.Enabled == "true" {
 		state = append(state, grafanaState...)
+	}
+	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.SSO.Enabled == "true" {
+		state = append(state, grafanaOauthProxy...)
 	}
 
 	return state
@@ -446,6 +460,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	}
 	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.DcgmExporter.Enabled == "true" {
 		state = append(state, dcgmExporter...)
+	}
+	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.SSO.Enabled == "true" {
+		state = append(state, grafanaOauthProxy...)
 	}
 	return state
 }

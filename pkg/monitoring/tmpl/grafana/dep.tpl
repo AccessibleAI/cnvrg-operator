@@ -20,6 +20,15 @@ spec:
         runAsUser: 65534
       serviceAccountName: grafana
       containers:
+      {{- if eq .Spec.SSO.Enabled "true" }}
+      - name: "cnvrg-oauth-proxy"
+        image: {{ .Spec.SSO.Image }}
+        command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+        volumeMounts:
+          - name: "oauth-proxy-config"
+            mountPath: "/opt/app-root/conf/proxy-config"
+            readOnly: true
+      {{- end }}
       - image: {{ .Spec.Monitoring.Grafana.Image }}
         name: grafana
         env:
@@ -44,7 +53,7 @@ spec:
             value: "8080"
           {{- end }}
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
           name: http
         readinessProbe:
           httpGet:
@@ -73,6 +82,11 @@ spec:
           readOnly: false
         {{- end }}
       volumes:
+      {{- if eq .Spec.SSO.Enabled "true" }}
+      - name: "oauth-proxy-config"
+        secret:
+          secretName: "oauth-proxy-grafana"
+      {{- end }}
       - emptyDir: {}
         name: grafana-storage
       - name: grafana-datasources

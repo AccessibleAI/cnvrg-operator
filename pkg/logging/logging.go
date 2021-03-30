@@ -8,33 +8,6 @@ import (
 
 const path = "/pkg/logging/tmpl"
 
-var es = []*desired.State{
-	{
-		TemplatePath:   path + "/es/sts.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.StatefulSetGVR],
-		Own:            true,
-	},
-	{
-		TemplatePath:   path + "/es/svc.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SvcGVR],
-		Own:            true,
-	},
-	{
-		TemplatePath:   path + "/es/vs.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.IstioVsGVR],
-		Own:            true,
-	},
-}
-
 var elastAlert = []*desired.State{
 	{
 
@@ -150,9 +123,6 @@ var fluentbitState = []*desired.State{
 func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Es.Enabled == "true" {
-		state = append(state, es...)
-	}
 	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Elastalert.Enabled == "true" {
 		state = append(state, elastAlert...)
 	}

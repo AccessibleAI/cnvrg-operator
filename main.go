@@ -159,6 +159,7 @@ func setupCommands() {
 
 func informPkger() {
 	pkger.Include("/pkg/controlplan/tmpl")
+	pkger.Include("/pkg/dbs/tmpl")
 	pkger.Include("/pkg/logging/tmpl")
 	pkger.Include("/pkg/monitoring/tmpl")
 	pkger.Include("/pkg/networking/tmpl")

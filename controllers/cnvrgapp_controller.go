@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplan"
+	"github.com/cnvrg-operator/pkg/dbs"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
@@ -181,8 +182,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check postgres status
-	if cnvrgApp.Spec.ControlPlan.Pg.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Pg.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.Dbs.Pg.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Pg.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -191,8 +192,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check minio status
-	if cnvrgApp.Spec.ControlPlan.Minio.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Minio.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.Dbs.Minio.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Minio.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -201,8 +202,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check redis status
-	if cnvrgApp.Spec.ControlPlan.Redis.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.Redis.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.Dbs.Redis.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Redis.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -211,8 +212,8 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check es status
-	if cnvrgApp.Spec.Logging.Enabled == "true" && cnvrgApp.Spec.Logging.Es.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Es.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.Dbs.Es.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Es.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckStatefulSetReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -248,6 +249,13 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 }
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
+
+	// dbs
+	cnvrgAppLog.Info("applying dbs")
+	if err := desired.Apply(dbs.AppDbsState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
 
 	// controlplan
 	cnvrgAppLog.Info("applying controlplan")
