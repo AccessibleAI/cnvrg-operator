@@ -51,8 +51,14 @@ cnvrg operator may deploy cnvrg stack in two different ways
 
 ### Quick start - multiple cnvrg control plans within the same K8s cluster 
 
+```shell
+add helm deploy command here 
+```
 ### Quick start - single cnvrg control plan
 
+```shell
+add helm deploy command here 
+```
 
 
 ### Build & Dev
