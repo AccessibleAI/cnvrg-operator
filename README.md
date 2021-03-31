@@ -2,6 +2,18 @@
 ---
 ## Deploy cnvrg stack on EKS | AKS | GKE | OpenShift | On-Premise clusters with K8s operator
 
+### Architecture overview 
+cnvrg operator may deploy cnvrg stack in two different ways
+1. As a fully multi tenant K8s cluster - multiple cnvrg control plan instances in different namespaces
+![schema](docs/images/multi-tenancy.png)
+
+2. As a regula K8s cluster - single instance of cnvrg control plan in one namespace  
+
+### Quick start
+Setup multi tenant cnvrg cluster
+
+
+
 
 ### Build & Dev
 Build docker image 
