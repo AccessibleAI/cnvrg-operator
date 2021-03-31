@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ghodss/yaml"
 	"github.com/go-logr/zapr"
 	"github.com/jeremywohl/flatten"
 	"github.com/markbates/pkger"
@@ -131,13 +130,6 @@ func generateDocs() {
 	for _, k := range keys {
 		fmt.Println(fmt.Sprintf("|`%v`|%v", k, finalParams[k]))
 	}
-
-	storage := mlopsv1.ControlPlanDefault
-	b, _ = yaml.Marshal(storage)
-	fmt.Println(string(b))
-
-
-
 }
 
 func initZapLog() *zap.Logger {

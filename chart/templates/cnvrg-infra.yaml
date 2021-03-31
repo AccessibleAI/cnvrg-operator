@@ -1,8 +1,7 @@
 apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgApp
+kind: CnvrgInfra
 metadata:
-  name: cnvrg-app
-  namespace: {{ template "spec.cnvrgNs" . }}
+  name: cnvrg-infra
 spec:
   clusterDomain: {{ .Values.clusterDomain }}
   infraNamespace: {{ .Values.infraNamespace }}

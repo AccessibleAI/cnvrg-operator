@@ -8,7 +8,7 @@ controlPlan:
     cpuLimit: {{ .Values.controlPlan.hyper.cpuLimit }}
     cpuRequest: {{ .Values.controlPlan.hyper.cpuRequest }}
     enableReadinessProbe: {{ .Values.controlPlan.hyper.enableReadinessProbe }}
-    enabled: {{ .Values.controlPlan.hyper.enabled }}
+    enabled: "{{ .Values.controlPlan.hyper.enabled }}"
     image: {{ .Values.controlPlan.hyper.image }}
     memoryLimit: {{ .Values.controlPlan.hyper.memoryLimit }}
     memoryRequest: {{ .Values.controlPlan.hyper.memoryRequest }}
@@ -20,7 +20,7 @@ controlPlan:
     svcName: {{ .Values.controlPlan.hyper.svcName }}
     token: {{ .Values.controlPlan.hyper.token }}
   ldap:
-    enabled: {{ .Values.controlPlan.ldap.enabled }}
+    enabled: "{{ .Values.controlPlan.ldap.enabled }}"
     host: {{ .Values.controlPlan.ldap.host }}
     port: {{ .Values.controlPlan.ldap.port }}
     account: {{ .Values.controlPlan.ldap.account }}
@@ -43,7 +43,7 @@ controlPlan:
     stsKey: {{ .Values.controlPlan.objectStorage.stsKey }}
   searchkiq:
     cpu: {{ .Values.controlPlan.searchkiq.cpu }}
-    enabled: {{ .Values.controlPlan.searchkiq.enabled }}
+    enabled: "{{ .Values.controlPlan.searchkiq.enabled }}"
     killTimeout: {{ .Values.controlPlan.searchkiq.killTimeout }}
     memory: {{ .Values.controlPlan.searchkiq.memory }}
     replicas: {{ .Values.controlPlan.searchkiq.replicas }}
@@ -53,7 +53,7 @@ controlPlan:
     seedCmd: {{ .Values.controlPlan.seeder.seedCmd }}
   sidekiq:
     cpu: {{ .Values.controlPlan.sidekiq.cpu }}
-    enabled: {{ .Values.controlPlan.sidekiq.enabled }}
+    enabled: "{{ .Values.controlPlan.sidekiq.enabled }}"
     killTimeout: {{ .Values.controlPlan.sidekiq.killTimeout }}
     memory: {{ .Values.controlPlan.sidekiq.memory }}
     replicas: {{ .Values.controlPlan.sidekiq.replicas }}
@@ -66,18 +66,18 @@ controlPlan:
     domain: {{ .Values.controlPlan.smtp.domain }}
   systemkiq:
     cpu: {{ .Values.controlPlan.systemkiq.cpu }}
-    enabled: {{ .Values.controlPlan.systemkiq.enabled }}
+    enabled: "{{ .Values.controlPlan.systemkiq.enabled }}"
     killTimeout: {{ .Values.controlPlan.systemkiq.killTimeout }}
     memory: {{ .Values.controlPlan.systemkiq.memory }}
     replicas: {{ .Values.controlPlan.systemkiq.replicas }}
   tenancy:
     dedicatedNodes: {{ .Values.controlPlan.tenancy.dedicatedNodes }}
-    enabled: {{ .Values.controlPlan.tenancy.enabled }}
+    enabled: "{{ .Values.controlPlan.tenancy.enabled }}"
     key: {{ .Values.controlPlan.tenancy.key }}
     value: {{ .Values.controlPlan.tenancy.value }}
   webapp:
     cpu: {{ .Values.controlPlan.webapp.cpu }}
-    enabled: {{ .Values.controlPlan.webapp.enabled }}
+    enabled: "{{ .Values.controlPlan.webapp.enabled }}"
     failureThreshold: {{ .Values.controlPlan.webapp.failureThreshold }}
     image: {{ .Values.controlPlan.webapp.image }}
     initialDelaySeconds: {{ .Values.controlPlan.webapp.initialDelaySeconds }}

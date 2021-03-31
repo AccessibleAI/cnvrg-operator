@@ -1,7 +1,7 @@
 {{- define "spec.logging_app" }}
 
 logging:
-  enabled: {{ .Values.logging.enabled }}
+  enabled: "{{ .Values.logging.enabled }}"
   elastalert:
     enabled: {{ .Values.logging.elastalert.enabled }}
     image: {{ .Values.logging.elastalert.image }}
@@ -18,7 +18,7 @@ logging:
     runAsUser: {{ .Values.logging.elastalert.runAsUser }}
     fsGroup: {{ .Values.logging.elastalert.fsGroup }}
   kibana:
-    enabled: {{ .Values.logging.kibana.enabled }}
+    enabled: "{{ .Values.logging.kibana.enabled }}"
     serviceAccount: {{ .Values.logging.kibana.serviceAccount }}
     svcName: {{ .Values.logging.kibana.svcName }}
     port: {{ .Values.logging.kibana.port }}

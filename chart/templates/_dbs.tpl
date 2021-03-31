@@ -3,7 +3,7 @@ dbs:
   es:
     cpuLimit: {{ .Values.dbs.es.cpuLimit }}
     cpuRequest: {{ .Values.dbs.es.cpuRequest }}
-    enabled: {{ .Values.dbs.es.enabled }}
+    enabled: "{{ .Values.dbs.es.enabled }}"
     fsGroup: {{ .Values.dbs.es.fsGroup }}
     image: {{ .Values.dbs.es.image }}
     memoryLimit: {{ .Values.dbs.es.memoryLimit }}
@@ -17,7 +17,7 @@ dbs:
     svcName: {{ .Values.dbs.es.svcName }}
   minio:
     cpuRequest: {{ .Values.dbs.minio.cpuRequest }}
-    enabled: {{ .Values.dbs.minio.enabled }}
+    enabled: "{{ .Values.dbs.minio.enabled }}"
     image: {{ .Values.dbs.minio.image }}
     memoryRequest: {{ .Values.dbs.minio.memoryRequest }}
     nodePort: {{ .Values.dbs.minio.nodePort }}
@@ -28,13 +28,13 @@ dbs:
       consistentHash:
         key: {{ .Values.dbs.minio.sharedStorage.consistentHash.key }}
         value: {{ .Values.dbs.minio.sharedStorage.consistentHash.value }}
-      enabled: {{ .Values.dbs.minio.sharedStorage.enabled }}
+      enabled: "{{ .Values.dbs.minio.sharedStorage.enabled }}"
     storageSize: {{ .Values.dbs.minio.storageSize }}
     svcName: {{ .Values.dbs.minio.svcName }}
   pg:
     cpuRequest: {{ .Values.dbs.pg.cpuRequest }}
     dbname: {{ .Values.dbs.pg.dbname }}
-    enabled: {{ .Values.dbs.pg.enabled }}
+    enabled: "{{ .Values.dbs.pg.enabled }}"
     fixpg: {{ .Values.dbs.pg.fixpg }}
     fsGroup: {{ .Values.dbs.pg.fsGroup }}
     hugePages:
@@ -55,7 +55,7 @@ dbs:
     user: {{ .Values.dbs.pg.user }}
   redis:
     appendonly: {{ .Values.dbs.redis.appendonly }}
-    enabled: {{ .Values.dbs.redis.enabled }}
+    enabled: "{{ .Values.dbs.redis.enabled }}"
     image: {{ .Values.dbs.redis.image }}
     limits:
       cpu: {{ .Values.dbs.redis.limits.cpu }}

@@ -38,7 +38,7 @@ uninstall: manifests
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	cd config/manager && kustomize edit set image controller=docker.io/cnvrg/cnvrg-operator:${TAG}
-	kustomize build config/default #| kubectl apply -f -
+	kustomize build config/default | kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
@@ -57,7 +57,7 @@ generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Build the docker image
-docker-build:
+docker-build: pack generate manifests
 		docker build . -t docker.io/cnvrg/cnvrg-operator:${TAG}
 
 # Push the docker image

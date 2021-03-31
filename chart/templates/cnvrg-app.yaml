@@ -1,14 +1,14 @@
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgApp
-metadata:
-  name: cnvrg-app
-  namespace: {{ template "spec.cnvrgNs" . }}
-spec:
-  clusterDomain: {{ .Values.clusterDomain }}
-  {{- include "spec.controlPlan" . | indent 2 }}
-  {{- include "spec.registry" . | indent 2 }}
-  {{- include "spec.dbs" . | indent 2 }}
-  {{- include "spec.logging_app" . | indent 2 }}
-  {{- include "spec.monitoring_app" . | indent 2 }}
-  {{- include "spec.networking_app" . | indent 2 }}
-  {{- include "spec.sso" . | indent 2 }}
+{{/*apiVersion: mlops.cnvrg.io/v1*/}}
+{{/*kind: CnvrgApp*/}}
+{{/*metadata:*/}}
+{{/*  name: cnvrg-app*/}}
+{{/*  namespace: {{ template "spec.cnvrgNs" . }}*/}}
+{{/*spec:*/}}
+{{/*  clusterDomain: {{ .Values.clusterDomain }}*/}}
+{{/*  {{- include "spec.controlPlan" . | indent 2 }}*/}}
+{{/*  {{- include "spec.registry" . | indent 2 }}*/}}
+{{/*  {{- include "spec.dbs" . | indent 2 }}*/}}
+{{/*  {{- include "spec.logging_app" . | indent 2 }}*/}}
+{{/*  {{- include "spec.monitoring_app" . | indent 2 }}*/}}
+{{/*  {{- include "spec.networking_app" . | indent 2 }}*/}}
+{{/*  {{- include "spec.sso" . | indent 2 }}*/}}

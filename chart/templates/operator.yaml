@@ -93,7 +93,7 @@ spec:
             - run
             - --max-concurrent-reconciles
             - "3"
-          image: "docker.io/cnvrg/cnvrg-operator:{{ .Chart.Version }}"
+          image: "docker.io/cnvrg/cnvrg-operator:v{{ .Chart.Version }}"
           imagePullPolicy: Always
           name: cnvrg-operator
           resources:

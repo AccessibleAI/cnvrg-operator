@@ -207,6 +207,7 @@ func (in *CnvrgAppNetworking) DeepCopy() *CnvrgAppNetworking {
 func (in *CnvrgAppSpec) DeepCopyInto(out *CnvrgAppSpec) {
 	*out = *in
 	in.ControlPlan.DeepCopyInto(&out.ControlPlan)
+	out.Registry = in.Registry
 	in.Dbs.DeepCopyInto(&out.Dbs)
 	out.Networking = in.Networking
 	in.Logging.DeepCopyInto(&out.Logging)
@@ -407,7 +408,6 @@ func (in *ControlPlan) DeepCopyInto(out *ControlPlan) {
 	out.Seeder = in.Seeder
 	in.BaseConfig.DeepCopyInto(&out.BaseConfig)
 	out.Ldap = in.Ldap
-	out.Registry = in.Registry
 	out.Rbac = in.Rbac
 	out.SMTP = in.SMTP
 	out.Tenancy = in.Tenancy
