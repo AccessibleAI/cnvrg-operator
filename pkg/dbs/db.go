@@ -10,6 +10,14 @@ const path = "/pkg/dbs/tmpl"
 
 var esState = []*desired.State{
 	{
+		TemplatePath:   path + "/es/sa.tpl",
+		Template:       nil,
+		ParsedTemplate: "",
+		Obj:            &unstructured.Unstructured{},
+		GVR:            desired.Kinds[desired.SaGVR],
+		Own:            true,
+	},
+	{
 		TemplatePath:   path + "/es/sts.tpl",
 		Template:       nil,
 		ParsedTemplate: "",
@@ -31,14 +39,6 @@ var esState = []*desired.State{
 		ParsedTemplate: "",
 		Obj:            &unstructured.Unstructured{},
 		GVR:            desired.Kinds[desired.IstioVsGVR],
-		Own:            true,
-	},
-	{
-		TemplatePath:   path + "/es/sa.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SaGVR],
 		Own:            true,
 	},
 }

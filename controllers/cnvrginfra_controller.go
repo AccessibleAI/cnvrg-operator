@@ -159,16 +159,16 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		reconcileResult = err
 	}
 
-	// Monitoring
-	cnvrgInfraLog.Info("applying monitoring")
-	if err := desired.Apply(monitoring.InfraMonitoringState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	// grafana dashboards
+	cnvrgInfraLog.Info("applying grafana dashboards")
+	if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
-	// grafana dashboards
-	cnvrgInfraLog.Info("applying grafana dashboards")
-	if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
+	// Monitoring
+	cnvrgInfraLog.Info("applying monitoring")
+	if err := desired.Apply(monitoring.InfraMonitoringState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
