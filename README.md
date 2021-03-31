@@ -6,7 +6,7 @@
 cnvrg operator may deploy cnvrg stack in two different ways
 1. As a fully multi tenant K8s cluster - multiple cnvrg control plan instances in different namespaces
 ```shell
-                            ------------cnvrg infra ----------------
+                            ------------cnvrg infra namespace-------
                             | Cluster scope prometheus             |
                             | Prometheus node exporter             |
                             | Kube state metrics                   |
