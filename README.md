@@ -15,7 +15,7 @@ cnvrg operator may deploy cnvrg stack in two different ways
                             | Istio control plan                   |
                             | Storage provisioners (hostpath/nfs)  |
                             ----------------------------------------           
----------------cnvrg control plan 1-----------  --------------cnvrg control plan 2------------
+---------cnvrg control plan 1 namespace-------  ---------cnvrg control plan 2 namespace-------
 | cnvrg control plan (webapp, sidekiqs, etc.)|  | cnvrg control plan (webapp, sidekiqs, etc.)|
 | PostgreSQL                                 |  | PostgreSQL                                 |
 | ElasticSearch + Kibana                     |  | ElasticSearch + Kibana                     |
