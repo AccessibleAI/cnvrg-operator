@@ -1,0 +1,368 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
+  creationTimestamp: null
+  name: cnvrginfras.mlops.cnvrg.io
+spec:
+  group: mlops.cnvrg.io
+  names:
+    kind: CnvrgInfra
+    listKind: CnvrgInfraList
+    plural: cnvrginfras
+    singular: cnvrginfra
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - jsonPath: .status.message
+      name: Message
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              clusterDomain:
+                type: string
+              cnvrgAppInstances:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                  type: object
+                type: array
+              dbs:
+                properties:
+                  redis:
+                    properties:
+                      appendonly:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: integer
+                          memory:
+                            type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                      tolerations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    required:
+                    - serviceAccount
+                    type: object
+                type: object
+              infraNamespace:
+                type: string
+              infraReconcilerCm:
+                type: string
+              logging:
+                properties:
+                  enabled:
+                    type: string
+                  fluentbit:
+                    properties:
+                      image:
+                        type: string
+                    type: object
+                type: object
+              monitoring:
+                properties:
+                  dcgmExporter:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                  enabled:
+                    type: string
+                  grafana:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      oauthProxy:
+                        properties:
+                          skipAuthRegex:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      port:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                  kubeStateMetrics:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                  kubeletServiceMonitor:
+                    type: string
+                  nodeExporter:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                  prometheus:
+                    properties:
+                      cpuRequest:
+                        type: integer
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  prometheusOperator:
+                    properties:
+                      enabled:
+                        type: string
+                      images:
+                        properties:
+                          configReloaderImage:
+                            type: string
+                          kubeRbacProxyImage:
+                            type: string
+                          operatorImage:
+                            type: string
+                          prometheusConfigReloaderImage:
+                            type: string
+                        type: object
+                    type: object
+                type: object
+              networking:
+                properties:
+                  https:
+                    properties:
+                      cert:
+                        type: string
+                      certSecret:
+                        type: string
+                      enabled:
+                        type: string
+                      key:
+                        type: string
+                    type: object
+                  ingress:
+                    properties:
+                      ingressType:
+                        enum:
+                        - istio
+                        - k8singress
+                        - openshift
+                        - nodeport
+                        type: string
+                      perTryTimeout:
+                        type: string
+                      retriesAttempts:
+                        type: integer
+                      timeout:
+                        type: string
+                    type: object
+                  istio:
+                    properties:
+                      enabled:
+                        type: string
+                      externalIp:
+                        type: string
+                      hub:
+                        type: string
+                      ingressSvcAnnotations:
+                        type: string
+                      ingressSvcExtraPorts:
+                        type: string
+                      loadBalancerSourceRanges:
+                        type: string
+                      mixerImage:
+                        type: string
+                      operatorImage:
+                        type: string
+                      pilotImage:
+                        type: string
+                      proxyImage:
+                        type: string
+                      tag:
+                        type: string
+                    type: object
+                type: object
+              registry:
+                properties:
+                  name:
+                    type: string
+                  password:
+                    type: string
+                  url:
+                    type: string
+                  user:
+                    type: string
+                type: object
+              sso:
+                properties:
+                  adminUser:
+                    type: string
+                  azureTenant:
+                    type: string
+                  clientId:
+                    type: string
+                  clientSecret:
+                    type: string
+                  cookieSecret:
+                    type: string
+                  emailDomain:
+                    type: string
+                  enabled:
+                    type: string
+                  image:
+                    type: string
+                  oidcIssuerUrl:
+                    type: string
+                  provider:
+                    type: string
+                  redisConnectionUrl:
+                    type: string
+                type: object
+              storage:
+                properties:
+                  enabled:
+                    type: string
+                  hostpath:
+                    properties:
+                      cpuLimit:
+                        type: string
+                      cpuRequest:
+                        type: string
+                      defaultSc:
+                        type: string
+                      enabled:
+                        type: string
+                      hostPath:
+                        type: string
+                      image:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      nodeName:
+                        type: string
+                      reclaimPolicy:
+                        type: string
+                      storageClassName:
+                        type: string
+                    type: object
+                  nfs:
+                    properties:
+                      cpuLimit:
+                        type: string
+                      cpuRequest:
+                        type: string
+                      defaultSc:
+                        type: string
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                      memoryLimit:
+                        type: string
+                      memoryRequest:
+                        type: string
+                      path:
+                        type: string
+                      provisioner:
+                        type: string
+                      reclaimPolicy:
+                        type: string
+                      server:
+                        type: string
+                      storageClassName:
+                        type: string
+                    type: object
+                type: object
+            type: object
+          status:
+            properties:
+              message:
+                type: string
+              progress:
+                type: string
+              status:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

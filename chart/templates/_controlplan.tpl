@@ -41,11 +41,6 @@ controlPlan:
     secretKeyBase: {{ .Values.controlPlan.objectStorage.secretKeyBase }}
     stsIv: {{ .Values.controlPlan.objectStorage.stsIv }}
     stsKey: {{ .Values.controlPlan.objectStorage.stsKey }}
-  registry:
-    name: {{ .Values.controlPlan.registry.name }}
-    url: {{ .Values.controlPlan.registry.url }}
-    user: {{ .Values.controlPlan.registry.user }}
-    password: {{ .Values.controlPlan.registry.password }}
   searchkiq:
     cpu: {{ .Values.controlPlan.searchkiq.cpu }}
     enabled: {{ .Values.controlPlan.searchkiq.enabled }}

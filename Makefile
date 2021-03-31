@@ -38,7 +38,7 @@ uninstall: manifests
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	cd config/manager && kustomize edit set image controller=docker.io/cnvrg/cnvrg-operator:${TAG}
-	kustomize build config/default | kubectl apply -f -
+	kustomize build config/default #| kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen

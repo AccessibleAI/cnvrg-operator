@@ -67,5 +67,4 @@ dbs:
     serviceAccount: {{ .Values.dbs.redis.serviceAccount }}
     storageSize: {{ .Values.dbs.redis.storageSize }}
     svcName: {{ .Values.dbs.redis.svcName }}
-
 {{- end }}
