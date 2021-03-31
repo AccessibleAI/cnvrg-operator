@@ -29,22 +29,22 @@ cnvrg operator may deploy cnvrg stack in two different ways
 ```
 2. Single cnvrg control plan in dedicated namespace 
 ```shell
-                            ----------------cnvrg namespace--------------------
-                            | Cluster scope prometheus                        |
-                            | Prometheus node exporter                        |
-                            | Kube state metrics                              |
-                            | Cluster scope service monitors                  |     
-                            | Namespace scope service monitors                |     
-                            | Fluentbit                                       |
-                            | Istio control plan                              |
-                            | Storage provisioners (hostpath/nfs)             |   
-                            | cnvrg control plan (webapp, sidekiqs, etc.)     |
-                            | PostgreSQL                                      |
-                            | ElasticSearch + Kibana                          | 
-                            | Minio                                           |
-                            | Redis                                           |  
-                            | IstioGateway + VirtualServices                  |
-                            ---------------------------------------------------           
+                        ----------------cnvrg namespace--------------------
+                        | Cluster scope prometheus                        |
+                        | Prometheus node exporter                        |
+                        | Kube state metrics                              |
+                        | Cluster scope service monitors                  |     
+                        | Namespace scope service monitors                |     
+                        | Fluentbit                                       |
+                        | Istio control plan                              |
+                        | Storage provisioners (hostpath/nfs)             |   
+                        | cnvrg control plan (webapp, sidekiqs, etc.)     |
+                        | PostgreSQL                                      |
+                        | ElasticSearch + Kibana                          | 
+                        | Minio                                           |
+                        | Redis                                           |  
+                        | IstioGateway + VirtualServices                  |
+                        ---------------------------------------------------           
 ```
    
   
