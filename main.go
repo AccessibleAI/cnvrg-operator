@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
+	"sort"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -83,33 +84,53 @@ var generateDocsCmd = &cobra.Command{
 }
 
 func generateDocs() {
+
+	// app params
 	app := mlopsv1.DefaultCnvrgAppSpec()
+	b, _ := json.Marshal(app)
+	flatAppParams, _ := flatten.FlattenString(string(b), "", flatten.DotStyle)
+	appParams := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(flatAppParams), &appParams)
 
-	b, err := json.Marshal(app)
-	if err != nil {
-		fmt.Printf("Error: %s", err)
-		return
-	}
-	flat, _ := flatten.FlattenString(string(b), "", flatten.DotStyle)
-	jsonMap := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(flat), &jsonMap)
-	for key, value := range jsonMap {
-		fmt.Println(fmt.Sprintf("%v: %v", key, value))
-	}
-
+	// infra params
 	infra := mlopsv1.DefaultCnvrgInfraSpec()
+	b, _ = json.Marshal(infra)
+	flatInfraParams, _ := flatten.FlattenString(string(b), "", flatten.DotStyle)
+	infraParams := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(flatInfraParams), &infraParams)
 
-	b, err = json.Marshal(infra)
-	if err != nil {
-		fmt.Printf("Error: %s", err)
-		return
+	finalParams := make(map[string]interface{})
+	skipKeys := []string{
+		"controlPlan.baseConfig.sentryUrl",
+		"controlPlan.objectStorage.stsIv",
+		"controlPlan.objectStorage.stsKey",
+		"controlPlan.objectStorage.secretKeyBase",
+		"controlPlan.objectStorage.minioSseMasterKey",
 	}
-	flat, _ = flatten.FlattenString(string(b), "", flatten.DotStyle)
-	jsonMap = make(map[string]interface{})
-	_ = json.Unmarshal([]byte(flat), &jsonMap)
-	for key, value := range jsonMap {
-		fmt.Println(fmt.Sprintf("%v: %v", key, value))
+	for key, value := range appParams {
+		skipKey := false
+		for _, item := range skipKeys {
+			if item == key {
+				skipKey = true
+			}
+		}
+		if !skipKey {
+			finalParams[key] = value
+		}
 	}
+
+	for key, value := range infraParams {
+		finalParams[key] = value
+	}
+	keys := make([]string, 0, len(finalParams))
+	for k := range finalParams {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Println(fmt.Sprintf("|`%v`|%v", k, finalParams[k]))
+	}
+
 }
 
 func initZapLog() *zap.Logger {
