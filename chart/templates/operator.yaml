@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    control-plane: cnvrg-operator
+  name: cnvrg-operator
+  namespace: {{ template "spec.cnvrgNs" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: cnvrg-operator
+  template:
+    metadata:
+      labels:
+        control-plane: cnvrg-operator
+    spec:
+      serviceAccountName: cnvrg-operator
+      terminationGracePeriodSeconds: 10
+      {{- if eq (.Values.tenancy.enabled | toString) "true" }}
+      nodeSelector:
+        {{ .Values.tenancy.cnvrg.key }}: "{{ .Values.tenancy.cnvrg.value }}"
+      {{- end }}
+      tolerations:
+        - key: "{{ .Values.tenancy.cnvrg.key }}"
+          operator: "Equal"
+          value: "{{ .Values.tenancy.cnvrg.value }}"
+          effect: "NoSchedule"
+      containers:
+        - name: manager
+          image: "{{.Values.operatorImage}}:{{ .Chart.Version }}"
+          args:
+            - --enable-leader-election
+            - --leader-election-id=cnvrg-operator
+            - --leader-election-namespace={{ template "spec.cnvrgNs" . }}
+            - --max-concurrent-reconciles=8
+            - --zap-encoder=console
+            - --zap-log-level=info
+          env:
+            - name: ANSIBLE_JINJA2_NATIVE
+              value: "true"
+            - name: ANSIBLE_HASH_BEHAVIOUR
+              value: merge
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name

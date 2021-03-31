@@ -1,0 +1,177 @@
+####################################### Install hooks #######################################
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "cnvrg-bootstrap"
+  namespace: "default"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "cnvrg-bootstrap"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - "create"
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    resourceNames:
+      - {{ template "spec.cnvrgNs" . }}
+    verbs:
+      - delete
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "cnvrg-bootstrap"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "cnvrg-bootstrap"
+subjects:
+  - kind: ServiceAccount
+    name: "cnvrg-bootstrap"
+    namespace: "default"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: post-install
+  namespace: {{ template "spec.cnvrgNs" . }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: cnvrg-operator
+      terminationGracePeriodSeconds: 1
+      containers:
+        - name: cnvrgapp
+          image: {{.Values.hookImage}}
+          args:
+            - /bin/bash
+            - -c
+            - |
+              _term() {
+                echo "Caught SIGTERM signal!"
+                exit
+              }
+              trap _term SIGTERM
+              echo "waiting for cnvrgapp will finish installation. . . ";
+              while (( $(kubectl get cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} -o yaml | grep "Awaiting next reconciliation" | wc -l ) != 1 )); do
+                sleep 0.1
+              done
+              echo "installation completed. . . ";
+              kubectl delete job post-install -n {{ template "spec.cnvrgNs" . }}
+      restartPolicy: Never
+####################################### Uninstall hooks #######################################
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "cnvrg-cleanup"
+  namespace: "default"
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "cnvrg-cleanup"
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - "list"
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    resourceNames: ["{{ template "spec.cnvrgNs" . }}"]
+    verbs:
+      - "*"
+  - apiGroups:
+      - "batch"
+    resources:
+      - jobs
+    resourceNames: ["pre-cnvrg-cleanup","post-cnvrg-cleanup"]
+    verbs:
+      - "*"
+  - apiGroups:
+      - mlops.cnvrg.io
+    resources:
+      - '*'
+    verbs:
+      - '*'
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "cnvrg-cleanup"
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "cnvrg-cleanup"
+subjects:
+  - kind: ServiceAccount
+    name: "cnvrg-cleanup"
+    namespace: "default"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-cnvrg-cleanup
+  namespace: default
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: cnvrg-cleanup
+      containers:
+        - name: delete-cnvrgapp
+          image: {{ .Values.hookImage }}
+          args:
+            - /bin/bash
+            - -c
+            - |
+              kubectl delete cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} --ignore-not-found
+              while (( $(kubectl get cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} | grep cnvrg-app | wc -l ) != 0 )); do
+                echo "waiting for cnvrgapp will be deleted. . . ";
+                sleep 1
+              done
+      restartPolicy: Never
+  backoffLimit: 4
