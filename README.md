@@ -49,9 +49,9 @@ cnvrg operator may deploy cnvrg stack in two different ways
    
   
 
-### Quick start
-Setup multi tenant cnvrg cluster
+### Quick start - multiple cnvrg control plans within the same K8s cluster 
 
+### Quick start - single cnvrg control plan
 
 
 
