@@ -5,7 +5,32 @@
 ### Architecture overview 
 cnvrg operator may deploy cnvrg stack in two different ways
 1. As a fully multi tenant K8s cluster - multiple cnvrg control plan instances in different namespaces
-![schema](docs/images/multi-tenancy.png)
+```shell
+                                            ------------cnvrg infra ----------------
+                                            | Cluster scope prometheus             |
+                                            | Prometheus node exporter             |
+                                            | Kube state metrics                   |
+                                            | Cluster scope service monitors       |     
+                                            | Fluentbit                            |
+                                            | Istio control plan                   |
+                                            | Storage provisioners (hostpath/nfs)  |   
+                                            ----------------------------------------
+                                         
+                      
+                     
+                    
+    ---------------cnvrg control plan 1----------------              ---------------cnvrg control plan 2----------------                 
+    | cnvrg control plan (webapp, sidekiqs, etc...)   |              | cnvrg control plan (webapp, sidekiqs, etc...)   |
+    | PostgreSQL                                      |              | PostgreSQL                                      |
+    | ElasticSearch + Kibana                          |              | ElasticSearch + Kibana                          |
+    | Minio                                           |              | Minio                                           |  
+    | Redis                                           |              | Redis                                           |
+    | Namespace scope Prometheus + Grafana            |              | Namespace scope Prometheus + Grafana            |
+    | Istio Gateway + VirtualServices                 |              | Istio Gateway + VirtualServices                 |
+    ---------------------------------------------------              --------------------------------------------------- 
+                    
+```
+
 
 2. As a regula K8s cluster - single instance of cnvrg control plan in one namespace  
 
