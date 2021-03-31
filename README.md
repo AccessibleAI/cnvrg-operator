@@ -6,28 +6,24 @@
 cnvrg operator may deploy cnvrg stack in two different ways
 1. As a fully multi tenant K8s cluster - multiple cnvrg control plan instances in different namespaces
 ```shell
-                                            ------------cnvrg infra ----------------
-                                            | Cluster scope prometheus             |
-                                            | Prometheus node exporter             |
-                                            | Kube state metrics                   |
-                                            | Cluster scope service monitors       |     
-                                            | Fluentbit                            |
-                                            | Istio control plan                   |
-                                            | Storage provisioners (hostpath/nfs)  |   
-                                            ----------------------------------------
-                                         
-                      
-                     
-                    
-    ---------------cnvrg control plan 1----------------              ---------------cnvrg control plan 2----------------                 
-    | cnvrg control plan (webapp, sidekiqs, etc...)   |              | cnvrg control plan (webapp, sidekiqs, etc...)   |
-    | PostgreSQL                                      |              | PostgreSQL                                      |
-    | ElasticSearch + Kibana                          |              | ElasticSearch + Kibana                          |
-    | Minio                                           |              | Minio                                           |  
-    | Redis                                           |              | Redis                                           |
-    | Namespace scope Prometheus + Grafana            |              | Namespace scope Prometheus + Grafana            |
-    | Istio Gateway + VirtualServices                 |              | Istio Gateway + VirtualServices                 |
-    ---------------------------------------------------              --------------------------------------------------- 
+                            ------------cnvrg infra ----------------
+                            | Cluster scope prometheus             |
+                            | Prometheus node exporter             |
+                            | Kube state metrics                   |
+                            | Cluster scope service monitors       |     
+                            | Fluentbit                            |
+                            | Istio control plan                   |
+                            | Storage provisioners (hostpath/nfs)  |   
+                            ----------------------------------------                                         
+---------------cnvrg control plan 1----------------  ---------------cnvrg control plan 2----------------                 
+| cnvrg control plan (webapp, sidekiqs, etc...)   |  | cnvrg control plan (webapp, sidekiqs, etc...)   |
+| PostgreSQL                                      |  | PostgreSQL                                      |
+| ElasticSearch + Kibana                          |  | ElasticSearch + Kibana                          |
+| Minio                                           |  | Minio                                           |  
+| Redis                                           |  | Redis                                           |
+| Namespace scope Prometheus + Grafana            |  | Namespace scope Prometheus + Grafana            |
+| Istio Gateway + VirtualServices                 |  | Istio Gateway + VirtualServices                 |
+---------------------------------------------------  --------------------------------------------------- 
                     
 ```
 
