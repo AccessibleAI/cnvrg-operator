@@ -1,11 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/go-logr/zapr"
+	"github.com/jeremywohl/flatten"
 	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -13,8 +12,11 @@ import (
 	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"os"
+
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
+	"strings"
 
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/controllers"
@@ -68,6 +70,46 @@ var runOperatorCmd = &cobra.Command{
 		zap.ReplaceGlobals(loggerMgr)
 		runOperator()
 	},
+}
+
+var generateDocsCmd = &cobra.Command{
+	Use:   "docs",
+	Short: "Generate cnvrg operator docs ",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Generating docs... ")
+		generateDocs()
+
+	},
+}
+
+func generateDocs() {
+	app := mlopsv1.DefaultCnvrgAppSpec()
+
+	b, err := json.Marshal(app)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+		return
+	}
+	flat, _ := flatten.FlattenString(string(b), "", flatten.DotStyle)
+	jsonMap := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(flat), &jsonMap)
+	for key, value := range jsonMap {
+		fmt.Println(fmt.Sprintf("%v: %v", key, value))
+	}
+
+	infra := mlopsv1.DefaultCnvrgInfraSpec()
+
+	b, err = json.Marshal(infra)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+		return
+	}
+	flat, _ = flatten.FlattenString(string(b), "", flatten.DotStyle)
+	jsonMap = make(map[string]interface{})
+	_ = json.Unmarshal([]byte(flat), &jsonMap)
+	for key, value := range jsonMap {
+		fmt.Println(fmt.Sprintf("%v: %v", key, value))
+	}
 }
 
 func initZapLog() *zap.Logger {
@@ -156,6 +198,7 @@ func setupCommands() {
 	setParams(runOperatorParams, runOperatorCmd)
 	setParams(rootParams, rootCmd)
 	rootCmd.AddCommand(runOperatorCmd)
+	rootCmd.AddCommand(generateDocsCmd)
 }
 
 func informPkger() {

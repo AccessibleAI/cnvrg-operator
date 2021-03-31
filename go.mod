@@ -11,6 +11,7 @@ require (
 	github.com/go-logr/zapr v0.1.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.6
+	github.com/jeremywohl/flatten v1.0.1
 	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/copystructure v1.1.1 // indirect
 	github.com/onsi/ginkgo v1.11.0

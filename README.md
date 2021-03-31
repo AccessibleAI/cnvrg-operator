@@ -60,8 +60,17 @@ add helm deploy command here
 add helm deploy command here 
 ```
 
+### Examples 
+```shell
+specs exaples goes here 
+```
 
-### Build & Dev
+### Deployment params 
+```shell
+Deployment params goes here  
+```
+
+### Build
 Build docker image 
 ```
 TAG=<docker-tag> make docker-build 
