@@ -1,6 +1,6 @@
 # cnvrg.io operator (v3)
 ---
-## Deploy cnvrg stack on EKS | AKS | GKE | OpenShift | On-Premise clusters with K8s operator
+## Deploy cnvrg stack on EKS | AKS | GKE | OpenShift | On-Premise clusters
 
 ### Architecture overview 
 cnvrg operator may deploy cnvrg stack in two different ways
