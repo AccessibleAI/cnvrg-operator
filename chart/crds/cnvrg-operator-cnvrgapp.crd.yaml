@@ -1,0 +1,121 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cnvrgapps.mlops.cnvrg.io
+spec:
+  group: mlops.cnvrg.io
+  names:
+    kind: CnvrgApp
+    listKind: CnvrgAppList
+    plural: cnvrgapps
+    singular: cnvrgapp
+  scope: Namespaced
+  versions:
+    - name: v1
+      additionalPrinterColumns:
+        - description: cnvrg version
+          jsonPath: .spec.cnvrgApp.image
+          name: Version
+          type: string
+        - description: otags
+          jsonPath: .spec.otags
+          name: Otag
+          type: string
+        - description: cnvrg status
+          jsonPath: .status.conditions[0].message
+          name: Status
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      schema:
+        openAPIV3Schema:
+          description: CnvrgApp is the Schema for the cnvrgapps API
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: Spec defines the desired state of CnvrgApp
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              description: Status defines the observed state of CnvrgApp
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cnvrgappupgrades.mlops.cnvrg.io
+spec:
+  group: mlops.cnvrg.io
+  names:
+    kind: CnvrgAppUpgrade
+    listKind: CnvrgAppUpgradeList
+    plural: cnvrgappupgrades
+    singular: cnvrgappupgrade
+  scope: Namespaced
+  versions:
+    - name: v1
+      additionalPrinterColumns:
+        - description: cnvrg version
+          jsonPath: .spec.cnvrgAppUpgrade.image
+          name: Version
+          type: string
+        - description: condition
+          jsonPath: .spec.condition
+          name: Condition
+          type: string
+        - description: cnvrg status
+          jsonPath: .status.status
+          name: Status
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      schema:
+        openAPIV3Schema:
+          description: CnvrgAppUpgrade is the Schema for the cnvrgappupgradess API
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: Spec defines the desired state of CnvrgAppUpgrade
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              description: Status defines the observed state of CnvrgAppUpgrade
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+

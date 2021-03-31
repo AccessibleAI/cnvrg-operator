@@ -13,7 +13,7 @@ spec:
         resources:
           requests:
             storage: {{ .Spec.Monitoring.Prometheus.StorageSize }}
-        {{- if ne .Spec.Monitoring.Prometheus.StorageClass "use-default" }}
+        {{- if ne .Spec.Monitoring.Prometheus.StorageClass "" }}
         storageClassName: {{ .Spec.Monitoring.Prometheus.StorageClass }}
         {{- end }}
   image: {{ .Spec.Monitoring.Prometheus.Image }}

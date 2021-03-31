@@ -193,7 +193,7 @@ var registryDefault = Registry{
 	Password: "",
 }
 
-var ControlPlanDefault = ControlPlan{
+var controlPlanDefault = ControlPlan{
 
 	WebApp: WebApp{
 		Replicas:                1,

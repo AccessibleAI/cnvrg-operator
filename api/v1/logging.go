@@ -60,7 +60,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		ContainerPort: 3030,
 		StorageSize:   "30Gi",
 		SvcName:       "elastalert",
-		StorageClass:  "use-default",
+		StorageClass:  "",
 		CPURequest:    "100m",
 		MemoryRequest: "200Mi",
 		CPULimit:      "400m",

@@ -103,7 +103,7 @@ var prometheusDefault = Prometheus{
 	Port:          9090,
 	NodePort:      30909,
 	StorageSize:   "100Gi",
-	StorageClass:  "use-default",
+	StorageClass:  "",
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{

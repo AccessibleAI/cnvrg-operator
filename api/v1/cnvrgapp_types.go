@@ -41,7 +41,7 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain: "",
-		ControlPlan:   ControlPlanDefault,
+		ControlPlan:   controlPlanDefault,
 		Dbs:           appDbsDefaults,
 		Logging:       cnvrgAppLoggingDefault,
 		Networking:    cnvrgAppNetworkingDefault,

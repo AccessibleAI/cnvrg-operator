@@ -1,0 +1,331 @@
+controlPlan:
+  baseConfig:
+    agentCustomTag: latest
+    checkJobExpiration: "true"
+    cnvrgJobUid: "1000"
+    defaultComputeConfig: /opt/kube
+    defaultComputeName: default
+    extractTagsFromCmd: "false"
+    intercom: "true"
+    passengerAppEnv: app
+    railsEnv: app
+    runJobsOnSelfCluster: "true"
+    sentryUrl: https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32
+    useStdout: "true"
+    featureFlags: ""
+  hyper:
+    cpuLimit: 2
+    cpuRequest: 100m
+    enableReadinessProbe: "true"
+    enabled: "true"
+    image: cnvrg/hyper-server:latest
+    memoryLimit: 4Gi
+    memoryRequest: 200Mi
+    nodePort: 30050
+    port: 5050
+    readinessPeriodSeconds: 100
+    readinessTimeoutSeconds: 60
+    replicas: 1
+    svcName: hyper
+    token: token
+  ldap:
+    enabled: "false"
+    host: ""
+    port: ""
+    account: "userPrincipalName"
+    base: ""
+    adminUser: ""
+    adminPassword: ""
+    ssl: ""
+  objectStorage:
+    cnvrgStorageAccessKey: AKIAIOSFODNN7EXAMPLE
+    cnvrgStorageBucket: cnvrg-storage
+    cnvrgStorageRegion: eastus
+    cnvrgStorageSecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    cnvrgStorageType: minio
+    gcpKeyfileMountPath: /tmp/gcp_keyfile
+    gcpKeyfileName: key.json
+    gcpStorageSecret: gcp-storage-secret
+    minioSseMasterKey: my-minio-key:a310aadcefdb634b748ae31225f175e3f64591f955dfc66ccc20e128a6817ff9
+    secretKeyBase: 0d2b33c2cc19cfaa838d3c354354a18fcc92beaaa8e97889ef99341c8aaf963ad3afcf0f7c20454cabb5c573c3fc35b60221034e109f4fb651ed1415bf61e9d5
+    stsIv: DeJ/CGz/Hkb/IbRe4t1xLg==
+    stsKey: 05646d3cbf8baa5be7150b4283eda07d
+  rbac:
+    role: cnvrg-control-plan-role
+    roleBindingName: cnvrg-control-plan-binding
+    serviceAccountName: cnvrg
+  registry:
+    name: cnvrg-registry
+    url: docker.io
+    user: ""
+    password: ""
+  searchkiq:
+    cpu: 750m
+    enabled: "true"
+    killTimeout: 60
+    memory: 750Mi
+    replicas: 1
+  seeder:
+    createBucketCmd: mb.sh
+    image: docker.io/cnvrg/cnvrg-boot:v0.26-tenancy
+    seedCmd: rails db:migrate && rails db:seed && rails libraries:update
+  sidekiq:
+    cpu: 1750m
+    enabled: "true"
+    killTimeout: 60
+    memory: 3750Mi
+    replicas: 2
+    split: "true"
+  smtp:
+    server: ""
+    port: ""
+    username: ""
+    password: ""
+    domain: ""
+  systemkiq:
+    cpu: 500m
+    enabled: "false"
+    killTimeout: 60
+    memory: 500Mi
+    replicas: 1
+  tenancy:
+    dedicatedNodes: "false"
+    enabled: "false"
+    key: cnvrg-taint
+    value: "true"
+  webapp:
+    cpu: 2
+    enabled: "true"
+    failureThreshold: 4
+    image: cnvrg/core:3.1.5
+    initialDelaySeconds: 10
+    memory: 4Gi
+    nodePort: 30080
+    oauthProxy:
+      skipAuthRegex:
+        - ^\/api
+        - \/assets
+        - \/healthz
+        - \/public
+        - \/pack
+        - \/vscode.tar.gz
+        - \/gitlens.vsix
+        - \/ms-python-release.vsix
+    passengerMaxPoolSize: 20
+    port: 8080
+    readinessPeriodSeconds: 25
+    readinessTimeoutSeconds: 20
+    replicas: 1
+    svcName: app
+
+dbs:
+  es:
+    cpuLimit: 2
+    cpuRequest: 1
+    enabled: "true"
+    fsGroup: 1000
+    image: docker.io/cnvrg/cnvrg-es:v7.8.1
+    memoryLimit: 4Gi
+    memoryRequest: 1Gi
+    nodePort: 32200
+    patchEsNodes: "true"
+    port: 9200
+    runAsUser: 1000
+    serviceAccount: es
+    storageSize: 30Gi
+    svcName: elasticsearch
+  minio:
+    cpuRequest: 1
+    enabled: "true"
+    image: docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z
+    memoryRequest: 2Gi
+    nodePort: 30090
+    port: 9000
+    replicas: 1
+    serviceAccount: ""
+    sharedStorage:
+      consistentHash:
+        key: httpQueryParameterName
+        value: uploadId
+      enabled: enabled
+    storageSize: 100Gi
+    svcName: minio
+  pg:
+    cpuRequest: 4
+    dbname: cnvrg_production
+    enabled: "true"
+    fixpg: "true"
+    fsGroup: 26
+    hugePages:
+      enabled: "false"
+      size: 2Mi
+      memory: ""
+    image: centos/postgresql-12-centos7
+    maxConnections: 100
+    memoryRequest: 4Gi
+    pass: pg_pass
+    port: 5432
+    runAsUser: 26
+    secretName: cnvrg-pg-secret
+    serviceAccount: default
+    sharedBuffers: 64MB
+    storageSize: 80Gi
+    svcName: postgres
+    user: cnvrg
+  redis:
+    appendonly: "yes"
+    enabled: "true"
+    image: docker.io/cnvrg/cnvrg-redis:v3.0.5.c2
+    limits:
+      cpu: 1
+      memory: 2Gi
+    port: 6379
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    serviceAccount: default
+    storageSize: 10Gi
+    svcName: redis
+
+logging:
+  enabled: "true"
+  fluentbit:
+    image: "cnvrg/cnvrg-fluentbit:v1.7.2"
+  elastalert:
+    enabled: "true"
+    image: "bitsensor/elastalert:3.0.0-beta.1"
+    port: 80
+    nodePort: 32030
+    containerPort: 3030
+    storageSize: "30Gi"
+    svcName: "elastalert"
+    storageClass: ""
+    cpuRequest: "100m"
+    memoryRequest: "200Mi"
+    cpuLimit: "400m"
+    memoryLimit: "800Mi"
+    runAsUser: 1000
+    fsGroup: 1000
+  kibana:
+    enabled: "true"
+    serviceAccount: "default"
+    svcName: "kibana"
+    port: 8080
+    image: "docker.elastic.co/kibana/kibana-oss:7.8.1"
+    nodePort: 30601
+    cpuRequest: "100m"
+    memoryRequest: "100Mi"
+    cpuLimit: 1
+    memoryLimit: "2Gi"
+    oauthProxy:
+      skipAuthRegex:
+
+monitoring:
+  enabled: "true"
+  kubeletServiceMonitor: "true"
+  upstreamPrometheus: "prometheus-operated.cnvrg-infra.svc.cluster.local:9090"
+
+  dcgmExporter:
+    enabled: "true"
+    image: "nvcr.io/nvidia/k8s/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04"
+
+  grafana:
+    enabled: "true"
+    image: grafana/grafana:7.3.4
+    nodePort: 30012
+    port: 8080
+    svcName: grafana
+    oauthProxy:
+      skipAuthRegex:
+        - \/api\/health
+
+  kubeStateMetrics:
+    enabled: "true"
+    image: quay.io/coreos/kube-state-metrics:v1.9.7
+
+  nodeExporter:
+    enabled: "true"
+    image: quay.io/prometheus/node-exporter:v1.0.1
+
+  prometheus:
+    cpuRequest: 1
+    enabled: "true"
+    image: quay.io/prometheus/prometheus:v2.22.1
+    memoryRequest: 1Gi
+    nodePort: 30909
+    port: 9090
+    storageClass: ""
+    storageSize: 100Gi
+    svcName: prometheus
+
+  prometheusOperator:
+    enabled: "true"
+    images:
+      kubeRbacProxyImage: quay.io/brancz/kube-rbac-proxy:v0.8.0
+      operatorImage: quay.io/prometheus-operator/prometheus-operator:v0.44.1
+      prometheusConfigReloaderImage: quay.io/prometheus-operator/prometheus-config-reloader:v0.44.1
+
+networking:
+  https:
+    enabled: "false"
+    cert: ""
+    key: ""
+    certSecret: ""
+  ingress:
+    ingressType: "istio"
+    perTryTimeout: "3600s"
+    retriesAttempts: 5
+    timeout: "18000s"
+  istio:
+    enabled: "true"
+    operatorImage: "docker.io/istio/operator:1.8.1"
+    hub: "docker.io/istio"
+    tag: "1.8.1"
+    proxyImage: "proxyv2"
+    mixerImage: "mixer"
+    pilotImage: "pilot"
+    externalIP: ""
+    ingressSvcAnnotations: ""
+    ingressSvcExtraPorts: ""
+    loadBalancerSourceRanges: ""
+
+sso:
+  enabled: "false"
+  image: "cnvrg/cnvrg-oauth-proxy:v7.0.1.c2"
+  redisConnectionUrl: "redis://redis:6379"
+  adminUser: ""
+  provider: ""
+  emailDomain: ""
+  clientID: ""
+  clientSecret: ""
+  cookieSecret: ""
+  azureTenant: ""
+  oidcIssuerURL: ""
+
+storage:
+  enabled: "false"
+  hostpath:
+    cpuLimit: 200m
+    cpuRequest: 100m
+    defaultSc: "false"
+    nodeName: ""
+    enabled: "false"
+    hostPath: /cnvrg-hostpath-storage
+    image: quay.io/kubevirt/hostpath-provisioner
+    memoryLimit: 200Mi
+    memoryRequest: 100Mi
+    reclaimPolicy: Retain
+    storageClassName: cnvrg-hostpath-storage
+  nfs:
+    cpuLimit: 100m
+    cpuRequest: 100m
+    defaultSc: "false"
+    enabled: "false"
+    server: ""
+    path: ""
+    image: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0
+    memoryLimit: 200Mi
+    memoryRequest: 100Mi
+    provisioner: cnvrg.io/ifs
+    reclaimPolicy: Retain
+    storageClassName: cnvrg-nfs-storage
