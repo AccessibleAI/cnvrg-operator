@@ -145,7 +145,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	var reconcileResult error
 
-	// Storage
+	// storage
 	cnvrgInfraLog.Info("applying storage")
 	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
@@ -166,21 +166,21 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		reconcileResult = err
 	}
 
-	// Monitoring
+	// monitoring
 	cnvrgInfraLog.Info("applying monitoring")
 	if err := desired.Apply(monitoring.InfraMonitoringState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
-	// infra base config
-	cnvrgInfraLog.Info("applying base config")
+	// registry
+	cnvrgInfraLog.Info("applying registry")
 	if err := desired.Apply(registry.State(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
-	// Istio
+	// istio
 	cnvrgInfraLog.Info("applying istio")
 	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)

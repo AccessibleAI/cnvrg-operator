@@ -8,18 +8,6 @@ import (
 
 const path = "/pkg/controlplan/tmpl"
 
-var registryState = []*desired.State{
-	{
-
-		TemplatePath:   path + "/conf/registry/secret.tpl",
-		Template:       nil,
-		ParsedTemplate: "",
-		Obj:            &unstructured.Unstructured{},
-		GVR:            desired.Kinds[desired.SecretGVR],
-		Own:            true,
-	},
-}
-
 var rbacState = []*desired.State{
 	{
 
@@ -205,7 +193,6 @@ var ssoState = []*desired.State{
 
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	state = append(state, registryState...)
 	state = append(state, rbacState...)
 	state = append(state, controlPlanConfigState...)
 

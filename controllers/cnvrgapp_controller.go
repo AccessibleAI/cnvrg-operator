@@ -10,6 +10,7 @@ import (
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
+	"github.com/cnvrg-operator/pkg/registry"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
@@ -249,6 +250,13 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 }
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
+
+	// registry
+	cnvrgInfraLog.Info("applying registry")
+	if err := desired.Apply(registry.State(), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
 
 	// dbs
 	cnvrgAppLog.Info("applying dbs")

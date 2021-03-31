@@ -1,3 +1,5 @@
+clusterDomain: ""
+infraNamespace: "cnvrg-infra"
 controlPlan:
   baseConfig:
     agentCustomTag: latest
@@ -54,11 +56,6 @@ controlPlan:
     role: cnvrg-control-plan-role
     roleBindingName: cnvrg-control-plan-binding
     serviceAccountName: cnvrg
-  registry:
-    name: cnvrg-registry
-    url: docker.io
-    user: ""
-    password: ""
   searchkiq:
     cpu: 750m
     enabled: "true"
@@ -329,3 +326,9 @@ storage:
     provisioner: cnvrg.io/ifs
     reclaimPolicy: Retain
     storageClassName: cnvrg-nfs-storage
+
+registry:
+  name: cnvrg-registry
+  url: docker.io
+  user: ""
+  password: ""

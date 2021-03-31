@@ -1,4 +1,4 @@
-{{- define "spec.networking" }}
+{{- define "spec.networking_infra" }}
 networking:
   https:
     enabled: {{ .Values.networking.https.enabled }}

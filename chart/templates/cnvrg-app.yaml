@@ -4,17 +4,11 @@ metadata:
   name: cnvrg-app
   namespace: {{ template "spec.cnvrgNs" . }}
 spec:
-  {{- include "spec.globals" . | indent 2 }}
-  {{- include "spec.tenancy" . | indent 2 }}
-  {{- include "spec.cnvrgApp" . | indent 2 }}
-  {{- include "spec.redis" . | indent 2 }}
-  {{- include "spec.pg" . | indent 2 }}
-  {{- include "spec.logging" . | indent 2 }}
-  {{- include "spec.minio" . | indent 2 }}
-  {{- include "spec.monitoring" . | indent 2 }}
-  {{- include "spec.networking" . | indent 2 }}
-  {{- include "spec.nvidiadp" . | indent 2 }}
-  {{- include "spec.mpi" . | indent 2 }}
-  {{- include "spec.storage" . | indent 2 }}
-  {{- include "spec.vpa" . | indent 2 }}
-
+  clusterDomain: {{ .Values.clusterDomain }}
+  {{- include "spec.controlPlan" . | indent 2 }}
+  {{- include "spec.registry" . | indent 2 }}
+  {{- include "spec.dbs" . | indent 2 }}
+  {{- include "spec.logging_app" . | indent 2 }}
+  {{- include "spec.monitoring_app" . | indent 2 }}
+  {{- include "spec.networking_app" . | indent 2 }}
+  {{- include "spec.sso" . | indent 2 }}

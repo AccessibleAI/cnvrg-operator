@@ -167,7 +167,6 @@ type ControlPlan struct {
 	Seeder        Seeder        `json:"seeder,omitempty"`
 	BaseConfig    BaseConfig    `json:"baseConfig,omitempty"`
 	Ldap          Ldap          `json:"ldap,omitempty"`
-	Registry      Registry      `json:"registry,omitempty"`
 	Rbac          Rbac          `json:"rbac,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
 	Tenancy       Tenancy       `json:"tenancy,omitempty"`
@@ -329,7 +328,6 @@ var controlPlanDefault = ControlPlan{
 		Ssl:           "", // true/false
 	},
 
-	Registry: registryDefault,
 
 	Rbac: Rbac{
 		Role:               "cnvrg-control-plan-role",

@@ -1,9 +1,7 @@
-{{- define "spec.logging" }}
+{{- define "spec.logging_app" }}
 
 logging:
   enabled: {{ .Values.logging.enabled }}
-  fluentbit:
-    image: {{ .Values.logging.fluentbit.image }}
   elastalert:
     enabled: {{ .Values.logging.elastalert.enabled }}
     image: {{ .Values.logging.elastalert.image }}

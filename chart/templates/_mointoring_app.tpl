@@ -1,12 +1,7 @@
-{{- define "spec.monitoring" }}
+{{- define "spec.monitoring_app" }}
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
-  kubeletServiceMonitor: {{ .Values.monitoring.kubeletServiceMonitor }}
   upstreamPrometheus: {{ .Values.monitoring.upstreamPrometheus }}
-
-  dcgmExporter:
-    enabled: {{ .Values.monitoring.dcgmExporter.enabled }}
-    image: {{ .Values.monitoring.dcgmExporter.image }}
 
   grafana:
     enabled: {{ .Values.monitoring.grafana.enabled }}
@@ -18,14 +13,6 @@ monitoring:
       skipAuthRegex:
         - \/api\/health
 
-  kubeStateMetrics:
-    enabled: {{ .Values.monitoring.kubeStateMetrics.enabled }}
-    image: {{ .Values.monitoring.kubeStateMetrics.image }}
-
-  nodeExporter:
-    enabled: {{ .Values.monitoring.nodeExporter.enabled }}
-    image: {{ .Values.monitoring.nodeExporter.image }}
-
   prometheus:
     cpuRequest: {{ .Values.monitoring.prometheus.cpuRequest }}
     enabled: {{ .Values.monitoring.prometheus.enabled }}
@@ -36,12 +23,5 @@ monitoring:
     storageClass: {{ .Values.monitoring.prometheus.storageSize }}
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}
     svcName: {{ .Values.monitoring.prometheus.svcName }}
-
-  prometheusOperator:
-    enabled: {{ .Values.monitoring.prometheusOperator.enabled }}
-    images:
-      kubeRbacProxyImage: {{ .Values.monitoring.prometheusOperator.images.kubeRbacProxyImage }}
-      operatorImage: {{ .Values.monitoring.prometheusOperator.images.operatorImage }}
-      prometheusConfigReloaderImage: {{ .Values.monitoring.prometheusOperator.images.prometheusConfigReloaderImage }}
 
 {{- end }}

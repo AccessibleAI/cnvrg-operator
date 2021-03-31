@@ -1,3 +1,4 @@
+{{- define "spec.sso" }}
 sso:
   enabled: {{ .Values.sso.enabled}}
   image: {{ .Values.sso.image }}
@@ -10,3 +11,4 @@ sso:
   cookieSecret: {{ .Values.sso.cookieSecret }}
   azureTenant: {{ .Values.sso.azureTenant }}
   oidcIssuerURL: {{ .Values.sso.oidcIssuerURL }}
+{{- end }}
