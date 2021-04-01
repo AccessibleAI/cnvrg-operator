@@ -361,33 +361,3 @@ TAG=<docker-tag> make deploy
 # use single command 
 TAG=<docker-tag> make docker-build docker-push deploy
 ```
-
-### `CnvrgInfra` example 
-```shell
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgInfra
-metadata:
-  name: cnvrginfra
-spec:
-  clusterDomain: <cluster-domain>
-  registry:
-    user: <user>
-    password: <password>
-```
-
-### `CnvrgApp` example
-```shell
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgApp
-metadata:
-  name: cnvrgapp
-  namespace: cnvrg-1
-spec:
-  clusterDomain: <cluster-domain>
-  controlPlane:
-    webapp:
-      image: <cnvrg-app-image> 
-    registry:
-      user: <user>
-      password: <password>
-```
