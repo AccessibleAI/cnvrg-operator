@@ -17,7 +17,7 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.controlPlan.webapp.image
+    - jsonPath: .spec.controlPlane.webapp.image
       name: Version
       type: string
     - jsonPath: .status.status
@@ -46,7 +46,7 @@ spec:
             properties:
               clusterDomain:
                 type: string
-              controlPlan:
+              controlPlane:
                 properties:
                   baseConfig:
                     properties:

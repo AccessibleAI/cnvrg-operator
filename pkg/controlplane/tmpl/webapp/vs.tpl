@@ -1,11 +1,11 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Spec.ControlPlan.WebApp.SvcName }}
+  name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ ns . }}
 spec:
   hosts:
-    - "{{.Spec.ControlPlan.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ istioGwName .}}
   http:
@@ -15,7 +15,7 @@ spec:
       timeout: {{ .Spec.Networking.Ingress.Timeout }}
       route:
         - destination:
-            host: "{{ .Spec.ControlPlan.WebApp.SvcName }}.{{ ns . }}.svc.cluster.local"
+            host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ ns . }}.svc.cluster.local"
       headers:
         request:
           set:

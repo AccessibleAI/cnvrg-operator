@@ -6,7 +6,7 @@ import (
 
 type CnvrgAppSpec struct {
 	ClusterDomain string             `json:"clusterDomain,omitempty"`
-	ControlPlan   ControlPlan        `json:"controlPlan,omitempty"`
+	ControlPlane  ControlPlane       `json:"controlPlane,omitempty"`
 	Registry      Registry           `json:"registry,omitempty"`
 	Dbs           AppDbs             `json:"dbs,omitempty"`
 	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
@@ -16,7 +16,7 @@ type CnvrgAppSpec struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlan.webapp.image`
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlane.webapp.image`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
 // +kubebuilder:subresource:status
@@ -42,7 +42,7 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain: "",
-		ControlPlan:   controlPlanDefault,
+		ControlPlane:  controlPlanDefault,
 		Registry:      registryDefault,
 		Dbs:           appDbsDefaults,
 		Logging:       cnvrgAppLoggingDefault,

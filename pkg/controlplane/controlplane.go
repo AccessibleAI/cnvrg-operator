@@ -1,4 +1,4 @@
-package controlplan
+package controlplane
 
 import (
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const path = "/pkg/controlplan/tmpl"
+const path = "/pkg/controlplane/tmpl"
 
 var rbacState = []*desired.State{
 	{
@@ -41,7 +41,7 @@ var rbacState = []*desired.State{
 	},
 }
 
-var controlPlanConfigState = []*desired.State{
+var ControlPlaneConfigState = []*desired.State{
 	{
 
 		TemplatePath:   path + "/conf/cm/config-base.tpl",
@@ -243,9 +243,9 @@ var mpiInfraState = []*desired.State{
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, rbacState...)
-	state = append(state, controlPlanConfigState...)
+	state = append(state, ControlPlaneConfigState...)
 
-	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled == "true" {
 		state = append(state, webAppState...)
 	}
 
@@ -253,27 +253,27 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, ssoState...)
 	}
 
-	if cnvrgApp.Spec.ControlPlan.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "true" {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "true" {
 		state = append(state, sidekiqState...)
 	}
 
-	if cnvrgApp.Spec.ControlPlan.Searchkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "true" {
+	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "true" {
 		state = append(state, searchkiqState...)
 	}
 
-	if cnvrgApp.Spec.ControlPlan.Systemkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "true" {
+	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "true" {
 		state = append(state, systemkiqState...)
 	}
 
-	if cnvrgApp.Spec.ControlPlan.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlan.Sidekiq.Split == "false" {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "false" {
 		state = append(state, sidekiqState...)
 	}
 
-	if cnvrgApp.Spec.ControlPlan.Hyper.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Hyper.Enabled == "true" {
 		state = append(state, hyperState...)
 	}
 
-	if cnvrgApp.Spec.ControlPlan.Mpi.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Mpi.Enabled == "true" {
 		state = append(state, mpiAppState...)
 	}
 	return state

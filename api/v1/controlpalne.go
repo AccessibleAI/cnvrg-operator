@@ -157,7 +157,7 @@ type CnvrgRouter struct {
 	Port     int    `json:"port,omitempty"`
 }
 
-type ControlPlan struct {
+type ControlPlane struct {
 	WebApp        WebApp        `json:"webapp,omitempty"`
 	Sidekiq       Sidekiq       `json:"sidekiq,omitempty"`
 	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
@@ -213,7 +213,7 @@ var registryDefault = Registry{
 	Password: "",
 }
 
-var controlPlanDefault = ControlPlan{
+var controlPlanDefault = ControlPlane{
 
 	WebApp: WebApp{
 		Replicas:                1,

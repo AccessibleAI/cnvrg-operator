@@ -11,7 +11,7 @@ data:
   REDIS_URL: "{{ redisUrl . }}"
   ELASTICSEARCH_URL: "{{ esUrl . }}"
   HYPER_SERVER_URL: "{{ hyperServerUrl .}}"
-  HYPER_SERVER_PORT: "{{ .Spec.ControlPlan.Hyper.Port }}"
+  HYPER_SERVER_PORT: "{{ .Spec.ControlPlane.Hyper.Port }}"
   ROUTE_BY_ISTIO: "{{ routeBy . "ISTIO" }}"
   ROUTE_BY_OPENSHIFT: "{{ routeBy . "OPENSHIFT" }}"
   ROUTE_BY_NGINX_INGRESS: "{{ routeBy . "NGINX_INGRESS" }}"

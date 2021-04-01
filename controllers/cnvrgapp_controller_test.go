@@ -52,14 +52,14 @@ var _ = Describe("CnvrgApp controller", func() {
 	//
 	//		//Eventually(func() map[string]string {
 	//		//	return deployment.Spec.Template.Spec.NodeSelector
-	//		//}, timeout, interval).Should(Equal(map[string]string{cnvrgApp.Spec.ControlPlan.Conf.Tenancy.Key: cnvrgApp.Spec.ControlPlan.Conf.Tenancy.Value}))
+	//		//}, timeout, interval).Should(Equal(map[string]string{cnvrgApp.Spec.ControlPlanee.Conf.Tenancy.Key: cnvrgApp.Spec.ControlPlanee.Conf.Tenancy.Value}))
 	//
 	//	})
 	//	It("Tenancy is set", func() {
 	//		ctx := context.Background()
 	//		ns := "tenancy-set-pg"
 	//		testSpec := mlopsv1.DefaultCnvrgAppSpec()
-	//		testSpec.ControlPlan.Tenancy.Enabled = "true"
+	//		testSpec.ControlPlanee.Tenancy.Enabled = "true"
 	//		testSpec.CnvrgNs = ns
 	//		testSpec.Ingress.Enabled = "false"
 	//		cnvrgApp := &mlopsv1.CnvrgApp{
@@ -77,14 +77,14 @@ var _ = Describe("CnvrgApp controller", func() {
 	//			}
 	//			return true
 	//		}, timeout, interval).Should(BeTrue())
-	//		shouldBe := map[string]string{cnvrgApp.Spec.ControlPlan.Tenancy.Key: cnvrgApp.Spec.ControlPlan.Tenancy.Value}
+	//		shouldBe := map[string]string{cnvrgApp.Spec.ControlPlanee.Tenancy.Key: cnvrgApp.Spec.ControlPlanee.Tenancy.Value}
 	//		Expect(deployment.Spec.Template.Spec.NodeSelector).Should(Equal(shouldBe))
 	//	})
 	//	//It("Tenancy is set, HostPath storage is set", func() {
 	//	//	ctx := context.Background()
 	//	//	ns := "tenancy-set-pg-hostpath"
 	//	//	testSpec := mlopsv1.DefaultCnvrgAppSpec()
-	//	//	testSpec.ControlPlan.Tenancy.Enabled = "true"
+	//	//	testSpec.ControlPlanee.Tenancy.Enabled = "true"
 	//	//	testSpec.Storage.Enabled = "true"
 	//	//	testSpec.Storage.Hostpath.Enabled = "true"
 	//	//	testSpec.Storage.Hostpath.NodeName = "node-1"
@@ -106,7 +106,7 @@ var _ = Describe("CnvrgApp controller", func() {
 	//	//		return true
 	//	//	}, timeout, interval).Should(BeTrue())
 	//	//	shouldBe := map[string]string{
-	//	//		cnvrgApp.Spec.ControlPlan.Tenancy.Key: cnvrgApp.Spec.ControlPlan.Tenancy.Value,
+	//	//		cnvrgApp.Spec.ControlPlanee.Tenancy.Key: cnvrgApp.Spec.ControlPlanee.Tenancy.Value,
 	//	//		"kubernetes.io/hostname":              testSpec.Storage.Hostpath.NodeName,
 	//	//	}
 	//	//	Expect(deployment.Spec.Template.Spec.NodeSelector).Should(Equal(shouldBe))
@@ -116,8 +116,8 @@ var _ = Describe("CnvrgApp controller", func() {
 	//	//	ns := "tenancy-true-dedicated-true"
 	//	//	testSpec := mlopsv1.DefaultCnvrgAppSpec()
 	//	//	testSpec.CnvrgNs = ns
-	//	//	testSpec.ControlPlan.Tenancy.Enabled = "true"
-	//	//	testSpec.ControlPlan.Tenancy.DedicatedNodes = "true"
+	//	//	testSpec.ControlPlanee.Tenancy.Enabled = "true"
+	//	//	testSpec.ControlPlanee.Tenancy.DedicatedNodes = "true"
 	//	//	testSpec.Networking.Enabled = "false"
 	//	//	cnvrgApp := &mlopsv1.CnvrgApp{
 	//	//		TypeMeta:   metav1.TypeMeta{Kind: "CnvrgApp", APIVersion: "mlops.cnvrg.io/v1"},
@@ -134,13 +134,13 @@ var _ = Describe("CnvrgApp controller", func() {
 	//	//		}
 	//	//		return true
 	//	//	}, timeout, interval).Should(BeTrue())
-	//	//	shouldBe := map[string]string{cnvrgApp.Spec.ControlPlan.Tenancy.Key: cnvrgApp.Spec.ControlPlan.Tenancy.Value}
+	//	//	shouldBe := map[string]string{cnvrgApp.Spec.ControlPlanee.Tenancy.Key: cnvrgApp.Spec.ControlPlanee.Tenancy.Value}
 	//	//	Expect(deployment.Spec.Template.Spec.NodeSelector).Should(Equal(shouldBe))
 	//	//	shouldBeToleration := []corev1.Toleration{
 	//	//		{
-	//	//			Key:      cnvrgApp.Spec.ControlPlan.Tenancy.Key,
+	//	//			Key:      cnvrgApp.Spec.ControlPlanee.Tenancy.Key,
 	//	//			Operator: "Equal",
-	//	//			Value:    cnvrgApp.Spec.ControlPlan.Tenancy.Value,
+	//	//			Value:    cnvrgApp.Spec.ControlPlanee.Tenancy.Value,
 	//	//			Effect:   "NoSchedule",
 	//	//		},
 	//	//	}
@@ -203,7 +203,7 @@ var _ = Describe("CnvrgApp controller", func() {
 	//		createNs(ns)
 	//		testSpec := mlopsv1.DefaultCnvrgAppSpec()
 	//		testSpec.CnvrgNs = ns
-	//		testSpec.ControlPlan.Tenancy.Enabled = "true"
+	//		testSpec.ControlPlanee.Tenancy.Enabled = "true"
 	//
 	//		cnvrgApp := &mlopsv1.CnvrgApp{
 	//			TypeMeta:   metav1.TypeMeta{Kind: "CnvrgApp", APIVersion: "mlops.cnvrg.io/v1"},
@@ -233,7 +233,7 @@ var _ = Describe("CnvrgApp controller", func() {
 	//		createNs(ns)
 	//		testSpec := mlopsv1.DefaultCnvrgAppSpec()
 	//		testSpec.CnvrgNs = ns
-	//		testSpec.ControlPlan.Tenancy.Enabled = "true"
+	//		testSpec.ControlPlanee.Tenancy.Enabled = "true"
 	//		cnvrgApp := &mlopsv1.CnvrgApp{
 	//			TypeMeta:   metav1.TypeMeta{Kind: "CnvrgApp", APIVersion: "mlops.cnvrg.io/v1"},
 	//			ObjectMeta: metav1.ObjectMeta{Name: ns},
@@ -249,7 +249,7 @@ var _ = Describe("CnvrgApp controller", func() {
 	//			}
 	//			return true
 	//		}, timeout, interval).Should(BeTrue())
-	//		shouldBe := map[string]string{cnvrgApp.Spec.ControlPlan.Tenancy.Key: cnvrgApp.Spec.ControlPlan.Tenancy.Value}
+	//		shouldBe := map[string]string{cnvrgApp.Spec.ControlPlanee.Tenancy.Key: cnvrgApp.Spec.ControlPlanee.Tenancy.Value}
 	//		Expect(deployment.Spec.Template.Spec.NodeSelector).Should(Equal(shouldBe))
 	//
 	//	})

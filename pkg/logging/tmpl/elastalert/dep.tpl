@@ -19,22 +19,22 @@ spec:
       securityContext:
         runAsUser: {{ .Spec.Logging.Elastalert.RunAsUser }}
         fsGroup: {{ .Spec.Logging.Elastalert.FsGroup }}
-      serviceAccountName: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
-      {{- if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "false") }}
+      serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+      {{- if and (ne .Spec.ControlPlane.BaseConfig.HostpathNode "") (eq .Spec.ControlPlane.Tenancy.Enabled "false") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
-      {{- else if and (eq .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
+        kubernetes.io/hostname: "{{ .Spec.ControlPlane.BaseConfig.HostpathNode }}"
+      {{- else if and (eq .Spec.ControlPlane.BaseConfig.HostpathNode "") (eq .Spec.ControlPlane.Tenancy.Enabled "true") }}
       nodeSelector:
-        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
-      {{- else if and (ne .Spec.ControlPlan.BaseConfig.HostpathNode "") (eq .Spec.ControlPlan.Tenancy.Enabled "true") }}
+        {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
+      {{- else if and (ne .Spec.ControlPlane.BaseConfig.HostpathNode "") (eq .Spec.ControlPlane.Tenancy.Enabled "true") }}
       nodeSelector:
-        kubernetes.io/hostname: "{{ .Spec.ControlPlan.BaseConfig.HostpathNode }}"
-        {{ .Spec.ControlPlan.Tenancy.Key }}: "{{ .Spec.ControlPlan.Tenancy.Value }}"
+        kubernetes.io/hostname: "{{ .Spec.ControlPlane.BaseConfig.HostpathNode }}"
+        {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
       {{- end }}
       tolerations:
-        - key: {{ .Spec.ControlPlan.Tenancy.Key }}
+        - key: {{ .Spec.ControlPlane.Tenancy.Key }}
           operator: Equal
-          value: "{{ .Spec.ControlPlan.Tenancy.Value }}"
+          value: "{{ .Spec.ControlPlane.Tenancy.Value }}"
           effect: "NoSchedule"
       containers:
       - image: {{ .Spec.Logging.Elastalert.Image }}

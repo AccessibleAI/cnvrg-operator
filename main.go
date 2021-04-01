@@ -101,11 +101,11 @@ func generateDocs() {
 
 	finalParams := make(map[string]interface{})
 	skipKeys := []string{
-		"controlPlan.baseConfig.sentryUrl",
-		"controlPlan.objectStorage.stsIv",
-		"controlPlan.objectStorage.stsKey",
-		"controlPlan.objectStorage.secretKeyBase",
-		"controlPlan.objectStorage.minioSseMasterKey",
+		"controlPlane.baseConfig.sentryUrl",
+		"controlPlane.objectStorage.stsIv",
+		"controlPlane.objectStorage.stsKey",
+		"controlPlane.objectStorage.secretKeyBase",
+		"controlPlane.objectStorage.minioSseMasterKey",
 	}
 	for key, value := range appParams {
 		skipKey := false
@@ -222,7 +222,7 @@ func setupCommands() {
 }
 
 func informPkger() {
-	pkger.Include("/pkg/controlplan/tmpl")
+	pkger.Include("/pkg/controlplane/tmpl")
 	pkger.Include("/pkg/dbs/tmpl")
 	pkger.Include("/pkg/logging/tmpl")
 	pkger.Include("/pkg/monitoring/tmpl")

@@ -17,20 +17,20 @@ spec:
     spec:
       serviceAccountName: mpi-operator
       imagePullSecrets:
-        - name: {{ .Spec.ControlPlan.Mpi.Registry.Name }}
+        - name: {{ .Spec.ControlPlane.Mpi.Registry.Name }}
       containers:
       - name: mpi-operator
         imagePullPolicy: Always
-        image: {{ .Spec.ControlPlan.Mpi.Image }}
+        image: {{ .Spec.ControlPlane.Mpi.Image }}
         args:
         - -alsologtostderr
         - --kubectl-delivery-image
-        - {{ .Spec.ControlPlan.Mpi.KubectlDeliveryImage }}
+        - {{ .Spec.ControlPlane.Mpi.KubectlDeliveryImage }}
         - --lock-namespace
         - {{ ns . }}
         - --namespace
         - {{ ns . }}
-        {{- range $extraArgName, $extraArgValue := .Spec.ControlPlan.Mpi.ExtraArgs }}
+        {{- range $extraArgName, $extraArgValue := .Spec.ControlPlane.Mpi.ExtraArgs }}
         - "{{ $extraArgName }}"
         - "{{ $extraArgValue }}"
         {{- end }}

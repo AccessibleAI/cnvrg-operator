@@ -124,15 +124,15 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"appDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
-					strconv.Itoa(cnvrgApp.Spec.ControlPlan.WebApp.NodePort)
+					strconv.Itoa(cnvrgApp.Spec.ControlPlane.WebApp.NodePort)
 			} else {
-				return cnvrgApp.Spec.ControlPlan.WebApp.SvcName + "." + cnvrgApp.Spec.ClusterDomain
+				return cnvrgApp.Spec.ControlPlane.WebApp.SvcName + "." + cnvrgApp.Spec.ClusterDomain
 			}
 		},
 		"defaultComputeClusterDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
-					strconv.Itoa(cnvrgApp.Spec.ControlPlan.WebApp.NodePort)
+					strconv.Itoa(cnvrgApp.Spec.ControlPlane.WebApp.NodePort)
 			} else {
 				return cnvrgApp.Spec.ClusterDomain
 			}
@@ -144,7 +144,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return "http://" + cnvrgApp.Spec.Dbs.Es.SvcName
 		},
 		"hyperServerUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			return "http://" + cnvrgApp.Spec.ControlPlan.Hyper.SvcName
+			return "http://" + cnvrgApp.Spec.ControlPlane.Hyper.SvcName
 		},
 		"esFullInternalUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			return fmt.Sprintf("http://%s.%s.svc.cluster.local:%d",
@@ -153,8 +153,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				cnvrgApp.Spec.Dbs.Es.Port)
 		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint != "" {
-				return cnvrgApp.Spec.ControlPlan.ObjectStorage.CnvrgStorageEndpoint
+			if cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint != "" {
+				return cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint
 			}
 			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
 				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
@@ -231,7 +231,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			if cnvrgApp.Spec.SSO.Enabled == "true" {
 				return 3000
 			}
-			return cnvrgApp.Spec.ControlPlan.WebApp.Port
+			return cnvrgApp.Spec.ControlPlane.WebApp.Port
 		},
 		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
 			return fmt.Sprintf(`

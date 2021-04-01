@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/pkg/controlplan"
+	"github.com/cnvrg-operator/pkg/controlplane"
 	"github.com/cnvrg-operator/pkg/dbs"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/logging"
@@ -99,7 +99,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	ready, percentageReady, err := r.getControlPlanReadinessStatus(cnvrgApp)
+	ready, percentageReady, err := r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -113,7 +113,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// get control plan readiness
-	ready, percentageReady, err = r.getControlPlanReadinessStatus(cnvrgApp)
+	ready, percentageReady, err = r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -138,13 +138,13 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 }
 
-func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
+func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
 
 	readyState := make(map[string]bool)
 
 	// check webapp status
-	if cnvrgApp.Spec.ControlPlan.WebApp.Enabled == "true" {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlan.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
+	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled == "true" {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, err
@@ -153,7 +153,7 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check sidekiq status
-	if cnvrgApp.Spec.ControlPlan.Sidekiq.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == "true" {
 		name := types.NamespacedName{Name: "sidekiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -163,7 +163,7 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check searchkiq status
-	if cnvrgApp.Spec.ControlPlan.Searchkiq.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled == "true" {
 		name := types.NamespacedName{Name: "searchkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -173,7 +173,7 @@ func (r *CnvrgAppReconciler) getControlPlanReadinessStatus(cnvrgApp *mlopsv1.Cnv
 	}
 
 	// check systemkiq status
-	if cnvrgApp.Spec.ControlPlan.Systemkiq.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled == "true" {
 		name := types.NamespacedName{Name: "systemkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -265,9 +265,9 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
-	// controlplan
-	cnvrgAppLog.Info("applying controlplan")
-	if err := desired.Apply(controlplan.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	// controlplane
+	cnvrgAppLog.Info("applying controlplane")
+	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}

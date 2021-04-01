@@ -1,6 +1,8 @@
-clusterDomain: ""
+infraClusterDomain: ""
+appClusterDomain: ""
 infraNamespace: "cnvrg-infra"
-controlPlan:
+
+controlPlane:
   baseConfig:
     agentCustomTag: latest
     checkJobExpiration: "true"
@@ -114,6 +116,11 @@ controlPlan:
     readinessTimeoutSeconds: 20
     replicas: 1
     svcName: app
+  mpi:
+    enabled: "true"
+    image: "mpioperator/mpi-operator:v0.2.3"
+    kubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3"
+    extraArgs: {}
 
 dbs:
   es:
