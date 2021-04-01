@@ -360,6 +360,9 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 	for _, m := range istioManifests {
 		// Make sure IstioOperator was deployed
 		if m.GVR == desired.Kinds[desired.IstioGVR] {
+			if m.TemplateData == nil {
+				m.TemplateData = cnvrgInfra
+			}
 			if err := m.GenerateDeployable(); err != nil {
 				cnvrgInfraLog.Error(err, "can't make manifest deployable")
 				return err
