@@ -62,4 +62,18 @@ spec:
             requests:
               cpu: {{ .Spec.Logging.Kibana.CPURequest }}
               memory: {{ .Spec.Logging.Kibana.MemoryRequest }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/bash
+                  - -c
+                  - |
+                    while [[ "$ready" != "200" ]]; do
+                      ready=$(curl -s http://localhost:$SERVER_PORT/api/status -o /dev/null -w '%{http_code}')
+                      echo "kibana not ready yet.. "
+                      sleep 1
+                    done
+                    curl -XPOST "http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/cnvrg" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d '{"attributes":{"title": "cnvrg","timeFieldName": "@timestamp"}}'
+
 

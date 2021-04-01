@@ -1,10 +1,10 @@
 {{- define "spec.monitoring_app" }}
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: "{{ .Values.monitoring.enabled }}"
   upstreamPrometheus: {{ .Values.monitoring.upstreamPrometheus }}
 
   grafana:
-    enabled: {{ .Values.monitoring.grafana.enabled }}
+    enabled: "{{ .Values.monitoring.grafana.enabled }}"
     image: {{ .Values.monitoring.grafana.image }}
     nodePort: {{ .Values.monitoring.grafana.nodePort }}
     port: {{ .Values.monitoring.grafana.port }}
@@ -15,7 +15,7 @@ monitoring:
 
   prometheus:
     cpuRequest: {{ .Values.monitoring.prometheus.cpuRequest }}
-    enabled: {{ .Values.monitoring.prometheus.enabled }}
+    enabled: "{{ .Values.monitoring.prometheus.enabled }}"
     image: {{ .Values.monitoring.prometheus.image }}
     memoryRequest: {{ .Values.monitoring.prometheus.memoryRequest }}
     nodePort: {{ .Values.monitoring.prometheus.nodePort }}

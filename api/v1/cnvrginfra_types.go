@@ -8,7 +8,6 @@ type CnvrgInfraSpec struct {
 	ClusterDomain     string               `json:"clusterDomain,omitempty"`
 	InfraNamespace    string               `json:"infraNamespace,omitempty"`
 	InfraReconcilerCm string               `json:"infraReconcilerCm,omitempty"`
-	CnvrgAppInstances []CnvrgAppInstance   `json:"cnvrgAppInstances,omitempty"`
 	Monitoring        CnvrgInfraMonitoring `json:"monitoring,omitempty"`
 	Networking        CnvrgInfraNetworking `json:"networking,omitempty"`
 	Logging           CnvrgInfraLogging    `json:"logging,omitempty"`
@@ -38,11 +37,6 @@ type CnvrgInfraList struct {
 	Items           []CnvrgInfra `json:"items"`
 }
 
-type CnvrgAppInstance struct {
-	Name      string `json:"name,omitempty"`
-	Namespace string `json:"namespace,omitempty"`
-}
-
 func init() {
 	SchemeBuilder.Register(&CnvrgInfra{}, &CnvrgInfraList{})
 }
@@ -52,7 +46,6 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		ClusterDomain:     "",
 		InfraNamespace:    "cnvrg-infra",
 		InfraReconcilerCm: "infra-reconciler-cm",
-		CnvrgAppInstances: []CnvrgAppInstance{},
 		SSO:               ssoDefault,
 		Storage:           storageDefault,
 		Networking:        cnvrgInfraNetworkingDefault,

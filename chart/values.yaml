@@ -120,7 +120,7 @@ controlPlane:
     enabled: "true"
     image: "mpioperator/mpi-operator:v0.2.3"
     kubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3"
-    extraArgs: {}
+    extraArgs: ""
 
 dbs:
   es:

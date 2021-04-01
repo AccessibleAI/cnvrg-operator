@@ -43,15 +43,6 @@ spec:
             properties:
               clusterDomain:
                 type: string
-              cnvrgAppInstances:
-                items:
-                  properties:
-                    name:
-                      type: string
-                    namespace:
-                      type: string
-                  type: object
-                type: array
               dbs:
                 properties:
                   redis:

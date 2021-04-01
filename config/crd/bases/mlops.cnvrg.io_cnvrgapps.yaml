@@ -373,8 +373,6 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                    required:
-                    - serviceAccount
                     type: object
                   minio:
                     properties:
@@ -422,8 +420,6 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                    required:
-                    - serviceAccount
                     type: object
                   pg:
                     properties:

@@ -32,7 +32,7 @@ type Pg struct {
 
 type Minio struct {
 	Enabled        string            `json:"enabled,omitempty"`
-	ServiceAccount string            `json:"serviceAccount"`
+	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Replicas       int               `json:"replicas,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
@@ -64,7 +64,7 @@ type Redis struct {
 
 type Es struct {
 	Enabled        string            `json:"enabled,omitempty"`
-	ServiceAccount string            `json:"serviceAccount"`
+	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`

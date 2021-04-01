@@ -123,9 +123,6 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if ready {
 		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
-		if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
-			return ctrl.Result{}, err
-		}
 		return ctrl.Result{}, nil
 	} else {
 		requeueAfter, err := time.ParseDuration("30s")
@@ -218,6 +215,13 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		ready, err := r.CheckStatefulSetReadiness(name)
 		if err != nil {
 			return false, 0, err
+		}
+		// if es is ready, trigger fluentbit reconfiguration
+		if ready {
+			cnvrgAppLog.Info("es is ready, triggering fluentbit reconfiguration")
+			if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
+				return false, 0, err
+			}
 		}
 		readyState["es"] = ready
 	}
@@ -510,6 +514,34 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// cleanup pvc
+	if err := r.cleanupPVCs(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgAppReconciler) cleanupPVCs() error {
+	cnvrgAppLog.Info("running pvc cleanup")
+	ctx := context.Background()
+	pvcList := v1core.PersistentVolumeClaimList{}
+	if err := r.List(ctx, &pvcList); err != nil {
+		cnvrgAppLog.Error(err, "failed cleanup pvcs")
+		return err
+	}
+	for _, pvc := range pvcList.Items {
+		if _, ok := pvc.ObjectMeta.Labels["app"]; ok {
+			if pvc.ObjectMeta.Labels["app"] == "prometheus" || pvc.ObjectMeta.Labels["app"] == "elasticsearch" {
+				if err := r.Delete(ctx, &pvc); err != nil && errors.IsNotFound(err) {
+					cnvrgInfraLog.Info("pvc already deleted")
+				} else if err != nil {
+					cnvrgInfraLog.Error(err, "error deleting prometheus pvc")
+					return err
+				}
+			}
+		}
+	}
 	return nil
 }
 

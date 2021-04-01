@@ -280,7 +280,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 	}
 }
 
-func (s *State) GenerateDeployable(templateData interface{}) error {
+func (s *State) GenerateDeployable() error {
 	var tpl bytes.Buffer
 	f, err := pkger.Open(s.TemplatePath)
 	if err != nil {
@@ -303,7 +303,7 @@ func (s *State) GenerateDeployable(templateData interface{}) error {
 		return err
 	}
 	s.Obj.SetGroupVersionKind(s.GVR)
-	if err := s.Template.Execute(&tpl, templateData); err != nil {
+	if err := s.Template.Execute(&tpl, s.TemplateData); err != nil {
 		zap.S().Error(err, "rendering template error", "file", s.TemplatePath)
 		return err
 	}
@@ -327,7 +327,11 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 	ctx := context.Background()
 	for _, manifest := range desiredManifests {
 
-		if err := manifest.GenerateDeployable(desiredSpec); err != nil {
+		if manifest.TemplateData == nil {
+
+			manifest.TemplateData = desiredSpec
+		}
+		if err := manifest.GenerateDeployable(); err != nil {
 			log.Error(err, "error generating deployable", "name", manifest.Obj.GetName())
 			return err
 		}
@@ -356,16 +360,6 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 			if !shouldUpdate(manifest, fetchInto) {
 				continue
 			}
-
-			//if manifest.GVR == Kinds[PvcGVR] {
-			//	// TODO: make this generic
-			//	continue
-			//}
-			//
-			//if manifest.GVR == Kinds[CrdGVR] && fetchInto.GetName() == "mpijobs.kubeflow.org" {
-			//	// TODO: need to figure out what's wrong with MPI CRD (might be related to apiextensions.k8s.io/v1beta1)
-			//	continue
-			//}
 
 			if err := mergo.Merge(fetchInto, manifest.Obj, mergo.WithOverride); err != nil {
 				log.Error(err, "can't merge")

@@ -1,3 +1,4 @@
+{{- if ne .Values.infraClusterDomain ""}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -105,3 +106,4 @@ spec:
               memory: 200Mi
       serviceAccountName: cnvrg-operator
       terminationGracePeriodSeconds: 10
+{{- end }}

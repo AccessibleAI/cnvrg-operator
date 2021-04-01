@@ -9,7 +9,7 @@ dbs:
     memoryLimit: {{ .Values.dbs.es.memoryLimit }}
     memoryRequest: {{ .Values.dbs.es.memoryRequest }}
     nodePort: {{ .Values.dbs.es.nodePort }}
-    patchEsNodes: {{ .Values.dbs.es.patchEsNodes }}
+    patchEsNodes: "{{ .Values.dbs.es.patchEsNodes }}"
     port: {{ .Values.dbs.es.port }}
     runAsUser: {{ .Values.dbs.es.runAsUser }}
     serviceAccount: {{ .Values.dbs.es.serviceAccount }}
@@ -35,10 +35,10 @@ dbs:
     cpuRequest: {{ .Values.dbs.pg.cpuRequest }}
     dbname: {{ .Values.dbs.pg.dbname }}
     enabled: "{{ .Values.dbs.pg.enabled }}"
-    fixpg: {{ .Values.dbs.pg.fixpg }}
+    fixpg: "{{ .Values.dbs.pg.fixpg }}"
     fsGroup: {{ .Values.dbs.pg.fsGroup }}
     hugePages:
-      enabled: {{ .Values.dbs.pg.hugePages.enabled }}
+      enabled: "{{ .Values.dbs.pg.hugePages.enabled }}"
       size: {{ .Values.dbs.pg.hugePages.size }}
       memory: {{ .Values.dbs.pg.hugePages.memory }}
     image: {{ .Values.dbs.pg.image }}
@@ -54,7 +54,7 @@ dbs:
     svcName: {{ .Values.dbs.pg.svcName }}
     user: {{ .Values.dbs.pg.user }}
   redis:
-    appendonly: {{ .Values.dbs.redis.appendonly }}
+    appendonly: "{{ .Values.dbs.redis.appendonly }}"
     enabled: "{{ .Values.dbs.redis.enabled }}"
     image: {{ .Values.dbs.redis.image }}
     limits:

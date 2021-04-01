@@ -15,43 +15,43 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
-          {{- range $_, $cnvrgAppInstance := .Spec.CnvrgAppInstances }}
-    @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-input.conf
-    @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-filter.conf
-    @INCLUDE {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-output.conf
-          {{- end }}
+    {{- range $namespace, $appname := . }}
+    @INCLUDE {{ $appname }}-{{ $namespace }}-input.conf
+    @INCLUDE {{ $appname }}-{{ $namespace }}-filter.conf
+    @INCLUDE {{ $appname }}-{{ $namespace }}-output.conf
+    {{- end }}
 
-          {{- range $_, $cnvrgAppInstance := .Spec.CnvrgAppInstances }}
+  {{- range $namespace, $appname := . }}
 
-  {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-input.conf: |
+  {{ $appname }}-{{ $namespace }}-input.conf: |
     [INPUT]
         Name              tail
-        Tag               kube.{{ $cnvrgAppInstance.Namespace }}.*
-        Path              /var/log/containers/*_{{ $cnvrgAppInstance.Namespace }}_*.log
+        Tag               kube.{{ $namespace }}.*
+        Path              /var/log/containers/*_{{ $namespace }}_*.log
         Parser            docker
         DB                /var/log/flb_kube.db
         Mem_Buf_Limit     5MB
         Skip_Long_Lines   On
         Refresh_Interval  10
 
-  {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-filter.conf: |
+  {{ $appname }}-{{ $namespace }}-filter.conf: |
     [FILTER]
         Name                kubernetes
-        Match               kube.{{ $cnvrgAppInstance.Namespace }}.*
+        Match               kube.{{ $namespace }}.*
         Kube_URL            https://kubernetes.default.svc:443
         Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.{{ $cnvrgAppInstance.Namespace }}.var.log.containers.
+        Kube_Tag_Prefix     kube.{{ $namespace }}.var.log.containers.
         Merge_Log           On
         Merge_Log_Key       log_processed
         K8S-Logging.Parser  On
         K8S-Logging.Exclude Off
 
-  {{ $cnvrgAppInstance.Name }}-{{ $cnvrgAppInstance.Namespace }}-output.conf: |
+  {{ $appname }}-{{ $namespace }}-output.conf: |
     [OUTPUT]
         Name            es
-        Match           kube.{{ $cnvrgAppInstance.Namespace }}.*
-        Host            elasticsearch.{{ $cnvrgAppInstance.Namespace }}.svc.cluster.local
+        Match           kube.{{ $namespace }}.*
+        Host            elasticsearch.{{ $namespace }}.svc.cluster.local
         Port            9200
         Logstash_Format Off
         Replace_Dots    On
@@ -59,7 +59,7 @@ data:
         Index           cnvrg
         Logstash_Prefix cnvrg
 
-          {{- end }}
+    {{- end }}
 
   parsers.conf: |
     [PARSER]

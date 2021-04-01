@@ -148,6 +148,30 @@ spec:
                       ssl:
                         type: string
                     type: object
+                  mpi:
+                    properties:
+                      enabled:
+                        type: string
+                      extraArgs:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      image:
+                        type: string
+                      kubectlDeliveryImage:
+                        type: string
+                      registry:
+                        properties:
+                          name:
+                            type: string
+                          password:
+                            type: string
+                          url:
+                            type: string
+                          user:
+                            type: string
+                        type: object
+                    type: object
                   objectStorage:
                     properties:
                       cnvrgStorageAccessKey:
@@ -349,8 +373,6 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                    required:
-                    - serviceAccount
                     type: object
                   minio:
                     properties:
@@ -398,8 +420,6 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                    required:
-                    - serviceAccount
                     type: object
                   pg:
                     properties:

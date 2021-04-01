@@ -2,12 +2,12 @@
 controlPlane:
   baseConfig:
     agentCustomTag: {{ .Values.controlPlane.baseConfig.agentCustomTag }}
-    intercom: {{ .Values.controlPlane.baseConfig.intercom }}
+    intercom: "{{ .Values.controlPlane.baseConfig.intercom }}"
     featureFlags: {{ .Values.controlPlane.baseConfig.featureFlags }}
   hyper:
     cpuLimit: {{ .Values.controlPlane.hyper.cpuLimit }}
     cpuRequest: {{ .Values.controlPlane.hyper.cpuRequest }}
-    enableReadinessProbe: {{ .Values.controlPlane.hyper.enableReadinessProbe }}
+    enableReadinessProbe: "{{ .Values.controlPlane.hyper.enableReadinessProbe }}"
     enabled: "{{ .Values.controlPlane.hyper.enabled }}"
     image: {{ .Values.controlPlane.hyper.image }}
     memoryLimit: {{ .Values.controlPlane.hyper.memoryLimit }}
@@ -57,7 +57,7 @@ controlPlane:
     killTimeout: {{ .Values.controlPlane.sidekiq.killTimeout }}
     memory: {{ .Values.controlPlane.sidekiq.memory }}
     replicas: {{ .Values.controlPlane.sidekiq.replicas }}
-    split: {{ .Values.controlPlane.sidekiq.split }}
+    split: "{{ .Values.controlPlane.sidekiq.split }}"
   smtp:
     server: {{ .Values.controlPlane.smtp.server }}
     port: {{ .Values.controlPlane.smtp.port }}
@@ -71,10 +71,10 @@ controlPlane:
     memory: {{ .Values.controlPlane.systemkiq.memory }}
     replicas: {{ .Values.controlPlane.systemkiq.replicas }}
   tenancy:
-    dedicatedNodes: {{ .Values.controlPlane.tenancy.dedicatedNodes }}
+    dedicatedNodes: "{{ .Values.controlPlane.tenancy.dedicatedNodes }}"
     enabled: "{{ .Values.controlPlane.tenancy.enabled }}"
     key: {{ .Values.controlPlane.tenancy.key }}
-    value: {{ .Values.controlPlane.tenancy.value }}
+    value: "{{ .Values.controlPlane.tenancy.value }}"
   webapp:
     cpu: {{ .Values.controlPlane.webapp.cpu }}
     enabled: "{{ .Values.controlPlane.webapp.enabled }}"

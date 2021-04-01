@@ -1,3 +1,4 @@
+{{- if ne .Values.appClusterDomain ""}}
 apiVersion: mlops.cnvrg.io/v1
 kind: CnvrgApp
 metadata:
@@ -12,3 +13,4 @@ spec:
   {{- include "spec.monitoring_app" . | indent 2 }}
   {{- include "spec.networking_app" . | indent 2 }}
   {{- include "spec.sso" . | indent 2 }}
+{{- end }}

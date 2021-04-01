@@ -3,7 +3,7 @@
 logging:
   enabled: "{{ .Values.logging.enabled }}"
   elastalert:
-    enabled: {{ .Values.logging.elastalert.enabled }}
+    enabled: "{{ .Values.logging.elastalert.enabled }}"
     image: {{ .Values.logging.elastalert.image }}
     port: {{ .Values.logging.elastalert.port }}
     nodePort: {{ .Values.logging.elastalert.nodePort }}
