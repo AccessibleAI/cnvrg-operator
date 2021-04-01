@@ -261,7 +261,7 @@ var controlPlanDefault = ControlPlane{
 	},
 
 	Systemkiq: Systemkiq{
-		Enabled:     "false",
+		Enabled:     "true",
 		CPU:         "500m",
 		Memory:      "500Mi",
 		Replicas:    1,
