@@ -171,6 +171,7 @@ type ControlPlan struct {
 	SMTP          SMTP          `json:"smtp,omitempty"`
 	Tenancy       Tenancy       `json:"tenancy,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
+	Mpi           Mpi           `json:"mpi,omitempty"`
 }
 
 type Tenancy struct {
@@ -185,6 +186,26 @@ type Cnvrg struct {
 	Value string `json:"value"`
 }
 
+type Mpi struct {
+	Enabled              string            `json:"enabled,omitempty"`
+	Image                string            `json:"image,omitempty"`
+	KubectlDeliveryImage string            `json:"kubectlDeliveryImage,omitempty"`
+	ExtraArgs            map[string]string `json:"extraArgs,omitempty"`
+	Registry             Registry          `json:"registry,omitempty"`
+}
+
+var mpiDefault = Mpi{
+	Enabled:              "true",
+	Image:                "mpioperator/mpi-operator:v0.2.3",
+	KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
+	ExtraArgs:            nil,
+	Registry: Registry{
+		Name:     "mpi-private-registry",
+		URL:      "docker.io",
+		User:     "",
+		Password: "",
+	},
+}
 var registryDefault = Registry{
 	Name:     "cnvrg-registry",
 	URL:      "docker.io",
@@ -328,7 +349,6 @@ var controlPlanDefault = ControlPlan{
 		Ssl:           "", // true/false
 	},
 
-
 	Rbac: Rbac{
 		Role:               "cnvrg-control-plan-role",
 		ServiceAccountName: "cnvrg",
@@ -349,4 +369,5 @@ var controlPlanDefault = ControlPlan{
 		Key:            "cnvrg-taint",
 		Value:          "true",
 	},
+	Mpi: mpiDefault,
 }

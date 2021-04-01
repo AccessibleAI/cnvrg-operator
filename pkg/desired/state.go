@@ -353,10 +353,19 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 			}
 		} else {
 
-			if manifest.GVR == Kinds[PvcGVR] {
-				// TODO: make this generic
+			if !shouldUpdate(manifest, fetchInto) {
 				continue
 			}
+
+			//if manifest.GVR == Kinds[PvcGVR] {
+			//	// TODO: make this generic
+			//	continue
+			//}
+			//
+			//if manifest.GVR == Kinds[CrdGVR] && fetchInto.GetName() == "mpijobs.kubeflow.org" {
+			//	// TODO: need to figure out what's wrong with MPI CRD (might be related to apiextensions.k8s.io/v1beta1)
+			//	continue
+			//}
 
 			if err := mergo.Merge(fetchInto, manifest.Obj, mergo.WithOverride); err != nil {
 				log.Error(err, "can't merge")
@@ -377,6 +386,20 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 		}
 	}
 	return nil
+}
+
+func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
+
+	// do not try to update PVC, they are immutable (probably)
+	if manifest.GVR == Kinds[PvcGVR] {
+		return false
+	}
+
+	// todo: need to figure out what's wrong with MPI CRD (might be related to apiextensions.k8s.io/v1beta1)
+	if manifest.GVR == Kinds[CrdGVR] && obj.GetName() == "mpijobs.kubeflow.org" {
+		return false
+	}
+	return true
 }
 
 func (s *State) dumpTemplateToFile() error {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/controlplan"
 	"github.com/cnvrg-operator/pkg/dbs"
 	"github.com/cnvrg-operator/pkg/desired"
 	"github.com/cnvrg-operator/pkg/logging"
@@ -190,6 +191,13 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	// redis
 	cnvrgInfraLog.Info("applying redis")
 	if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
+	// mpi infra
+	cnvrgInfraLog.Info("applying mpi infra")
+	if err := desired.Apply(controlplan.MpiInfraState(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -448,6 +456,12 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			cnvrgInfraLog.Error(err, "can't apply prometheus CRDs")
 			os.Exit(1)
 		}
+	}
+
+	err := desired.Apply(controlplan.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+	if err != nil {
+		cnvrgInfraLog.Error(err, "can't apply MPI CRDs")
+		os.Exit(1)
 	}
 
 	p := predicate.Funcs{

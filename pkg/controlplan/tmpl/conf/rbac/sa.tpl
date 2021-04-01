@@ -4,4 +4,4 @@ metadata:
   name: {{ .Spec.ControlPlan.Rbac.ServiceAccountName }}
   namespace: {{ ns . }}
 imagePullSecrets:
-  - name: {{ .Spec.ControlPlan.Registry.Name }}
+  - name: {{ .Spec.Registry.Name }}
