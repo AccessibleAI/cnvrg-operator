@@ -2,9 +2,9 @@
 networking:
   https:
     enabled: "{{ .Values.networking.https.enabled }}"
-    cert: {{ .Values.networking.https.cert }}
-    key: {{ .Values.networking.https.key }}
-    certSecret: {{ .Values.networking.https.certSecret }}
+    cert: "{{ .Values.networking.https.cert }}"
+    key: "{{ .Values.networking.https.key }}"
+    certSecret: "{{ .Values.networking.https.certSecret }}"
   ingress:
     ingressType: {{ .Values.networking.ingress.ingressType }}
     perTryTimeout: {{ .Values.networking.ingress.perTryTimeout }}
@@ -18,8 +18,8 @@ networking:
     proxyImage: {{ .Values.networking.istio.proxyImage }}
     mixerImage: {{ .Values.networking.istio.mixerImage }}
     pilotImage: {{ .Values.networking.istio.pilotImage }}
-    externalIp: {{ .Values.networking.istio.externalIp }}
-    ingressSvcAnnotations: {{ .Values.networking.istio.ingressSvcAnnotations }}
-    ingressSvcExtraPorts: {{ .Values.networking.istio.ingressSvcExtraPorts }}
-    loadBalancerSourceRanges: {{ .Values.networking.istio.loadBalancerSourceRanges }}
+    externalIp: "{{ .Values.networking.istio.externalIp }}"
+    ingressSvcAnnotations: "{{ .Values.networking.istio.ingressSvcAnnotations }}"
+    ingressSvcExtraPorts: "{{ .Values.networking.istio.ingressSvcExtraPorts }}"
+    loadBalancerSourceRanges: "{{ .Values.networking.istio.loadBalancerSourceRanges }}"
 {{- end }}

@@ -20,7 +20,7 @@ monitoring:
     memoryRequest: {{ .Values.monitoring.prometheus.memoryRequest }}
     nodePort: {{ .Values.monitoring.prometheus.nodePort }}
     port: {{ .Values.monitoring.prometheus.port }}
-    storageClass: {{ .Values.monitoring.prometheus.storageSize }}
+    storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}
     svcName: {{ .Values.monitoring.prometheus.svcName }}
 

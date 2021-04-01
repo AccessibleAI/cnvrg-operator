@@ -3,13 +3,20 @@ controlPlane:
   baseConfig:
     agentCustomTag: {{ .Values.controlPlane.baseConfig.agentCustomTag }}
     intercom: "{{ .Values.controlPlane.baseConfig.intercom }}"
-    featureFlags: {{ .Values.controlPlane.baseConfig.featureFlags }}
+    {{- if eq (len .Values.controlPlane.mpi.extraArgs) 0 }}
+    featureFlags: {}
+    {{- else }}
+    featureFlags:
+    {{- range $key, $value := .Values.controlPlane.baseConfig.featureFlags }}
+      - {{$key}}: {{$value}}
+    {{- end }}
+    {{- end }}
   hyper:
     cpuLimit: {{ .Values.controlPlane.hyper.cpuLimit }}
-    cpuRequest: {{ .Values.controlPlane.hyper.cpuRequest }}
+    cpuRequest: "{{ .Values.controlPlane.hyper.cpuRequest }}"
     enableReadinessProbe: "{{ .Values.controlPlane.hyper.enableReadinessProbe }}"
     enabled: "{{ .Values.controlPlane.hyper.enabled }}"
-    image: {{ .Values.controlPlane.hyper.image }}
+    image: "{{ .Values.controlPlane.hyper.image }}"
     memoryLimit: {{ .Values.controlPlane.hyper.memoryLimit }}
     memoryRequest: {{ .Values.controlPlane.hyper.memoryRequest }}
     nodePort: {{ .Values.controlPlane.hyper.nodePort }}
@@ -21,13 +28,13 @@ controlPlane:
     token: {{ .Values.controlPlane.hyper.token }}
   ldap:
     enabled: "{{ .Values.controlPlane.ldap.enabled }}"
-    host: {{ .Values.controlPlane.ldap.host }}
-    port: {{ .Values.controlPlane.ldap.port }}
+    host: "{{ .Values.controlPlane.ldap.host }}"
+    port: "{{ .Values.controlPlane.ldap.port }}"
     account: {{ .Values.controlPlane.ldap.account }}
-    base: {{ .Values.controlPlane.ldap.base }}
-    adminUser: {{ .Values.controlPlane.ldap.adminUser }}
-    adminPassword: {{ .Values.controlPlane.ldap.adminPassword }}
-    ssl: {{ .Values.controlPlane.ldap.ssl }}
+    base: "{{ .Values.controlPlane.ldap.base }}"
+    adminUser: "{{ .Values.controlPlane.ldap.adminUser }}"
+    adminPassword: "{{ .Values.controlPlane.ldap.adminPassword }}"
+    ssl: "{{ .Values.controlPlane.ldap.ssl }}"
   objectStorage:
     cnvrgStorageAccessKey: {{ .Values.controlPlane.objectStorage.cnvrgStorageAccessKey }}
     cnvrgStorageBucket: {{ .Values.controlPlane.objectStorage.cnvrgStorageBucket }}
@@ -59,11 +66,11 @@ controlPlane:
     replicas: {{ .Values.controlPlane.sidekiq.replicas }}
     split: "{{ .Values.controlPlane.sidekiq.split }}"
   smtp:
-    server: {{ .Values.controlPlane.smtp.server }}
-    port: {{ .Values.controlPlane.smtp.port }}
-    username: {{ .Values.controlPlane.smtp.username }}
-    password: {{ .Values.controlPlane.smtp.password }}
-    domain: {{ .Values.controlPlane.smtp.domain }}
+    server: "{{ .Values.controlPlane.smtp.server }}"
+    port: "{{ .Values.controlPlane.smtp.port }}"
+    username: "{{ .Values.controlPlane.smtp.username }}"
+    password: "{{ .Values.controlPlane.smtp.password }}"
+    domain: "{{ .Values.controlPlane.smtp.domain }}"
   systemkiq:
     cpu: {{ .Values.controlPlane.systemkiq.cpu }}
     enabled: "{{ .Values.controlPlane.systemkiq.enabled }}"
@@ -103,5 +110,13 @@ controlPlane:
     enabled: "{{ .Values.controlPlane.mpi.enabled }}"
     image: {{ .Values.controlPlane.mpi.image }}
     kubectlDeliveryImage: {{ .Values.controlPlane.mpi.kubectlDeliveryImage }}
-    extraArgs: {{ .Values.controlPlane.mpi.extraArgs }}
+    {{- if eq (len .Values.controlPlane.mpi.extraArgs) 0 }}
+    extraArgs: {}
+    {{- else }}
+    extraArgs:
+    {{- range $key, $value := .Values.controlPlane.mpi.extraArgs }}
+      - {{$key}}: {{$value}}
+    {{- end }}
+    {{- end }}
+
 {{- end }}

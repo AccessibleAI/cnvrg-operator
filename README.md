@@ -51,18 +51,53 @@ cnvrg operator may deploy cnvrg stack in two different ways
 
 ### Quick start - multiple cnvrg control plans within the same K8s cluster 
 
+Deploy cnvrg infrastructure first 
 ```shell
-add helm deploy command here 
+helm install cnvrg-infra . -n cnvrg-infra --create-namespace \
+  --set infraClusterDomain="<infrastructure-domain-record>" \
+  --set registry.user="<cnvrg-private-registry-user>" \
+  --set registry.password="<cnvrg-private-registry-password>"  
 ```
-### Quick start - single cnvrg control plan
-
+Once infrastructure components are ready, deploy cnvrg control plane 
 ```shell
-add helm deploy command here 
+helm install cnvrg-1 . -n cnvrg-1 --create-namespace \
+  --set appClusterDomain="<control-plane-domain-record>" \
+  --set controlPlane.webapp.image="<cnvrg-control-plane-image>" \
+  --set registry.user="<cnvrg-private-registry-user>" \
+  --set registry.password="<cnvrg-private-registry-password>"  
 ```
 
 ### Examples 
+enable on-prem nfs storage  
 ```shell
-specs exaples goes here 
+  ... 
+  --set storage.enabled="true" \
+  --set storage.nfs.enabled="true" \
+  --set storage.nfs.defaultSc="true" \
+  --set storage.nfs.server="<NFS-SERVER-IP>" \
+  --set storage.nfs.path="<EXPORT-PATH>" \
+  ...  
+```
+
+enable on-prom istio with TLS termination  
+```shell
+  ... 
+  --set networking.https.enabled="true" \
+  --set networking.https.certSecret="<CERTIFICATE-K8S-SECRET>" \
+  --set networking.istio.externalIp="<K8S-NODES-IPS>" \
+  ...  
+```
+
+enable SSO 
+```shell
+  ... 
+  --set sso.enabled="true" \
+  --set sso.adminUser="<admin user>" \
+  --set sso.provider="<provider>" \
+  --set sso.emailDomain="<email-domain>" \
+  --set sso.clientId="<client-id>" \
+  --set sso.clientSecret="<client-secret>" \ 
+  ...  
 ```
 
 ### Chart options 
@@ -131,7 +166,7 @@ specs exaples goes here
 |`controlPlane.sidekiq.replicas`|2
 |`controlPlane.sidekiq.split`|true
 |`controlPlane.systemkiq.cpu`|500m
-|`controlPlane.systemkiq.enabled`|false
+|`controlPlane.systemkiq.enabled`|true
 |`controlPlane.systemkiq.killTimeout`|60
 |`controlPlane.systemkiq.memory`|500Mi
 |`controlPlane.systemkiq.replicas`|1
@@ -181,7 +216,7 @@ specs exaples goes here
 |`dbs.minio.nodePort`|30090
 |`dbs.minio.port`|9000
 |`dbs.minio.replicas`|1
-|`dbs.minio.serviceAccount`|
+|`dbs.minio.serviceAccount`|default
 |`dbs.minio.sharedStorage.consistentHash.key`|httpQueryParameterName
 |`dbs.minio.sharedStorage.consistentHash.value`|uploadId
 |`dbs.minio.sharedStorage.enabled`|enabled
@@ -309,6 +344,7 @@ specs exaples goes here
 |`storage.nfs.provisioner`|cnvrg.io/ifs
 |`storage.nfs.reclaimPolicy`|Retain
 |`storage.nfs.storageClassName`|cnvrg-nfs-storage
+
 
 ### Build
 Build docker image 

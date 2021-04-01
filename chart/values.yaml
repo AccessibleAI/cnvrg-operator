@@ -16,7 +16,7 @@ controlPlane:
     runJobsOnSelfCluster: "true"
     sentryUrl: https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32
     useStdout: "true"
-    featureFlags: ""
+    featureFlags: {}
   hyper:
     cpuLimit: 2
     cpuRequest: 100m
@@ -120,7 +120,8 @@ controlPlane:
     enabled: "true"
     image: "mpioperator/mpi-operator:v0.2.3"
     kubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3"
-    extraArgs: ""
+    extraArgs: {}
+
 
 dbs:
   es:
@@ -146,7 +147,7 @@ dbs:
     nodePort: 30090
     port: 9000
     replicas: 1
-    serviceAccount: ""
+    serviceAccount: "default"
     sharedStorage:
       consistentHash:
         key: httpQueryParameterName
@@ -304,7 +305,7 @@ sso:
   clientSecret: ""
   cookieSecret: ""
   azureTenant: ""
-  oidcIssuerURL: ""
+  oidcIssuerUrl: ""
 
 storage:
   enabled: "false"

@@ -40,7 +40,7 @@ dbs:
     hugePages:
       enabled: "{{ .Values.dbs.pg.hugePages.enabled }}"
       size: {{ .Values.dbs.pg.hugePages.size }}
-      memory: {{ .Values.dbs.pg.hugePages.memory }}
+      memory: "{{ .Values.dbs.pg.hugePages.memory }}"
     image: {{ .Values.dbs.pg.image }}
     maxConnections: {{ .Values.dbs.pg.maxConnections }}
     memoryRequest: {{ .Values.dbs.pg.memoryRequest }}

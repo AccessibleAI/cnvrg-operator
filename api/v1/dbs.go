@@ -96,6 +96,7 @@ type InfraDbs struct {
 
 var minioDefaults = Minio{
 	Enabled:       "true",
+	ServiceAccount: "default",
 	Replicas:      1,
 	Image:         "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
 	Port:          9000,

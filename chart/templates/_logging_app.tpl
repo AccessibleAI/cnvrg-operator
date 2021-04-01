@@ -10,7 +10,7 @@ logging:
     containerPort: {{ .Values.logging.elastalert.containerPort }}
     storageSize: {{ .Values.logging.elastalert.storageSize }}
     svcName: {{ .Values.logging.elastalert.svcName }}
-    storageClass: {{ .Values.logging.elastalert.storageClass }}
+    storageClass: "{{ .Values.logging.elastalert.storageClass }}"
     cpuRequest: {{ .Values.logging.elastalert.cpuRequest }}
     memoryRequest: {{ .Values.logging.elastalert.memoryRequest }}
     cpuLimit: {{ .Values.logging.elastalert.cpuLimit }}
