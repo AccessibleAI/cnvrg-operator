@@ -6,6 +6,7 @@ metadata:
   namespace: {{ template "spec.cnvrgNs" . }}
 spec:
   clusterDomain: {{ .Values.appClusterDomain }}
+  namespaceTenancy: "{{.Values.namespaceTenancy }}"
   {{- include "spec.controlPlane" . | indent 2 }}
   {{- include "spec.registry" . | indent 2 }}
   {{- include "spec.dbs" . | indent 2 }}
@@ -13,4 +14,4 @@ spec:
   {{- include "spec.monitoring_app" . | indent 2 }}
   {{- include "spec.networking_app" . | indent 2 }}
   {{- include "spec.sso" . | indent 2 }}
-{{- end }}
+  {{- end }}

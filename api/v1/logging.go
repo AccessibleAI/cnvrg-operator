@@ -30,7 +30,7 @@ type Kibana struct {
 	NodePort       int                   `json:"nodePort,omitempty"`
 	CPURequest     string                `json:"cpuRequest,omitempty"`
 	MemoryRequest  string                `json:"memoryRequest,omitempty"`
-	CPULimit       int                   `json:"cpuLimit,omitempty"`
+	CPULimit       string                `json:"cpuLimit,omitempty"`
 	MemoryLimit    string                `json:"memoryLimit,omitempty"`
 	OauthProxy     OauthProxyServiceConf `json:"oauthProxy,omitempty"`
 }
@@ -77,7 +77,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		NodePort:       30601,
 		CPURequest:     "100m",
 		MemoryRequest:  "100Mi",
-		CPULimit:       1,
+		CPULimit:       "1000m",
 		MemoryLimit:    "2Gi",
 		OauthProxy:     OauthProxyServiceConf{SkipAuthRegex: nil},
 	},

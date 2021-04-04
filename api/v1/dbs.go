@@ -20,7 +20,7 @@ type Pg struct {
 	RunAsUser      int               `json:"runAsUser,omitempty"`
 	FsGroup        int               `json:"fsGroup,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	CPURequest     int               `json:"cpuRequest,omitempty"`
+	CPURequest     string            `json:"cpuRequest,omitempty"`
 	MemoryRequest  string            `json:"memoryRequest,omitempty"`
 	MaxConnections int               `json:"maxConnections,omitempty"`
 	SharedBuffers  string            `json:"sharedBuffers,omitempty"`
@@ -40,7 +40,7 @@ type Minio struct {
 	SvcName        string            `json:"svcName,omitempty"`
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	CPURequest     int               `json:"cpuRequest,omitempty"`
+	CPURequest     string            `json:"cpuRequest,omitempty"`
 	MemoryRequest  string            `json:"memoryRequest,omitempty"`
 	SharedStorage  SharedStorage     `json:"sharedStorage,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
@@ -73,9 +73,9 @@ type Es struct {
 	FsGroup        int               `json:"fsGroup,omitempty"`
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	CPURequest     int               `json:"cpuRequest,omitempty"`
+	CPURequest     string            `json:"cpuRequest,omitempty"`
 	MemoryRequest  string            `json:"memoryRequest,omitempty"`
-	CPULimit       int               `json:"cpuLimit,omitempty"`
+	CPULimit       string            `json:"cpuLimit,omitempty"`
 	MemoryLimit    string            `json:"memoryLimit,omitempty"`
 	JavaOpts       string            `json:"javaOpts,omitempty"`
 	PatchEsNodes   string            `json:"patchEsNodes,omitempty"`
@@ -104,7 +104,7 @@ var minioDefaults = Minio{
 	SvcName:        "minio",
 	NodePort:       30090,
 	StorageClass:   "",
-	CPURequest:     1,
+	CPURequest:     "1000m",
 	MemoryRequest:  "2Gi",
 	SharedStorage: SharedStorage{
 		Enabled:          "enabled",
@@ -130,7 +130,7 @@ var pgDefault = Pg{
 	RunAsUser:      26,
 	FsGroup:        26,
 	StorageClass:   "",
-	CPURequest:     4,
+	CPURequest:     "4000m",
 	MemoryRequest:  "4Gi",
 	MaxConnections: 100,
 	SharedBuffers:  "64MB",
@@ -176,9 +176,9 @@ var esDefault = Es{
 	FsGroup:        1000,
 	NodePort:       32200,
 	StorageClass:   "",
-	CPURequest:     1,
+	CPURequest:     "1000m",
 	MemoryRequest:  "1Gi",
-	CPULimit:       2,
+	CPULimit:       "2000m",
 	MemoryLimit:    "4Gi",
 	JavaOpts:       "",
 	PatchEsNodes:   "true",

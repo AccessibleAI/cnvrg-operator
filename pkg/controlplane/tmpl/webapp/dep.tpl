@@ -57,6 +57,8 @@ spec:
             name: cp-object-storage
         - secretRef:
             name: {{ .Spec.Dbs.Pg.SvcName }}
+        - secretRef:
+            name: cp-smtp
         name: cnvrg-app
         ports:
           - containerPort: {{ .Spec.ControlPlane.WebApp.Port }}

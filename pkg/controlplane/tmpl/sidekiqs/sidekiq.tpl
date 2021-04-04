@@ -52,6 +52,8 @@ spec:
                 name: cp-object-storage
             - secretRef:
                 name: {{ .Spec.Dbs.Pg.SvcName }}
+            - secretRef:
+                name: cp-smtp
           resources:
             requests:
               cpu: {{ .Spec.ControlPlane.Sidekiq.CPU }}

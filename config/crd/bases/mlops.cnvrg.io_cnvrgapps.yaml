@@ -321,9 +321,9 @@ spec:
                   es:
                     properties:
                       cpuLimit:
-                        type: integer
+                        type: string
                       cpuRequest:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       fsGroup:
@@ -364,7 +364,7 @@ spec:
                   minio:
                     properties:
                       cpuRequest:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       image:
@@ -411,7 +411,7 @@ spec:
                   pg:
                     properties:
                       cpuRequest:
-                        type: integer
+                        type: string
                       dbname:
                         type: string
                       enabled:
@@ -548,7 +548,7 @@ spec:
                   kibana:
                     properties:
                       cpuLimit:
-                        type: integer
+                        type: string
                       cpuRequest:
                         type: string
                       enabled:

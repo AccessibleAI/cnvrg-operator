@@ -82,8 +82,15 @@ func controlPlaneConfigState() []*desired.State {
 			Own:            true,
 		},
 		{
-
 			TemplatePath:   path + "/conf/cm/secret-object-storage.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/conf/cm/secret-smtp.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},

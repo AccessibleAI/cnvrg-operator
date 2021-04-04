@@ -1,6 +1,7 @@
 infraClusterDomain: ""
 appClusterDomain: ""
 infraNamespace: "cnvrg-infra"
+namespaceTenancy: "false"
 
 controlPlane:
   baseConfig:
@@ -18,7 +19,7 @@ controlPlane:
     useStdout: "true"
     featureFlags: {}
   hyper:
-    cpuLimit: 2
+    cpuLimit: 2000m
     cpuRequest: 100m
     enableReadinessProbe: "true"
     enabled: "true"
@@ -93,7 +94,7 @@ controlPlane:
     key: cnvrg-taint
     value: "true"
   webapp:
-    cpu: 2
+    cpu: 2000m
     enabled: "true"
     failureThreshold: 4
     image: cnvrg/core:3.1.5
@@ -122,11 +123,10 @@ controlPlane:
     kubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3"
     extraArgs: {}
 
-
 dbs:
   es:
-    cpuLimit: 2
-    cpuRequest: 1
+    cpuLimit: 2000m
+    cpuRequest: 1000m
     enabled: "true"
     fsGroup: 1000
     image: docker.io/cnvrg/cnvrg-es:v7.8.1
@@ -140,7 +140,7 @@ dbs:
     storageSize: 30Gi
     svcName: elasticsearch
   minio:
-    cpuRequest: 1
+    cpuRequest: 1000m
     enabled: "true"
     image: docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z
     memoryRequest: 2Gi
@@ -156,7 +156,7 @@ dbs:
     storageSize: 100Gi
     svcName: minio
   pg:
-    cpuRequest: 4
+    cpuRequest: 4000m
     dbname: cnvrg_production
     enabled: "true"
     fixpg: "true"
@@ -182,7 +182,7 @@ dbs:
     enabled: "true"
     image: docker.io/cnvrg/cnvrg-redis:v3.0.5.c2
     limits:
-      cpu: 1
+      cpu: 1000m
       memory: 2Gi
     port: 6379
     requests:
@@ -220,7 +220,7 @@ logging:
     nodePort: 30601
     cpuRequest: "100m"
     memoryRequest: "100Mi"
-    cpuLimit: 1
+    cpuLimit: "1000m"
     memoryLimit: "2Gi"
     oauthProxy:
       skipAuthRegex:
@@ -253,7 +253,7 @@ monitoring:
     image: quay.io/prometheus/node-exporter:v1.0.1
 
   prometheus:
-    cpuRequest: 1
+    cpuRequest: "200m"
     enabled: "true"
     image: quay.io/prometheus/prometheus:v2.22.1
     memoryRequest: 1Gi
