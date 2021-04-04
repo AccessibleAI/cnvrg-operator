@@ -20,6 +20,8 @@ func registryState() []*desired.State {
 	}
 }
 
-func State() []*desired.State {
-	return registryState()
+func State(data interface{}) []*desired.State {
+	registry := registryState()
+	registry[0].TemplateData = data
+	return registry
 }

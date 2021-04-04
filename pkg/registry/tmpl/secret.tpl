@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Secret
 type: kubernetes.io/dockerconfigjson
 metadata:
-  name: "cnvrg-registry"
-  namespace: {{ ns . }}
+  name: {{ .Data.Registry.Name }}
+  namespace: {{ .Namespace }}
 data:
-  .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .Spec.Registry.URL .Spec.Registry.User .Spec.Registry.Password  (printf "%s:%s" .Spec.Registry.User .Spec.Registry.Password | b64enc) | b64enc }}
+  .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .Data.Registry.URL .Data.Registry.User .Data.Registry.Password  (printf "%s:%s" .Data.Registry.User .Data.Registry.Password | b64enc) | b64enc }}
 

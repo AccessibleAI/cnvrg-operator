@@ -257,7 +257,11 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// registry
 	cnvrgInfraLog.Info("applying registry")
-	if err := desired.Apply(registry.State(), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	registryData := desired.TemplateData{
+		Namespace: cnvrgApp.Namespace,
+		Data:      map[string]interface{}{"Registry": cnvrgApp.Spec.Registry},
+	}
+	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}

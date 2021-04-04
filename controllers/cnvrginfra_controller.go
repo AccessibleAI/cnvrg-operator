@@ -137,6 +137,18 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	var reconcileResult error
 
+	// registry
+	cnvrgInfraLog.Info("applying registry")
+
+	registryData := desired.TemplateData{
+		Namespace: cnvrgInfra.Spec.InfraNamespace,
+		Data:      map[string]interface{}{"Registry": cnvrgInfra.Spec.Registry},
+	}
+	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
 	// logging
 	cnvrgInfraLog.Info("applying logging")
 	cnvrgApps, err := r.getCnvrgAppInstances(cnvrgInfra)
@@ -170,13 +182,6 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	// monitoring
 	cnvrgInfraLog.Info("applying monitoring")
 	if err := desired.Apply(monitoring.InfraMonitoringState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-		reconcileResult = err
-	}
-
-	// registry
-	cnvrgInfraLog.Info("applying registry")
-	if err := desired.Apply(registry.State(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}

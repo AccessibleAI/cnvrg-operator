@@ -6,6 +6,11 @@ import (
 	"text/template"
 )
 
+type TemplateData struct {
+	Namespace string
+	Data      map[string]interface{}
+}
+
 type State struct {
 	TemplatePath   string
 	Template       *template.Template
