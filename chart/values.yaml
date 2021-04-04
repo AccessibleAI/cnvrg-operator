@@ -84,7 +84,7 @@ controlPlane:
     domain: ""
   systemkiq:
     cpu: 500m
-    enabled: "false"
+    enabled: "true"
     killTimeout: 60
     memory: 500Mi
     replicas: 1
