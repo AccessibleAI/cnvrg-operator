@@ -139,7 +139,6 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// registry
 	cnvrgInfraLog.Info("applying registry")
-
 	registryData := desired.TemplateData{
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
 		Data:      map[string]interface{}{"Registry": cnvrgInfra.Spec.Registry},
@@ -156,7 +155,11 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
-	if err := desired.Apply(logging.FluentbitConfigurationState(cnvrgApps), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	fluentbitData := desired.TemplateData{
+		Namespace: cnvrgInfra.Spec.InfraNamespace,
+		Data:      map[string]interface{}{"AppInstance": cnvrgApps},
+	}
+	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}

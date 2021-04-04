@@ -70,7 +70,7 @@ func istioInstanceState() []*desired.State {
 	}
 }
 
-func infraIngressState() []*desired.State {
+func ingressState() []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/ingress/gw.tpl",
@@ -88,16 +88,16 @@ func IstioInstanceState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	if cnvrgInfra.Spec.Networking.Istio.Enabled == "true" {
 		state = append(state, istioInstanceState()...)
 	}
-	if cnvrgInfra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
-		state = append(state, infraIngressState()...)
+	if cnvrgInfra.Spec.Networking.Ingress.Enabled == "true" && cnvrgInfra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		state = append(state, ingressState()...)
 	}
 	return state
 }
 
 func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
-		state = append(state, infraIngressState()...)
+	if cnvrgApp.Spec.Networking.Ingress.Enabled == "true" && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		state = append(state, ingressState()...)
 	}
 	return state
 }

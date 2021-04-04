@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fluent-bit-config
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   labels:
     k8s-app: fluent-bit
 data:
@@ -15,13 +15,13 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
-    {{- range $namespace, $appname := . }}
+    {{- range $namespace, $appname := .Data.AppInstance }}
     @INCLUDE {{ $appname }}-{{ $namespace }}-input.conf
     @INCLUDE {{ $appname }}-{{ $namespace }}-filter.conf
     @INCLUDE {{ $appname }}-{{ $namespace }}-output.conf
     {{- end }}
 
-  {{- range $namespace, $appname := . }}
+  {{- range $namespace, $appname := .Data.AppInstance }}
 
   {{ $appname }}-{{ $namespace }}-input.conf: |
     [INPUT]

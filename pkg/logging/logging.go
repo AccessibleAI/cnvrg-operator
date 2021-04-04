@@ -175,8 +175,8 @@ func InfraLoggingState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	return state
 }
 
-func FluentbitConfigurationState(apps map[string]string) []*desired.State {
+func FluentbitConfigurationState(data interface{}) []*desired.State {
 	fluentbitConfigState := fluentbitConfigState()
-	fluentbitConfigState[0].TemplateData = apps
+	fluentbitConfigState[0].TemplateData = data
 	return fluentbitConfigState
 }
