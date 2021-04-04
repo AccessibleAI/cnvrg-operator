@@ -74,6 +74,10 @@ func getGrafanaDashboards(obj interface{}) []string {
 		return GrafanaInfraDashboards
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
+		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
+		if cnvrgApp.Spec.NamespaceTenancy == "false" {
+			return GrafanaInfraDashboards
+		}
 		return GrafanaAppDashboards
 	}
 	return nil
@@ -257,7 +261,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
   metrics_path: '/federate'
   params:
     'match[]':
-      - 'job=~".+"'
+      - '{job=~".+"}'
   static_configs:
     - targets:
       - '%s'
