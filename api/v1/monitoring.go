@@ -13,7 +13,7 @@ type PrometheusOperator struct {
 type Prometheus struct {
 	Enabled       string `json:"enabled,omitempty"`
 	Image         string `json:"image,omitempty"`
-	CPURequest    int    `json:"cpuRequest,omitempty"`
+	CPURequest    string `json:"cpuRequest,omitempty"`
 	MemoryRequest string `json:"memoryRequest,omitempty"`
 	SvcName       string `json:"svcName,omitempty"`
 	Port          int    `json:"port,omitempty"`
@@ -97,12 +97,12 @@ var grafanaDefault = Grafana{
 var prometheusDefault = Prometheus{
 	Enabled:       "true",
 	Image:         "quay.io/prometheus/prometheus:v2.22.1",
-	CPURequest:    1,
-	MemoryRequest: "1Gi",
+	CPURequest:    "200m",
+	MemoryRequest: "500Mi",
 	SvcName:       "prometheus",
 	Port:          9090,
 	NodePort:      30909,
-	StorageSize:   "100Gi",
+	StorageSize:   "50Gi",
 	StorageClass:  "",
 }
 

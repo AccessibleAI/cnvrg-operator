@@ -234,7 +234,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return cnvrgApp.Spec.ControlPlane.WebApp.Port
 		},
 		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
-			return fmt.Sprintf(`
+			if cnvrgApp.Spec.NamespaceTenancy == "true" {
+				return fmt.Sprintf(`
 - job_name: 'federate'
   scrape_interval: 10s
   honor_labels: true
@@ -247,6 +248,20 @@ func cnvrgTemplateFuncs() map[string]interface{} {
     - targets:
       - '%s'
 `, ns, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
+			}
+			return fmt.Sprintf(`
+- job_name: 'federate'
+  scrape_interval: 10s
+  honor_labels: true
+  honor_timestamps: false
+  metrics_path: '/federate'
+  params:
+    'match[]':
+      - 'job=~".+"'
+  static_configs:
+    - targets:
+      - '%s'
+`, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
 		},
 		"grafanaDataSource": func(promSvc string, ns string, promPort int) string {
 			return fmt.Sprintf(`

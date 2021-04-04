@@ -312,13 +312,13 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
 		return nil
 	}
-
 	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
-
-	for _, dashboard := range desired.GrafanaAppDashboards {
-		if dashboard == "node-exporter.json" {
-			fmt.Println("as")
-		}
+	dashboards := desired.GrafanaAppDashboards
+	// if namespace tenancy is off, deploy all (infra + app) grafana dashboards
+	if cnvrgApp.Spec.NamespaceTenancy == "false" {
+		dashboards = desired.GrafanaInfraDashboards
+	}
+	for _, dashboard := range dashboards {
 		f, err := pkger.Open(basePath + dashboard)
 		if err != nil {
 			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)

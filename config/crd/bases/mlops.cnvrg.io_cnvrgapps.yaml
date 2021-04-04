@@ -85,23 +85,10 @@ spec:
                       useStdout:
                         type: string
                     type: object
-                  cnvrgRouter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      nodePort:
-                        type: integer
-                      port:
-                        type: integer
-                      svcName:
-                        type: string
-                    type: object
                   hyper:
                     properties:
                       cpuLimit:
-                        type: integer
+                        type: string
                       cpuRequest:
                         type: string
                       enableReadinessProbe:
@@ -295,7 +282,7 @@ spec:
                   webapp:
                     properties:
                       cpu:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       failureThreshold:
@@ -490,7 +477,7 @@ spec:
                       limits:
                         properties:
                           cpu:
-                            type: integer
+                            type: string
                           memory:
                             type: string
                         type: object
@@ -616,7 +603,7 @@ spec:
                   prometheus:
                     properties:
                       cpuRequest:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       image:
@@ -639,6 +626,8 @@ spec:
                 required:
                 - upstreamPrometheus
                 type: object
+              namespaceTenancy:
+                type: string
               networking:
                 properties:
                   https:

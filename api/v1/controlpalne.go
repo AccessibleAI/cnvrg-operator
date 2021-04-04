@@ -12,7 +12,7 @@ type SharedStorage struct {
 }
 
 type Limits struct {
-	CPU    int    `json:"cpu,omitempty"`
+	CPU    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
 }
 type Requests struct {
@@ -25,7 +25,7 @@ type WebApp struct {
 	Enabled                 string                `json:"enabled,omitempty"`
 	Image                   string                `json:"image,omitempty"`
 	Port                    int                   `json:"port,omitempty"`
-	CPU                     int                   `json:"cpu,omitempty"`
+	CPU                     string                `json:"cpu,omitempty"`
 	Memory                  string                `json:"memory,omitempty"`
 	SvcName                 string                `json:"svcName,omitempty"`
 	NodePort                int                   `json:"nodePort,omitempty"`
@@ -77,7 +77,7 @@ type Hyper struct {
 	Token                   string `json:"token,omitempty"`
 	CPURequest              string `json:"cpuRequest,omitempty"`
 	MemoryRequest           string `json:"memoryRequest,omitempty"`
-	CPULimit                int    `json:"cpuLimit,omitempty"`
+	CPULimit                string `json:"cpuLimit,omitempty"`
 	MemoryLimit             string `json:"memoryLimit,omitempty"`
 	EnableReadinessProbe    string `json:"enableReadinessProbe,omitempty"`
 	ReadinessPeriodSeconds  int    `json:"readinessPeriodSeconds,omitempty"`
@@ -149,20 +149,12 @@ type BaseConfig struct {
 	CcpStorageClass      string            `json:"ccpStorageClass,omitempty"`
 	HostpathNode         string            `json:"hostpathNode,omitempty"`
 }
-type CnvrgRouter struct {
-	Enabled  string `json:"enabled,omitempty"`
-	Image    string `json:"image,omitempty"`
-	SvcName  string `json:"svcName,omitempty"`
-	NodePort int    `json:"nodePort,omitempty"`
-	Port     int    `json:"port,omitempty"`
-}
 
 type ControlPlane struct {
 	WebApp        WebApp        `json:"webapp,omitempty"`
 	Sidekiq       Sidekiq       `json:"sidekiq,omitempty"`
 	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
 	Systemkiq     Systemkiq     `json:"systemkiq,omitempty"`
-	CnvrgRouter   CnvrgRouter   `json:"cnvrgRouter,omitempty"`
 	Hyper         Hyper         `json:"hyper,omitempty"`
 	Seeder        Seeder        `json:"seeder,omitempty"`
 	BaseConfig    BaseConfig    `json:"baseConfig,omitempty"`
@@ -206,8 +198,16 @@ var mpiDefault = Mpi{
 		Password: "",
 	},
 }
-var registryDefault = Registry{
-	Name:     "cnvrg-registry",
+
+var appRegistryDefault = Registry{
+	Name:     "cnvrg-app-registry",
+	URL:      "docker.io",
+	User:     "",
+	Password: "",
+}
+
+var infraRegistryDefault = Registry{
+	Name:     "cnvrg-infra-registry",
 	URL:      "docker.io",
 	User:     "",
 	Password: "",
@@ -220,7 +220,7 @@ var controlPlanDefault = ControlPlane{
 		Enabled:                 "true",
 		Image:                   "cnvrg/core:3.1.5",
 		Port:                    8080,
-		CPU:                     2,
+		CPU:                     "2000m",
 		Memory:                  "4Gi",
 		SvcName:                 "app",
 		NodePort:                30080,
@@ -278,7 +278,7 @@ var controlPlanDefault = ControlPlane{
 		Token:                   "token",
 		CPURequest:              "100m",
 		MemoryRequest:           "200Mi",
-		CPULimit:                2,
+		CPULimit:                "2000m",
 		MemoryLimit:             "4Gi",
 		EnableReadinessProbe:    "true",
 		ReadinessPeriodSeconds:  100,
@@ -289,14 +289,6 @@ var controlPlanDefault = ControlPlane{
 		Image:           "docker.io/cnvrg/cnvrg-boot:v0.26-tenancy",
 		SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
 		CreateBucketCmd: "mb.sh",
-	},
-
-	CnvrgRouter: CnvrgRouter{
-		Enabled:  "false",
-		Image:    "nginx",
-		SvcName:  "routing-service",
-		NodePort: 30081,
-		Port:     80,
 	},
 
 	BaseConfig: BaseConfig{

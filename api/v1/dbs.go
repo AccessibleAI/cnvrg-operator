@@ -95,17 +95,17 @@ type InfraDbs struct {
 }
 
 var minioDefaults = Minio{
-	Enabled:       "true",
+	Enabled:        "true",
 	ServiceAccount: "default",
-	Replicas:      1,
-	Image:         "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
-	Port:          9000,
-	StorageSize:   "100Gi",
-	SvcName:       "minio",
-	NodePort:      30090,
-	StorageClass:  "",
-	CPURequest:    1,
-	MemoryRequest: "2Gi",
+	Replicas:       1,
+	Image:          "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
+	Port:           9000,
+	StorageSize:    "100Gi",
+	SvcName:        "minio",
+	NodePort:       30090,
+	StorageClass:   "",
+	CPURequest:     1,
+	MemoryRequest:  "2Gi",
 	SharedStorage: SharedStorage{
 		Enabled:          "enabled",
 		UseExistingClaim: "",
@@ -156,7 +156,7 @@ var redisDefault = Redis{
 	NodeSelector:   nil,
 	Tolerations:    nil,
 	Limits: Limits{
-		CPU:    1,
+		CPU:    "1000m",
 		Memory: "2Gi",
 	},
 	Requests: Requests{

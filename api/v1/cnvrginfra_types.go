@@ -51,7 +51,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Networking:        cnvrgInfraNetworkingDefault,
 		Monitoring:        infraMonitoringDefault,
 		Logging:           cnvrgInfraLoggingDefault,
-		Registry:          registryDefault,
+		Registry:          infraRegistryDefault,
 		Dbs:               infraDbsDefaults,
 	}
 	return infraDefault
