@@ -69,7 +69,7 @@ controlPlane:
     image: docker.io/cnvrg/cnvrg-boot:v0.26-tenancy
     seedCmd: rails db:migrate && rails db:seed && rails libraries:update
   sidekiq:
-    cpu: 1750m
+    cpu: 1000m
     enabled: "true"
     killTimeout: 60
     memory: 3750Mi

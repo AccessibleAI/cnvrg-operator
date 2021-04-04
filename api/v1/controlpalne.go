@@ -246,7 +246,7 @@ var controlPlanDefault = ControlPlane{
 	Sidekiq: Sidekiq{
 		Enabled:     "true",
 		Split:       "true",
-		CPU:         "1750m",
+		CPU:         "1000m",
 		Memory:      "3750Mi",
 		Replicas:    2,
 		KillTimeout: 60,
