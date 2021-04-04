@@ -229,6 +229,7 @@ func informPkger() {
 	pkger.Include("/pkg/networking/tmpl")
 	pkger.Include("/pkg/registry/tmpl")
 	pkger.Include("/pkg/storage/tmpl")
+	pkger.Include("/pkg/gpu/tmpl")
 }
 
 func main() {

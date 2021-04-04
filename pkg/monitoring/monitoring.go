@@ -441,9 +441,24 @@ func grafanaOauthProxy() []*desired.State {
 	}
 }
 
+func appServiceMonitors() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/default-servicemonitors/cnvrg-idle-metrics.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
+			Own:            true,
+		},
+	}
+}
+
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
-	var state []*desired.State
+	// always add cnvrg idle metrics exporter
+	var state = appServiceMonitors()
+
 	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Prometheus.Enabled == "true" {
 		state = append(state, ccpPrometheusInstance()...)
 	}

@@ -89,6 +89,16 @@ spec:
                     - serviceAccount
                     type: object
                 type: object
+              gpu:
+                properties:
+                  nvidiaDp:
+                    properties:
+                      enabled:
+                        type: string
+                      image:
+                        type: string
+                    type: object
+                type: object
               infraNamespace:
                 type: string
               infraReconcilerCm:

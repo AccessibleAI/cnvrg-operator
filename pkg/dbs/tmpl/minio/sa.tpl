@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Spec.Dbs.Es.ServiceAccount }}
+  name: {{ .Spec.Dbs.Minio.ServiceAccount }}
   namespace: {{ ns . }}
 imagePullSecrets:
   - name: {{ .Spec.Registry.Name }}

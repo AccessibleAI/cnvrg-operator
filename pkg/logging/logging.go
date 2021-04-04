@@ -11,7 +11,6 @@ const path = "/pkg/logging/tmpl"
 func elastAlert() []*desired.State {
 	return []*desired.State{
 		{
-
 			TemplatePath:   path + "/elastalert/pvc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

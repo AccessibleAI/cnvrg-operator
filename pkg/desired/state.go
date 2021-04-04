@@ -38,6 +38,7 @@ var GrafanaAppDashboards = []string{
 	"pod-total.json",
 	"statefulset.json",
 	"workload-total.json",
+	"grafana-idle-metrics.json",
 }
 
 var GrafanaInfraDashboards = append([]string{

@@ -7,6 +7,7 @@ import (
 	"github.com/cnvrg-operator/pkg/controlplane"
 	"github.com/cnvrg-operator/pkg/dbs"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/gpu"
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
@@ -208,6 +209,19 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	if err := desired.Apply(controlplane.MpiInfraState(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
+	}
+
+	// nvidia device plugin
+	if cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled == "true" {
+		cnvrgInfraLog.Info("nvidia device plugin")
+		nvidiaDpData := desired.TemplateData{
+			Namespace: cnvrgInfra.Spec.InfraNamespace,
+			Data:      map[string]interface{}{"NvidiaDp": cnvrgInfra.Spec.Gpu.NvidiaDp},
+		}
+		if err := desired.Apply(gpu.NvidiaDpState(nvidiaDpData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			reconcileResult = err
+		}
 	}
 
 	return reconcileResult

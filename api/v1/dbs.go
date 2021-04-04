@@ -96,7 +96,7 @@ type InfraDbs struct {
 
 var minioDefaults = Minio{
 	Enabled:        "true",
-	ServiceAccount: "default",
+	ServiceAccount: "minio",
 	Replicas:       1,
 	Image:          "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
 	Port:           9000,
@@ -118,7 +118,7 @@ var minioDefaults = Minio{
 
 var pgDefault = Pg{
 	Enabled:        "true",
-	ServiceAccount: "default",
+	ServiceAccount: "pg",
 	SecretName:     "cnvrg-pg-secret",
 	Image:          "centos/postgresql-12-centos7",
 	Port:           5432,
@@ -146,7 +146,7 @@ var pgDefault = Pg{
 
 var redisDefault = Redis{
 	Enabled:        "true",
-	ServiceAccount: "default",
+	ServiceAccount: "redis",
 	Image:          "docker.io/cnvrg/cnvrg-redis:v3.0.5.c2",
 	SvcName:        "redis",
 	Port:           6379,

@@ -48,6 +48,14 @@ func esState() []*desired.State {
 func pgState() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/pg/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
 
 			TemplatePath:   path + "/pg/pvc.tpl",
 			Template:       nil,
@@ -98,6 +106,14 @@ func pgState() []*desired.State {
 func redisState() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/redis/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/redis/pvc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -136,6 +152,14 @@ func redisState() []*desired.State {
 
 func singleBackendMinio() []*desired.State {
 	return []*desired.State{
+		{
+			TemplatePath:   path + "/minio/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
 		{
 
 			TemplatePath:   path + "/minio/pvc.tpl",
@@ -177,7 +201,14 @@ func singleBackendMinio() []*desired.State {
 
 func sharedBackendMinio() []*desired.State {
 	return []*desired.State{
-
+		{
+			TemplatePath:   path + "/minio/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
 		{
 
 			TemplatePath:   path + "/minio/vs.tpl",
