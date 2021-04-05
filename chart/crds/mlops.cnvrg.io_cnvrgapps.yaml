@@ -85,23 +85,10 @@ spec:
                       useStdout:
                         type: string
                     type: object
-                  cnvrgRouter:
-                    properties:
-                      enabled:
-                        type: string
-                      image:
-                        type: string
-                      nodePort:
-                        type: integer
-                      port:
-                        type: integer
-                      svcName:
-                        type: string
-                    type: object
                   hyper:
                     properties:
                       cpuLimit:
-                        type: integer
+                        type: string
                       cpuRequest:
                         type: string
                       enableReadinessProbe:
@@ -295,7 +282,7 @@ spec:
                   webapp:
                     properties:
                       cpu:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       failureThreshold:
@@ -334,9 +321,9 @@ spec:
                   es:
                     properties:
                       cpuLimit:
-                        type: integer
+                        type: string
                       cpuRequest:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       fsGroup:
@@ -377,7 +364,7 @@ spec:
                   minio:
                     properties:
                       cpuRequest:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       image:
@@ -424,7 +411,7 @@ spec:
                   pg:
                     properties:
                       cpuRequest:
-                        type: integer
+                        type: string
                       dbname:
                         type: string
                       enabled:
@@ -490,7 +477,7 @@ spec:
                       limits:
                         properties:
                           cpu:
-                            type: integer
+                            type: string
                           memory:
                             type: string
                         type: object
@@ -561,7 +548,7 @@ spec:
                   kibana:
                     properties:
                       cpuLimit:
-                        type: integer
+                        type: string
                       cpuRequest:
                         type: string
                       enabled:
@@ -616,7 +603,7 @@ spec:
                   prometheus:
                     properties:
                       cpuRequest:
-                        type: integer
+                        type: string
                       enabled:
                         type: string
                       image:
@@ -639,6 +626,8 @@ spec:
                 required:
                 - upstreamPrometheus
                 type: object
+              namespaceTenancy:
+                type: string
               networking:
                 properties:
                   https:
@@ -654,12 +643,16 @@ spec:
                     type: object
                   ingress:
                     properties:
+                      enabled:
+                        type: string
                       ingressType:
                         enum:
                         - istio
                         - k8singress
                         - openshift
                         - nodeport
+                        type: string
+                      istioGwName:
                         type: string
                       perTryTimeout:
                         type: string
