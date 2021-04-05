@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/cnvrg-operator/pkg/docs"
 	"github.com/go-logr/zapr"
-	"github.com/jeremywohl/flatten"
 	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -13,8 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
-	"sort"
-
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"strings"
@@ -78,58 +75,9 @@ var generateDocsCmd = &cobra.Command{
 	Short: "Generate cnvrg operator docs ",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Generating docs... ")
-		generateDocs()
+		docs.GenerateDocs()
 
 	},
-}
-
-func generateDocs() {
-
-	// app params
-	app := mlopsv1.DefaultCnvrgAppSpec()
-	b, _ := json.Marshal(app)
-	flatAppParams, _ := flatten.FlattenString(string(b), "", flatten.DotStyle)
-	appParams := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(flatAppParams), &appParams)
-
-	// infra params
-	infra := mlopsv1.DefaultCnvrgInfraSpec()
-	b, _ = json.Marshal(infra)
-	flatInfraParams, _ := flatten.FlattenString(string(b), "", flatten.DotStyle)
-	infraParams := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(flatInfraParams), &infraParams)
-
-	finalParams := make(map[string]interface{})
-	skipKeys := []string{
-		"controlPlane.baseConfig.sentryUrl",
-		"controlPlane.objectStorage.stsIv",
-		"controlPlane.objectStorage.stsKey",
-		"controlPlane.objectStorage.secretKeyBase",
-		"controlPlane.objectStorage.minioSseMasterKey",
-	}
-	for key, value := range appParams {
-		skipKey := false
-		for _, item := range skipKeys {
-			if item == key {
-				skipKey = true
-			}
-		}
-		if !skipKey {
-			finalParams[key] = value
-		}
-	}
-
-	for key, value := range infraParams {
-		finalParams[key] = value
-	}
-	keys := make([]string, 0, len(finalParams))
-	for k := range finalParams {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		fmt.Println(fmt.Sprintf("|`%v`|%v", k, finalParams[k]))
-	}
 }
 
 func initZapLog() *zap.Logger {
