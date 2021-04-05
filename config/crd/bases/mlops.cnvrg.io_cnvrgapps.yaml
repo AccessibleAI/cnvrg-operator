@@ -623,8 +623,6 @@ spec:
                     type: object
                   upstreamPrometheus:
                     type: string
-                required:
-                - upstreamPrometheus
                 type: object
               namespaceTenancy:
                 type: string

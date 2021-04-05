@@ -1,6 +1,10 @@
 {{- define "spec.monitoring_app" }}
 monitoring:
+  {{- if eq (.Values.namespaceTenancy|toString) "true" }}
   enabled: "{{ .Values.monitoring.enabled }}"
+  {{- else }}
+  enabled: "false"
+  {{- end }}
   upstreamPrometheus: {{ .Values.monitoring.upstreamPrometheus }}
 
   grafana:

@@ -1,9 +1,13 @@
-{{- if ne .Values.infraClusterDomain ""}}
+{{- define "spec.operator" }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cnvrg-operator
+  {{- if eq (.Values.namespaceTenancy|toString) "true" }}
   namespace: {{ .Values.infraNamespace }}
+  {{- else }}
+  namespace: {{ template "spec.cnvrgNs" . }}
+  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -69,7 +73,11 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: cnvrg-operator
+    {{- if eq (.Values.namespaceTenancy|toString) "true" }}
     namespace: {{ .Values.infraNamespace }}
+    {{- else }}
+    namespace: {{ template "spec.cnvrgNs" . }}
+    {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -77,7 +85,11 @@ metadata:
   labels:
     control-plane: cnvrg-operator
   name: cnvrg-operator
+  {{- if eq (.Values.namespaceTenancy|toString) "true" }}
   namespace: {{ .Values.infraNamespace }}
+  {{- else }}
+  namespace: {{ template "spec.cnvrgNs" . }}
+  {{- end }}
 spec:
   replicas: 1
   selector:

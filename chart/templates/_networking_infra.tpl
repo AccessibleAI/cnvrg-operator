@@ -6,6 +6,11 @@ networking:
     key: "{{ .Values.networking.https.key }}"
     certSecret: "{{ .Values.networking.https.certSecret }}"
   ingress:
+    {{- if eq (.Values.namespaceTenancy|toString) "true" }}
+    enabled: "{{ .Values.networking.ingress.enabled }}"
+    {{- else }}
+    enabled: "false"
+    {{- end }}
     ingressType: {{ .Values.networking.ingress.ingressType }}
     perTryTimeout: {{ .Values.networking.ingress.perTryTimeout }}
     retriesAttempts: {{ .Values.networking.ingress.retriesAttempts }}

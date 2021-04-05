@@ -80,7 +80,7 @@ type CnvrgInfraMonitoring struct {
 
 type CnvrgAppMonitoring struct {
 	Enabled            string     `json:"enabled,omitempty"`
-	UpstreamPrometheus string     `json:"upstreamPrometheus"`
+	UpstreamPrometheus string     `json:"upstreamPrometheus,omitempty"`
 	Prometheus         Prometheus `json:"prometheus,omitempty"`
 	Grafana            Grafana    `json:"grafana,omitempty"`
 }

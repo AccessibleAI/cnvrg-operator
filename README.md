@@ -46,27 +46,38 @@ cnvrg operator may deploy cnvrg stack in two different ways
                         | IstioGateway + VirtualServices                  |
                         ---------------------------------------------------           
 ```
-   
-  
 
-### Quick start - multiple cnvrg control plans within the same K8s cluster 
+
+
+### Quick start - namespace tenancy *disabled* with multiple cnvrg control plans within the same K8s cluster
+```shell
+helm install cnvrg-1 . -n cnvrg-1 --create-namespace \ 
+  --set appClusterDomain="<control-plane-domain-record>" \
+  --set controlPlane.webapp.image="<cnvrg-control-plane-image>" \
+  --set registry.user="<cnvrg-private-registry-user>" \
+  --set registry.password="<cnvrg-private-registry-password>"  
+```
+
+### Quick start - namespace tenancy *enabled* with multiple cnvrg control plans within the same K8s cluster 
 
 Deploy cnvrg infrastructure first 
 ```shell
 helm install cnvrg-infra . -n cnvrg-infra --create-namespace \
+  --set namespaceTenancy="true" \ 
   --set infraClusterDomain="<infrastructure-domain-record>" \
   --set registry.user="<cnvrg-private-registry-user>" \
   --set registry.password="<cnvrg-private-registry-password>"  
 ```
 Once infrastructure components are ready, deploy cnvrg control plane 
 ```shell
-helm install cnvrg-1 . -n cnvrg-1 --create-namespace \ 
+helm install cnvrg-1 . -n cnvrg-1 --create-namespace \
+  --set namespaceTenancy="true" \ 
   --set appClusterDomain="<control-plane-domain-record>" \
-  --set namespaceTenancy="true" \
   --set controlPlane.webapp.image="<cnvrg-control-plane-image>" \
   --set registry.user="<cnvrg-private-registry-user>" \
   --set registry.password="<cnvrg-private-registry-password>"  
 ```
+
 
 ### Examples 
 enable on-prem nfs storage  

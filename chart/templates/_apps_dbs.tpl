@@ -1,4 +1,4 @@
-{{- define "spec.dbs" }}
+{{- define "spec.app_dbs" }}
 dbs:
   es:
     cpuLimit: {{ .Values.dbs.es.cpuLimit }}
