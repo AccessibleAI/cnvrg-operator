@@ -70,7 +70,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 	},
 	Kibana: Kibana{
 		Enabled:        "true",
-		ServiceAccount: "default",
+		ServiceAccount: "kibana",
 		SvcName:        "kibana",
 		Port:           8080,
 		Image:          "docker.elastic.co/kibana/kibana-oss:7.8.1",

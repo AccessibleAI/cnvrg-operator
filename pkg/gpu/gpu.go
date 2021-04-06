@@ -10,6 +10,15 @@ const path = "/pkg/gpu/tmpl"
 func nvidiaDp() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/nvidiadp/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+			TemplateData:   nil,
+		},
+		{
 			TemplatePath:   path + "/nvidiadp/ds.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -24,5 +33,6 @@ func nvidiaDp() []*desired.State {
 func NvidiaDpState(data interface{}) []*desired.State {
 	nvidiaDp := nvidiaDp()
 	nvidiaDp[0].TemplateData = data
+	nvidiaDp[1].TemplateData = data
 	return nvidiaDp
 }

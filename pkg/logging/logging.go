@@ -55,7 +55,14 @@ func elastAlert() []*desired.State {
 func kibana() []*desired.State {
 	return []*desired.State{
 		{
-
+			TemplatePath:   path + "/kibana/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/kibana/dep.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -64,7 +71,6 @@ func kibana() []*desired.State {
 			Own:            true,
 		},
 		{
-
 			TemplatePath:   path + "/kibana/svc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

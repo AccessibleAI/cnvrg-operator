@@ -415,39 +415,21 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 		return
 	}
 	ctx := context.Background()
-	cnvrgApp.Status.Status = status
-	cnvrgApp.Status.Message = message
 	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		err := r.Status().Update(ctx, cnvrgApp)
+		name := types.NamespacedName{Namespace: cnvrgApp.Namespace, Name: cnvrgApp.Name}
+		app, err := r.getCnvrgAppSpec(name)
+		if err != nil {
+			return err
+		}
+		app.Status.Status = status
+		app.Status.Message = message
+		err = r.Status().Update(ctx, app)
 		return err
 	})
 	if err != nil {
 		cnvrgAppLog.Error(err, "can't update status")
 	}
 
-	//// This check is to make sure that the status is indeed updated
-	//// short reconciliations loop might cause status to be applied but not yet saved into BD
-	//// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
-	//// to avoid this error, fetch the object and compare the status
-	//statusCheckAttempts := 3
-	//for {
-	//	cnvrgApp, err := r.getCnvrgAppSpec(types.NamespacedName{Namespace: cnvrgApp.Namespace, Name: cnvrgApp.Name})
-	//	if err != nil {
-	//		cnvrgAppLog.Error(err, "can't validate status update")
-	//	}
-	//	cnvrgAppLog.V(1).Info("expected status", "status", status, "message", message)
-	//	cnvrgAppLog.V(1).Info("current status", "status", cnvrgApp.Status.Status, "message", cnvrgApp.Status.Message)
-	//	if cnvrgApp.Status.Status == status && cnvrgApp.Status.Message == message {
-	//		break
-	//	}
-	//	if statusCheckAttempts == 0 {
-	//		cnvrgAppLog.Info("can't verify status update, status checks attempts exceeded")
-	//		break
-	//	}
-	//	statusCheckAttempts--
-	//	cnvrgAppLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
-	//	time.Sleep(1 * time.Second)
-	//}
 }
 
 func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, error) {

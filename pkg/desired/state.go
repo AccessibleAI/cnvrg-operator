@@ -429,6 +429,12 @@ func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
 		return false
 	}
 
+	// do not apply CRDs if already exists
+	// todo: have to ensure that existing CRD version is compatible with actually CR
+	if manifest.GVR == Kinds[CrdGVR] {
+		return false
+	}
+
 	// todo: need to figure out what's wrong with MPI CRD (might be related to apiextensions.k8s.io/v1beta1)
 	if manifest.GVR == Kinds[CrdGVR] && obj.GetName() == "mpijobs.kubeflow.org" {
 		return false

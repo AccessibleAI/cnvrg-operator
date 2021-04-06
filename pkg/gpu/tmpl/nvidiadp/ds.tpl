@@ -12,6 +12,7 @@ spec:
       labels:
         name: nvidia-device-plugin-ds
     spec:
+      serviceAccountName: nvidia-device-plugin
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists

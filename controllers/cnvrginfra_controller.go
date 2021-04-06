@@ -37,6 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strings"
+	"time"
 )
 
 const CnvrginfraFinalizer = "cnvrginfra.mlops.cnvrg.io/finalizer"
@@ -61,7 +62,8 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, err
 	}
 	if !equal {
-		return ctrl.Result{Requeue: true}, nil
+		requeueAfter, _ := time.ParseDuration("3s")
+		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
 
 	cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
@@ -87,14 +89,21 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			if err := r.cleanup(cnvrgInfra); err != nil {
 				return ctrl.Result{}, err
 			}
+			cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			if cnvrgInfra == nil {
+				return ctrl.Result{}, nil
+			}
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
 			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
-				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgApp object still exists")
-				// if update was failed, make sure that cnvrgInfra still exists
-				spec, e := r.getCnvrgInfraSpec(req.NamespacedName)
-				if spec == nil && e == nil {
-					return ctrl.Result{}, nil // probably spec was deleted, stop reconcile
-				}
+				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
+				//// if update was failed, make sure that cnvrgInfra still exists
+				//spec, e := r.getCnvrgInfraSpec(req.NamespacedName)
+				//if spec == nil && e == nil {
+				//	return ctrl.Result{}, nil // probably spec was deleted, stop reconcile
+				//}
 				return ctrl.Result{}, err
 			}
 		}
@@ -216,7 +225,10 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		cnvrgInfraLog.Info("nvidia device plugin")
 		nvidiaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
-			Data:      map[string]interface{}{"NvidiaDp": cnvrgInfra.Spec.Gpu.NvidiaDp},
+			Data: map[string]interface{}{
+				"NvidiaDp": cnvrgInfra.Spec.Gpu.NvidiaDp,
+				"Registry": cnvrgInfra.Spec.Registry,
+			},
 		}
 		if err := desired.Apply(gpu.NvidiaDpState(nvidiaDpData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
@@ -307,7 +319,7 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		cnvrgInfraLog.Info("states are not equals, syncing and requeuing")
 		cnvrgInfra.Spec = desiredSpec
 		if err := r.Update(context.Background(), cnvrgInfra); err != nil && errors.IsConflict(err) {
-			cnvrgAppLog.Info("conflict updating cnvrgInfra object, requeue for reconciliations...")
+			cnvrgAppLog.Error(err, "conflict updating cnvrgInfra object, requeue for reconciliations...")
 			return true, nil
 		} else if err != nil {
 			return false, err
@@ -419,38 +431,20 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 		return
 	}
 	ctx := context.Background()
-	cnvrgInfra.Status.Status = status
-	cnvrgInfra.Status.Message = message
 	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		err := r.Status().Update(ctx, cnvrgInfra)
+		name := types.NamespacedName{Namespace: "", Name: cnvrgInfra.Name}
+		infra, err := r.getCnvrgInfraSpec(name)
+		if err != nil {
+			return err
+		}
+		infra.Status.Status = status
+		infra.Status.Message = message
+		err = r.Status().Update(ctx, infra)
 		return err
 	})
 	if err != nil {
 		cnvrgInfraLog.Error(err, "can't update status")
 	}
-	//// This check is to make sure that the status is indeed updated
-	//// short reconciliations loop might cause status to be applied but not yet saved into BD
-	//// and leads to error: "the object has been modified; please apply your changes to the latest version and try again"
-	//// to avoid this error, fetch the object and compare the status
-	//statusCheckAttempts := 3
-	//for {
-	//	cnvrgInfra, err := r.getCnvrgInfraSpec(types.NamespacedName{Namespace: cnvrgInfra.Spec.InfraNamespace, Name: cnvrgInfra.Name})
-	//	if err != nil {
-	//		cnvrgInfraLog.Error(err, "can't validate status update")
-	//	}
-	//	cnvrgInfraLog.V(1).Info("expected status", "status", status, "message", message)
-	//	cnvrgInfraLog.V(1).Info("current status", "status", cnvrgInfra.Status.Status, "message", cnvrgInfra.Status.Message)
-	//	if cnvrgInfra.Status.Status == status && cnvrgInfra.Status.Message == message {
-	//		break
-	//	}
-	//	if statusCheckAttempts == 0 {
-	//		cnvrgInfraLog.Info("can't verify status update, status checks attempts exceeded")
-	//		break
-	//	}
-	//	statusCheckAttempts--
-	//	cnvrgInfraLog.V(1).Info("validating status update", "attempts", statusCheckAttempts)
-	//	time.Sleep(1 * time.Second)
-	//}
 }
 
 func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv1.CnvrgInfra) error {
@@ -475,29 +469,30 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	cnvrgInfraLog = r.Log.WithValues("initializing", "crds")
 
 	if viper.GetBool("deploy-depended-crds") == false {
-		zap.S().Warn("deploy-depended-crds is to false, I hope CRDs was deployed ahead, if not I will fail...")
-	}
+		zap.S().Info("deploy-depended-crds is false, I hope CRDs was deployed ahead and match expected versions, if not I will fail...")
+	} else {
 
-	if viper.GetBool("own-istio-resources") {
-		err := desired.Apply(networking.IstioCrds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+		if viper.GetBool("own-istio-resources") {
+			err := desired.Apply(networking.IstioCrds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+			if err != nil {
+				cnvrgInfraLog.Error(err, "can't apply istio CRDs")
+				os.Exit(1)
+			}
+		}
+
+		if viper.GetBool("own-prometheus-resources") {
+			err := desired.Apply(monitoring.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+			if err != nil {
+				cnvrgInfraLog.Error(err, "can't apply prometheus CRDs")
+				os.Exit(1)
+			}
+		}
+
+		err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 		if err != nil {
-			cnvrgInfraLog.Error(err, "can't apply istio CRDs")
+			cnvrgInfraLog.Error(err, "can't apply MPI CRDs")
 			os.Exit(1)
 		}
-	}
-
-	if viper.GetBool("own-prometheus-resources") {
-		err := desired.Apply(monitoring.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
-		if err != nil {
-			cnvrgInfraLog.Error(err, "can't apply prometheus CRDs")
-			os.Exit(1)
-		}
-	}
-
-	err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
-	if err != nil {
-		cnvrgInfraLog.Error(err, "can't apply MPI CRDs")
-		os.Exit(1)
 	}
 
 	p := predicate.Funcs{

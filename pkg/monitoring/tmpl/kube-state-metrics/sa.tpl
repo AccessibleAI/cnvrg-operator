@@ -6,3 +6,5 @@ metadata:
     app.kubernetes.io/version: v1.9.7
   name: kube-state-metrics
   namespace: {{ ns . }}
+imagePullSecrets:
+  - name: {{ .Spec.Registry.Name }}
