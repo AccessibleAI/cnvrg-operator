@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: grafana-datasources
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
 type: Opaque
 data:
-  datasources.yaml: {{ grafanaDataSource .Spec.Monitoring.Prometheus.SvcName (ns .) .Spec.Monitoring.Prometheus.Port  | b64enc }}
+  datasources.yaml: {{ grafanaDataSource .Data.Svc .Namespace .Data.Port .Data.User .Data.Pass | b64enc }}
 

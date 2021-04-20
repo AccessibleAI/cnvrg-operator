@@ -63,7 +63,7 @@ helm install cnvrg-1 . -n cnvrg-1 --create-namespace \
 Deploy cnvrg infrastructure first 
 ```shell
 helm install cnvrg-infra . -n cnvrg-infra --create-namespace \
-  --set namespaceTenancy="true" \ 
+  --set namespaceTenancy="true" \
   --set infraClusterDomain="<infrastructure-domain-record>" \
   --set registry.user="<cnvrg-private-registry-user>" \
   --set registry.password="<cnvrg-private-registry-password>"  
@@ -71,7 +71,7 @@ helm install cnvrg-infra . -n cnvrg-infra --create-namespace \
 Once infrastructure components are ready, deploy cnvrg control plane 
 ```shell
 helm install cnvrg-1 . -n cnvrg-1 --create-namespace \
-  --set namespaceTenancy="true" \ 
+  --set namespaceTenancy="true" \
   --set appClusterDomain="<control-plane-domain-record>" \
   --set controlPlane.webapp.image="<cnvrg-control-plane-image>" \
   --set registry.user="<cnvrg-private-registry-user>" \

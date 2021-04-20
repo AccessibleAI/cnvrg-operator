@@ -12,6 +12,7 @@ type SSO struct {
 	CookieSecret       string `json:"cookieSecret,omitempty"`
 	AzureTenant        string `json:"azureTenant,omitempty"`
 	OidcIssuerURL      string `json:"oidcIssuerUrl,omitempty"`
+	KeysSecretRef      string `json:"keysSecretRef,omitempty"`
 }
 
 type OauthProxyServiceConf struct {
@@ -20,8 +21,9 @@ type OauthProxyServiceConf struct {
 
 var ssoDefault = SSO{
 	Enabled:            "false",
-	Image:              "cnvrg/cnvrg-oauth-proxy:v7.0.1.c2",
+	Image:              "cnvrg/cnvrg-oauth-proxy:v7.0.1.c7",
 	RedisConnectionUrl: "redis://redis:6379",
+	KeysSecretRef:      "sso-keys",
 	AdminUser:          "",
 	Provider:           "",
 	EmailDomain:        "",

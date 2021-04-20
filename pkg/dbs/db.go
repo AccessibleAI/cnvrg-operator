@@ -287,5 +287,4 @@ func InfraDbsState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, redisState()...)
 	}
 	return state
-
 }

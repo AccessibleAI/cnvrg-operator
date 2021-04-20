@@ -39,3 +39,27 @@ spec:
     matchLabels:
       cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   version: v2.22.1
+  {{- if eq .Spec.SSO.Enabled "true" }}
+  listenLocal: true
+  containers:
+  - name: "cnvrg-oauth-proxy"
+    image: {{ .Spec.SSO.Image }}
+    command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+    ports:
+    - containerPort: 9091
+      name: web
+    volumeMounts:
+    - name: "oauth-proxy-config"
+      mountPath: "/opt/app-root/conf/proxy-config"
+      readOnly: true
+    - name: {{ .Spec.Monitoring.Prometheus.BasicAuthRef }}
+      mountPath: "/opt/app-root/conf/keys"
+      readOnly: true
+  volumes:
+  - name: "oauth-proxy-config"
+    secret:
+      secretName: "oauth-proxy-{{.Spec.Monitoring.Prometheus.SvcName}}"
+  - name: {{ .Spec.Monitoring.Prometheus.BasicAuthRef }}
+    secret:
+      secretName: {{ .Spec.Monitoring.Prometheus.BasicAuthRef }}
+  {{- end }}

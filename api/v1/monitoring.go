@@ -20,6 +20,7 @@ type Prometheus struct {
 	NodePort      int    `json:"nodePort,omitempty"`
 	StorageSize   string `json:"storageSize,omitempty"`
 	StorageClass  string `json:"storageClass,omitempty"`
+	BasicAuthRef  string `json:"basicAuthRef"`
 }
 
 type NodeExporter struct {
@@ -104,6 +105,7 @@ var prometheusDefault = Prometheus{
 	NodePort:      30909,
 	StorageSize:   "50Gi",
 	StorageClass:  "",
+	BasicAuthRef:  "prom-basic-auth-creds",
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{

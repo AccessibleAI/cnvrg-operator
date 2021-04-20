@@ -12,6 +12,7 @@ import (
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/registry"
+	"github.com/cnvrg-operator/pkg/shared"
 	"github.com/cnvrg-operator/pkg/storage"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -112,6 +113,26 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 
 	r.updateStatusMessage(mlopsv1.StatusReconciling, "reconciling", cnvrgInfra)
 
+	// generate SSO tokens and basic auth secrets
+	if cnvrgInfra.Spec.SSO.Enabled == "true" {
+		basicAuthUser := "cnvrg"
+		pubkey, basicAuthPass, err := r.generateSSOKeysAndToken(cnvrgInfra)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		// crate basic auth secret for prometheus
+		if err := r.createBasicAuthSecret(
+			cnvrgInfra.Spec.Monitoring.Prometheus.BasicAuthRef,
+			cnvrgInfra.Spec.InfraNamespace,
+			basicAuthUser,
+			string(basicAuthPass),
+			string(pubkey),
+			cnvrgInfra,
+		); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
 	// apply manifests
 	if err := r.applyManifests(cnvrgInfra); err != nil {
 		return ctrl.Result{}, err
@@ -125,6 +146,109 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	r.updateStatusMessage(mlopsv1.StatusHealthy, "successfully reconciled", cnvrgInfra)
 	cnvrgInfraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *CnvrgInfraReconciler) getBasicAuthCreds(secretName string, ns string) (string, string, error) {
+	basicAuthCreds := v1.Secret{ObjectMeta: metav1.ObjectMeta{Name: secretName, Namespace: ns}}
+	namespacedName := types.NamespacedName{Namespace: ns, Name: secretName}
+	if err := r.Get(context.Background(), namespacedName, &basicAuthCreds); err != nil && errors.IsNotFound(err) {
+		cnvrgInfraLog.Info("returning empty token, secret not found", "secret", secretName)
+		return "", "", err
+	} else if err != nil {
+		cnvrgInfraLog.Error(err, "can't get secret", "secret", secretName)
+		return "", "", err
+	}
+	if _, ok := basicAuthCreds.Data["user"]; !ok {
+		cnvrgInfraLog.Info("user is missing!")
+		return "", "", fmt.Errorf("basic auth pass is missing in secret: %s", secretName)
+	}
+	if _, ok := basicAuthCreds.Data["pass"]; !ok {
+		cnvrgInfraLog.Info("pass is missing!")
+		return "", "", fmt.Errorf("basic auth pass is missing in secret: %s", secretName)
+	}
+	return string(basicAuthCreds.Data["user"]), string(basicAuthCreds.Data["pass"]), nil
+}
+
+func (r *CnvrgInfraReconciler) createBasicAuthSecret(name string, ns string, user string, pass string, pubkey string, infra *mlopsv1.CnvrgInfra) error {
+	basicAuthCreds := v1.Secret{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: ns}}
+	namespacedName := types.NamespacedName{Namespace: ns, Name: name}
+
+	if err := r.Get(context.Background(), namespacedName, &basicAuthCreds); err != nil && errors.IsNotFound(err) {
+		if err := ctrl.SetControllerReference(infra, &basicAuthCreds, r.Scheme); err != nil {
+			cnvrgInfraLog.Error(err, "error set controller reference", "name", name)
+			return err
+		}
+		basicAuthCreds.Data = map[string][]byte{"user": []byte(user), "pass": []byte(pass), "pubkey": []byte(pubkey)}
+		if err := r.Create(context.Background(), &basicAuthCreds); err != nil {
+			cnvrgInfraLog.Error(err, "failed to create secret", "secret", name)
+			return err
+		}
+		return nil
+	} else if err != nil {
+		cnvrgInfraLog.Error(err, "can't check if secret exists", "secret", name)
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) generateSSOKeysAndToken(infra *mlopsv1.CnvrgInfra) ([]byte, []byte, error) {
+
+	keysForTokens := v1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: infra.Spec.SSO.KeysSecretRef, Namespace: infra.Spec.InfraNamespace},
+	}
+	namespacedName := types.NamespacedName{
+		Namespace: keysForTokens.ObjectMeta.Namespace,
+		Name:      keysForTokens.ObjectMeta.Name,
+	}
+
+	if err := r.Get(context.Background(), namespacedName, &keysForTokens); err != nil && errors.IsNotFound(err) {
+		cnvrgInfraLog.Info("secret does not exists, will create one", "secret", infra.Spec.SSO.KeysSecretRef)
+		privateKey, err := shared.GeneratePrivateKey()
+		if err != nil {
+			cnvrgInfraLog.Error(err, "error generating private key for SSO tokens")
+			return nil, nil, err
+		}
+		privateKeyBytes, publicKeyBytes, err := shared.EncodeKeysToPEM(privateKey)
+		if err != nil {
+			cnvrgInfraLog.Error(err, "error generating public key or encoding keys for SSO tokens")
+			return nil, nil, err
+		}
+		ssoToken, err := shared.CreateSSOToken(infra.Spec.SSO.ClientID, privateKeyBytes)
+		if err != nil {
+			cnvrgInfraLog.Error(err, "error generating SSO Token")
+			return nil, nil, err
+		}
+		if err := ctrl.SetControllerReference(infra, &keysForTokens, r.Scheme); err != nil {
+			cnvrgInfraLog.Error(err, "error set controller reference")
+			return nil, nil, err
+		}
+		keysForTokens.Data = map[string][]byte{
+			"pubkey":   publicKeyBytes,
+			"privkey":  privateKeyBytes,
+			"ssoToken": []byte(ssoToken),
+		}
+		if err := r.Create(context.Background(), &keysForTokens); err != nil {
+			cnvrgInfraLog.Error(err, "failed to create secret for sso tokens ")
+			return nil, nil, err
+		}
+		return publicKeyBytes, []byte(ssoToken), nil
+	} else if err != nil {
+		cnvrgInfraLog.Error(err, "can't check if secret exists", "secret", infra.Spec.SSO.KeysSecretRef)
+		return nil, nil, err
+	}
+	cnvrgInfraLog.Info("secret exists, skipping...", "secret", infra.Spec.SSO.KeysSecretRef)
+
+	if _, ok := keysForTokens.Data["ssoToken"]; !ok {
+		cnvrgInfraLog.Info("sso token is missing!")
+		return nil, nil, fmt.Errorf("sso token is missing in secret: %s", infra.Spec.SSO.KeysSecretRef)
+	}
+	if _, ok := keysForTokens.Data["pubkey"]; !ok {
+		cnvrgInfraLog.Info("pubkey token is missing!")
+		return nil, nil, fmt.Errorf("pubkey is missing in secret: %s", infra.Spec.SSO.KeysSecretRef)
+	}
+	return keysForTokens.Data["pubkey"], keysForTokens.Data["ssoToken"], nil
+
 }
 
 func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (map[string]string, error) {
@@ -188,6 +312,27 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	// grafana dashboards
 	cnvrgInfraLog.Info("applying grafana dashboards")
 	if err := r.createGrafanaDashboards(cnvrgInfra); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
+	// grafana datasource
+	cnvrgInfraLog.Info("applying grafana datasource")
+	basicAuthUser, basicAuthPass, err := r.getBasicAuthCreds(cnvrgInfra.Spec.Monitoring.Prometheus.BasicAuthRef, cnvrgInfra.Spec.InfraNamespace)
+	if err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+	grafanaDatasourceData := desired.TemplateData{
+		Namespace: cnvrgInfra.Spec.InfraNamespace,
+		Data: map[string]interface{}{
+			"Svc":  cnvrgInfra.Spec.Monitoring.Prometheus.SvcName,
+			"Port": cnvrgInfra.Spec.Monitoring.Prometheus.Port,
+			"User": basicAuthUser,
+			"Pass": basicAuthPass,
+		},
+	}
+	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -299,6 +444,11 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
 
+	//check if SSO enabled and patch services ports
+	if cnvrgInfra.Spec.SSO.Enabled == "true" {
+		cnvrgInfra.Spec.Monitoring.Prometheus.Port = 9091
+	}
+
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride); err != nil {
 		cnvrgInfraLog.Error(err, "can't merge")
@@ -359,6 +509,25 @@ func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 		return err
 	}
 
+	// cleanup tokens keys cm
+	if err := r.cleanupTokensKeysCM(cnvrgInfra); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) cleanupTokensKeysCM(infra *mlopsv1.CnvrgInfra) error {
+	cnvrgAppLog.Info("running cleanup", "secret", infra.Spec.SSO.KeysSecretRef)
+	ctx := context.Background()
+	tokensKeySecret := &v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: infra.Spec.SSO.KeysSecretRef, Namespace: infra.Spec.InfraNamespace}}
+	err := r.Delete(ctx, tokensKeySecret)
+	if err != nil && errors.IsNotFound(err) {
+		cnvrgAppLog.Info("no need to delete secret ", "secret", infra.Spec.SSO.KeysSecretRef)
+	} else if err != nil {
+		cnvrgAppLog.Error(err, "error deleting ", "secret", infra.Spec.SSO.KeysSecretRef)
+		return err
+	}
 	return nil
 }
 

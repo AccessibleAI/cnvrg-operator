@@ -212,9 +212,9 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort int, upstreamPort int) string {
 			sso := getSSOConfig(obj)
-			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/static/`)
+			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
 			for i, url := range skipAuthRegex {
 				if i == (len(skipAuthRegex) - 1) {
 					skipAuthUrls += fmt.Sprintf(`"%v"`, url)
@@ -224,8 +224,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			skipAuthUrls += "]"
 			proxyConf := []string{
-				fmt.Sprintf(`provider = "%v"`, sso.Provider),
-				fmt.Sprintf(`http_address = "0.0.0.0:8080"`),
+				fmt.Sprintf(`provider = "%v"`, provider),
+				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf(`redis_connection_url = "%v"`, sso.RedisConnectionUrl),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
@@ -234,8 +234,9 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
 				fmt.Sprintf(`cookie_secret = "%v"`, sso.CookieSecret),
 				fmt.Sprintf(`oidc_issuer_url = "%v"`, sso.OidcIssuerURL),
-				`upstreams = ["http://127.0.0.1:3000/", "file:///var/www/static/#/static/"]`,
+				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///opt/app-root/src/templates/#/cnvrg-static/"]`, upstreamPort),
 				`session_store_type = "redis"`,
+				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/opt/app-root/src/templates"`,
 				"ssl_insecure_skip_verify = true",
 				`cookie_name = "_oauth2_proxy"`,
@@ -288,7 +289,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
       - '%s'
 `, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
 		},
-		"grafanaDataSource": func(promSvc string, ns string, promPort int) string {
+		"grafanaDataSource": func(promSvc string, ns string, promPort int, user string, pass string) string {
 			return fmt.Sprintf(`
 {
     "apiVersion": 1,
@@ -300,10 +301,16 @@ func cnvrgTemplateFuncs() map[string]interface{} {
             "orgId": 1,
             "type": "prometheus",
             "url": "http://%s.%s.svc:%d",
-            "version": 1
+            "version": 1,
+            "basicAuth": true,
+            "basicAuthUser": "%s",
+            "basicAuthPassword": "%s",
+            "secureJsonFields": {
+              "basicAuthPassword": true
+            },
         }
     ]
-}`, promSvc, ns, promPort)
+}`, promSvc, ns, promPort, user, pass)
 		},
 		"grafanaDashboards": func(obj interface{}) []string {
 			return getGrafanaDashboards(obj)

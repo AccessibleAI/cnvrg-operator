@@ -59,6 +59,14 @@ func prometheusOperatorState() []*desired.State {
 func infraPrometheusInstanceState() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/prometheus/instance/infra/oauth.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/prometheus/instance/infra/clusterrole.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -170,6 +178,20 @@ func kubeStateMetricsState() []*desired.State {
 	}
 }
 
+func GrafanaDSState(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplateData:   data,
+			TemplatePath:   path + "/grafana/datasource.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+		},
+	}
+}
+
 func grafanaState() []*desired.State {
 	return []*desired.State{
 		{
@@ -194,14 +216,6 @@ func grafanaState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
-			Own:            true,
-		},
-		{
-			TemplatePath:   path + "/grafana/datasource.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
 		},
 		{
