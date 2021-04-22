@@ -50,6 +50,11 @@ spec:
           value: "/usr/share/elasticsearch/data/logs"
         - name: "ES_JAVA_OPTS"
           value: "{{ .Spec.Dbs.Es.JavaOpts }}"
+        - name: "ES_SECURITY_ENABLED"
+          value: "true"
+        envFrom:
+          - secretRef:
+              name: {{ .Spec.Dbs.Es.CredsRef }}
         ports:
         - containerPort: {{ .Spec.Dbs.Es.Port }}
         resources:
@@ -60,16 +65,32 @@ spec:
             cpu: {{ .Spec.Dbs.Es.CPURequest }}
             memory: {{ .Spec.Dbs.Es.MemoryRequest }}
         readinessProbe:
-          httpGet:
-            path: /_cluster/health
-            port: {{ .Spec.Dbs.Es.Port }}
+          exec:
+            command:
+              - /bin/bash
+              - -c
+              - |
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                if [ "$ready" == "200" ]; then
+                  exit 0
+                else
+                  exit 1
+                fi
           initialDelaySeconds: 30
           periodSeconds: 20
           failureThreshold: 5
         livenessProbe:
-          httpGet:
-            path: /_cluster/health
-            port: {{ .Spec.Dbs.Es.Port }}
+          exec:
+            command:
+              - /bin/bash
+              - -c
+              - |
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                if [ "$ready" == "200" ]; then
+                  exit 0;
+                else
+                  exit 1
+                fi
           initialDelaySeconds: 5
           periodSeconds: 20
           failureThreshold: 5

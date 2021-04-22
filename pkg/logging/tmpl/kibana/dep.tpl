@@ -25,6 +25,9 @@ spec:
         - name: "oauth-proxy-config"
           secret:
             secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
+        - name: "kibana-config"
+          secret:
+            secretName: "kibana-config"
       {{- end }}
       containers:
         {{- if eq .Spec.SSO.Enabled "true" }}
@@ -38,18 +41,16 @@ spec:
         {{- end }}
         - name: {{ .Spec.Logging.Kibana.SvcName }}
           image: {{ .Spec.Logging.Kibana.Image }}
+          volumeMounts:
+            - name: "kibana-config"
+              mountPath: "/usr/share/kibana/config"
+              readOnly: true
           env:
-          - name: ELASTICSEARCH_URL
-            value: {{ esFullInternalUrl .}}
           {{- if eq .Spec.SSO.Enabled "true" }}
-          - name: SERVER_HOST
-            value: "127.0.0.1"
           - name: SERVER_PORT
             value: "3000"
           {{- end }}
           {{- if ne .Spec.SSO.Enabled "true" }}
-          - name: SERVER_HOST
-            value: "0.0.0.0"
           - name: SERVER_PORT
             value: "{{ .Spec.Logging.Kibana.Port }}"
           {{- end }}

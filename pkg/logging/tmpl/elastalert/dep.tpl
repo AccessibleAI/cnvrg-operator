@@ -42,6 +42,9 @@ spec:
         ports:
         - containerPort: {{ .Spec.Logging.Elastalert.ContainerPort }}
           protocol: TCP
+        envFrom:
+          - secretRef:
+              name: {{ .Spec.Dbs.Es.CredsRef }}
         resources:
           requests:
             cpu: {{.Spec.Logging.Elastalert.CPURequest}}

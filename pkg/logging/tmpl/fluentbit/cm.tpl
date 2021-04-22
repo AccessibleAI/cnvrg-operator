@@ -57,6 +57,8 @@ data:
         Retry_Limit     False
         Index           cnvrg
         Logstash_Prefix cnvrg
+        HTTP_User       {{ .Data.EsUser }}
+        HTTP_Passwd     {{ .Data.EsPass }}
 
     {{- end }}
 

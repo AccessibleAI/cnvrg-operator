@@ -324,6 +324,21 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"istioGwName": func(obj interface{}) string {
 			return getIstioGwName(obj)
 		},
+		"kibanaSecret": func(host, port, esHost, esUser, esPass, esBasicAuth string) string {
+			return fmt.Sprintf(`
+server:
+  name: kibana
+  host: %s
+  port: %s
+elasticsearch:
+  hosts:
+  - %s
+  username: %s
+  password: %s
+  customHeaders:
+    Authorization: "Basic %s"
+`, host, port, esHost, esUser, esPass, esBasicAuth)
+		},
 	}
 }
 
@@ -446,6 +461,7 @@ func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
 	if manifest.GVR == Kinds[CrdGVR] && obj.GetName() == "mpijobs.kubeflow.org" {
 		return false
 	}
+
 	return true
 }
 

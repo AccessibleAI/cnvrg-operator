@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplane"
@@ -31,6 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -133,6 +136,55 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		cnvrgAppLog.Info("stack not ready yet, requeuing...")
 		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
+}
+
+func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
+	user = "cnvrg"
+	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Es.CredsRef, Namespace: app.Namespace}
+	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
+		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
+			return "", "", err
+		}
+		b := make([]byte, 12)
+		_, err = rand.Read(b)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error generating es password")
+			return "", "", err
+		}
+		pass = base64.StdEncoding.EncodeToString(b)
+		creds.Data = map[string][]byte{
+			"CNVRG_ES_USER":          []byte(user), // envs for webapp/sidekiq
+			"CNVRG_ES_PASS":          []byte(pass), // envs for webapp/sidekiq
+			"ES_USERNAME":            []byte(user), // envs for elastalerts
+			"ES_PASSWORD":            []byte(pass), // envs for elastalerts
+			"ELASTICSEARCH_USERNAME": []byte(user), // envs for kibana
+			"ELASTICSEARCH_PASSWORD": []byte(pass), // envs for kibana
+		}
+		if err := r.Create(context.Background(), &creds); err != nil {
+			cnvrgAppLog.Error(err, "error creating es creds", "name", namespacedName.Name)
+			return "", "", err
+		}
+		return user, pass, nil
+	} else if err != nil {
+		cnvrgAppLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
+		return "", "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_ES_USER"]; !ok {
+		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_USER", namespacedName.Name)
+		cnvrgAppLog.Error(err, "missing required field")
+		return "", "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_ES_PASS"]; !ok {
+		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_PASS", namespacedName.Name)
+		cnvrgAppLog.Error(err, "missing required field")
+		return "", "", err
+	}
+
+	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
 }
 
 func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
@@ -266,6 +318,12 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// creds for ES
+	if _, _, err := r.esCredsSecret(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
 	// dbs
 	cnvrgAppLog.Info("applying dbs")
 	if err := desired.Apply(dbs.AppDbsState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
@@ -288,6 +346,15 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// logging
+	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(cnvrgApp)
+	if err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+	if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
 	cnvrgAppLog.Info("applying logging")
 	if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
@@ -308,6 +375,31 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	return nil
+}
+func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*desired.TemplateData, error) {
+	kibanaHost := "0.0.0.0"
+	kibanaPort := strconv.Itoa(app.Spec.Logging.Kibana.Port)
+	esUser, esPass, err := r.esCredsSecret(app)
+	if err != nil {
+		cnvrgAppLog.Error(err, "can't fetch es creds")
+		return nil, err
+	}
+	if app.Spec.SSO.Enabled == "true" {
+		kibanaHost = "127.0.0.1"
+		kibanaPort = "3000"
+	}
+
+	return &desired.TemplateData{
+		Namespace: app.Namespace,
+		Data: map[string]interface{}{
+			"Host":   kibanaHost,
+			"Port":   kibanaPort,
+			"EsHost": fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port),
+			"EsUser": esUser,
+			"EsPass": esPass,
+		},
+	}, nil
+
 }
 
 func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {

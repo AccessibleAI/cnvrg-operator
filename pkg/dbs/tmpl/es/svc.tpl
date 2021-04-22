@@ -11,7 +11,7 @@ spec:
   type: NodePort
   {{- end }}
   ports:
-  - port: {{ .Spec.Dbs.Es.Port}}
+  - port: {{ .Spec.Dbs.Es.Port }}
     {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
     nodePort: {{ .Spec.Dbs.Es.NodePort }}
     {{- end }}

@@ -81,6 +81,7 @@ type Es struct {
 	PatchEsNodes   string            `json:"patchEsNodes,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
+	CredsRef       string            `json:"credsRef"`
 }
 
 type AppDbs struct {
@@ -168,7 +169,7 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        "true",
 	ServiceAccount: "es",
-	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1",
+	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1.a1",
 	Port:           9200,
 	StorageSize:    "30Gi",
 	SvcName:        "elasticsearch",
@@ -184,6 +185,7 @@ var esDefault = Es{
 	PatchEsNodes:   "true",
 	NodeSelector:   nil,
 	Tolerations:    nil,
+	CredsRef:       "es-creds",
 }
 
 var appDbsDefaults = AppDbs{

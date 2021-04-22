@@ -52,6 +52,20 @@ func elastAlert() []*desired.State {
 	}
 }
 
+func KibanaConfSecret(data desired.TemplateData) []*desired.State {
+	return []*desired.State{
+		{
+			TemplateData:   data,
+			TemplatePath:   path + "/kibana/secret.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+		},
+	}
+}
+
 func kibana() []*desired.State {
 	return []*desired.State{
 		{
