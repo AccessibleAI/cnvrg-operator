@@ -382,25 +382,25 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// grafana datasource
-	//cnvrgInfraLog.Info("applying grafana datasource")
-	//basicAuthUser, basicAuthPass, err := r.getBasicAuthCreds(cnvrgInfra.Spec.Monitoring.Prometheus.BasicAuthRef, cnvrgInfra.Spec.InfraNamespace)
-	//if err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
-	//grafanaDatasourceData := desired.TemplateData{
-	//	Namespace: cnvrgInfra.Spec.InfraNamespace,
-	//	Data: map[string]interface{}{
-	//		"Svc":  cnvrgInfra.Spec.Monitoring.Prometheus.SvcName,
-	//		"Port": cnvrgInfra.Spec.Monitoring.Prometheus.Port,
-	//		"User": basicAuthUser,
-	//		"Pass": basicAuthPass,
-	//	},
-	//}
-	//if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-	//	reconcileResult = err
-	//}
+	cnvrgInfraLog.Info("applying grafana datasource")
+	basicAuthUser, basicAuthPass, err := r.promCredsSecret(cnvrgInfra)
+	if err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+	grafanaDatasourceData := desired.TemplateData{
+		Namespace: cnvrgInfra.Spec.InfraNamespace,
+		Data: map[string]interface{}{
+			"Svc":  cnvrgInfra.Spec.Monitoring.Prometheus.SvcName,
+			"Port": cnvrgInfra.Spec.Monitoring.Prometheus.Port,
+			"User": basicAuthUser,
+			"Pass": basicAuthPass,
+		},
+	}
+	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
 	_, _, err = r.promCredsSecret(cnvrgInfra)
 	if err != nil {
