@@ -59,6 +59,14 @@ func prometheusOperatorState() []*desired.State {
 func infraPrometheusInstanceState() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/prometheus/prom-auth-proxy-cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/prometheus/instance/infra/oauth.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

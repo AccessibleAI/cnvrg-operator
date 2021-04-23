@@ -3,6 +3,8 @@ module github.com/cnvrg-operator
 go 1.16
 
 require (
+	github.com/Dimss/crypt v0.0.0-20200316065508-bb7000b8a962
+	github.com/GehirnInc/crypt v0.0.0-20200316065508-bb7000b8a962 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible

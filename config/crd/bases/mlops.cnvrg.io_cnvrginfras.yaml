@@ -162,9 +162,11 @@ spec:
                     type: object
                   prometheus:
                     properties:
-                      basicAuthRef:
+                      basicAuthProxyImage:
                         type: string
                       cpuRequest:
+                        type: string
+                      credsRef:
                         type: string
                       enabled:
                         type: string
@@ -182,8 +184,6 @@ spec:
                         type: string
                       svcName:
                         type: string
-                    required:
-                    - basicAuthRef
                     type: object
                   prometheusOperator:
                     properties:
