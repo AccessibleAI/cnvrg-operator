@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplane"
@@ -376,6 +377,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	return nil
 }
+
 func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*desired.TemplateData, error) {
 	kibanaHost := "0.0.0.0"
 	kibanaPort := strconv.Itoa(app.Spec.Logging.Kibana.Port)
@@ -475,6 +477,18 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		},
 	}
 
+	esUser, esPass, err := r.esCredsSecret(cnvrgApp)
+	if err != nil {
+		cnvrgAppLog.Error(err, "failed to fetch es creds ")
+		return err
+	}
+
+	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass}
+	appInstanceBytes, err := json.Marshal(appInstance)
+	if err != nil {
+		cnvrgAppLog.Error(err, "failed to marshal app instance ")
+		return err
+	}
 	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
 		cnvrgAppLog.Info("infra reconciler cm does not exists, skipping", name, name)
 		return nil
@@ -485,9 +499,9 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 
 	if op == "add" {
 		if cm.Data == nil {
-			cm.Data = map[string]string{cnvrgApp.Namespace: cnvrgApp.Name}
+			cm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
 		} else {
-			cm.Data[cnvrgApp.Namespace] = cnvrgApp.Name
+			cm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
 		}
 	}
 	if op == "remove" {

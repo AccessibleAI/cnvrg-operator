@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplane"
@@ -251,7 +252,7 @@ func (r *CnvrgInfraReconciler) generateSSOKeysAndToken(infra *mlopsv1.CnvrgInfra
 
 }
 
-func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (map[string]string, error) {
+func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
 
 	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: infra.Spec.InfraReconcilerCm}
 	if cmName.Name == "" {
@@ -264,7 +265,16 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 		return nil, err
 	}
 
-	return cnvrgAppCm.Data, nil
+	var apps []mlopsv1.AppInstance
+	for _, appJson := range cnvrgAppCm.Data {
+		var app mlopsv1.AppInstance
+		if err := json.Unmarshal([]byte(appJson), &app); err != nil {
+			cnvrgInfraLog.Error(err, "error decoding AppInstance")
+			return nil, err
+		}
+		apps = append(apps, app)
+	}
+	return apps, nil
 }
 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {

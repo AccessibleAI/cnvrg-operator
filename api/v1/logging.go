@@ -1,5 +1,12 @@
 package v1
 
+type AppInstance struct {
+	SpecName string
+	SpecNs   string
+	EsUser   string
+	EsPass   string
+}
+
 type Fluentbit struct {
 	Image string `json:"image,omitempty"`
 }

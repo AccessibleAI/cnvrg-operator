@@ -15,50 +15,50 @@ data:
         HTTP_Server   On
         HTTP_Listen   0.0.0.0
         HTTP_Port     2020
-    {{- range $namespace, $appname := .Data.AppInstance }}
-    @INCLUDE {{ $appname }}-{{ $namespace }}-input.conf
-    @INCLUDE {{ $appname }}-{{ $namespace }}-filter.conf
-    @INCLUDE {{ $appname }}-{{ $namespace }}-output.conf
+    {{- range $_, $app := .Data.AppInstance }}
+    @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf
+    @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf
+    @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-output.conf
     {{- end }}
 
-  {{- range $namespace, $appname := .Data.AppInstance }}
+  {{- range $_, $app := .Data.AppInstance }}
 
-  {{ $appname }}-{{ $namespace }}-input.conf: |
+  {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf: |
     [INPUT]
         Name              tail
-        Tag               kube.{{ $namespace }}.*
-        Path              /var/log/containers/*_{{ $namespace }}_*.log
+        Tag               kube.{{ $app.SpecNs }}.*
+        Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
         Parser            docker
         DB                /var/log/flb_kube.db
         Mem_Buf_Limit     5MB
         Skip_Long_Lines   On
         Refresh_Interval  10
 
-  {{ $appname }}-{{ $namespace }}-filter.conf: |
+  {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf: |
     [FILTER]
         Name                kubernetes
-        Match               kube.{{ $namespace }}.*
+        Match               kube.{{ $app.SpecNs }}.*
         Kube_URL            https://kubernetes.default.svc:443
         Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.{{ $namespace }}.var.log.containers.
+        Kube_Tag_Prefix     kube.{{ $app.SpecNs }}.var.log.containers.
         Merge_Log           On
         K8S-Logging.Parser  On
         K8S-Logging.Exclude Off
 
-  {{ $appname }}-{{ $namespace }}-output.conf: |
+  {{ $app.SpecName }}-{{ $app.SpecNs }}-output.conf: |
     [OUTPUT]
         Name            es
-        Match           kube.{{ $namespace }}.*
-        Host            elasticsearch.{{ $namespace }}.svc.cluster.local
+        Match           kube.{{ $app.SpecNs }}.*
+        Host            elasticsearch.{{ $app.SpecNs }}.svc.cluster.local
         Port            9200
         Logstash_Format Off
         Replace_Dots    On
         Retry_Limit     False
         Index           cnvrg
         Logstash_Prefix cnvrg
-        HTTP_User       {{ .Data.EsUser }}
-        HTTP_Passwd     {{ .Data.EsPass }}
+        HTTP_User       {{ $app.EsUser }}
+        HTTP_Passwd     {{ $app.EsPass }}
 
     {{- end }}
 
