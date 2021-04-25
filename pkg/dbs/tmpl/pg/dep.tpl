@@ -19,13 +19,13 @@ spec:
     spec:
       serviceAccountName: {{ .Spec.Dbs.Pg.ServiceAccount }}
       securityContext:
-        runAsUser: {{ .Spec.Dbs.Pg.RunAsUser }}
-        fsGroup: {{ .Spec.Dbs.Pg.FsGroup }}
+        runAsUser: 26
+        fsGroup: 26
       containers:
         - name: postgresql
           envFrom:
             - secretRef:
-                name: {{ .Spec.Dbs.Pg.SvcName }}
+                name: {{ .Spec.Dbs.Pg.CredsRef }}
           image: {{.Spec.Dbs.Pg.Image}}
           imagePullPolicy: IfNotPresent
           ports:

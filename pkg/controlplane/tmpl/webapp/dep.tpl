@@ -56,15 +56,15 @@ spec:
         - secretRef:
             name: cp-object-storage
         - secretRef:
-            name: {{ .Spec.Dbs.Pg.SvcName }}
-        - secretRef:
             name: cp-smtp
+        - secretRef:
+            name: {{ .Spec.Dbs.Es.CredsRef }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Pg.CredsRef }}
         {{- if eq .Spec.Monitoring.Prometheus.Enabled "true"}}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
         {{- end }}
-        - secretRef:
-            name: {{ .Spec.Dbs.Es.CredsRef }}
         name: cnvrg-app
         ports:
           - containerPort: {{ .Spec.ControlPlane.WebApp.Port }}
@@ -126,7 +126,7 @@ spec:
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]
         envFrom:
         - secretRef:
-            name: {{ .Spec.Dbs.Pg.SvcName }}
+            name: {{ .Spec.Dbs.Pg.CredsRef }}
         imagePullPolicy: Always
       {{- end }}
       - name: seeder
@@ -142,6 +142,8 @@ spec:
           value: {{ ns . }}
         - name: "CNVRG_SA_NAME"
           value: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+        - name: "CNVRG_PG_CREDS"
+          value: {{ .Spec.Dbs.Pg.CredsRef }}
         {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: "{{ .Spec.ControlPlane.OjbectStorage.GcpStorageSecret }}"

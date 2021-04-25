@@ -14,11 +14,6 @@ type Pg struct {
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`
 	SvcName        string            `json:"svcName,omitempty"`
-	Dbname         string            `json:"dbname,omitempty"`
-	Pass           string            `json:"pass,omitempty"`
-	User           string            `json:"user,omitempty"`
-	RunAsUser      int               `json:"runAsUser,omitempty"`
-	FsGroup        int               `json:"fsGroup,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
 	CPURequest     string            `json:"cpuRequest,omitempty"`
 	MemoryRequest  string            `json:"memoryRequest,omitempty"`
@@ -28,6 +23,7 @@ type Pg struct {
 	Fixpg          string            `json:"fixpg,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
+	CredsRef       string            `json:"credsRef"`
 }
 
 type Minio struct {
@@ -125,11 +121,6 @@ var pgDefault = Pg{
 	Port:           5432,
 	StorageSize:    "80Gi",
 	SvcName:        "postgres",
-	Dbname:         "cnvrg_production",
-	Pass:           "pg_pass",
-	User:           "cnvrg",
-	RunAsUser:      26,
-	FsGroup:        26,
 	StorageClass:   "",
 	CPURequest:     "4000m",
 	MemoryRequest:  "4Gi",
@@ -143,6 +134,7 @@ var pgDefault = Pg{
 		Size:    "2Mi",
 		Memory:  "",
 	},
+	CredsRef: "pg-creds",
 }
 
 var redisDefault = Redis{

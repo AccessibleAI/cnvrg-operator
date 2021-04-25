@@ -51,7 +51,7 @@ spec:
             - secretRef:
                 name: cp-object-storage
             - secretRef:
-                name: {{ .Spec.Dbs.Pg.SvcName }}
+                name: {{ .Spec.Dbs.Pg.CredsRef }}
             - secretRef:
                 name: cp-smtp
           resources:

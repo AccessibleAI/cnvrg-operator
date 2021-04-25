@@ -75,15 +75,6 @@ func pgState() []*desired.State {
 		},
 		{
 
-			TemplatePath:   path + "/pg/secret.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
-			Own:            true,
-		},
-		{
-
 			TemplatePath:   path + "/pg/pvc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

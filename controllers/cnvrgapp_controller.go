@@ -188,6 +188,49 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
 }
 
+func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
+
+	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Pg.CredsRef, Namespace: app.Namespace}
+	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
+		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
+			return err
+		}
+		b := make([]byte, 12)
+		_, err = rand.Read(b)
+		if err != nil {
+			cnvrgAppLog.Error(err, "error generating pg password")
+			return err
+		}
+		user := "cnvrg"
+		pass := base64.StdEncoding.EncodeToString(b)
+		database := "cnvrg_production"
+		creds.Data = map[string][]byte{
+			"POSTGRESQL_USER":            []byte(user),
+			"POSTGRESQL_PASSWORD":        []byte(pass),
+			"POSTGRESQL_ADMIN_PASSWORD":  []byte(pass),
+			"POSTGRESQL_DATABASE":        []byte(database),
+			"POSTGRESQL_MAX_CONNECTIONS": []byte(strconv.Itoa(app.Spec.Dbs.Pg.MaxConnections)),
+			"POSTGRESQL_SHARED_BUFFERS":  []byte(app.Spec.Dbs.Pg.SharedBuffers),
+			// required vars for the app
+			"POSTGRES_DB":       []byte(database),
+			"POSTGRES_PASSWORD": []byte(pass),
+			"POSTGRES_USER":     []byte(user),
+			"POSTGRES_HOST":     []byte(app.Spec.Dbs.Pg.SvcName),
+		}
+		if err := r.Create(context.Background(), &creds); err != nil {
+			cnvrgAppLog.Error(err, "error creating pg creds", "name", namespacedName.Name)
+			return err
+		}
+		return nil
+	} else if err != nil {
+		cnvrgAppLog.Error(err, "can't check if pg creds secret exists", "name", namespacedName.Name)
+		return err
+	}
+	return nil
+}
+
 func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
 
 	readyState := make(map[string]bool)
@@ -319,14 +362,18 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// dbs
+	cnvrgAppLog.Info("applying dbs")
 	// creds for ES
 	if _, _, err := r.esCredsSecret(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
-
-	// dbs
-	cnvrgAppLog.Info("applying dbs")
+	// creds for PG
+	if err := r.pgCredsSecret(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
 	if err := desired.Apply(dbs.AppDbsState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err

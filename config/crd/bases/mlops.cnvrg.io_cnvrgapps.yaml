@@ -416,14 +416,12 @@ spec:
                     properties:
                       cpuRequest:
                         type: string
-                      dbname:
+                      credsRef:
                         type: string
                       enabled:
                         type: string
                       fixpg:
                         type: string
-                      fsGroup:
-                        type: integer
                       hugePages:
                         properties:
                           enabled:
@@ -443,11 +441,7 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      pass:
-                        type: string
                       port:
-                        type: integer
-                      runAsUser:
                         type: integer
                       secretName:
                         type: string
@@ -465,9 +459,8 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      user:
-                        type: string
                     required:
+                    - credsRef
                     - serviceAccount
                     type: object
                   redis:
