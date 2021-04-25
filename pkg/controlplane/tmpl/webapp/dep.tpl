@@ -59,6 +59,12 @@ spec:
             name: {{ .Spec.Dbs.Pg.SvcName }}
         - secretRef:
             name: cp-smtp
+        {{- if eq .Spec.Monitoring.Prometheus.Enabled "true"}}
+        - secretRef:
+            name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
+        {{- end }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Es.CredsRef }}
         name: cnvrg-app
         ports:
           - containerPort: {{ .Spec.ControlPlane.WebApp.Port }}
