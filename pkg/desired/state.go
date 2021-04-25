@@ -643,7 +643,7 @@ requirepass %s
 func RandomString() string {
 	var output strings.Builder
 	mathrand.Seed(time.Now().Unix())
-	charSet := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=+^%"
+	charSet := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	for i := 0; i < 20; i++ {
 		random := mathrand.Intn(len(charSet))
 		randomChar := charSet[random]

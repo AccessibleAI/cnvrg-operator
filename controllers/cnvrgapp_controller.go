@@ -72,29 +72,31 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
-	// Setup finalizer
+	// setup finalizer
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
+			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrginfraFinalizer)
 			if err := r.Update(context.Background(), cnvrgApp); err != nil {
-				cnvrgAppLog.Error(err, "failed to add finalizer")
+				cnvrgInfraLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
 	} else {
-		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
 			r.updateStatusMessage(mlopsv1.StatusRemoving, "removing cnvrg spec", cnvrgApp)
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
-			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), cnvrgApp); err != nil {
-				cnvrgAppLog.Info("error in removing finalizer, checking if cnvrgApp object still exists")
-				// if update was failed, make sure that cnvrgApp still exists
-				spec, e := r.getCnvrgAppSpec(req.NamespacedName)
-				if spec == nil && e == nil {
-					return ctrl.Result{}, nil // probably spec was deleted, stop reconcile
-				}
+			cnvrgInfra, err := r.getCnvrgAppSpec(req.NamespacedName)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			if cnvrgInfra == nil {
+				return ctrl.Result{}, nil
+			}
+			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
+			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
+				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
 				return ctrl.Result{}, err
 			}
 		}
@@ -348,39 +350,8 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
-
 	// dbs
-	cnvrgAppLog.Info("applying dbs")
-	// creds for es
-	if _, _, err := r.esCredsSecret(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-	// creds for pg
-	if err := r.pgCredsSecret(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-	// creds for redis
-	if err := desired.CreateRedisCredsSecret(
-		cnvrgApp,
-		cnvrgApp.Spec.Dbs.Redis.CredsRef,
-		cnvrgApp.Namespace,
-		fmt.Sprintf("%s:%d", cnvrgApp.Spec.Dbs.Redis.SvcName, cnvrgApp.Spec.Dbs.Redis.Port),
-		r,
-		r.Scheme,
-		cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-	if err := desired.Apply(dbs.AppDbsState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-
-	// controlplane
-	cnvrgAppLog.Info("applying controlplane")
-	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	if err := r.dbsState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
@@ -393,58 +364,119 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// logging
-	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(cnvrgApp)
-	if err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-	if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-	cnvrgAppLog.Info("applying logging")
-	if err := desired.Apply(logging.CnvrgAppLoggingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	if err := r.loggingState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
-	// grafana dashboards
-	cnvrgAppLog.Info("applying grafana dashboards ")
-	if err := r.createGrafanaDashboards(cnvrgApp); err != nil {
-		return err
-	}
-
-	// grafana datasource
-	cnvrgInfraLog.Info("applying grafana datasource")
-	if err := desired.CreatePromCredsSecret(cnvrgApp, cnvrgApp.Spec.Monitoring.Prometheus.CredsRef, cnvrgApp.Namespace, r, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-	user, pass, err := desired.GetPromCredsSecret(cnvrgApp.Spec.Monitoring.Prometheus.CredsRef, cnvrgApp.Namespace, r, cnvrgAppLog)
-	grafanaDatasourceData := desired.TemplateData{
-		Namespace: cnvrgApp.Namespace,
-		Data: map[string]interface{}{
-			"Svc":  cnvrgApp.Spec.Monitoring.Prometheus.SvcName,
-			"Port": cnvrgApp.Spec.Monitoring.Prometheus.Port,
-			"User": user,
-			"Pass": pass,
-		},
-	}
-
-	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
-		return err
-	}
-
-	if err := r.upstreamPrometheusConfig(cnvrgApp); err != nil {
+	// controlplane
+	cnvrgAppLog.Info("applying controlplane")
+	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
 
 	// monitoring
-	cnvrgAppLog.Info("applying monitoring")
-	if err := desired.Apply(monitoring.AppMonitoringState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	if err := r.monitoringState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
+	cnvrgAppLog.Info("applying logging")
+	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
+	if err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), app, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+
+	if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
+	// dbs
+	cnvrgAppLog.Info("applying dbs")
+	// creds for es
+	if _, _, err := r.esCredsSecret(app); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	// creds for pg
+	if err := r.pgCredsSecret(app); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	// creds for redis
+	if err := desired.CreateRedisCredsSecret(
+		app,
+		app.Spec.Dbs.Redis.CredsRef,
+		app.Namespace,
+		fmt.Sprintf("%s:%d", app.Spec.Dbs.Redis.SvcName, app.Spec.Dbs.Redis.Port),
+		r,
+		r.Scheme,
+		cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
+	// monitoring
+	cnvrgAppLog.Info("applying monitoring")
+	if err := desired.CreatePromCredsSecret(app, app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	if err := r.upstreamPrometheusConfig(app); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	// grafana dashboards
+	cnvrgAppLog.Info("applying grafana dashboards ")
+	if err := r.createGrafanaDashboards(app); err != nil {
+		return err
+	}
+	// grafana datasource
+	cnvrgInfraLog.Info("applying grafana datasource")
+
+	user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, cnvrgAppLog)
+	if err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	grafanaDatasourceData := desired.TemplateData{
+		Namespace: app.Namespace,
+		Data: map[string]interface{}{
+			"Svc":  app.Spec.Monitoring.Prometheus.SvcName,
+			"Port": app.Spec.Monitoring.Prometheus.Port,
+			"User": user,
+			"Pass": pass,
+		},
+	}
+
+	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+
+	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
 

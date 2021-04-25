@@ -100,11 +100,6 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
 			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
 				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
-				//// if update was failed, make sure that cnvrgInfra still exists
-				//spec, e := r.getCnvrgInfraSpec(req.NamespacedName)
-				//if spec == nil && e == nil {
-				//	return ctrl.Result{}, nil // probably spec was deleted, stop reconcile
-				//}
 				return ctrl.Result{}, err
 			}
 		}
