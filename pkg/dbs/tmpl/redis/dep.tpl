@@ -41,5 +41,5 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Spec.Dbs.Redis.SvcName }}
         - name: redis-config
-          configMap:
-            name: redis-conf
+          secret:
+            secretName: {{ .Spec.Dbs.Redis.CredsRef }}

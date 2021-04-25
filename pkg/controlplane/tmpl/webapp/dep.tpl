@@ -35,6 +35,9 @@ spec:
       - name: "cnvrg-oauth-proxy"
         image: {{ .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+        envFrom:
+          - secretRef:
+              name: {{ .Spec.Dbs.Redis.CredsRef }}
         volumeMounts:
           - name: "oauth-proxy-webapp"
             mountPath: "/opt/app-root/conf/proxy-config"
@@ -61,6 +64,8 @@ spec:
             name: {{ .Spec.Dbs.Es.CredsRef }}
         - secretRef:
             name: {{ .Spec.Dbs.Pg.CredsRef }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Redis.CredsRef }}
         {{- if eq .Spec.Monitoring.Prometheus.Enabled "true"}}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}

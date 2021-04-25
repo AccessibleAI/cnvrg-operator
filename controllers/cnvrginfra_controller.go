@@ -211,6 +211,16 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// redis
 	cnvrgInfraLog.Info("applying redis")
+	if err := desired.CreateRedisCredsSecret(cnvrgInfra,
+		cnvrgInfra.Spec.Dbs.Redis.CredsRef,
+		cnvrgInfra.Spec.InfraNamespace,
+		fmt.Sprintf("%s:%d", cnvrgInfra.Spec.Dbs.Redis.SvcName, cnvrgInfra.Spec.Dbs.Redis.Port),
+		r,
+		r.Scheme,
+		cnvrgInfraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 	if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
@@ -405,25 +415,6 @@ func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 		return err
 	}
 
-	// cleanup tokens keys cm
-	if err := r.cleanupTokensKeysCM(cnvrgInfra); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *CnvrgInfraReconciler) cleanupTokensKeysCM(infra *mlopsv1.CnvrgInfra) error {
-	cnvrgAppLog.Info("running cleanup", "secret", infra.Spec.SSO.KeysSecretRef)
-	ctx := context.Background()
-	tokensKeySecret := &v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: infra.Spec.SSO.KeysSecretRef, Namespace: infra.Spec.InfraNamespace}}
-	err := r.Delete(ctx, tokensKeySecret)
-	if err != nil && errors.IsNotFound(err) {
-		cnvrgAppLog.Info("no need to delete secret ", "secret", infra.Spec.SSO.KeysSecretRef)
-	} else if err != nil {
-		cnvrgAppLog.Error(err, "error deleting ", "secret", infra.Spec.SSO.KeysSecretRef)
-		return err
-	}
 	return nil
 }
 

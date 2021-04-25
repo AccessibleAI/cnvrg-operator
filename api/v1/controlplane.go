@@ -43,21 +43,18 @@ type Sidekiq struct {
 	CPU         string `json:"cpu,omitempty"`
 	Memory      string `json:"memory,omitempty"`
 	Replicas    int    `json:"replicas,omitempty"`
-	KillTimeout int    `json:"killTimeout,omitempty"`
 }
 type Searchkiq struct {
 	Enabled     string `json:"enabled,omitempty"`
 	CPU         string `json:"cpu,omitempty"`
 	Memory      string `json:"memory,omitempty"`
 	Replicas    int    `json:"replicas,omitempty"`
-	KillTimeout int    `json:"killTimeout,omitempty"`
 }
 type Systemkiq struct {
 	Enabled     string `json:"enabled,omitempty"`
 	CPU         string `json:"cpu,omitempty"`
 	Memory      string `json:"memory,omitempty"`
 	Replicas    int    `json:"replicas,omitempty"`
-	KillTimeout int    `json:"killTimeout,omitempty"`
 }
 
 type Registry struct {
@@ -249,7 +246,6 @@ var controlPlanDefault = ControlPlane{
 		CPU:         "1000m",
 		Memory:      "3750Mi",
 		Replicas:    2,
-		KillTimeout: 60,
 	},
 
 	Searchkiq: Searchkiq{
@@ -257,7 +253,6 @@ var controlPlanDefault = ControlPlane{
 		CPU:         "750m",
 		Memory:      "750Mi",
 		Replicas:    1,
-		KillTimeout: 60,
 	},
 
 	Systemkiq: Systemkiq{
@@ -265,7 +260,6 @@ var controlPlanDefault = ControlPlane{
 		CPU:         "500m",
 		Memory:      "500Mi",
 		Replicas:    1,
-		KillTimeout: 60,
 	},
 
 	Hyper: Hyper{

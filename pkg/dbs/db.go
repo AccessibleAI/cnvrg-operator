@@ -122,15 +122,6 @@ func redisState() []*desired.State {
 			Own:            true,
 		},
 		{
-
-			TemplatePath:   path + "/redis/cm.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.ConfigMapGVR],
-			Own:            true,
-		},
-		{
 			TemplatePath:   path + "/redis/dep.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

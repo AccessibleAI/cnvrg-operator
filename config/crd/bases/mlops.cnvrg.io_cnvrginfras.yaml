@@ -47,7 +47,7 @@ spec:
                 properties:
                   redis:
                     properties:
-                      appendonly:
+                      CredsRef:
                         type: string
                       enabled:
                         type: string
@@ -86,6 +86,7 @@ spec:
                           type: string
                         type: object
                     required:
+                    - CredsRef
                     - serviceAccount
                     type: object
                 type: object
@@ -294,13 +295,9 @@ spec:
                     type: string
                   image:
                     type: string
-                  keysSecretRef:
-                    type: string
                   oidcIssuerUrl:
                     type: string
                   provider:
-                    type: string
-                  redisConnectionUrl:
                     type: string
                 type: object
               storage:

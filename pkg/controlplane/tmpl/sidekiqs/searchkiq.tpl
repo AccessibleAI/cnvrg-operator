@@ -56,6 +56,8 @@ spec:
               name: {{ .Spec.Dbs.Pg.CredsRef }}
           - secretRef:
               name: cp-smtp
+          - secretRef:
+              name: {{ .Spec.Dbs.Redis.CredsRef }}
         resources:
           requests:
             cpu: {{ .Spec.ControlPlane.Searchkiq.CPU }}
@@ -63,7 +65,7 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid {{ .Spec.ControlPlane.Searchkiq.KillTimeout }}"]
+              command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid 60"]
       {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
       volumes:
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}

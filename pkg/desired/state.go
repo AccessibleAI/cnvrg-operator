@@ -216,7 +216,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort int, upstreamPort int) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int) string {
 			sso := getSSOConfig(obj)
 			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
 			for i, url := range skipAuthRegex {
@@ -231,7 +231,6 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
-				fmt.Sprintf(`redis_connection_url = "%v"`, sso.RedisConnectionUrl),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
 				fmt.Sprintf(`email_domains = ["%v"]`, sso.EmailDomain),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
@@ -528,6 +527,58 @@ func GetPromCredsSecret(secretName string, secretNs string, client client.Client
 	return string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_PASS"]), nil
 }
 
+func GetRedisCredsSecret(secretName string, secretNs string, client client.Client, log logr.Logger) (pass string, err error) {
+	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
+	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
+		log.Error(err, "redis creds secret not found", "name", secretName)
+		return "", err
+	} else if err != nil {
+		log.Error(err, "can't get prometheus creds secret", "name", secretName)
+		return "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_REDIS_PASSWORD"]; !ok {
+		err := fmt.Errorf("redis creds secret %s missing require field CNVRG_REDIS_PASSWORD", namespacedName.Name)
+		log.Error(err, "missing required field")
+		return "", err
+	}
+
+	return string(creds.Data["CNVRG_REDIS_PASSWORD"]), nil
+}
+
+func CreateRedisCredsSecret(obj v1.Object, secretName, secretNs, redisUrl string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
+	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
+	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
+		if err := ctrl.SetControllerReference(obj, &creds, schema); err != nil {
+			log.Error(err, "error set controller reference", "name", namespacedName.Name)
+			return err
+		}
+		b := make([]byte, 12)
+		_, err = rand.Read(b)
+		if err != nil {
+			log.Error(err, "error generating redis password")
+			return err
+		}
+		pass := base64.StdEncoding.EncodeToString(b)
+		creds.Data = map[string][]byte{
+			"CNVRG_REDIS_PASSWORD":              []byte(pass),
+			"redis.conf":                        []byte(redisConf(pass)),
+			"OAUTH2_PROXY_REDIS_CONNECTION_URL": []byte(fmt.Sprintf("redis://:%s@%s", pass, redisUrl)), // for oauth2 proxy
+		}
+		if err := client.Create(context.Background(), &creds); err != nil {
+			log.Error(err, "error creating redis creds", "name", namespacedName.Name)
+			return err
+		}
+		return nil
+	} else if err != nil {
+		log.Error(err, "can't check if redis creds secret exists", "name", namespacedName.Name)
+		return err
+	}
+	return nil
+}
+
 func CreatePromCredsSecret(obj v1.Object, secretName string, secretNs string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
 	user := "cnvrg"
 	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
@@ -585,4 +636,16 @@ func PrometheusUpstreamConfig(user, pass, ns, upstream string) string {
     - targets:
       - '%s'
 `, user, pass, ns, upstream)
+}
+
+func redisConf(password string) string {
+	return fmt.Sprintf(`
+dir /data/
+appendonly "yes"
+appendfilename "appendonly.aof"
+appendfsync everysec
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 128mb
+requirepass %s
+`, password)
 }

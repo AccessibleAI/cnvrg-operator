@@ -364,13 +364,25 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// dbs
 	cnvrgAppLog.Info("applying dbs")
-	// creds for ES
+	// creds for es
 	if _, _, err := r.esCredsSecret(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
-	// creds for PG
+	// creds for pg
 	if err := r.pgCredsSecret(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+	// creds for redis
+	if err := desired.CreateRedisCredsSecret(
+		cnvrgApp,
+		cnvrgApp.Spec.Dbs.Redis.CredsRef,
+		cnvrgApp.Namespace,
+		fmt.Sprintf("%s:%d", cnvrgApp.Spec.Dbs.Redis.SvcName, cnvrgApp.Spec.Dbs.Redis.Port),
+		r,
+		r.Scheme,
+		cnvrgAppLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
