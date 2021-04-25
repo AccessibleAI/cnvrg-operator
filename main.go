@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/cnvrg-operator/pkg/docs"
 	"github.com/go-logr/zapr"
 	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
@@ -75,7 +74,7 @@ var generateDocsCmd = &cobra.Command{
 	Short: "Generate cnvrg operator docs ",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Generating docs... ")
-		docs.GenerateDocs()
+		//docs.GenerateDocs()
 
 	},
 }

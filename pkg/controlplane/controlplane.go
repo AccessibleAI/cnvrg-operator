@@ -271,35 +271,35 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	state = append(state, rbacState()...)
 	state = append(state, controlPlaneConfigState()...)
 
-	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled == true {
 		state = append(state, webAppState()...)
 	}
 
-	if cnvrgApp.Spec.SSO.Enabled == "true" {
+	if cnvrgApp.Spec.SSO.Enabled == true {
 		state = append(state, ssoState()...)
 	}
 
-	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "true" {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == true && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == true {
 		state = append(state, sidekiqState()...)
 	}
 
-	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "true" {
+	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled == true && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == true {
 		state = append(state, searchkiqState()...)
 	}
 
-	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "true" {
+	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled == true && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == true {
 		state = append(state, systemkiqState()...)
 	}
 
-	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == "true" && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == "false" {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == true && cnvrgApp.Spec.ControlPlane.Sidekiq.Split == false {
 		state = append(state, sidekiqState()...)
 	}
 
-	if cnvrgApp.Spec.ControlPlane.Hyper.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Hyper.Enabled == true {
 		state = append(state, hyperState()...)
 	}
 
-	if cnvrgApp.Spec.ControlPlane.Mpi.Enabled == "true" {
+	if cnvrgApp.Spec.ControlPlane.Mpi.Enabled == true {
 		state = append(state, mpiAppState()...)
 	}
 	return state

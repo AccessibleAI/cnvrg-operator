@@ -20,7 +20,7 @@ spec:
       labels:
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
     spec:
-      {{- if eq .Spec.ControlPlane.Tenancy.Enabled "true" }}
+      {{- if .Spec.ControlPlane.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
       {{- end }}
@@ -31,7 +31,7 @@ spec:
         effect: "NoSchedule"
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
       containers:
-      {{- if eq .Spec.SSO.Enabled "true" }}
+      {{- if .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"
         image: {{ .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
@@ -66,7 +66,7 @@ spec:
             name: {{ .Spec.Dbs.Pg.CredsRef }}
         - secretRef:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
-        {{- if eq .Spec.Monitoring.Prometheus.Enabled "true"}}
+        {{- if .Spec.Monitoring.Prometheus.Enabled }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
         {{- end }}
@@ -93,7 +93,7 @@ spec:
           mountPath: "{{ .Spec.ControlPlane.ObjectStorage.GcpKeyfileMountPath }}"
           readOnly: true
         {{- end }}
-      {{- if eq .Spec.SSO.Enabled "true" }}
+      {{- if .Spec.SSO.Enabled }}
       volumes:
       - name: "oauth-proxy-webapp"
         secret:
@@ -111,12 +111,12 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( eq .Spec.Dbs.Minio.Enabled "true") (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
+          {{- if and ( .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
           value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
           {{- else }}
           value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }}"
           {{ end }}
-      {{- if and ( eq .Spec.Dbs.Minio.Enabled "true") (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
+      {{- if and ( .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
       - name: create-cnvrg-bucket
         image: {{ .Spec.ControlPlane.Seeder.Image }}
         command: ["/bin/bash","-c", "{{ .Spec.ControlPlane.Seeder.CreateBucketCmd }}"]
@@ -125,7 +125,7 @@ spec:
         - secretRef:
             name: cp-object-storage
       {{- end }}
-      {{- if eq .Spec.Dbs.Pg.Fixpg "true" }}
+      {{- if .Spec.Dbs.Pg.Fixpg }}
       - name: fixpg
         image: {{.Spec.ControlPlane.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]

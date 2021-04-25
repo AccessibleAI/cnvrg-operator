@@ -481,13 +481,13 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	// always add cnvrg idle metrics exporter
 	var state = appServiceMonitors()
 
-	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Prometheus.Enabled == "true" {
+	if cnvrgApp.Spec.Monitoring.Enabled == true && cnvrgApp.Spec.Monitoring.Prometheus.Enabled == true {
 		state = append(state, ccpPrometheusInstance()...)
 	}
-	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.Monitoring.Grafana.Enabled == "true" {
+	if cnvrgApp.Spec.Monitoring.Enabled == true && cnvrgApp.Spec.Monitoring.Grafana.Enabled == true {
 		state = append(state, grafanaState()...)
 	}
-	if cnvrgApp.Spec.Monitoring.Enabled == "true" && cnvrgApp.Spec.SSO.Enabled == "true" {
+	if cnvrgApp.Spec.Monitoring.Enabled == true && cnvrgApp.Spec.SSO.Enabled == true {
 		state = append(state, grafanaOauthProxy()...)
 	}
 
@@ -496,28 +496,28 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.PrometheusOperator.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.PrometheusOperator.Enabled == true {
 		state = append(state, prometheusOperatorState()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.Prometheus.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.Prometheus.Enabled == true {
 		state = append(state, infraPrometheusInstanceState()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.KubeStateMetrics.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.KubeStateMetrics.Enabled == true {
 		state = append(state, kubeStateMetricsState()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.Grafana.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.Grafana.Enabled == true {
 		state = append(state, grafanaState()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.NodeExporter.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.NodeExporter.Enabled == true {
 		state = append(state, nodeExporterState()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true {
 		state = append(state, defaultServiceMonitors()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.Monitoring.DcgmExporter.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.DcgmExporter.Enabled == true {
 		state = append(state, dcgmExporter()...)
 	}
-	if infra.Spec.Monitoring.Enabled == "true" && infra.Spec.SSO.Enabled == "true" {
+	if infra.Spec.Monitoring.Enabled == true && infra.Spec.SSO.Enabled == true {
 		state = append(state, grafanaOauthProxy()...)
 	}
 	return state

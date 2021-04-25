@@ -21,7 +21,7 @@ spec:
         app: {{ .Spec.ControlPlane.Hyper.SvcName }}
     spec:
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
-      {{- if eq .Spec.ControlPlane.Tenancy.Enabled "true" }}
+      {{- if .Spec.ControlPlane.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
       {{- end }}

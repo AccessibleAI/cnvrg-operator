@@ -127,10 +127,10 @@ func nfsClientState() []*desired.State {
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if cnvrgInfra.Spec.Storage.Enabled == "true" && cnvrgInfra.Spec.Storage.Hostpath.Enabled == "true" {
+	if cnvrgInfra.Spec.Storage.Enabled == true && cnvrgInfra.Spec.Storage.Hostpath.Enabled == true {
 		state = append(state, hostPathState()...)
 	}
-	if cnvrgInfra.Spec.Storage.Enabled == "true" && cnvrgInfra.Spec.Storage.Nfs.Enabled == "true" {
+	if cnvrgInfra.Spec.Storage.Enabled == true && cnvrgInfra.Spec.Storage.Nfs.Enabled == true {
 		state = append(state, nfsClientState()...)
 	}
 	return state

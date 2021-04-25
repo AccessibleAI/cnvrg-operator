@@ -100,7 +100,7 @@ func getGrafanaDashboards(obj interface{}) []string {
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
-		if cnvrgApp.Spec.NamespaceTenancy == "false" {
+		if cnvrgApp.Spec.NamespaceTenancy == false {
 			return GrafanaInfraDashboards
 		}
 		return GrafanaAppDashboards
@@ -121,7 +121,7 @@ func getSSOConfig(obj interface{}) *mlopsv1.SSO {
 func getSSORedirectUrl(obj interface{}, svc string) string {
 	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
 		infra := obj.(*mlopsv1.CnvrgInfra)
-		if infra.Spec.Networking.HTTPS.Enabled == "true" {
+		if infra.Spec.Networking.HTTPS.Enabled == true {
 			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
 		} else {
 			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
@@ -130,7 +130,7 @@ func getSSORedirectUrl(obj interface{}, svc string) string {
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		app := obj.(*mlopsv1.CnvrgApp)
-		if app.Spec.Networking.HTTPS.Enabled == "true" {
+		if app.Spec.Networking.HTTPS.Enabled == true {
 			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
 		} else {
 			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
@@ -145,7 +145,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return getNs(obj)
 		},
 		"httpScheme": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
+			if cnvrgApp.Spec.Networking.HTTPS.Enabled == true {
 				return "https://"
 			}
 			return "http://"
@@ -185,7 +185,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			if cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint != "" {
 				return cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint
 			}
-			if cnvrgApp.Spec.Networking.HTTPS.Enabled == "true" {
+			if cnvrgApp.Spec.Networking.HTTPS.Enabled == true {
 				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 			} else {
 				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
@@ -251,19 +251,19 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return strings.Join(proxyConf, "\n")
 		},
 		"cnvrgPassengerBindAddress": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.SSO.Enabled == "true" {
+			if cnvrgApp.Spec.SSO.Enabled == true {
 				return "127.0.0.1"
 			}
 			return "0.0.0.0"
 		},
 		"cnvrgPassengerBindPort": func(cnvrgApp mlopsv1.CnvrgApp) int {
-			if cnvrgApp.Spec.SSO.Enabled == "true" {
+			if cnvrgApp.Spec.SSO.Enabled == true {
 				return 3000
 			}
 			return cnvrgApp.Spec.ControlPlane.WebApp.Port
 		},
 		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
-			if cnvrgApp.Spec.NamespaceTenancy == "true" {
+			if cnvrgApp.Spec.NamespaceTenancy == true {
 				return fmt.Sprintf(`
 - job_name: 'federate'
   scrape_interval: 10s

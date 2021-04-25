@@ -4,7 +4,7 @@ metadata:
   name: cp-ldap
   namespace: {{ ns . }}
 data:
-  LDAP_ACTIVE: {{ .Spec.ControlPlane.Ldap.Enabled | b64enc }}
+  LDAP_ACTIVE: {{ .Spec.ControlPlane.Ldap.Enabled | toString | b64enc }}
   LDAP_HOST: {{ .Spec.ControlPlane.Ldap.Host | b64enc }}
   LDAP_PORT: {{ .Spec.ControlPlane.Ldap.Port | b64enc }}
   LDAP_SSL: {{ .Spec.ControlPlane.Ldap.Ssl | b64enc }}

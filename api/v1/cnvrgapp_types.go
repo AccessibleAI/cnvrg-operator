@@ -6,7 +6,7 @@ import (
 
 type CnvrgAppSpec struct {
 	ClusterDomain    string             `json:"clusterDomain,omitempty"`
-	NamespaceTenancy string             `json:"namespaceTenancy,omitempty"`
+	NamespaceTenancy bool               `json:"namespaceTenancy,omitempty"`
 	ControlPlane     ControlPlane       `json:"controlPlane,omitempty"`
 	Registry         Registry           `json:"registry,omitempty"`
 	Dbs              AppDbs             `json:"dbs,omitempty"`
@@ -43,7 +43,7 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain:    "",
-		NamespaceTenancy: "false",
+		NamespaceTenancy: false,
 		ControlPlane:     controlPlanDefault,
 		Registry:         appRegistryDefault,
 		Dbs:              appDbsDefaults,

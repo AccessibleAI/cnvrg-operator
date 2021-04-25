@@ -20,13 +20,13 @@ spec:
         runAsUser: {{ .Spec.Logging.Elastalert.RunAsUser }}
         fsGroup: {{ .Spec.Logging.Elastalert.FsGroup }}
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
-      {{- if and (ne .Spec.ControlPlane.BaseConfig.HostpathNode "") (eq .Spec.ControlPlane.Tenancy.Enabled "false") }}
+      {{- if and (ne .Spec.ControlPlane.BaseConfig.HostpathNode "") (not .Spec.ControlPlane.Tenancy.Enabled) }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.ControlPlane.BaseConfig.HostpathNode }}"
-      {{- else if and (eq .Spec.ControlPlane.BaseConfig.HostpathNode "") (eq .Spec.ControlPlane.Tenancy.Enabled "true") }}
+      {{- else if and (eq .Spec.ControlPlane.BaseConfig.HostpathNode "") (.Spec.ControlPlane.Tenancy.Enabled ) }}
       nodeSelector:
         {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
-      {{- else if and (ne .Spec.ControlPlane.BaseConfig.HostpathNode "") (eq .Spec.ControlPlane.Tenancy.Enabled "true") }}
+      {{- else if and (ne .Spec.ControlPlane.BaseConfig.HostpathNode "") (.Spec.ControlPlane.Tenancy.Enabled ) }}
       nodeSelector:
         kubernetes.io/hostname: "{{ .Spec.ControlPlane.BaseConfig.HostpathNode }}"
         {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"

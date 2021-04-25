@@ -15,7 +15,7 @@ spec:
         app: {{ .Spec.Dbs.Es.SvcName }}
     spec:
       serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
-      {{- if eq .Spec.Dbs.Es.PatchEsNodes "true" }}
+      {{- if .Spec.Dbs.Es.PatchEsNodes }}
       initContainers:
       - name: "maxmap"
         image: "docker.io/cnvrg/cnvrg-tools:v0.3"

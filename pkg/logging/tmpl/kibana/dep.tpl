@@ -20,7 +20,7 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       serviceAccountName: {{ .Spec.Logging.Kibana.ServiceAccount }}
-      {{- if eq .Spec.SSO.Enabled "true" }}
+      {{- if .Spec.SSO.Enabled }}
       volumes:
         - name: "oauth-proxy-config"
           secret:
@@ -30,7 +30,7 @@ spec:
             secretName: "kibana-config"
       {{- end }}
       containers:
-        {{- if eq .Spec.SSO.Enabled "true" }}
+        {{- if .Spec.SSO.Enabled }}
         - name: "cnvrg-oauth-proxy"
           image: {{ .Spec.SSO.Image }}
           command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
@@ -49,11 +49,10 @@ spec:
               mountPath: "/usr/share/kibana/config"
               readOnly: true
           env:
-          {{- if eq .Spec.SSO.Enabled "true" }}
+          {{- if .Spec.SSO.Enabled }}
           - name: SERVER_PORT
             value: "3000"
-          {{- end }}
-          {{- if ne .Spec.SSO.Enabled "true" }}
+          {{- else }}
           - name: SERVER_PORT
             value: "{{ .Spec.Logging.Kibana.Port }}"
           {{- end }}

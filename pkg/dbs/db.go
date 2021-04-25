@@ -243,21 +243,21 @@ func sharedBackendMinio() []*desired.State {
 func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.Dbs.Pg.Enabled == "true" {
+	if cnvrgApp.Spec.Dbs.Pg.Enabled == true {
 		state = append(state, pgState()...)
 	}
 
-	if cnvrgApp.Spec.Dbs.Redis.Enabled == "true" {
+	if cnvrgApp.Spec.Dbs.Redis.Enabled == true {
 		state = append(state, redisState()...)
 	}
 
-	if cnvrgApp.Spec.Dbs.Minio.Enabled == "true" && cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled == "true" {
+	if cnvrgApp.Spec.Dbs.Minio.Enabled == true && cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled == true {
 		state = append(state, sharedBackendMinio()...)
 	} else {
 		state = append(state, singleBackendMinio()...)
 	}
 
-	if cnvrgApp.Spec.Dbs.Es.Enabled == "true" {
+	if cnvrgApp.Spec.Dbs.Es.Enabled == true {
 		state = append(state, esState()...)
 	}
 	return state
@@ -265,7 +265,7 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 func InfraDbsState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if infra.Spec.Dbs.Redis.Enabled == "true" {
+	if infra.Spec.Dbs.Redis.Enabled == true {
 		state = append(state, redisState()...)
 	}
 	return state

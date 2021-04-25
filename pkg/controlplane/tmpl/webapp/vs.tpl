@@ -19,7 +19,7 @@ spec:
       headers:
         request:
           set:
-            {{- if eq .Spec.Networking.HTTPS.Enabled "true"}}
+            {{- if .Spec.Networking.HTTPS.Enabled }}
             x-forwarded-proto: https
             {{- else }}
             x-forwarded-proto: http

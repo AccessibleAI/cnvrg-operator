@@ -229,7 +229,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// nvidia device plugin
-	if cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled == "true" {
+	if cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled == true {
 		cnvrgInfraLog.Info("nvidia device plugin")
 		nvidiaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
@@ -292,7 +292,7 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 
 func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
-	if cnvrgInfra.Spec.Monitoring.Enabled != "true" {
+	if cnvrgInfra.Spec.Monitoring.Enabled != true {
 		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
 		return nil
 	}

@@ -20,7 +20,7 @@ spec:
         runAsUser: 65534
       serviceAccountName: grafana
       containers:
-      {{- if eq .Spec.SSO.Enabled "true" }}
+      {{- if .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"
         image: {{ .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
@@ -43,13 +43,12 @@ spec:
             value: Admin
           - name: GF_SECURITY_ALLOW_EMBEDDING
             value: "true"
-          {{- if eq .Spec.SSO.Enabled "true" }}
+          {{- if .Spec.SSO.Enabled }}
           - name: GF_SERVER_HTTP_ADDR
             value: "127.0.0.1"
           - name: GF_SERVER_HTTP_PORT
             value: "3000"
-          {{- end }}
-          {{- if ne .Spec.SSO.Enabled "true" }}
+          {{- else }}
           - name: GF_SERVER_HTTP_ADDR
             value: "0.0.0.0"
           - name: GF_SERVER_HTTP_PORT
@@ -85,7 +84,7 @@ spec:
           readOnly: false
         {{- end }}
       volumes:
-      {{- if eq .Spec.SSO.Enabled "true" }}
+      {{- if .Spec.SSO.Enabled }}
       - name: "oauth-proxy-config"
         secret:
           secretName: "oauth-proxy-grafana"

@@ -50,7 +50,7 @@ spec:
                       CredsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       limits:
@@ -95,7 +95,7 @@ spec:
                   nvidiaDp:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                     type: object
@@ -107,7 +107,7 @@ spec:
               logging:
                 properties:
                   enabled:
-                    type: string
+                    type: boolean
                   fluentbit:
                     properties:
                       image:
@@ -119,16 +119,16 @@ spec:
                   dcgmExporter:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                     type: object
                   enabled:
-                    type: string
+                    type: boolean
                   grafana:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       nodePort:
@@ -148,16 +148,16 @@ spec:
                   kubeStateMetrics:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                     type: object
                   kubeletServiceMonitor:
-                    type: string
+                    type: boolean
                   nodeExporter:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                     type: object
@@ -172,7 +172,7 @@ spec:
                       credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryRequest:
@@ -193,7 +193,7 @@ spec:
                   prometheusOperator:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       images:
                         properties:
                           configReloaderImage:
@@ -216,14 +216,14 @@ spec:
                       certSecret:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       key:
                         type: string
                     type: object
                   ingress:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       ingressType:
                         enum:
                         - istio
@@ -243,7 +243,7 @@ spec:
                   istio:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       externalIp:
                         type: string
                       hub:
@@ -292,7 +292,7 @@ spec:
                   emailDomain:
                     type: string
                   enabled:
-                    type: string
+                    type: boolean
                   image:
                     type: string
                   oidcIssuerUrl:
@@ -303,7 +303,7 @@ spec:
               storage:
                 properties:
                   enabled:
-                    type: string
+                    type: boolean
                   hostpath:
                     properties:
                       cpuLimit:
@@ -311,9 +311,9 @@ spec:
                       cpuRequest:
                         type: string
                       defaultSc:
-                        type: string
+                        type: boolean
                       enabled:
-                        type: string
+                        type: boolean
                       hostPath:
                         type: string
                       image:
@@ -336,9 +336,9 @@ spec:
                       cpuRequest:
                         type: string
                       defaultSc:
-                        type: string
+                        type: boolean
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:

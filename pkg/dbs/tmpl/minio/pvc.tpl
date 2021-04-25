@@ -5,7 +5,7 @@ metadata:
   namespace: {{ ns .  }}
 spec:
   accessModes:
-    {{- if eq .Spec.Dbs.Minio.SharedStorage.Enabled "true" }}
+    {{- if .Spec.Dbs.Minio.SharedStorage.Enabled }}
     - ReadWriteMany
     {{- else }}
     - ReadWriteOnce

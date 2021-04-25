@@ -1,7 +1,7 @@
 package v1
 
 type NvidiaDp struct {
-	Enabled string `json:"enabled,omitempty"`
+	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 
@@ -10,7 +10,7 @@ type Gpu struct {
 }
 
 var nvidiaDpDefault = NvidiaDp{
-	Enabled: "true",
+	Enabled: true,
 	Image:   "nvcr.io/nvidia/k8s-device-plugin:v0.9.0",
 }
 

@@ -53,12 +53,12 @@ spec:
               name: postgres-data
             - mountPath: /dev/shm
               name: dshm
-            {{- if eq .Spec.Dbs.Pg.HugePages.Enabled "true" }}
+            {{- if .Spec.Dbs.Pg.HugePages.Enabled }}
             - mountPath: "/hugepages"
               name: "hugepage"
             {{- end }}
           resources:
-            {{- if eq .Spec.Dbs.Pg.HugePages.Enabled "true" }}
+            {{- if .Spec.Dbs.Pg.HugePages.Enabled }}
             limits:
               {{- if eq .Spec.Dbs.Pg.HugePages.Memory ""}}
               hugepages-{{ .Spec.Dbs.Pg.HugePages.Size }}: {{ .Spec.Dbs.Pg.MemoryRequest }}
@@ -77,7 +77,7 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 2Gi
-        {{- if eq .Spec.Dbs.Pg.HugePages.Enabled "true" }}
+        {{- if .Spec.Dbs.Pg.HugePages.Enabled }}
         - name: "hugepage"
           emptyDir:
             medium: HugePages

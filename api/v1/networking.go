@@ -11,7 +11,7 @@ const (
 )
 
 type Istio struct {
-	Enabled                  string `json:"enabled,omitempty"`
+	Enabled                  bool   `json:"enabled,omitempty"`
 	OperatorImage            string `json:"operatorImage,omitempty"`
 	Hub                      string `json:"hub,omitempty"`
 	Tag                      string `json:"tag,omitempty"`
@@ -25,7 +25,7 @@ type Istio struct {
 }
 
 type Ingress struct {
-	Enabled         string      `json:"enabled,omitempty"`
+	Enabled         bool        `json:"enabled,omitempty"`
 	IngressType     IngressType `json:"ingressType,omitempty"`
 	Timeout         string      `json:"timeout,omitempty"`
 	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
@@ -34,7 +34,7 @@ type Ingress struct {
 }
 
 type HTTPS struct {
-	Enabled    string `json:"enabled,omitempty"`
+	Enabled    bool   `json:"enabled,omitempty"`
 	Cert       string `json:"cert,omitempty"`
 	Key        string `json:"key,omitempty"`
 	CertSecret string `json:"certSecret,omitempty"`
@@ -52,10 +52,10 @@ type CnvrgInfraNetworking struct {
 }
 
 var istioDefault = Istio{
-	Enabled:                  "true",
-	OperatorImage:            "docker.io/istio/operator:1.8.1",
+	Enabled:                  true,
+	OperatorImage:            "docker.io/istio/operator:1.8.5",
 	Hub:                      "docker.io/istio",
-	Tag:                      "1.8.1",
+	Tag:                      "1.8.5",
 	ProxyImage:               "proxyv2",
 	MixerImage:               "mixer",
 	PilotImage:               "pilot",
@@ -66,14 +66,14 @@ var istioDefault = Istio{
 }
 
 var httpsDefault = HTTPS{
-	Enabled:    "false",
+	Enabled:    false,
 	Cert:       "",
 	Key:        "",
 	CertSecret: "",
 }
 
 var ingressAppDefault = Ingress{
-	Enabled:         "true",
+	Enabled:         true,
 	IngressType:     IstioIngress,
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
@@ -82,7 +82,7 @@ var ingressAppDefault = Ingress{
 }
 
 var ingressInfraDefault = Ingress{
-	Enabled:         "true",
+	Enabled:         true,
 	IngressType:     IstioIngress,
 	Timeout:         "18000s",
 	RetriesAttempts: 5,

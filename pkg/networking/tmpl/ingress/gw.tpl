@@ -13,7 +13,7 @@ spec:
         protocol: HTTP
       hosts:
         - "*.{{ .Spec.ClusterDomain }}"
-      {{- if and (eq .Spec.Networking.HTTPS.Enabled "true") (ne .Spec.Networking.HTTPS.CertSecret "") }}
+      {{- if and ( .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
       tls:
         httpsRedirect: true
     - hosts:
@@ -25,7 +25,7 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: {{ .Spec.Networking.HTTPS.CertSecret }}
-      {{- else if eq .Spec.Networking.HTTPS.Enabled "true" }}
+      {{- else if .Spec.Networking.HTTPS.Enabled }}
       tls:
         httpsRedirect: true
     - hosts:

@@ -92,9 +92,9 @@ spec:
                       cpuRequest:
                         type: string
                       enableReadinessProbe:
-                        type: string
+                        type: boolean
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
@@ -127,7 +127,7 @@ spec:
                       base:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       host:
                         type: string
                       port:
@@ -138,7 +138,7 @@ spec:
                   mpi:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       extraArgs:
                         additionalProperties:
                           type: string
@@ -210,7 +210,7 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       memory:
                         type: string
                       replicas:
@@ -230,13 +230,13 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       memory:
                         type: string
                       replicas:
                         type: integer
                       split:
-                        type: string
+                        type: boolean
                     type: object
                   smtp:
                     properties:
@@ -256,7 +256,7 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       memory:
                         type: string
                       replicas:
@@ -267,7 +267,7 @@ spec:
                       dedicatedNodes:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       key:
                         type: string
                       value:
@@ -278,7 +278,7 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       failureThreshold:
                         type: integer
                       image:
@@ -321,7 +321,7 @@ spec:
                       credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       fsGroup:
                         type: integer
                       image:
@@ -364,7 +364,7 @@ spec:
                       cpuRequest:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryRequest:
@@ -391,7 +391,7 @@ spec:
                                 type: string
                             type: object
                           enabled:
-                            type: string
+                            type: boolean
                           useExistingClaim:
                             type: string
                         type: object
@@ -413,13 +413,13 @@ spec:
                       credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       fixpg:
-                        type: string
+                        type: boolean
                       hugePages:
                         properties:
                           enabled:
-                            type: string
+                            type: boolean
                           memory:
                             type: string
                           size:
@@ -462,7 +462,7 @@ spec:
                       CredsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       limits:
@@ -513,7 +513,7 @@ spec:
                       cpuRequest:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       fsGroup:
                         type: integer
                       image:
@@ -536,7 +536,7 @@ spec:
                         type: string
                     type: object
                   enabled:
-                    type: string
+                    type: boolean
                   kibana:
                     properties:
                       cpuLimit:
@@ -544,7 +544,7 @@ spec:
                       cpuRequest:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
@@ -571,11 +571,11 @@ spec:
               monitoring:
                 properties:
                   enabled:
-                    type: string
+                    type: boolean
                   grafana:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       nodePort:
@@ -603,7 +603,7 @@ spec:
                       credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryRequest:
@@ -623,7 +623,7 @@ spec:
                     type: object
                 type: object
               namespaceTenancy:
-                type: string
+                type: boolean
               networking:
                 properties:
                   https:
@@ -633,14 +633,14 @@ spec:
                       certSecret:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       key:
                         type: string
                     type: object
                   ingress:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       ingressType:
                         enum:
                         - istio
@@ -684,7 +684,7 @@ spec:
                   emailDomain:
                     type: string
                   enabled:
-                    type: string
+                    type: boolean
                   image:
                     type: string
                   oidcIssuerUrl:
