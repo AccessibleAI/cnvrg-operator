@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
@@ -148,13 +146,8 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return "", "", err
 		}
-		b := make([]byte, 12)
-		_, err = rand.Read(b)
-		if err != nil {
-			cnvrgAppLog.Error(err, "error generating es password")
-			return "", "", err
-		}
-		pass = base64.StdEncoding.EncodeToString(b)
+
+		pass = desired.RandomString()
 		creds.Data = map[string][]byte{
 			"CNVRG_ES_USER":          []byte(user), // envs for webapp/sidekiq
 			"CNVRG_ES_PASS":          []byte(pass), // envs for webapp/sidekiq
@@ -197,14 +190,8 @@ func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
 			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return err
 		}
-		b := make([]byte, 12)
-		_, err = rand.Read(b)
-		if err != nil {
-			cnvrgAppLog.Error(err, "error generating pg password")
-			return err
-		}
 		user := "cnvrg"
-		pass := base64.StdEncoding.EncodeToString(b)
+		pass := desired.RandomString()
 		database := "cnvrg_production"
 		creds.Data = map[string][]byte{
 			"POSTGRESQL_USER":            []byte(user),

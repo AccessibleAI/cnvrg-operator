@@ -25,7 +25,7 @@ spec:
           value: "{{ .Spec.ControlPlane.Tenancy.Value }}"
           effect: "NoSchedule"
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
-      terminationGracePeriodSeconds: {{ .Spec.ControlPlane.Systemkiq.KillTimeout }}
+      terminationGracePeriodSeconds: 60
       containers:
         - name: sidekiq
           image: {{ .Spec.ControlPlane.WebApp.Image}}

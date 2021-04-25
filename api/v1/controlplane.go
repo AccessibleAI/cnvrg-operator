@@ -38,23 +38,23 @@ type WebApp struct {
 }
 
 type Sidekiq struct {
-	Enabled     string `json:"enabled,omitempty"`
-	Split       string `json:"split,omitempty"`
-	CPU         string `json:"cpu,omitempty"`
-	Memory      string `json:"memory,omitempty"`
-	Replicas    int    `json:"replicas,omitempty"`
+	Enabled  string `json:"enabled,omitempty"`
+	Split    string `json:"split,omitempty"`
+	CPU      string `json:"cpu,omitempty"`
+	Memory   string `json:"memory,omitempty"`
+	Replicas int    `json:"replicas,omitempty"`
 }
 type Searchkiq struct {
-	Enabled     string `json:"enabled,omitempty"`
-	CPU         string `json:"cpu,omitempty"`
-	Memory      string `json:"memory,omitempty"`
-	Replicas    int    `json:"replicas,omitempty"`
+	Enabled  string `json:"enabled,omitempty"`
+	CPU      string `json:"cpu,omitempty"`
+	Memory   string `json:"memory,omitempty"`
+	Replicas int    `json:"replicas,omitempty"`
 }
 type Systemkiq struct {
-	Enabled     string `json:"enabled,omitempty"`
-	CPU         string `json:"cpu,omitempty"`
-	Memory      string `json:"memory,omitempty"`
-	Replicas    int    `json:"replicas,omitempty"`
+	Enabled  string `json:"enabled,omitempty"`
+	CPU      string `json:"cpu,omitempty"`
+	Memory   string `json:"memory,omitempty"`
+	Replicas int    `json:"replicas,omitempty"`
 }
 
 type Registry struct {
@@ -241,25 +241,25 @@ var controlPlanDefault = ControlPlane{
 	},
 
 	Sidekiq: Sidekiq{
-		Enabled:     "true",
-		Split:       "true",
-		CPU:         "1000m",
-		Memory:      "3750Mi",
-		Replicas:    2,
+		Enabled:  "true",
+		Split:    "true",
+		CPU:      "1000m",
+		Memory:   "3750Mi",
+		Replicas: 2,
 	},
 
 	Searchkiq: Searchkiq{
-		Enabled:     "true",
-		CPU:         "750m",
-		Memory:      "750Mi",
-		Replicas:    1,
+		Enabled:  "true",
+		CPU:      "750m",
+		Memory:   "750Mi",
+		Replicas: 1,
 	},
 
 	Systemkiq: Systemkiq{
-		Enabled:     "true",
-		CPU:         "500m",
-		Memory:      "500Mi",
-		Replicas:    1,
+		Enabled:  "true",
+		CPU:      "500m",
+		Memory:   "500Mi",
+		Replicas: 1,
 	},
 
 	Hyper: Hyper{

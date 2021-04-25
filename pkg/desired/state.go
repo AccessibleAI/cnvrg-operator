@@ -3,8 +3,6 @@ package desired
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
@@ -22,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
+	mathrand "math/rand"
 	"os"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -29,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 )
 
 var GrafanaAppDashboards = []string{
@@ -555,13 +555,8 @@ func CreateRedisCredsSecret(obj v1.Object, secretName, secretNs, redisUrl string
 			log.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return err
 		}
-		b := make([]byte, 12)
-		_, err = rand.Read(b)
-		if err != nil {
-			log.Error(err, "error generating redis password")
-			return err
-		}
-		pass := base64.StdEncoding.EncodeToString(b)
+
+		pass := RandomString()
 		creds.Data = map[string][]byte{
 			"CNVRG_REDIS_PASSWORD":              []byte(pass),
 			"redis.conf":                        []byte(redisConf(pass)),
@@ -588,13 +583,8 @@ func CreatePromCredsSecret(obj v1.Object, secretName string, secretNs string, cl
 			log.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return err
 		}
-		b := make([]byte, 12)
-		_, err = rand.Read(b)
-		if err != nil {
-			log.Error(err, "error generating prometheus password")
-			return err
-		}
-		pass := base64.StdEncoding.EncodeToString(b)
+
+		pass := RandomString()
 		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
 		if err != nil {
 			log.Error(err, "error generating prometheus hash ")
@@ -648,4 +638,16 @@ auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 128mb
 requirepass %s
 `, password)
+}
+
+func RandomString() string {
+	var output strings.Builder
+	mathrand.Seed(time.Now().Unix())
+	charSet := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=+^%"
+	for i := 0; i < 20; i++ {
+		random := mathrand.Intn(len(charSet))
+		randomChar := charSet[random]
+		output.WriteString(string(randomChar))
+	}
+	return output.String()
 }
