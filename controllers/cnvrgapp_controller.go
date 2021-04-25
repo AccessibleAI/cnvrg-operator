@@ -368,6 +368,33 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// grafana datasource
+	cnvrgInfraLog.Info("applying grafana datasource")
+	if err := desired.CreatePromCredsSecret(cnvrgApp, cnvrgApp.Spec.Monitoring.Prometheus.CredsRef, cnvrgApp.Namespace, r, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+	user, pass, err := desired.GetPromCredsSecret(cnvrgApp.Spec.Monitoring.Prometheus.CredsRef, cnvrgApp.Namespace, r, cnvrgAppLog)
+	grafanaDatasourceData := desired.TemplateData{
+		Namespace: cnvrgApp.Namespace,
+		Data: map[string]interface{}{
+			"Svc":  cnvrgApp.Spec.Monitoring.Prometheus.SvcName,
+			"Port": cnvrgApp.Spec.Monitoring.Prometheus.Port,
+			"User": user,
+			"Pass": pass,
+		},
+	}
+
+	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
+	if err := r.upstreamPrometheusConfig(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
 	// monitoring
 	cnvrgAppLog.Info("applying monitoring")
 	if err := desired.Apply(monitoring.AppMonitoringState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
@@ -375,6 +402,55 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	return nil
+}
+
+func (r *CnvrgAppReconciler) getCnvrgInfra() (*mlopsv1.CnvrgInfra, error) {
+
+	cnvrgAppInfra := &mlopsv1.CnvrgInfraList{}
+
+	if err := r.List(context.Background(), cnvrgAppInfra); err != nil {
+		cnvrgAppLog.Error(err, "can't list CnvrgInfra objects")
+		return nil, err
+	}
+
+	if len(cnvrgAppInfra.Items) == 0 {
+		cnvrgAppLog.Info("no CnvrgInfra objects was deployed, skipping infra reconciler")
+		return nil, fmt.Errorf("no CnvrgInfra objects was deployed, skipping infra reconciler")
+	}
+
+	return &cnvrgAppInfra.Items[0], nil
+}
+
+func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) error {
+	namespacedName := types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: app.Namespace}
+	upstreamSecret := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := r.Get(context.Background(), namespacedName, &upstreamSecret); err != nil && errors.IsNotFound(err) {
+		if err := ctrl.SetControllerReference(app, &upstreamSecret, r.Scheme); err != nil {
+			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
+			return err
+		}
+
+		infra, err := r.getCnvrgInfra()
+		if err != nil {
+			cnvrgAppLog.Error(err, "can't get cnvrgInfra object", "name", namespacedName.Name)
+			return err
+		}
+
+		user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, cnvrgInfraLog)
+		if err != nil {
+			cnvrgAppLog.Error(err, "can't get cnvrgInfra prometheus creds", "name", namespacedName.Name)
+			return err
+		}
+		upstreamPrometheus := fmt.Sprintf("prometheus-operated.%s.svc:%d", infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port)
+		promUpstreamConfig := desired.PrometheusUpstreamConfig(user, pass, app.Namespace, upstreamPrometheus)
+		cnvrgAppLog.V(1).Info(promUpstreamConfig)
+		upstreamSecret.Data = map[string][]byte{"prometheus-additional.yaml": []byte(promUpstreamConfig)}
+		if err := r.Create(context.Background(), &upstreamSecret); err != nil {
+			cnvrgAppLog.Error(err, "error crating upstream prometheus static configs")
+			return err
+		}
+	}
 	return nil
 }
 
@@ -453,21 +529,15 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 
 func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, op string) error {
 
-	cnvrgAppInfra := &mlopsv1.CnvrgInfraList{}
+	infra, err := r.getCnvrgInfra()
 
-	if err := r.List(context.Background(), cnvrgAppInfra); err != nil {
-		cnvrgAppLog.Error(err, "can't list CnvrgInfra objects")
+	if err != nil {
 		return err
 	}
 
-	if len(cnvrgAppInfra.Items) == 0 {
-		cnvrgAppLog.Info("no CnvrgInfra objects was deployed, skipping infra reconciler")
-		return nil
-	}
-
 	name := types.NamespacedName{
-		Name:      cnvrgAppInfra.Items[0].Spec.InfraReconcilerCm,
-		Namespace: cnvrgAppInfra.Items[0].Spec.InfraNamespace,
+		Name:      infra.Spec.InfraReconcilerCm,
+		Namespace: infra.Spec.InfraNamespace,
 	}
 
 	cm := &v1core.ConfigMap{

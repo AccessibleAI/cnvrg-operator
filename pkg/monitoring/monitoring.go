@@ -307,6 +307,14 @@ func nodeExporterState() []*desired.State {
 func ccpPrometheusInstance() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/prometheus/prom-auth-proxy-cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/prometheus/instance/ccp/role.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -352,14 +360,6 @@ func ccpPrometheusInstance() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
-			Own:            true,
-		},
-		{
-			TemplatePath:   path + "/prometheus/instance/ccp/staticconfig.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
 		},
 	}

@@ -40,5 +40,26 @@ spec:
       cnvrg-ccp-prometheus: {{ .Name }}-{{ ns .}}
   version: v2.22.1
   additionalScrapeConfigs:
-    name: prom-static-config
+    name: {{ .Spec.Monitoring.Prometheus.UpstreamRef }}
     key: prometheus-additional.yaml
+  listenLocal: true
+  containers:
+    - name: "prom-auth-proxy"
+      image: {{ .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}
+      ports:
+        - containerPort: 9091
+          name: web
+      volumeMounts:
+        - name: "prom-auth-proxy"
+          mountPath: "/etc/nginx"
+          readOnly: true
+        - name: "htpasswd"
+          mountPath: "/etc/nginx/htpasswd"
+          readOnly: true
+  volumes:
+    - name: "prom-auth-proxy"
+      configMap:
+        name: "prom-auth-proxy"
+    - name: "htpasswd"
+      secret:
+        secretName: {{ .Spec.Monitoring.Prometheus.CredsRef }}

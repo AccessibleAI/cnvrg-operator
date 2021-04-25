@@ -285,8 +285,8 @@ var fullAppSpec = mlopsv1.CnvrgAppSpec{
 		},
 	},
 	Monitoring: mlopsv1.CnvrgAppMonitoring{
-		Enabled:            "-",
-		UpstreamPrometheus: "-",
+		Enabled: "-",
+		//UpstreamPrometheus: "-",
 		Prometheus: mlopsv1.Prometheus{
 			Enabled:       "-",
 			Image:         "-",

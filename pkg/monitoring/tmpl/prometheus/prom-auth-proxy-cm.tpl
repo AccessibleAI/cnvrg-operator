@@ -15,7 +15,7 @@ data:
       server {
         listen 9091;
         location / {
-        auth_basic           "Cnvrg's Prometheus instance";
+        auth_basic           "Cnvrg's Prometheus";
         auth_basic_user_file /etc/nginx/htpasswd/htpasswd;
         proxy_pass           http://localhost:9090/;
         }

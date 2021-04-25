@@ -606,6 +606,8 @@ spec:
                     type: object
                   prometheus:
                     properties:
+                      UpstreamRef:
+                        type: string
                       basicAuthProxyImage:
                         type: string
                       cpuRequest:
@@ -628,9 +630,9 @@ spec:
                         type: string
                       svcName:
                         type: string
+                    required:
+                    - UpstreamRef
                     type: object
-                  upstreamPrometheus:
-                    type: string
                 type: object
               namespaceTenancy:
                 type: string

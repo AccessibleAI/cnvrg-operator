@@ -3,7 +3,10 @@ package desired
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/go-logr/logr"
@@ -12,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"io/ioutil"
+	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -267,13 +271,16 @@ func cnvrgTemplateFuncs() map[string]interface{} {
   honor_labels: true
   honor_timestamps: false
   metrics_path: '/federate'
+  basic_auth:
+    username: 'email@username.me'
+    password: 'cfgqvzjbhnwcomplicatedpasswordwjnqmd'
   params:
     'match[]':
       - '{namespace="%s"}'
   static_configs:
     - targets:
       - '%s'
-`, ns, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
+`, ns, "asd")
 			}
 			return fmt.Sprintf(`
 - job_name: 'federate'
@@ -287,7 +294,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
   static_configs:
     - targets:
       - '%s'
-`, cnvrgApp.Spec.Monitoring.UpstreamPrometheus)
+`, "cnvrgApp.Spec.Monitoring.UpstreamPrometheus")
 		},
 		"grafanaDataSource": func(promSvc string, ns string, promPort int, user string, pass string) string {
 			return fmt.Sprintf(`
@@ -492,4 +499,90 @@ func (s *State) dumpTemplateToFile() error {
 
 	}
 	return nil
+}
+
+func GetPromCredsSecret(secretName string, secretNs string, client client.Client, log logr.Logger) (user string, pass string, err error) {
+	user = "cnvrg"
+	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
+	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
+		log.Error(err, "Prometheus creds secret not found", "name", secretName)
+		return "", "", err
+	} else if err != nil {
+		log.Error(err, "can't get prometheus creds secret", "name", secretName)
+		return "", "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_PROMETHEUS_USER"]; !ok {
+		err := fmt.Errorf("prometheus creds secret %s missing require field CNVRG_PROMETHEUS_USER", namespacedName.Name)
+		log.Error(err, "missing required field")
+		return "", "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_PROMETHEUS_PASS"]; !ok {
+		err := fmt.Errorf("prometheus creds secret %s missing require field CNVRG_PROMETHEUS_PASS", namespacedName.Name)
+		log.Error(err, "missing required field")
+		return "", "", err
+	}
+
+	return string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_PASS"]), nil
+}
+
+func CreatePromCredsSecret(obj v1.Object, secretName string, secretNs string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
+	user := "cnvrg"
+	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
+	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
+		if err := ctrl.SetControllerReference(obj, &creds, schema); err != nil {
+			log.Error(err, "error set controller reference", "name", namespacedName.Name)
+			return err
+		}
+		b := make([]byte, 12)
+		_, err = rand.Read(b)
+		if err != nil {
+			log.Error(err, "error generating prometheus password")
+			return err
+		}
+		pass := base64.StdEncoding.EncodeToString(b)
+		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
+		if err != nil {
+			log.Error(err, "error generating prometheus hash ")
+			return err
+		}
+		creds.Data = map[string][]byte{
+			"CNVRG_PROMETHEUS_USER": []byte(user),
+			"CNVRG_PROMETHEUS_PASS": []byte(pass),
+			"htpasswd":              []byte(fmt.Sprintf("%s:%s", user, passHash)),
+		}
+		if err := client.Create(context.Background(), &creds); err != nil {
+			log.Error(err, "error creating prometheus creds", "name", namespacedName.Name)
+			return err
+		}
+
+		return nil
+	} else if err != nil {
+		log.Error(err, "can't check if prometheus creds secret exists", "name", namespacedName.Name)
+		return err
+	}
+	return nil
+
+}
+
+func PrometheusUpstreamConfig(user, pass, ns, upstream string) string {
+	return fmt.Sprintf(`
+- job_name: 'federate'
+  scrape_interval: 10s
+  honor_labels: true
+  honor_timestamps: false
+  metrics_path: '/federate'
+  basic_auth:
+    username: '%s'
+    password: '%s'
+  params:
+    'match[]':
+      - '{namespace="%s"}'
+  static_configs:
+    - targets:
+      - '%s'
+`, user, pass, ns, upstream)
 }

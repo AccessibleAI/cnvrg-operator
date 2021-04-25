@@ -22,6 +22,7 @@ type Prometheus struct {
 	StorageSize         string `json:"storageSize,omitempty"`
 	StorageClass        string `json:"storageClass,omitempty"`
 	CredsRef            string `json:"credsRef,omitempty"`
+	UpstreamRef         string `json:"UpstreamRef"`
 }
 
 type NodeExporter struct {
@@ -81,10 +82,9 @@ type CnvrgInfraMonitoring struct {
 }
 
 type CnvrgAppMonitoring struct {
-	Enabled            string     `json:"enabled,omitempty"`
-	UpstreamPrometheus string     `json:"upstreamPrometheus,omitempty"`
-	Prometheus         Prometheus `json:"prometheus,omitempty"`
-	Grafana            Grafana    `json:"grafana,omitempty"`
+	Enabled    string     `json:"enabled,omitempty"`
+	Prometheus Prometheus `json:"prometheus,omitempty"`
+	Grafana    Grafana    `json:"grafana,omitempty"`
 }
 
 var grafanaDefault = Grafana{
@@ -108,13 +108,13 @@ var prometheusDefault = Prometheus{
 	StorageSize:         "50Gi",
 	StorageClass:        "",
 	CredsRef:            "prom-creds",
+	UpstreamRef:         "upstream-prom-static-config",
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
-	Enabled:            "true",
-	UpstreamPrometheus: "prometheus-operated.cnvrg-infra.svc.cluster.local:9090",
-	Prometheus:         prometheusDefault,
-	Grafana:            grafanaDefault,
+	Enabled:    "true",
+	Prometheus: prometheusDefault,
+	Grafana:    grafanaDefault,
 }
 
 var infraMonitoringDefault = CnvrgInfraMonitoring{
