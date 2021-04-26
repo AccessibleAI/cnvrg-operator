@@ -8,7 +8,7 @@ type HugePages struct {
 
 type Pg struct {
 	Enabled        *bool             `json:"enabled,omitempty"`
-	ServiceAccount string            `json:"serviceAccount"`
+	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	SecretName     string            `json:"secretName,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
@@ -23,7 +23,7 @@ type Pg struct {
 	Fixpg          *bool             `json:"fixpg,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
-	CredsRef       string            `json:"credsRef"`
+	CredsRef       string            `json:"credsRef,omitempty"`
 }
 
 type Minio struct {
@@ -45,7 +45,7 @@ type Minio struct {
 
 type Redis struct {
 	Enabled        *bool             `json:"enabled,omitempty"`
-	ServiceAccount string            `json:"serviceAccount"`
+	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	SvcName        string            `json:"svcName,omitempty"`
 	Port           int               `json:"port,omitempty"`
@@ -55,7 +55,7 @@ type Redis struct {
 	Requests       Requests          `json:"requests,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
-	CredsRef       string            `json:"credsRef"`
+	CredsRef       string            `json:"credsRef,omitempty"`
 }
 
 type Es struct {
@@ -74,10 +74,10 @@ type Es struct {
 	CPULimit       string            `json:"cpuLimit,omitempty"`
 	MemoryLimit    string            `json:"memoryLimit,omitempty"`
 	JavaOpts       string            `json:"javaOpts,omitempty"`
-	PatchEsNodes   string            `json:"patchEsNodes,omitempty"`
+	PatchEsNodes   *bool             `json:"patchEsNodes,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
-	CredsRef       string            `json:"credsRef"`
+	CredsRef       string            `json:"credsRef,omitempty"`
 }
 
 type AppDbs struct {
@@ -174,7 +174,7 @@ var esDefault = Es{
 	CPULimit:       "2000m",
 	MemoryLimit:    "4Gi",
 	JavaOpts:       "",
-	PatchEsNodes:   "true",
+	PatchEsNodes:   &defaultTrue,
 	NodeSelector:   nil,
 	Tolerations:    nil,
 	CredsRef:       "es-creds",

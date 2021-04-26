@@ -85,9 +85,6 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                    required:
-                    - credsRef
-                    - serviceAccount
                     type: object
                 type: object
               gpu:
@@ -106,10 +103,10 @@ spec:
                 type: string
               logging:
                 properties:
-                  enabled:
-                    type: boolean
                   fluentbit:
                     properties:
+                      enabled:
+                        type: boolean
                       image:
                         type: string
                     type: object
@@ -123,8 +120,11 @@ spec:
                       image:
                         type: string
                     type: object
-                  enabled:
-                    type: boolean
+                  defaultServiceMonitors:
+                    properties:
+                      enabled:
+                        type: boolean
+                    type: object
                   grafana:
                     properties:
                       enabled:

@@ -119,13 +119,12 @@ func fluentbitConfigState() []*desired.State {
 
 func fluentbitState() []*desired.State {
 	return []*desired.State{
-
 		{
-			TemplatePath:   path + "/fluentbit/ds.tpl",
+			TemplatePath:   path + "/fluentbit/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.DaemonSetGVR],
+			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
 		},
 		{
@@ -145,11 +144,11 @@ func fluentbitState() []*desired.State {
 			Own:            true,
 		},
 		{
-			TemplatePath:   path + "/fluentbit/sa.tpl",
+			TemplatePath:   path + "/fluentbit/ds.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SaGVR],
+			GVR:            desired.Kinds[desired.DaemonSetGVR],
 			Own:            true,
 		},
 	}
@@ -171,13 +170,13 @@ func kibanaOauthProxy() []*desired.State {
 func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.Logging.Elastalert.Enabled {
+	if *cnvrgApp.Spec.Logging.Elastalert.Enabled {
 		state = append(state, elastAlert()...)
 	}
-	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
+	if *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		state = append(state, kibana()...)
 	}
-	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.SSO.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
+	if *cnvrgApp.Spec.SSO.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		state = append(state, kibanaOauthProxy()...)
 	}
 
@@ -187,7 +186,7 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 func InfraLoggingState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
 
-	if *infra.Spec.Logging.Enabled {
+	if *infra.Spec.Logging.Fluentbit.Enabled {
 		state = append(state, fluentbitState()...)
 	}
 

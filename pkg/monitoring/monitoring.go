@@ -479,28 +479,25 @@ func appServiceMonitors() []*desired.State {
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if *cnvrgApp.Spec.Monitoring.Enabled {
+	state = appServiceMonitors()
 
-		state = appServiceMonitors()
-
-		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
-			state = append(state, ccpPrometheusInstance()...)
-		}
-		if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
-			state = append(state, grafanaState()...)
-		}
-		if *cnvrgApp.Spec.SSO.Enabled {
-			state = append(state, promOauthProxy()...)
-		}
-		if *cnvrgApp.Spec.SSO.Enabled {
-			state = append(state, grafanaOauthProxy()...)
-		}
-		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
-			state = append(state, promIstioVs()...)
-		}
-		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
-			state = append(state, promOcpRoute()...)
-		}
+	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
+		state = append(state, ccpPrometheusInstance()...)
+	}
+	if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+		state = append(state, grafanaState()...)
+	}
+	if *cnvrgApp.Spec.SSO.Enabled {
+		state = append(state, promOauthProxy()...)
+	}
+	if *cnvrgApp.Spec.SSO.Enabled {
+		state = append(state, grafanaOauthProxy()...)
+	}
+	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		state = append(state, promIstioVs()...)
+	}
+	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		state = append(state, promOcpRoute()...)
 	}
 
 	return state
@@ -508,38 +505,36 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if *infra.Spec.Monitoring.Enabled {
 
-		if *infra.Spec.Monitoring.PrometheusOperator.Enabled {
-			state = append(state, prometheusOperatorState()...)
-		}
-		if *infra.Spec.Monitoring.Prometheus.Enabled {
-			state = append(state, infraPrometheusInstanceState()...)
-		}
-		if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
-			state = append(state, kubeStateMetricsState()...)
-		}
-		if *infra.Spec.Monitoring.Grafana.Enabled {
-			state = append(state, grafanaState()...)
-		}
-		if *infra.Spec.Monitoring.NodeExporter.Enabled {
-			state = append(state, nodeExporterState()...)
-		}
-		if *infra.Spec.Monitoring.Enabled {
-			state = append(state, defaultServiceMonitors()...)
-		}
-		if *infra.Spec.Monitoring.DcgmExporter.Enabled {
-			state = append(state, dcgmExporter()...)
-		}
-		if *infra.Spec.SSO.Enabled {
-			state = append(state, grafanaOauthProxy()...)
-		}
-		if infra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
-			state = append(state, promIstioVs()...)
-		}
-		if infra.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
-			state = append(state, promOcpRoute()...)
-		}
+	if *infra.Spec.Monitoring.PrometheusOperator.Enabled {
+		state = append(state, prometheusOperatorState()...)
+	}
+	if *infra.Spec.Monitoring.Prometheus.Enabled {
+		state = append(state, infraPrometheusInstanceState()...)
+	}
+	if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
+		state = append(state, kubeStateMetricsState()...)
+	}
+	if *infra.Spec.Monitoring.Grafana.Enabled {
+		state = append(state, grafanaState()...)
+	}
+	if *infra.Spec.Monitoring.NodeExporter.Enabled {
+		state = append(state, nodeExporterState()...)
+	}
+	if *infra.Spec.Monitoring.DefaultServiceMonitors.Enabled {
+		state = append(state, defaultServiceMonitors()...)
+	}
+	if *infra.Spec.Monitoring.DcgmExporter.Enabled {
+		state = append(state, dcgmExporter()...)
+	}
+	if *infra.Spec.SSO.Enabled {
+		state = append(state, grafanaOauthProxy()...)
+	}
+	if *infra.Spec.Monitoring.Prometheus.Enabled && infra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		state = append(state, promIstioVs()...)
+	}
+	if *infra.Spec.Monitoring.Prometheus.Enabled && infra.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		state = append(state, promOcpRoute()...)
 	}
 
 	return state

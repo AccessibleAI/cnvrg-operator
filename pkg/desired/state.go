@@ -460,6 +460,11 @@ func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
 		return false
 	}
 
+	// todo: figure out what to do with this (happens only on OCP, why?)
+	if manifest.GVR == Kinds[SaGVR] {
+		return false
+	}
+
 	// do not apply CRDs if already exists
 	// todo: have to ensure that existing CRD version is compatible with actually CR
 	if manifest.GVR == Kinds[CrdGVR] {

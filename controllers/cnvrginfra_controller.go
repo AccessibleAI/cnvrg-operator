@@ -251,9 +251,6 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
-	if !*infra.Spec.Monitoring.Enabled {
-		return nil
-	}
 	err := desired.CreatePromCredsSecret(infra, infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, r.Scheme, cnvrgInfraLog)
 	if err != nil {
 
@@ -297,8 +294,8 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 
 func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
-	if !*cnvrgInfra.Spec.Monitoring.Enabled {
-		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
+	if !*cnvrgInfra.Spec.Monitoring.Grafana.Enabled {
+		cnvrgInfraLog.Info("grafana disabled, skipping grafana deployment")
 		return nil
 	}
 
@@ -564,6 +561,13 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return true
 				}
 				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrginfra spec wasn't changed, assuming status update, won't reconcile
+
+				if !shouldReconcileOnSpecChange && viper.GetBool("verbose") {
+					cnvrgInfraLog.V(1).Info("printing the diff between oldObject.Spec and newObject.Spec")
+					diff, _ := messagediff.PrettyDiff(oldObject.Spec, newObject.Spec)
+					cnvrgInfraLog.V(1).Info(diff)
+				}
+
 				cnvrgInfraLog.V(1).Info("cnvrginfra update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
 
 				return !shouldReconcileOnSpecChange

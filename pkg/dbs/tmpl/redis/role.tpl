@@ -4,9 +4,11 @@ metadata:
   name: {{ .Spec.Dbs.Redis.ServiceAccount }}
   namespace: {{ ns . }}
 rules:
-- apiGroups:
-  - "*"
-  resources:
-  - "*"
-  verbs:
-  - "*"
+  - apiGroups:
+      - security.openshift.io
+    resourceNames:
+      - anyuid
+    resources:
+      - securitycontextconstraints
+    verbs:
+      - use

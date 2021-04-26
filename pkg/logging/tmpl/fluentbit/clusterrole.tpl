@@ -8,3 +8,12 @@ rules:
   - namespaces
   - pods
   verbs: ["get", "list", "watch"]
+- apiGroups:
+    - security.openshift.io
+  resourceNames:
+    - hostaccess
+    - anyuid
+  resources:
+    - securitycontextconstraints
+  verbs:
+    - use

@@ -65,18 +65,17 @@ type MetricsServer struct {
 }
 
 type CnvrgInfraMonitoring struct {
-	Enabled               *bool              `json:"enabled,omitempty"`
-	PrometheusOperator    PrometheusOperator `json:"prometheusOperator,omitempty"`
-	Prometheus            Prometheus         `json:"prometheus,omitempty"`
-	KubeletServiceMonitor *bool              `json:"kubeletServiceMonitor,omitempty"`
-	NodeExporter          NodeExporter       `json:"nodeExporter,omitempty"`
-	KubeStateMetrics      KubeStateMetrics   `json:"kubeStateMetrics,omitempty"`
-	Grafana               Grafana            `json:"grafana,omitempty"`
-	DcgmExporter          DcgmExporter       `json:"dcgmExporter,omitempty"`
+	PrometheusOperator     PrometheusOperator     `json:"prometheusOperator,omitempty"`
+	Prometheus             Prometheus             `json:"prometheus,omitempty"`
+	KubeletServiceMonitor  *bool                  `json:"kubeletServiceMonitor,omitempty"`
+	NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
+	KubeStateMetrics       KubeStateMetrics       `json:"kubeStateMetrics,omitempty"`
+	Grafana                Grafana                `json:"grafana,omitempty"`
+	DcgmExporter           DcgmExporter           `json:"dcgmExporter,omitempty"`
+	DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
 }
 
 type CnvrgAppMonitoring struct {
-	Enabled    *bool      `json:"enabled,omitempty"`
 	Prometheus Prometheus `json:"prometheus,omitempty"`
 	Grafana    Grafana    `json:"grafana,omitempty"`
 }
@@ -106,16 +105,15 @@ var prometheusDefault = Prometheus{
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
-	Enabled:    &defaultEnabled,
 	Prometheus: prometheusDefault,
 	Grafana:    grafanaDefault,
 }
 
 var infraMonitoringDefault = CnvrgInfraMonitoring{
-	Enabled:    &defaultEnabled,
 	Prometheus: prometheusDefault,
 	Grafana:    grafanaDefault,
 	PrometheusOperator: PrometheusOperator{
+		Enabled: &defaultEnabled,
 		Images: Images{
 			OperatorImage:                 "quay.io/prometheus-operator/prometheus-operator:v0.44.1",
 			PrometheusConfigReloaderImage: "quay.io/prometheus-operator/prometheus-config-reloader:v0.44.1",
@@ -133,5 +131,8 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	DcgmExporter: DcgmExporter{
 		Enabled: &defaultEnabled,
 		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
+	},
+	DefaultServiceMonitors: DefaultServiceMonitors{
+		Enabled: &defaultEnabled,
 	},
 }

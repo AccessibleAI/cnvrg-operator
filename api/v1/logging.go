@@ -8,7 +8,8 @@ type AppInstance struct {
 }
 
 type Fluentbit struct {
-	Image string `json:"image,omitempty"`
+	Enabled *bool  `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
 }
 
 type Elastalert struct {
@@ -43,18 +44,17 @@ type Kibana struct {
 }
 
 type CnvrgAppLogging struct {
-	Enabled    *bool      `json:"enabled,omitempty"`
 	Elastalert Elastalert `json:"elastalert,omitempty"`
 	Kibana     Kibana     `json:"kibana,omitempty"`
 }
 
 type CnvrgInfraLogging struct {
-	Enabled   *bool     `json:"enabled,omitempty"`
 	Fluentbit Fluentbit `json:"fluentbit,omitempty"`
 }
 
 var fluentbitDefault = Fluentbit{
-	Image: "cnvrg/cnvrg-fluentbit:v1.7.2",
+	Enabled: &defaultEnabled,
+	Image:   "cnvrg/cnvrg-fluentbit:v1.7.2",
 }
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{
@@ -90,6 +90,5 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 }
 
 var cnvrgInfraLoggingDefault = CnvrgInfraLogging{
-	Enabled:   &defaultEnabled,
 	Fluentbit: fluentbitDefault,
 }

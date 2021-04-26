@@ -312,7 +312,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check kibana status
-	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
+	if *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Kibana.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -560,8 +560,8 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 
 func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
 
-	if !*cnvrgApp.Spec.Monitoring.Enabled {
-		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
+	if !*cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+		cnvrgInfraLog.Info("grafana disabled, skipping grafana deployment")
 		return nil
 	}
 	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
