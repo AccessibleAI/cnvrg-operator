@@ -34,6 +34,15 @@ spec:
               {{- end }}
             {{- end }}
         {{- end }}
+        {{- if .Spec.Tenancy.Enabled }}
+        nodeSelector:
+          {{.Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- end }}
+        tolerations:
+          - key: {{.Spec.Tenancy.Key }}
+            operator: "Equal"
+            value: {{ .Spec.Tenancy.Value }}
+            effect: "NoSchedule"
         env:
           - name: ISTIO_META_ROUTER_MODE
             value: sni-dnat

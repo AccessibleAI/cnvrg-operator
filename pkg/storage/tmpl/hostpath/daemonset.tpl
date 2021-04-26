@@ -14,6 +14,18 @@ spec:
       labels:
         k8s-app: hostpath-provisioner
     spec:
+      nodeSelector:
+      {{- if .Spec.Tenancy.Enabled }}
+        kubernetes.io/hostname: {{ .Spec.Storage.Hostpath.NodeName }}
+        {{.Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+      {{- else }}
+        kubernetes.io/hostname: {{ .Spec.Storage.Hostpath.NodeName }}
+      {{- end }}
+      tolerations:
+        - key: {{.Spec.Tenancy.Key }}
+          operator: "Equal"
+          value: {{ .Spec.Tenancy.Value }}
+          effect: "NoSchedule"
       serviceAccountName: hostpath-provisioner-admin
       containers:
         - name: hostpath-provisioner
@@ -21,7 +33,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: USE_NAMING_PREFIX
-              value: "true" # change to true, to have the name of the pvc be part of the directory
+              value: "true"
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
@@ -29,7 +41,7 @@ spec:
             - name: PV_DIR
               value: {{ .Spec.Storage.Hostpath.HostPath }}
           volumeMounts:
-            - name: pv-volume # root dir where your bind mounts will be on the node
+            - name: pv-volume
               mountPath: {{ .Spec.Storage.Hostpath.HostPath }}
           resources:
             limits:

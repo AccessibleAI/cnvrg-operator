@@ -345,6 +345,9 @@ elasticsearch:
     Authorization: "Basic %s"
 `, host, port, esHost, esUser, esPass, esBasicAuth)
 		},
+		"tenancy":func()string{
+			return ""
+		},
 	}
 }
 

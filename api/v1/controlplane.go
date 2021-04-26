@@ -158,16 +158,8 @@ type ControlPlane struct {
 	Ldap          Ldap          `json:"ldap,omitempty"`
 	Rbac          Rbac          `json:"rbac,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
-	Tenancy       Tenancy       `json:"tenancy,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
 	Mpi           Mpi           `json:"mpi,omitempty"`
-}
-
-type Tenancy struct {
-	Enabled        bool   `json:"enabled,omitempty"`
-	DedicatedNodes string `json:"dedicatedNodes,omitempty"`
-	Key            string `json:"key,omitempty"`
-	Value          string `json:"value,omitempty"`
 }
 
 type Cnvrg struct {
@@ -349,11 +341,6 @@ var controlPlanDefault = ControlPlane{
 		Domain:   "",
 	},
 
-	Tenancy: Tenancy{
-		Enabled:        false,
-		DedicatedNodes: "false",
-		Key:            "cnvrg-taint",
-		Value:          "true",
-	},
+
 	Mpi: mpiDefault,
 }

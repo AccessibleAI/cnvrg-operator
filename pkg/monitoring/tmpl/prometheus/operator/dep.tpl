@@ -18,6 +18,15 @@ spec:
         app: cnvrg-prometheus-operator
         version: v0.44.1
     spec:
+      {{- if .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{.Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+      {{- end }}
+      tolerations:
+        - key: {{.Spec.Tenancy.Key }}
+          operator: "Equal"
+          value: {{ .Spec.Tenancy.Value }}
+          effect: "NoSchedule"
       serviceAccountName: cnvrg-prometheus-operator
       securityContext:
         runAsNonRoot: true

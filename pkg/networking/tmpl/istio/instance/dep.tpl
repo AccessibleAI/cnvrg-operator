@@ -13,6 +13,15 @@ spec:
       labels:
         name: istio-operator
     spec:
+      {{- if .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{.Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+      {{- end }}
+      tolerations:
+        - key: {{.Spec.Tenancy.Key }}
+          operator: "Equal"
+          value: {{ .Spec.Tenancy.Value }}
+          effect: "NoSchedule"
       imagePullSecrets:
         - name: {{ .Spec.Registry.Name }}
       serviceAccountName: istio-operator
