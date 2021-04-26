@@ -20,15 +20,16 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       serviceAccountName: {{ .Spec.Logging.Kibana.ServiceAccount }}
-      {{- if .Spec.SSO.Enabled }}
+
       volumes:
-        - name: "oauth-proxy-config"
-          secret:
-            secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
         - name: "kibana-config"
           secret:
             secretName: "kibana-config"
-      {{- end }}
+        {{- if .Spec.SSO.Enabled }}
+        - name: "oauth-proxy-config"
+          secret:
+            secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
+        {{- end }}
       containers:
         {{- if .Spec.SSO.Enabled }}
         - name: "cnvrg-oauth-proxy"
