@@ -5,7 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: cnvrg-jobs
-    {{- if .Spec.NamespaceTenancy }}
+    {{- if isTrue .Spec.NamespaceTenancy }}
     cnvrg-ccp-prometheus: {{ .Name }}-{{ ns .}}
     {{- else }}
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}

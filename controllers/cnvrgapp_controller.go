@@ -74,8 +74,8 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// setup finalizer
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
-			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrginfraFinalizer)
+		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(context.Background(), cnvrgApp); err != nil {
 				cnvrgInfraLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
@@ -225,7 +225,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	readyState := make(map[string]bool)
 
 	// check webapp status
-	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled == true {
+	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -235,7 +235,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check sidekiq status
-	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled == true {
+	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled {
 		name := types.NamespacedName{Name: "sidekiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -245,7 +245,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check searchkiq status
-	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled == true {
+	if *cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled {
 		name := types.NamespacedName{Name: "searchkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -255,7 +255,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check systemkiq status
-	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled == true {
+	if *cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled {
 		name := types.NamespacedName{Name: "systemkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -265,7 +265,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check postgres status
-	if cnvrgApp.Spec.Dbs.Pg.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Pg.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Pg.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -275,7 +275,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check minio status
-	if cnvrgApp.Spec.Dbs.Minio.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Minio.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -285,7 +285,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check redis status
-	if cnvrgApp.Spec.Dbs.Redis.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Redis.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Redis.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -295,7 +295,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check es status
-	if cnvrgApp.Spec.Dbs.Es.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Es.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Es.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckStatefulSetReadiness(name)
 		if err != nil {
@@ -312,7 +312,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check kibana status
-	if cnvrgApp.Spec.Logging.Enabled == true && cnvrgApp.Spec.Logging.Kibana.Enabled == true {
+	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Kibana.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -540,7 +540,7 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 		cnvrgAppLog.Error(err, "can't fetch es creds")
 		return nil, err
 	}
-	if app.Spec.SSO.Enabled == true {
+	if *app.Spec.SSO.Enabled {
 		kibanaHost = "127.0.0.1"
 		kibanaPort = "3000"
 	}
@@ -560,7 +560,7 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 
 func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
 
-	if cnvrgApp.Spec.Monitoring.Enabled != true {
+	if !*cnvrgApp.Spec.Monitoring.Enabled {
 		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
 		return nil
 	}

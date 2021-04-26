@@ -59,22 +59,6 @@ func prometheusOperatorState() []*desired.State {
 func infraPrometheusInstanceState() []*desired.State {
 	return []*desired.State{
 		{
-			TemplatePath:   path + "/prometheus/prom-auth-proxy-cm.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.ConfigMapGVR],
-			Own:            true,
-		},
-		{
-			TemplatePath:   path + "/prometheus/instance/infra/oauth.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
-			Own:            true,
-		},
-		{
 			TemplatePath:   path + "/prometheus/instance/infra/clusterrole.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -91,7 +75,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Own:            true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/instance/infra/sa.tpl",
+			TemplatePath:   path + "/prometheus/instance/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -107,19 +91,11 @@ func infraPrometheusInstanceState() []*desired.State {
 			Own:            true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/instance/infra/svc.tpl",
+			TemplatePath:   path + "/prometheus/instance/svc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
-			Own:            true,
-		},
-		{
-			TemplatePath:   path + "/prometheus/instance/infra/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
 		},
 		{
@@ -306,14 +282,7 @@ func nodeExporterState() []*desired.State {
 
 func ccpPrometheusInstance() []*desired.State {
 	return []*desired.State{
-		{
-			TemplatePath:   path + "/prometheus/prom-auth-proxy-cm.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.ConfigMapGVR],
-			Own:            true,
-		},
+
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/role.tpl",
 			Template:       nil,
@@ -331,7 +300,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Own:            false,
 		},
 		{
-			TemplatePath:   path + "/prometheus/instance/ccp/sa.tpl",
+			TemplatePath:   path + "/prometheus/instance/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -347,19 +316,50 @@ func ccpPrometheusInstance() []*desired.State {
 			Own:            true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/instance/ccp/svc.tpl",
+			TemplatePath:   path + "/prometheus/instance/svc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
 		},
+	}
+}
+
+func promOauthProxy() []*desired.State {
+	return []*desired.State{
 		{
-			TemplatePath:   path + "/prometheus/instance/ccp/vs.tpl",
+			TemplatePath:   path + "/prometheus/instance/prom-auth-proxy-cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+		},
+	}
+}
+
+func promIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prometheus/instance/vs.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+		},
+	}
+}
+
+func promOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prometheus/instance/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
 			Own:            true,
 		},
 	}
@@ -477,18 +477,30 @@ func appServiceMonitors() []*desired.State {
 }
 
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
+	var state []*desired.State
 
-	// always add cnvrg idle metrics exporter
-	var state = appServiceMonitors()
+	if *cnvrgApp.Spec.Monitoring.Enabled {
 
-	if cnvrgApp.Spec.Monitoring.Enabled == true && cnvrgApp.Spec.Monitoring.Prometheus.Enabled == true {
-		state = append(state, ccpPrometheusInstance()...)
-	}
-	if cnvrgApp.Spec.Monitoring.Enabled == true && cnvrgApp.Spec.Monitoring.Grafana.Enabled == true {
-		state = append(state, grafanaState()...)
-	}
-	if cnvrgApp.Spec.Monitoring.Enabled == true && cnvrgApp.Spec.SSO.Enabled == true {
-		state = append(state, grafanaOauthProxy()...)
+		state = appServiceMonitors()
+
+		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
+			state = append(state, ccpPrometheusInstance()...)
+		}
+		if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+			state = append(state, grafanaState()...)
+		}
+		if *cnvrgApp.Spec.SSO.Enabled {
+			state = append(state, promOauthProxy()...)
+		}
+		if *cnvrgApp.Spec.SSO.Enabled {
+			state = append(state, grafanaOauthProxy()...)
+		}
+		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+			state = append(state, promIstioVs()...)
+		}
+		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+			state = append(state, promOcpRoute()...)
+		}
 	}
 
 	return state
@@ -496,30 +508,40 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.PrometheusOperator.Enabled == true {
-		state = append(state, prometheusOperatorState()...)
+	if *infra.Spec.Monitoring.Enabled {
+
+		if *infra.Spec.Monitoring.PrometheusOperator.Enabled {
+			state = append(state, prometheusOperatorState()...)
+		}
+		if *infra.Spec.Monitoring.Prometheus.Enabled {
+			state = append(state, infraPrometheusInstanceState()...)
+		}
+		if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
+			state = append(state, kubeStateMetricsState()...)
+		}
+		if *infra.Spec.Monitoring.Grafana.Enabled {
+			state = append(state, grafanaState()...)
+		}
+		if *infra.Spec.Monitoring.NodeExporter.Enabled {
+			state = append(state, nodeExporterState()...)
+		}
+		if *infra.Spec.Monitoring.Enabled {
+			state = append(state, defaultServiceMonitors()...)
+		}
+		if *infra.Spec.Monitoring.DcgmExporter.Enabled {
+			state = append(state, dcgmExporter()...)
+		}
+		if *infra.Spec.SSO.Enabled {
+			state = append(state, grafanaOauthProxy()...)
+		}
+		if infra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+			state = append(state, promIstioVs()...)
+		}
+		if infra.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+			state = append(state, promOcpRoute()...)
+		}
 	}
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.Prometheus.Enabled == true {
-		state = append(state, infraPrometheusInstanceState()...)
-	}
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.KubeStateMetrics.Enabled == true {
-		state = append(state, kubeStateMetricsState()...)
-	}
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.Grafana.Enabled == true {
-		state = append(state, grafanaState()...)
-	}
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.NodeExporter.Enabled == true {
-		state = append(state, nodeExporterState()...)
-	}
-	if infra.Spec.Monitoring.Enabled == true {
-		state = append(state, defaultServiceMonitors()...)
-	}
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.Monitoring.DcgmExporter.Enabled == true {
-		state = append(state, dcgmExporter()...)
-	}
-	if infra.Spec.Monitoring.Enabled == true && infra.Spec.SSO.Enabled == true {
-		state = append(state, grafanaOauthProxy()...)
-	}
+
 	return state
 }
 

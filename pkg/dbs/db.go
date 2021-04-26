@@ -19,6 +19,22 @@ func esState() []*desired.State {
 			Own:            true,
 		},
 		{
+			TemplatePath:   path + "/es/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/es/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/es/sts.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -53,6 +69,22 @@ func pgState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/pg/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/pg/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
 		},
 		{
@@ -105,6 +137,22 @@ func redisState() []*desired.State {
 			Own:            true,
 		},
 		{
+			TemplatePath:   path + "/redis/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/redis/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/redis/pvc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -140,6 +188,22 @@ func singleBackendMinio() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/minio/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/minio/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
 		},
 		{
@@ -243,21 +307,21 @@ func sharedBackendMinio() []*desired.State {
 func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.Dbs.Pg.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Pg.Enabled {
 		state = append(state, pgState()...)
 	}
 
-	if cnvrgApp.Spec.Dbs.Redis.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Redis.Enabled {
 		state = append(state, redisState()...)
 	}
 
-	if cnvrgApp.Spec.Dbs.Minio.Enabled == true && cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled && *cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled {
 		state = append(state, sharedBackendMinio()...)
 	} else {
 		state = append(state, singleBackendMinio()...)
 	}
 
-	if cnvrgApp.Spec.Dbs.Es.Enabled == true {
+	if *cnvrgApp.Spec.Dbs.Es.Enabled {
 		state = append(state, esState()...)
 	}
 	return state
@@ -265,7 +329,7 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 func InfraDbsState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if infra.Spec.Dbs.Redis.Enabled == true {
+	if *infra.Spec.Dbs.Redis.Enabled {
 		state = append(state, redisState()...)
 	}
 	return state

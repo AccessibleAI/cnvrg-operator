@@ -6,7 +6,7 @@ type ConsistentHash struct {
 }
 
 type SharedStorage struct {
-	Enabled          bool           `json:"enabled,omitempty"`
+	Enabled          *bool          `json:"enabled,omitempty"`
 	UseExistingClaim string         `json:"useExistingClaim,omitempty"`
 	ConsistentHash   ConsistentHash `json:"consistentHash,omitempty"`
 }
@@ -22,7 +22,7 @@ type Requests struct {
 
 type WebApp struct {
 	Replicas                int                   `json:"replicas,omitempty"`
-	Enabled                 bool                  `json:"enabled,omitempty"`
+	Enabled                 *bool                 `json:"enabled,omitempty"`
 	Image                   string                `json:"image,omitempty"`
 	Port                    int                   `json:"port,omitempty"`
 	CPU                     string                `json:"cpu,omitempty"`
@@ -38,20 +38,20 @@ type WebApp struct {
 }
 
 type Sidekiq struct {
-	Enabled  bool   `json:"enabled,omitempty"`
-	Split    bool   `json:"split,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Split    *bool  `json:"split,omitempty"`
 	CPU      string `json:"cpu,omitempty"`
 	Memory   string `json:"memory,omitempty"`
 	Replicas int    `json:"replicas,omitempty"`
 }
 type Searchkiq struct {
-	Enabled  bool   `json:"enabled,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
 	CPU      string `json:"cpu,omitempty"`
 	Memory   string `json:"memory,omitempty"`
 	Replicas int    `json:"replicas,omitempty"`
 }
 type Systemkiq struct {
-	Enabled  bool   `json:"enabled,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
 	CPU      string `json:"cpu,omitempty"`
 	Memory   string `json:"memory,omitempty"`
 	Replicas int    `json:"replicas,omitempty"`
@@ -65,7 +65,7 @@ type Registry struct {
 }
 
 type Hyper struct {
-	Enabled                 bool   `json:"enabled,omitempty"`
+	Enabled                 *bool  `json:"enabled,omitempty"`
 	Image                   string `json:"image,omitempty"`
 	Port                    int    `json:"port,omitempty"`
 	Replicas                int    `json:"replicas,omitempty"`
@@ -76,7 +76,6 @@ type Hyper struct {
 	MemoryRequest           string `json:"memoryRequest,omitempty"`
 	CPULimit                string `json:"cpuLimit,omitempty"`
 	MemoryLimit             string `json:"memoryLimit,omitempty"`
-	EnableReadinessProbe    bool   `json:"enableReadinessProbe,omitempty"`
 	ReadinessPeriodSeconds  int    `json:"readinessPeriodSeconds,omitempty"`
 	ReadinessTimeoutSeconds int    `json:"readinessTimeoutSeconds,omitempty"`
 }
@@ -86,7 +85,7 @@ type Seeder struct {
 	CreateBucketCmd string `json:"createBucketCmd,omitempty"`
 }
 type Ldap struct {
-	Enabled       bool   `json:"enabled,omitempty"`
+	Enabled       *bool  `json:"enabled,omitempty"`
 	Host          string `json:"host,omitempty"`
 	Port          string `json:"port,omitempty"`
 	Account       string `json:"account,omitempty"`
@@ -164,7 +163,7 @@ type ControlPlane struct {
 }
 
 type Tenancy struct {
-	Enabled        bool   `json:"enabled,omitempty"`
+	Enabled        *bool  `json:"enabled,omitempty"`
 	DedicatedNodes string `json:"dedicatedNodes,omitempty"`
 	Key            string `json:"key,omitempty"`
 	Value          string `json:"value,omitempty"`
@@ -176,7 +175,7 @@ type Cnvrg struct {
 }
 
 type Mpi struct {
-	Enabled              bool              `json:"enabled,omitempty"`
+	Enabled              *bool             `json:"enabled,omitempty"`
 	Image                string            `json:"image,omitempty"`
 	KubectlDeliveryImage string            `json:"kubectlDeliveryImage,omitempty"`
 	ExtraArgs            map[string]string `json:"extraArgs,omitempty"`
@@ -184,11 +183,12 @@ type Mpi struct {
 }
 
 var mpiDefault = Mpi{
-	Enabled:              true,
+	Enabled:              &defaultEnabled,
 	Image:                "mpioperator/mpi-operator:v0.2.3",
 	KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
 	ExtraArgs:            nil,
 	Registry: Registry{
+
 		Name:     "mpi-private-registry",
 		URL:      "docker.io",
 		User:     "",
@@ -197,6 +197,7 @@ var mpiDefault = Mpi{
 }
 
 var appRegistryDefault = Registry{
+
 	Name:     "cnvrg-app-registry",
 	URL:      "docker.io",
 	User:     "",
@@ -204,6 +205,7 @@ var appRegistryDefault = Registry{
 }
 
 var infraRegistryDefault = Registry{
+
 	Name:     "cnvrg-infra-registry",
 	URL:      "docker.io",
 	User:     "",
@@ -213,8 +215,8 @@ var infraRegistryDefault = Registry{
 var controlPlanDefault = ControlPlane{
 
 	WebApp: WebApp{
+		Enabled:                 &defaultEnabled,
 		Replicas:                1,
-		Enabled:                 true,
 		Image:                   "cnvrg/core:3.1.5",
 		Port:                    8080,
 		CPU:                     "2000m",
@@ -241,29 +243,29 @@ var controlPlanDefault = ControlPlane{
 	},
 
 	Sidekiq: Sidekiq{
-		Enabled:  true,
-		Split:    true,
+		Enabled:  &defaultEnabled,
+		Split:    &defaultEnabled,
 		CPU:      "1000m",
 		Memory:   "3750Mi",
 		Replicas: 2,
 	},
 
 	Searchkiq: Searchkiq{
-		Enabled:  true,
+		Enabled:  &defaultEnabled,
 		CPU:      "750m",
 		Memory:   "750Mi",
 		Replicas: 1,
 	},
 
 	Systemkiq: Systemkiq{
-		Enabled:  true,
+		Enabled:  &defaultEnabled,
 		CPU:      "500m",
 		Memory:   "500Mi",
 		Replicas: 1,
 	},
 
 	Hyper: Hyper{
-		Enabled:                 true,
+		Enabled:                 &defaultEnabled,
 		Image:                   "cnvrg/hyper-server:latest",
 		Port:                    5050,
 		Replicas:                1,
@@ -274,12 +276,12 @@ var controlPlanDefault = ControlPlane{
 		MemoryRequest:           "200Mi",
 		CPULimit:                "2000m",
 		MemoryLimit:             "4Gi",
-		EnableReadinessProbe:    true,
 		ReadinessPeriodSeconds:  100,
 		ReadinessTimeoutSeconds: 60,
 	},
 
 	Seeder: Seeder{
+
 		Image:           "docker.io/cnvrg/cnvrg-boot:v0.27-tenancy",
 		SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
 		CreateBucketCmd: "mb.sh",
@@ -295,7 +297,7 @@ var controlPlanDefault = ControlPlane{
 		DefaultComputeConfig: "/opt/kube",
 		DefaultComputeName:   "default",
 		UseStdout:            "true",
-		ExtractTagsFromCmd:   "false",
+		ExtractTagsFromCmd:   "&defaultEnabled",
 		CheckJobExpiration:   "true",
 		AgentCustomTag:       "latest",
 		Intercom:             "true",
@@ -305,6 +307,7 @@ var controlPlanDefault = ControlPlane{
 	},
 
 	ObjectStorage: ObjectStorage{
+
 		CnvrgStorageType:             "minio",
 		CnvrgStorageBucket:           "cnvrg-storage",
 		CnvrgStorageAccessKey:        "AKIAIOSFODNN7EXAMPLE",
@@ -325,17 +328,18 @@ var controlPlanDefault = ControlPlane{
 	},
 
 	Ldap: Ldap{
-		Enabled:       false,
+		Enabled:       &defaultEnabled,
 		Host:          "",
 		Port:          "",
 		Account:       "userPrincipalName",
 		Base:          "", // dc=my-domain,dc=local
 		AdminUser:     "",
 		AdminPassword: "",
-		Ssl:           "", // true/false
+		Ssl:           "", // true/&defaultEnabled
 	},
 
 	Rbac: Rbac{
+
 		Role:               "cnvrg-control-plan-role",
 		ServiceAccountName: "cnvrg",
 		RoleBindingName:    "cnvrg-control-plan-binding",
@@ -350,8 +354,8 @@ var controlPlanDefault = ControlPlane{
 	},
 
 	Tenancy: Tenancy{
-		Enabled:        false,
-		DedicatedNodes: "false",
+		Enabled:        &defaultEnabled,
+		DedicatedNodes: "&defaultEnabled",
 		Key:            "cnvrg-taint",
 		Value:          "true",
 	},

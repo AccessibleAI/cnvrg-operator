@@ -31,7 +31,7 @@ spec:
         effect: "NoSchedule"
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
       containers:
-      {{- if .Spec.SSO.Enabled }}
+      {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"
         image: {{ .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
@@ -66,7 +66,7 @@ spec:
             name: {{ .Spec.Dbs.Pg.CredsRef }}
         - secretRef:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
-        {{- if .Spec.Monitoring.Prometheus.Enabled }}
+        {{- if isTrue .Spec.Monitoring.Prometheus.Enabled }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
         {{- end }}
@@ -93,7 +93,7 @@ spec:
           mountPath: "{{ .Spec.ControlPlane.ObjectStorage.GcpKeyfileMountPath }}"
           readOnly: true
         {{- end }}
-      {{- if .Spec.SSO.Enabled }}
+      {{- if isTrue .Spec.SSO.Enabled }}
       volumes:
       - name: "oauth-proxy-webapp"
         secret:
@@ -111,12 +111,12 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
+          {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
           value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
           {{- else }}
           value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }}"
           {{ end }}
-      {{- if and ( .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
+      {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "minio") }}
       - name: create-cnvrg-bucket
         image: {{ .Spec.ControlPlane.Seeder.Image }}
         command: ["/bin/bash","-c", "{{ .Spec.ControlPlane.Seeder.CreateBucketCmd }}"]
@@ -125,7 +125,7 @@ spec:
         - secretRef:
             name: cp-object-storage
       {{- end }}
-      {{- if .Spec.Dbs.Pg.Fixpg }}
+      {{- if isTrue .Spec.Dbs.Pg.Fixpg }}
       - name: fixpg
         image: {{.Spec.ControlPlane.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]

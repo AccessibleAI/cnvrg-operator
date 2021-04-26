@@ -4,6 +4,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var defaultEnabled = false
+var defaultTrue = true
+
 type CnvrgAppSpec struct {
 	ClusterDomain    string             `json:"clusterDomain,omitempty"`
 	NamespaceTenancy bool               `json:"namespaceTenancy,omitempty"`

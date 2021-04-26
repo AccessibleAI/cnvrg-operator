@@ -171,13 +171,13 @@ func kibanaOauthProxy() []*desired.State {
 func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.Logging.Enabled == true && cnvrgApp.Spec.Logging.Elastalert.Enabled == true {
+	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.Logging.Elastalert.Enabled {
 		state = append(state, elastAlert()...)
 	}
-	if cnvrgApp.Spec.Logging.Enabled == true && cnvrgApp.Spec.Logging.Kibana.Enabled == true {
+	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		state = append(state, kibana()...)
 	}
-	if cnvrgApp.Spec.Logging.Enabled == true && cnvrgApp.Spec.SSO.Enabled == true && cnvrgApp.Spec.Logging.Kibana.Enabled == true {
+	if *cnvrgApp.Spec.Logging.Enabled && *cnvrgApp.Spec.SSO.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		state = append(state, kibanaOauthProxy()...)
 	}
 
@@ -187,7 +187,7 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 func InfraLoggingState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
 
-	if infra.Spec.Logging.Enabled == true {
+	if *infra.Spec.Logging.Enabled {
 		state = append(state, fluentbitState()...)
 	}
 

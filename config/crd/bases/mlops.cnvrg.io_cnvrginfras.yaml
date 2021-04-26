@@ -47,7 +47,7 @@ spec:
                 properties:
                   redis:
                     properties:
-                      CredsRef:
+                      credsRef:
                         type: string
                       enabled:
                         type: boolean
@@ -86,7 +86,7 @@ spec:
                           type: string
                         type: object
                     required:
-                    - CredsRef
+                    - credsRef
                     - serviceAccount
                     type: object
                 type: object
@@ -163,8 +163,6 @@ spec:
                     type: object
                   prometheus:
                     properties:
-                      UpstreamRef:
-                        type: string
                       basicAuthProxyImage:
                         type: string
                       cpuRequest:
@@ -187,8 +185,10 @@ spec:
                         type: string
                       svcName:
                         type: string
+                      upstreamRef:
+                        type: string
                     required:
-                    - UpstreamRef
+                    - upstreamRef
                     type: object
                   prometheusOperator:
                     properties:
@@ -222,8 +222,6 @@ spec:
                     type: object
                   ingress:
                     properties:
-                      enabled:
-                        type: boolean
                       ingressType:
                         enum:
                         - istio

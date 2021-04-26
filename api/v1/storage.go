@@ -1,13 +1,13 @@
 package v1
 
 type Storage struct {
-	Enabled  bool     `json:"enabled,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
 	Hostpath Hostpath `json:"hostpath,omitempty"`
 	Nfs      Nfs      `json:"nfs,omitempty"`
 }
 
 type Hostpath struct {
-	Enabled          bool   `json:"enabled,omitempty"`
+	Enabled          *bool  `json:"enabled,omitempty"`
 	Image            string `json:"image,omitempty"`
 	HostPath         string `json:"hostPath,omitempty"`
 	StorageClassName string `json:"storageClassName,omitempty"`
@@ -17,11 +17,11 @@ type Hostpath struct {
 	CPULimit         string `json:"cpuLimit,omitempty"`
 	MemoryLimit      string `json:"memoryLimit,omitempty"`
 	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
-	DefaultSc        bool   `json:"defaultSc,omitempty"`
+	DefaultSc        *bool  `json:"defaultSc,omitempty"`
 }
 
 type Nfs struct {
-	Enabled          bool   `json:"enabled,omitempty"`
+	Enabled          *bool  `json:"enabled,omitempty"`
 	Image            string `json:"image,omitempty"`
 	Provisioner      string `json:"provisioner,omitempty"`
 	StorageClassName string `json:"storageClassName,omitempty"`
@@ -32,13 +32,13 @@ type Nfs struct {
 	CPULimit         string `json:"cpuLimit,omitempty"`
 	MemoryLimit      string `json:"memoryLimit,omitempty"`
 	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
-	DefaultSc        bool   `json:"defaultSc,omitempty"`
+	DefaultSc        *bool  `json:"defaultSc,omitempty"`
 }
 
 var storageDefault = Storage{
-	Enabled: false,
+	Enabled: &defaultEnabled,
 	Hostpath: Hostpath{
-		Enabled:          false,
+		Enabled:          &defaultEnabled,
 		Image:            "quay.io/kubevirt/hostpath-provisioner",
 		HostPath:         "/cnvrg-hostpath-storage",
 		StorageClassName: "cnvrg-hostpath-storage",
@@ -48,10 +48,10 @@ var storageDefault = Storage{
 		CPULimit:         "200m",
 		MemoryLimit:      "200Mi",
 		ReclaimPolicy:    "Retain",
-		DefaultSc:        false,
+		DefaultSc:        &defaultEnabled,
 	},
 	Nfs: Nfs{
-		Enabled:          false,
+		Enabled:          &defaultEnabled,
 		Image:            "gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0",
 		Provisioner:      "cnvrg.io/ifs",
 		StorageClassName: "cnvrg-nfs-storage",
@@ -62,6 +62,6 @@ var storageDefault = Storage{
 		CPULimit:         "100m",
 		MemoryLimit:      "200Mi",
 		ReclaimPolicy:    "Retain",
-		DefaultSc:        false,
+		DefaultSc:        &defaultEnabled,
 	},
 }

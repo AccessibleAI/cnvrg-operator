@@ -5,7 +5,7 @@ metadata:
   namespace: {{ ns . }}
 data:
   DEFAULT_COMPUTE_CLUSTER_DOMAIN: "{{ defaultComputeClusterDomain .}}"
-  DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ .Spec.Networking.HTTPS.Enabled }}"
+  DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ isTrue .Spec.Networking.HTTPS.Enabled }}"
   AGENT_CUSTOM_TAG: "{{ .Spec.ControlPlane.BaseConfig.AgentCustomTag }}"
   PASSENGER_APP_ENV: "{{ .Spec.ControlPlane.BaseConfig.PassengerAppEnv }}"
   RAILS_ENV: "{{ .Spec.ControlPlane.BaseConfig.RailsEnv }}"
@@ -19,7 +19,7 @@ data:
   SHOW_INTERCOM: "{{ .Spec.ControlPlane.BaseConfig.Intercom }}"
   SPLIT_SIDEKIQ: "{{ .Spec.ControlPlane.Sidekiq.Split }}"
   CNVRG_PASSENGER_MAX_POOL_SIZE: "{{ .Spec.ControlPlane.WebApp.PassengerMaxPoolSize }}"
-  OAUTH_PROXY_ENABLED: "{{ .Spec.SSO.Enabled }}"
+  OAUTH_PROXY_ENABLED: "{{ isTrue .Spec.SSO.Enabled }}"
   OAUTH_ADMIN_USER: "{{ .Spec.SSO.AdminUser }}"
   CNVRG_PASSENGER_BIND_ADDRESS: "{{ cnvrgPassengerBindAddress . }}"
   CNVRG_PASSENGER_BIND_PORT: "{{ cnvrgPassengerBindPort . }}"

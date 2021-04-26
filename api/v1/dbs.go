@@ -1,13 +1,13 @@
 package v1
 
 type HugePages struct {
-	Enabled bool   `json:"enabled,omitempty"`
+	Enabled *bool  `json:"enabled,omitempty"`
 	Size    string `json:"size,omitempty"`
 	Memory  string `json:"memory,omitempty"`
 }
 
 type Pg struct {
-	Enabled        bool              `json:"enabled,omitempty"`
+	Enabled        *bool             `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount"`
 	SecretName     string            `json:"secretName,omitempty"`
 	Image          string            `json:"image,omitempty"`
@@ -20,14 +20,14 @@ type Pg struct {
 	MaxConnections int               `json:"maxConnections,omitempty"`
 	SharedBuffers  string            `json:"sharedBuffers,omitempty"`
 	HugePages      HugePages         `json:"hugePages,omitempty"`
-	Fixpg          bool              `json:"fixpg,omitempty"`
+	Fixpg          *bool             `json:"fixpg,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
 	CredsRef       string            `json:"credsRef"`
 }
 
 type Minio struct {
-	Enabled        bool              `json:"enabled,omitempty"`
+	Enabled        *bool             `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Replicas       int               `json:"replicas,omitempty"`
 	Image          string            `json:"image,omitempty"`
@@ -44,7 +44,7 @@ type Minio struct {
 }
 
 type Redis struct {
-	Enabled        bool              `json:"enabled,omitempty"`
+	Enabled        *bool             `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount"`
 	Image          string            `json:"image,omitempty"`
 	SvcName        string            `json:"svcName,omitempty"`
@@ -55,11 +55,11 @@ type Redis struct {
 	Requests       Requests          `json:"requests,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations    map[string]string `json:"tolerations,omitempty"`
-	CredsRef       string            `json:"CredsRef"`
+	CredsRef       string            `json:"credsRef"`
 }
 
 type Es struct {
-	Enabled        bool              `json:"enabled,omitempty"`
+	Enabled        *bool             `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
@@ -92,7 +92,7 @@ type InfraDbs struct {
 }
 
 var minioDefaults = Minio{
-	Enabled:        true,
+	Enabled:        &defaultEnabled,
 	ServiceAccount: "minio",
 	Replicas:       1,
 	Image:          "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
@@ -104,7 +104,7 @@ var minioDefaults = Minio{
 	CPURequest:     "1000m",
 	MemoryRequest:  "2Gi",
 	SharedStorage: SharedStorage{
-		Enabled:          false,
+		Enabled:          &defaultEnabled,
 		UseExistingClaim: "",
 		ConsistentHash: ConsistentHash{
 			Key:   "httpQueryParameterName",
@@ -114,7 +114,7 @@ var minioDefaults = Minio{
 }
 
 var pgDefault = Pg{
-	Enabled:        true,
+	Enabled:        &defaultEnabled,
 	ServiceAccount: "pg",
 	SecretName:     "cnvrg-pg-secret",
 	Image:          "centos/postgresql-12-centos7",
@@ -126,11 +126,11 @@ var pgDefault = Pg{
 	MemoryRequest:  "4Gi",
 	MaxConnections: 100,
 	SharedBuffers:  "64MB",
-	Fixpg:          true,
+	Fixpg:          &defaultTrue,
 	NodeSelector:   nil,
 	Tolerations:    nil,
 	HugePages: HugePages{
-		Enabled: false,
+		Enabled: &defaultEnabled,
 		Size:    "2Mi",
 		Memory:  "",
 	},
@@ -138,7 +138,7 @@ var pgDefault = Pg{
 }
 
 var redisDefault = Redis{
-	Enabled:        true,
+	Enabled:        &defaultEnabled,
 	ServiceAccount: "redis",
 	Image:          "docker.io/cnvrg/cnvrg-redis:v3.0.5.c2",
 	SvcName:        "redis",
@@ -159,7 +159,7 @@ var redisDefault = Redis{
 }
 
 var esDefault = Es{
-	Enabled:        true,
+	Enabled:        &defaultEnabled,
 	ServiceAccount: "es",
 	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1.a1",
 	Port:           9200,

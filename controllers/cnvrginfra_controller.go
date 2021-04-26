@@ -171,20 +171,22 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// redis
-	cnvrgInfraLog.Info("applying redis")
-	if err := desired.CreateRedisCredsSecret(cnvrgInfra,
-		cnvrgInfra.Spec.Dbs.Redis.CredsRef,
-		cnvrgInfra.Spec.InfraNamespace,
-		fmt.Sprintf("%s:%d", cnvrgInfra.Spec.Dbs.Redis.SvcName, cnvrgInfra.Spec.Dbs.Redis.Port),
-		r,
-		r.Scheme,
-		cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-		reconcileResult = err
-	}
-	if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-		reconcileResult = err
+	if *cnvrgInfra.Spec.Dbs.Redis.Enabled || *cnvrgInfra.Spec.SSO.Enabled {
+		cnvrgInfraLog.Info("applying redis")
+		if err := desired.CreateRedisCredsSecret(cnvrgInfra,
+			cnvrgInfra.Spec.Dbs.Redis.CredsRef,
+			cnvrgInfra.Spec.InfraNamespace,
+			fmt.Sprintf("%s:%d", cnvrgInfra.Spec.Dbs.Redis.SvcName, cnvrgInfra.Spec.Dbs.Redis.Port),
+			r,
+			r.Scheme,
+			cnvrgInfraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			reconcileResult = err
+		}
+		if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			reconcileResult = err
+		}
 	}
 
 	// logging
@@ -229,7 +231,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// nvidia device plugin
-	if cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled == true {
+	if *cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled {
 		cnvrgInfraLog.Info("nvidia device plugin")
 		nvidiaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
@@ -249,6 +251,9 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
+	if !*infra.Spec.Monitoring.Enabled {
+		return nil
+	}
 	err := desired.CreatePromCredsSecret(infra, infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, r.Scheme, cnvrgInfraLog)
 	if err != nil {
 
@@ -292,7 +297,7 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 
 func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
-	if cnvrgInfra.Spec.Monitoring.Enabled != true {
+	if !*cnvrgInfra.Spec.Monitoring.Enabled {
 		cnvrgInfraLog.Info("monitoring disabled, skipping grafana deployment")
 		return nil
 	}
