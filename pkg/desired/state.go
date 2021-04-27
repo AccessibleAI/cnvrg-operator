@@ -295,7 +295,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
       - '%s'
 `, "cnvrgApp.Spec.Monitoring.UpstreamPrometheus")
 		},
-		"grafanaDataSource": func(promSvc string, ns string, promPort int, user string, pass string) string {
+		"grafanaDataSource": func(promUrl, user, pass string) string {
 			return fmt.Sprintf(`
 {
     "apiVersion": 1,
@@ -306,7 +306,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
             "name": "prometheus",
             "orgId": 1,
             "type": "prometheus",
-            "url": "http://%s.%s.svc:%d",
+            "url": "%s",
             "version": 1,
             "basicAuth": true,
             "basicAuthUser": "%s",
@@ -314,9 +314,12 @@ func cnvrgTemplateFuncs() map[string]interface{} {
             "secureJsonFields": {
               "basicAuthPassword": true
             },
+            "jsonData": {
+                "tlsSkipVerify": true
+            },
         }
     ]
-}`, promSvc, ns, promPort, user, pass)
+}`, promUrl, user, pass)
 		},
 		"grafanaDashboards": func(obj interface{}) []string {
 			return getGrafanaDashboards(obj)
@@ -508,31 +511,37 @@ func (s *State) dumpTemplateToFile() error {
 	return nil
 }
 
-func GetPromCredsSecret(secretName string, secretNs string, client client.Client, log logr.Logger) (user string, pass string, err error) {
+func GetPromCredsSecret(secretName string, secretNs string, client client.Client, log logr.Logger) (url, user, pass string, err error) {
 	user = "cnvrg"
 	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
 	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
 		log.Error(err, "Prometheus creds secret not found", "name", secretName)
-		return "", "", err
+		return "", "", "", err
 	} else if err != nil {
 		log.Error(err, "can't get prometheus creds secret", "name", secretName)
-		return "", "", err
+		return "", "", "", err
 	}
 
 	if _, ok := creds.Data["CNVRG_PROMETHEUS_USER"]; !ok {
 		err := fmt.Errorf("prometheus creds secret %s missing require field CNVRG_PROMETHEUS_USER", namespacedName.Name)
 		log.Error(err, "missing required field")
-		return "", "", err
+		return "", "", "", err
 	}
 
 	if _, ok := creds.Data["CNVRG_PROMETHEUS_PASS"]; !ok {
 		err := fmt.Errorf("prometheus creds secret %s missing require field CNVRG_PROMETHEUS_PASS", namespacedName.Name)
 		log.Error(err, "missing required field")
-		return "", "", err
+		return "", "", "", err
 	}
 
-	return string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_PASS"]), nil
+	if _, ok := creds.Data["CNVRG_PROMETHEUS_URL"]; !ok {
+		err := fmt.Errorf("prometheus creds secret %s missing require field CNVRG_PROMETHEUS_URL", namespacedName.Name)
+		log.Error(err, "missing required field")
+		return "", "", "", err
+	}
+
+	return string(creds.Data["CNVRG_PROMETHEUS_URL"]), string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_PASS"]), nil
 }
 
 func GetRedisCredsSecret(secretName string, secretNs string, client client.Client, log logr.Logger) (pass string, err error) {
@@ -583,7 +592,7 @@ func CreateRedisCredsSecret(obj v1.Object, secretName, secretNs, redisUrl string
 	return nil
 }
 
-func CreatePromCredsSecret(obj v1.Object, secretName string, secretNs string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
+func CreatePromCredsSecret(obj v1.Object, secretName, secretNs, promUrl string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
 	user := "cnvrg"
 	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
 	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
@@ -596,12 +605,13 @@ func CreatePromCredsSecret(obj v1.Object, secretName string, secretNs string, cl
 		pass := RandomString()
 		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
 		if err != nil {
-			log.Error(err, "error generating prometheus hash ")
+			log.Error(err, "error generating prometheus hash")
 			return err
 		}
 		creds.Data = map[string][]byte{
 			"CNVRG_PROMETHEUS_USER": []byte(user),
 			"CNVRG_PROMETHEUS_PASS": []byte(pass),
+			"CNVRG_PROMETHEUS_URL":  []byte(promUrl),
 			"htpasswd":              []byte(fmt.Sprintf("%s:%s", user, passHash)),
 		}
 		if err := client.Create(context.Background(), &creds); err != nil {

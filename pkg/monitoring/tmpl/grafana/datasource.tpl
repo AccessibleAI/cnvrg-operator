@@ -5,5 +5,5 @@ metadata:
   namespace: {{ .Namespace }}
 type: Opaque
 data:
-  datasources.yaml: {{ grafanaDataSource .Data.Svc .Namespace .Data.Port .Data.User .Data.Pass | b64enc }}
+  datasources.yaml: {{ grafanaDataSource .Data.Url .Data.User .Data.Pass | b64enc }}
 

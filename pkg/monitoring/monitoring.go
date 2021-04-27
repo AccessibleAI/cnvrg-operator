@@ -546,7 +546,6 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		}
 	}
 
-
 	return state
 }
 

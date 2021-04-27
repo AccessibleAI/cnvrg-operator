@@ -112,6 +112,20 @@ enable SSO
   ...  
 ```
 
+#### External Monitoring with OpenShift
+1. Get user and password for OpenShift Prometheus instance 
+```bash
+CNVRG_PROMETHEUS_USER=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthUser')
+CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthPassword')
+CNVRG_PROMETHEUS_URL=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
+
+kubectl create secret generic prom-creds -ncnvrg \
+ --from-literal=CNVRG_PROMETHEUS_USER=$CNVRG_PROMETHEUS_USER \
+ --from-literal=CNVRG_PROMETHEUS_PASS=$CNVRG_PROMETHEUS_PASS \
+ --from-literal=CNVRG_PROMETHEUS_URL=$CNVRG_PROMETHEUS_URL
+
+```
+
 ### Chart options 
 |**key**|**default value**
 | ---|---| 

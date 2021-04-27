@@ -440,7 +440,12 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
 	if *app.Spec.Monitoring.Prometheus.Enabled {
 		cnvrgAppLog.Info("applying monitoring")
-		if err := desired.CreatePromCredsSecret(app, app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, r.Scheme, cnvrgAppLog); err != nil {
+		if err := desired.CreatePromCredsSecret(app,
+			app.Spec.Monitoring.Prometheus.CredsRef,
+			app.Namespace, fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
+			r,
+			r.Scheme,
+			cnvrgAppLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
@@ -459,7 +464,7 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 		// grafana datasource
 		cnvrgInfraLog.Info("applying grafana datasource")
 
-		user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, cnvrgAppLog)
+		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, cnvrgAppLog)
 		if err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
@@ -467,8 +472,7 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 		grafanaDatasourceData := desired.TemplateData{
 			Namespace: app.Namespace,
 			Data: map[string]interface{}{
-				"Svc":  app.Spec.Monitoring.Prometheus.SvcName,
-				"Port": app.Spec.Monitoring.Prometheus.Port,
+				"Url":  url,
 				"User": user,
 				"Pass": pass,
 			},
@@ -520,7 +524,7 @@ func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) err
 			return err
 		}
 
-		user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, cnvrgInfraLog)
+		_, user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, cnvrgInfraLog)
 		if err != nil {
 			cnvrgAppLog.Error(err, "can't get cnvrgInfra prometheus creds", "name", namespacedName.Name)
 			return err

@@ -251,38 +251,45 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
-	err := desired.CreatePromCredsSecret(infra, infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, r.Scheme, cnvrgInfraLog)
-	if err != nil {
+	if *infra.Spec.Monitoring.Prometheus.Enabled {
+		err := desired.CreatePromCredsSecret(infra,
+			infra.Spec.Monitoring.Prometheus.CredsRef,
+			infra.Spec.InfraNamespace,
+			fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
+			r,
+			r.Scheme,
+			cnvrgInfraLog)
+		if err != nil {
 
-		return err
+			return err
+		}
 	}
 
-	// grafana dashboards
-	cnvrgInfraLog.Info("applying grafana dashboards")
-	if err := r.createGrafanaDashboards(infra); err != nil {
-		return err
-	}
+	if *infra.Spec.Monitoring.Grafana.Enabled {
+		// grafana dashboards
+		cnvrgInfraLog.Info("applying grafana dashboards")
+		if err := r.createGrafanaDashboards(infra); err != nil {
+			return err
+		}
 
-	// grafana datasource
-	cnvrgInfraLog.Info("applying grafana datasource")
-	basicAuthUser, basicAuthPass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, cnvrgInfraLog)
-	if err != nil {
-		return err
+		// grafana datasource
+		cnvrgInfraLog.Info("applying grafana datasource")
+		url, basicAuthUser, basicAuthPass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, cnvrgInfraLog)
+		if err != nil {
+			return err
+		}
+		grafanaDatasourceData := desired.TemplateData{
+			Namespace: infra.Spec.InfraNamespace,
+			Data: map[string]interface{}{
+				"Url":  url,
+				"User": basicAuthUser,
+				"Pass": basicAuthPass,
+			},
+		}
+		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+			return err
+		}
 	}
-
-	grafanaDatasourceData := desired.TemplateData{
-		Namespace: infra.Spec.InfraNamespace,
-		Data: map[string]interface{}{
-			"Svc":  infra.Spec.Monitoring.Prometheus.SvcName,
-			"Port": infra.Spec.Monitoring.Prometheus.Port,
-			"User": basicAuthUser,
-			"Pass": basicAuthPass,
-		},
-	}
-	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
-		return err
-	}
-
 	// monitoring
 	cnvrgInfraLog.Info("applying monitoring")
 	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
