@@ -149,6 +149,8 @@ spec:
           value: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
         - name: "CNVRG_PG_CREDS"
           value: {{ .Spec.Dbs.Pg.CredsRef }}
+        - name: "CNVRG_REDIS_CREDS"
+          value: {{ .Spec.Dbs.Redis.CredsRef }}
         {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: "{{ .Spec.ControlPlane.OjbectStorage.GcpStorageSecret }}"
