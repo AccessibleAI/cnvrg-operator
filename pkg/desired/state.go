@@ -566,9 +566,10 @@ func CreateRedisCredsSecret(obj v1.Object, secretName, secretNs, redisUrl string
 
 		pass := RandomString()
 		creds.Data = map[string][]byte{
-			"REDIS_URL":                         []byte(pass),
-			"redis.conf":                        []byte(redisConf(pass)),
+			"CNVRG_REDIS_PASSWORD":              []byte(pass),
+			"REDIS_URL":                         []byte(fmt.Sprintf("redis://:%s@%s", pass, redisUrl)), // for cnvrg webapp/sidekiq
 			"OAUTH2_PROXY_REDIS_CONNECTION_URL": []byte(fmt.Sprintf("redis://:%s@%s", pass, redisUrl)), // for oauth2 proxy
+			"redis.conf":                        []byte(redisConf(pass)),
 		}
 		if err := client.Create(context.Background(), &creds); err != nil {
 			log.Error(err, "error creating redis creds", "name", namespacedName.Name)
