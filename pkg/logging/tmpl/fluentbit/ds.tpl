@@ -40,6 +40,10 @@ spec:
               readOnly: true
             - name: fluent-bit-config
               mountPath: /opt/app-root/etc/
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsGroup: 0
       terminationGracePeriodSeconds: 10
       volumes:
         - name: varlog

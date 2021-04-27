@@ -11,8 +11,7 @@ rules:
 - apiGroups:
     - security.openshift.io
   resourceNames:
-    - hostaccess
-    - anyuid
+    - privileged
   resources:
     - securitycontextconstraints
   verbs:
