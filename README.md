@@ -125,7 +125,41 @@ kubectl create secret generic prom-creds -ncnvrg \
  --from-literal=CNVRG_PROMETHEUS_URL=$CNVRG_PROMETHEUS_URL
 
 ```
-
+2. Manually deploy ServiceMonitors
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cnvrg-jobs
+  namespace: openshift-monitoring
+  labels:
+    app: cnvrg-jobs
+spec:
+  jobLabel: cnvrg-job
+  selector:
+    matchLabels:
+      exporter: cnvrg-job
+  endpoints:
+    - interval: 30s
+      scrapeTimeout: 10s
+      port: "http"
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: dcgm-exporter
+  namespace: openshift-monitoring
+  labels:
+    app: "dcgm-exporter"
+spec:
+  selector:
+    matchLabels:
+      app: "dcgm-exporter"
+  endpoints:
+    - port: "metrics"
+      path: "/metrics"
+      interval: "15s"
+``` 
 ### Chart options 
 |**key**|**default value**
 | ---|---| 

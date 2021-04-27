@@ -47,11 +47,15 @@ spec:
           - secretRef:
               name: cp-object-storage
           - secretRef:
-              name: {{ .Spec.Dbs.Pg.CredsRef }}
-          - secretRef:
               name: cp-smtp
           - secretRef:
+              name: {{ .Spec.Dbs.Es.CredsRef }}
+          - secretRef:
+              name: {{ .Spec.Dbs.Pg.CredsRef }}
+          - secretRef:
               name: {{ .Spec.Dbs.Redis.CredsRef }}
+          - secretRef:
+              name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
         resources:
           requests:
             cpu: {{ .Spec.ControlPlane.Searchkiq.CPU }}

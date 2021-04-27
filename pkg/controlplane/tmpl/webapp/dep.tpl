@@ -60,10 +60,8 @@ spec:
             name: {{ .Spec.Dbs.Pg.CredsRef }}
         - secretRef:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
-        {{- if isTrue .Spec.Monitoring.Prometheus.Enabled }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
-        {{- end }}
         name: cnvrg-app
         ports:
           - containerPort: {{ .Spec.ControlPlane.WebApp.Port }}

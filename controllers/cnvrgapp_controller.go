@@ -150,13 +150,16 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 		}
 
 		pass = desired.RandomString()
+		esUrl := fmt.Sprintf("http://%s:%s@%s.%s.svc:%d", user, pass, app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port)
 		creds.Data = map[string][]byte{
-			"CNVRG_ES_USER":          []byte(user), // envs for webapp/sidekiq
-			"CNVRG_ES_PASS":          []byte(pass), // envs for webapp/sidekiq
-			"ES_USERNAME":            []byte(user), // envs for elastalerts
-			"ES_PASSWORD":            []byte(pass), // envs for elastalerts
-			"ELASTICSEARCH_USERNAME": []byte(user), // envs for kibana
-			"ELASTICSEARCH_PASSWORD": []byte(pass), // envs for kibana
+			"CNVRG_ES_USER":          []byte(user),  // envs for webapp/kiqs
+			"CNVRG_ES_PASS":          []byte(pass),  // envs for webapp/kiqs
+			"ELASTICSEARCH_URL":      []byte(esUrl), // envs for webapp/kiqs
+			"ES_USERNAME":            []byte(user),  // envs for elastalerts
+			"ES_PASSWORD":            []byte(pass),  // envs for elastalerts
+			"ELASTICSEARCH_USERNAME": []byte(user),  // envs for kibana
+			"ELASTICSEARCH_PASSWORD": []byte(pass),  // envs for kibana
+
 		}
 		if err := r.Create(context.Background(), &creds); err != nil {
 			cnvrgAppLog.Error(err, "error creating es creds", "name", namespacedName.Name)
