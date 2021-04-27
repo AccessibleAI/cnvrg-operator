@@ -22,7 +22,7 @@ type Prometheus struct {
 	StorageSize         string `json:"storageSize,omitempty"`
 	StorageClass        string `json:"storageClass,omitempty"`
 	CredsRef            string `json:"credsRef,omitempty"`
-	UpstreamRef         string `json:"upstreamRef"`
+	UpstreamRef         string `json:"upstreamRef,omitempty"`
 }
 
 type NodeExporter struct {

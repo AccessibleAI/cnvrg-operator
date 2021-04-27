@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: grafana
+  name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
 imagePullSecrets:
   - name: {{ .Spec.Registry.Name }}

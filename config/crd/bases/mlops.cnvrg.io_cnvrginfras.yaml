@@ -187,8 +187,6 @@ spec:
                         type: string
                       upstreamRef:
                         type: string
-                    required:
-                    - upstreamRef
                     type: object
                   prometheusOperator:
                     properties:

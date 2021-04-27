@@ -282,7 +282,7 @@ var controlPlanDefault = ControlPlane{
 
 	Seeder: Seeder{
 
-		Image:           "docker.io/cnvrg/cnvrg-boot:v0.27-tenancy",
+		Image:           "docker.io/cnvrg/cnvrg-boot:v0.31-tenancy",
 		SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
 		CreateBucketCmd: "mb.sh",
 	},
@@ -340,9 +340,9 @@ var controlPlanDefault = ControlPlane{
 
 	Rbac: Rbac{
 
-		Role:               "cnvrg-control-plan-role",
+		Role:               "cnvrg-control-plane-role",
 		ServiceAccountName: "cnvrg",
-		RoleBindingName:    "cnvrg-control-plan-binding",
+		RoleBindingName:    "cnvrg-control-plane-binding",
 	},
 
 	SMTP: SMTP{

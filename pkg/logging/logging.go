@@ -90,6 +90,32 @@ func KibanaConfSecret(data desired.TemplateData) []*desired.State {
 	}
 }
 
+func kibanaIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/kibana/vs.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+		},
+	}
+}
+
+func kibanaOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/kibana/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
+			Own:            true,
+		},
+	}
+}
+
 func kibana() []*desired.State {
 	return []*desired.State{
 		{
@@ -130,14 +156,6 @@ func kibana() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
-			Own:            true,
-		},
-		{
-			TemplatePath:   path + "/kibana/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
 		},
 	}
@@ -215,9 +233,18 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	}
 	if *cnvrgApp.Spec.Logging.Kibana.Enabled {
 		state = append(state, kibana()...)
-	}
-	if *cnvrgApp.Spec.SSO.Enabled && *cnvrgApp.Spec.Logging.Kibana.Enabled {
-		state = append(state, kibanaOauthProxy()...)
+
+		if *cnvrgApp.Spec.SSO.Enabled {
+			state = append(state, kibanaOauthProxy()...)
+		}
+
+		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+			state = append(state, kibanaIstioVs()...)
+		}
+
+		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+			state = append(state, kibanaOcpRoute()...)
+		}
 	}
 
 	return state

@@ -21,6 +21,9 @@ spec:
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
     spec:
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"

@@ -5,6 +5,14 @@ metadata:
   namespace: {{ ns . }}
 rules:
 - apiGroups:
+    - security.openshift.io
+  resourceNames:
+    - anyuid
+  resources:
+    - securitycontextconstraints
+  verbs:
+    - use
+- apiGroups:
     - ""
   resources:
     - services

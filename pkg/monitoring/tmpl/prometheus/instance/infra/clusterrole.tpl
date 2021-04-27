@@ -4,6 +4,14 @@ metadata:
   name: cnvrg-infra-prometheus
 rules:
 - apiGroups:
+    - security.openshift.io
+  resourceNames:
+    - anyuid
+  resources:
+    - securitycontextconstraints
+  verbs:
+    - use
+- apiGroups:
     - ""
   resources:
     - services

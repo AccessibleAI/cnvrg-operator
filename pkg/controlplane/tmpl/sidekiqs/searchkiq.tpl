@@ -16,6 +16,9 @@ spec:
         app: searchkiq
     spec:
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       terminationGracePeriodSeconds: 60
       containers:
       - name: sidekiq

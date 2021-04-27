@@ -187,6 +187,22 @@ func grafanaState() []*desired.State {
 			Own:            true,
 		},
 		{
+			TemplatePath:   path + "/grafana/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/grafana/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/grafana/svc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -511,12 +527,25 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	if *cnvrgApp.Spec.SSO.Enabled {
 		state = append(state, grafanaOauthProxy()...)
 	}
-	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
-		state = append(state, promIstioVs()...)
+
+	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
+			state = append(state, promIstioVs()...)
+		}
+		if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+			state = append(state, grafanaIstioVs()...)
+		}
 	}
-	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
-		state = append(state, promOcpRoute()...)
+
+	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
+			state = append(state, promOcpRoute()...)
+		}
+		if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+			state = append(state, grafanaOcpRoute()...)
+		}
 	}
+
 
 	return state
 }

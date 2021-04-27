@@ -119,6 +119,20 @@ func webAppState() []*desired.State {
 			Own:            true,
 		},
 		{
+
+			TemplatePath:   path + "/webapp/oauth.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+		},
+	}
+}
+
+func webAppIstioVs() []*desired.State {
+	return []*desired.State{
+		{
 			TemplatePath:   path + "/webapp/vs.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -126,13 +140,17 @@ func webAppState() []*desired.State {
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
 		},
-		{
+	}
+}
 
-			TemplatePath:   path + "/webapp/oauth.tpl",
+func webAppOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/webapp/route.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
 			Own:            true,
 		},
 	}
@@ -273,6 +291,12 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		state = append(state, webAppState()...)
+		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+			state = append(state, webAppIstioVs()...)
+		}
+		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+			state = append(state, webAppOcpRoute()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.SSO.Enabled {
