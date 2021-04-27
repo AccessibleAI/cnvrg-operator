@@ -21,15 +21,6 @@ spec:
         app: {{ .Spec.ControlPlane.Hyper.SvcName }}
     spec:
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
-      {{- if .Spec.ControlPlane.Tenancy.Enabled }}
-      nodeSelector:
-        {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
-      {{- end }}
-      tolerations:
-        - key: "{{ .Spec.ControlPlane.Tenancy.Key }}"
-          operator: "Equal"
-          value: "{{ .Spec.ControlPlane.Tenancy.Value }}"
-          effect: "NoSchedule"
       containers:
         - image: {{ .Spec.ControlPlane.Hyper.Image }}
           name: {{ .Spec.ControlPlane.Hyper.SvcName }}

@@ -82,7 +82,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 		}
 	} else {
-		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
+		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			r.updateStatusMessage(mlopsv1.StatusRemoving, "removing cnvrg spec", cnvrgApp)
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
@@ -94,7 +94,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			if cnvrgInfra == nil {
 				return ctrl.Result{}, nil
 			}
-			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
+			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
 				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
 				return ctrl.Result{}, err
@@ -437,42 +437,47 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
-	// monitoring
-	cnvrgAppLog.Info("applying monitoring")
-	if err := desired.CreatePromCredsSecret(app, app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
-	}
-	if err := r.upstreamPrometheusConfig(app); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
-	}
-	// grafana dashboards
-	cnvrgAppLog.Info("applying grafana dashboards ")
-	if err := r.createGrafanaDashboards(app); err != nil {
-		return err
-	}
-	// grafana datasource
-	cnvrgInfraLog.Info("applying grafana datasource")
 
-	user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, cnvrgAppLog)
-	if err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
-	}
-	grafanaDatasourceData := desired.TemplateData{
-		Namespace: app.Namespace,
-		Data: map[string]interface{}{
-			"Svc":  app.Spec.Monitoring.Prometheus.SvcName,
-			"Port": app.Spec.Monitoring.Prometheus.Port,
-			"User": user,
-			"Pass": pass,
-		},
+	if *app.Spec.Monitoring.Prometheus.Enabled {
+		cnvrgAppLog.Info("applying monitoring")
+		if err := desired.CreatePromCredsSecret(app, app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, r.Scheme, cnvrgAppLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
+		if err := r.upstreamPrometheusConfig(app); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
 
-	if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+	if *app.Spec.Monitoring.Grafana.Enabled {
+		// grafana dashboards
+		cnvrgAppLog.Info("applying grafana dashboards ")
+		if err := r.createGrafanaDashboards(app); err != nil {
+			return err
+		}
+		// grafana datasource
+		cnvrgInfraLog.Info("applying grafana datasource")
+
+		user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, cnvrgAppLog)
+		if err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
+		grafanaDatasourceData := desired.TemplateData{
+			Namespace: app.Namespace,
+			Data: map[string]interface{}{
+				"Svc":  app.Spec.Monitoring.Prometheus.SvcName,
+				"Port": app.Spec.Monitoring.Prometheus.Port,
+				"User": user,
+				"Pass": pass,
+			},
+		}
+
+		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
 
 	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
@@ -751,7 +756,12 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// update infra reconciler cm
 	if err := r.triggerInfraReconciler(cnvrgApp, "remove"); err != nil {
-		return err
+		if err.Error() == "no CnvrgInfra objects was deployed, skipping infra reconciler" {
+			cnvrgInfraLog.Info("cnvrgInfra object not found, no need to trigger infra reconciler")
+		} else {
+			return err
+		}
+
 	}
 
 	// cleanup pvc

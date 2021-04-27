@@ -11,6 +11,30 @@ const path = "/pkg/logging/tmpl"
 func elastAlert() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/elastalert/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/elastalert/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/elastalert/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/elastalert/pvc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -74,6 +98,22 @@ func kibana() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/kibana/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/kibana/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
 		},
 		{

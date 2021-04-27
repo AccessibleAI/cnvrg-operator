@@ -15,15 +15,6 @@ spec:
       labels:
         app: sidekiq
     spec:
-      {{- if .Spec.ControlPlane.Tenancy.Enabled }}
-      nodeSelector:
-        {{ .Spec.ControlPlane.Tenancy.Key }}: "{{ .Spec.ControlPlane.Tenancy.Value }}"
-      {{- end }}
-      tolerations:
-        - key: "{{ .Spec.ControlPlane.Tenancy.Key }}"
-          operator: "Equal"
-          value: "{{ .Spec.ControlPlane.Tenancy.Value }}"
-          effect: "NoSchedule"
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
       terminationGracePeriodSeconds: 60
       containers:

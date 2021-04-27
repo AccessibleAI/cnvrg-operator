@@ -493,10 +493,10 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	if *cnvrgApp.Spec.SSO.Enabled {
 		state = append(state, grafanaOauthProxy()...)
 	}
-	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
 		state = append(state, promIstioVs()...)
 	}
-	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
 		state = append(state, promOcpRoute()...)
 	}
 
