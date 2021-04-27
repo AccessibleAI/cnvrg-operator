@@ -50,14 +50,6 @@ func esState() []*desired.State {
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
 		},
-		{
-			TemplatePath:   path + "/es/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.IstioVsGVR],
-			Own:            true,
-		},
 	}
 }
 
@@ -233,15 +225,6 @@ func singleBackendMinio() []*desired.State {
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
 		},
-		{
-
-			TemplatePath:   path + "/minio/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.IstioVsGVR],
-			Own:            true,
-		},
 	}
 }
 
@@ -253,15 +236,6 @@ func sharedBackendMinio() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
-			Own:            true,
-		},
-		{
-
-			TemplatePath:   path + "/minio/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
 		},
 
@@ -304,6 +278,58 @@ func sharedBackendMinio() []*desired.State {
 	}
 }
 
+func esIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/vs.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+		},
+	}
+}
+
+func esOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
+			Own:            true,
+		},
+	}
+}
+
+func minioIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/minio/vs.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+		},
+	}
+}
+
+func minioOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/minio/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
+			Own:            true,
+		},
+	}
+}
+
 func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
@@ -320,10 +346,26 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	} else {
 		state = append(state, singleBackendMinio()...)
 	}
-
 	if *cnvrgApp.Spec.Dbs.Es.Enabled {
 		state = append(state, esState()...)
 	}
+
+	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		state = append(state, esIstioVs()...)
+	}
+
+	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		state = append(state, esOcpRoute()...)
+	}
+
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		state = append(state, minioIstioVs()...)
+	}
+
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		state = append(state, minioOcpRoute()...)
+	}
+
 	return state
 }
 

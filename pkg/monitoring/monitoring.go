@@ -210,14 +210,6 @@ func grafanaState() []*desired.State {
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
 		},
-		{
-			TemplatePath:   path + "/grafana/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.IstioVsGVR],
-			Own:            true,
-		},
 	}
 
 }
@@ -356,6 +348,32 @@ func promOcpRoute() []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/prometheus/instance/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
+			Own:            true,
+		},
+	}
+}
+
+func grafanaIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/grafana/vs.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+		},
+	}
+}
+
+func grafanaOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/grafana/route.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -530,11 +548,23 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	if *infra.Spec.SSO.Enabled {
 		state = append(state, grafanaOauthProxy()...)
 	}
-	if *infra.Spec.Monitoring.Prometheus.Enabled && infra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
-		state = append(state, promIstioVs()...)
+
+	if infra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		if *infra.Spec.Monitoring.Prometheus.Enabled {
+			state = append(state, promIstioVs()...)
+		}
+		if *infra.Spec.Monitoring.Grafana.Enabled {
+			state = append(state, grafanaIstioVs()...)
+		}
 	}
-	if *infra.Spec.Monitoring.Prometheus.Enabled && infra.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
-		state = append(state, promOcpRoute()...)
+
+	if infra.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		if *infra.Spec.Monitoring.Prometheus.Enabled {
+			state = append(state, promOcpRoute()...)
+		}
+		if *infra.Spec.Monitoring.Grafana.Enabled {
+			state = append(state, grafanaOcpRoute()...)
+		}
 	}
 
 	return state
