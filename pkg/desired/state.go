@@ -566,7 +566,7 @@ func CreateRedisCredsSecret(obj v1.Object, secretName, secretNs, redisUrl string
 
 		pass := RandomString()
 		creds.Data = map[string][]byte{
-			"CNVRG_REDIS_PASSWORD":              []byte(pass),
+			"REDIS_URL":                         []byte(pass),
 			"redis.conf":                        []byte(redisConf(pass)),
 			"OAUTH2_PROXY_REDIS_CONNECTION_URL": []byte(fmt.Sprintf("redis://:%s@%s", pass, redisUrl)), // for oauth2 proxy
 		}
