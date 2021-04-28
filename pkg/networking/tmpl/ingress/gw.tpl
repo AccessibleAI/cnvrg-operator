@@ -25,7 +25,7 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: {{ .Spec.Networking.HTTPS.CertSecret }}
-      {{- else if .Spec.Networking.HTTPS.Enabled }}
+      {{- else if isTrue .Spec.Networking.HTTPS.Enabled }}
       tls:
         httpsRedirect: true
     - hosts:

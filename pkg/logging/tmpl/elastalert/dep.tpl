@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,7 +18,7 @@ spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
-        {{- range $key, $val := .Spec.Dbs.Elastalert.NodeSelector }}
+        {{- range $key, $val := .Spec.Logging.Elastalert.NodeSelector }}
         {{ $key }}: {{ $val }}
         {{- end }}
       tolerations:
@@ -27,9 +26,9 @@ spec:
           operator: "Equal"
           value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
-      {{- else if (gt (len .Spec.Dbs.Elastalert.NodeSelector) 0) }}
+      {{- else if (gt (len .Spec.Logging.Elastalert.NodeSelector) 0) }}
       nodeSelector:
-        {{- range $key, $val := .Spec.Dbs.Elastalert.NodeSelector }}
+        {{- range $key, $val := .Spec.Logging.Elastalert.NodeSelector }}
         {{ $key }}: {{ $val }}
         {{- end }}
       {{- end }}

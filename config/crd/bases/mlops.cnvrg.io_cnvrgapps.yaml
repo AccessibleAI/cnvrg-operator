@@ -479,6 +479,10 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       port:
                         type: integer
                       storageClass:
@@ -557,6 +561,10 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       port:
                         type: integer
                       storageClass:

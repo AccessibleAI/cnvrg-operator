@@ -1,7 +1,6 @@
 package v1
 
 type Storage struct {
-	Enabled  *bool    `json:"enabled,omitempty"`
 	Hostpath Hostpath `json:"hostpath,omitempty"`
 	Nfs      Nfs      `json:"nfs,omitempty"`
 }
@@ -9,9 +8,8 @@ type Storage struct {
 type Hostpath struct {
 	Enabled          *bool             `json:"enabled,omitempty"`
 	Image            string            `json:"image,omitempty"`
-	HostPath         string            `json:"hostPath,omitempty"`
+	Path             string            `json:"path,omitempty"`
 	StorageClassName string            `json:"storageClassName,omitempty"`
-	NodeName         string            `json:"nodeName,omitempty"`
 	CPURequest       string            `json:"cpuRequest,omitempty"`
 	MemoryRequest    string            `json:"memoryRequest,omitempty"`
 	CPULimit         string            `json:"cpuLimit,omitempty"`
@@ -22,28 +20,26 @@ type Hostpath struct {
 }
 
 type Nfs struct {
-	Enabled          *bool             `json:"enabled,omitempty"`
-	Image            string            `json:"image,omitempty"`
-	Provisioner      string            `json:"provisioner,omitempty"`
-	StorageClassName string            `json:"storageClassName,omitempty"`
-	Server           string            `json:"server,omitempty"`
-	Path             string            `json:"path,omitempty"`
-	CPURequest       string            `json:"cpuRequest,omitempty"`
-	MemoryRequest    string            `json:"memoryRequest,omitempty"`
-	CPULimit         string            `json:"cpuLimit,omitempty"`
-	MemoryLimit      string            `json:"memoryLimit,omitempty"`
-	ReclaimPolicy    string            `json:"reclaimPolicy,omitempty"`
-	DefaultSc        *bool             `json:"defaultSc,omitempty"`
+	Enabled          *bool  `json:"enabled,omitempty"`
+	Image            string `json:"image,omitempty"`
+	Provisioner      string `json:"provisioner,omitempty"`
+	StorageClassName string `json:"storageClassName,omitempty"`
+	Server           string `json:"server,omitempty"`
+	Path             string `json:"path,omitempty"`
+	CPURequest       string `json:"cpuRequest,omitempty"`
+	MemoryRequest    string `json:"memoryRequest,omitempty"`
+	CPULimit         string `json:"cpuLimit,omitempty"`
+	MemoryLimit      string `json:"memoryLimit,omitempty"`
+	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
+	DefaultSc        *bool  `json:"defaultSc,omitempty"`
 }
 
 var storageDefault = Storage{
-	Enabled: &defaultEnabled,
 	Hostpath: Hostpath{
 		Enabled:          &defaultEnabled,
 		Image:            "quay.io/kubevirt/hostpath-provisioner",
-		HostPath:         "/cnvrg-hostpath-storage",
+		Path:             "/cnvrg-hostpath-storage",
 		StorageClassName: "cnvrg-hostpath-storage",
-		NodeName:         "",
 		CPURequest:       "100m",
 		MemoryRequest:    "100Mi",
 		CPULimit:         "200m",

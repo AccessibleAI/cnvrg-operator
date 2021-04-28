@@ -44,10 +44,10 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: PV_DIR
-              value: {{ .Spec.Storage.Hostpath.HostPath }}
+              value: {{ .Spec.Storage.Hostpath.Path }}
           volumeMounts:
             - name: pv-volume # root dir where your bind mounts will be on the node
-              mountPath: {{ .Spec.Storage.Hostpath.HostPath }}
+              mountPath: {{ .Spec.Storage.Hostpath.Path }}
           resources:
             limits:
               cpu: {{ .Spec.Storage.Hostpath.CPULimit }}
@@ -58,4 +58,4 @@ spec:
       volumes:
         - name: pv-volume
           hostPath:
-            path: {{ .Spec.Storage.Hostpath.HostPath }}
+            path: {{ .Spec.Storage.Hostpath.Path }}

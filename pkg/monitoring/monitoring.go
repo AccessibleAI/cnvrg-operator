@@ -514,8 +514,9 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
 	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
-		state = append(state, ccpPrometheusInstance()...)
+		state = append(state, promOauthProxy()...)
 		state = append(state, appServiceMonitors()...)
+		state = append(state, ccpPrometheusInstance()...)
 	}
 
 	if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
@@ -523,7 +524,6 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	}
 
 	if *cnvrgApp.Spec.SSO.Enabled {
-		state = append(state, promOauthProxy()...)
 		state = append(state, grafanaOauthProxy()...)
 	}
 
@@ -555,7 +555,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, prometheusOperatorState()...)
 	}
 	if *infra.Spec.Monitoring.Prometheus.Enabled {
+		state = append(state, promOauthProxy()...)
 		state = append(state, infraPrometheusInstanceState()...)
+
 	}
 	if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
 		state = append(state, kubeStateMetricsState()...)
@@ -573,7 +575,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, dcgmExporter()...)
 	}
 	if *infra.Spec.SSO.Enabled {
-		state = append(state, promOauthProxy()...)
+
 		state = append(state, grafanaOauthProxy()...)
 	}
 

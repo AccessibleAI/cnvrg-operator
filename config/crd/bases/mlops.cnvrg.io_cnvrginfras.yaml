@@ -173,6 +173,10 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       port:
                         type: integer
                       storageClass:
@@ -294,8 +298,6 @@ spec:
                 type: object
               storage:
                 properties:
-                  enabled:
-                    type: boolean
                   hostpath:
                     properties:
                       cpuLimit:
@@ -306,15 +308,17 @@ spec:
                         type: boolean
                       enabled:
                         type: boolean
-                      hostPath:
-                        type: string
                       image:
                         type: string
                       memoryLimit:
                         type: string
                       memoryRequest:
                         type: string
-                      nodeName:
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      path:
                         type: string
                       reclaimPolicy:
                         type: string
