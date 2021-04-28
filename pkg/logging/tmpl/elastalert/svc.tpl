@@ -13,7 +13,7 @@ spec:
   ports:
     - port: {{ .Spec.Logging.Elastalert.Port }}
       protocol: TCP
-      targetPort: {{ .Spec.Logging.Elastalert.ContainerPort}}
+      targetPort: 3030
       {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
       nodePort: {{ .Spec.Logging.Elastalert.NodePort }}
       {{- end }}

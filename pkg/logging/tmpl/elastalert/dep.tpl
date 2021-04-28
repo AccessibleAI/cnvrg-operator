@@ -16,14 +16,15 @@ spec:
       labels:
         app: {{ .Spec.Logging.Elastalert.SvcName }}
     spec:
+      serviceAccountName: {{ .Spec.Logging.Elastalert.SvcName }}
       securityContext:
-        runAsUser: {{ .Spec.Logging.Elastalert.RunAsUser }}
-        fsGroup: {{ .Spec.Logging.Elastalert.FsGroup }}
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
       - image: {{ .Spec.Logging.Elastalert.Image }}
         name: {{ .Spec.Logging.Elastalert.SvcName }}
         ports:
-        - containerPort: {{ .Spec.Logging.Elastalert.ContainerPort }}
+        - containerPort: 3030
           protocol: TCP
         envFrom:
           - secretRef:

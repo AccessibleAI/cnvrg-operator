@@ -17,7 +17,6 @@ type Elastalert struct {
 	Image         string `json:"image,omitempty"`
 	Port          int    `json:"port,omitempty"`
 	NodePort      int    `json:"nodePort,omitempty"`
-	ContainerPort int    `json:"containerPort,omitempty"`
 	StorageSize   string `json:"storageSize,omitempty"`
 	SvcName       string `json:"svcName,omitempty"`
 	StorageClass  string `json:"storageClass,omitempty"`
@@ -25,8 +24,6 @@ type Elastalert struct {
 	MemoryRequest string `json:"memoryRequest,omitempty"`
 	CPULimit      string `json:"cpuLimit,omitempty"`
 	MemoryLimit   string `json:"memoryLimit,omitempty"`
-	RunAsUser     int    `json:"runAsUser,omitempty"`
-	FsGroup       int    `json:"fsGroup,omitempty"`
 }
 
 type Kibana struct {
@@ -63,7 +60,6 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		Image:         "bitsensor/elastalert:3.0.0-beta.1",
 		Port:          80,
 		NodePort:      32030,
-		ContainerPort: 3030,
 		StorageSize:   "30Gi",
 		SvcName:       "elastalert",
 		StorageClass:  "",
@@ -71,8 +67,6 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		MemoryRequest: "200Mi",
 		CPULimit:      "400m",
 		MemoryLimit:   "800Mi",
-		RunAsUser:     1000,
-		FsGroup:       1000,
 	},
 	Kibana: Kibana{
 		Enabled:        &defaultEnabled,

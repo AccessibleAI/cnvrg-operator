@@ -320,8 +320,6 @@ spec:
                         type: string
                       enabled:
                         type: boolean
-                      fsGroup:
-                        type: integer
                       image:
                         type: string
                       javaOpts:
@@ -340,8 +338,6 @@ spec:
                         type: boolean
                       port:
                         type: integer
-                      runAsUser:
-                        type: integer
                       serviceAccount:
                         type: string
                       storageClass:
@@ -350,10 +346,6 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                   minio:
                     properties:
@@ -397,10 +389,6 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                   pg:
                     properties:
@@ -445,10 +433,6 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                   redis:
                     properties:
@@ -486,26 +470,18 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                 type: object
               logging:
                 properties:
                   elastalert:
                     properties:
-                      containerPort:
-                        type: integer
                       cpuLimit:
                         type: string
                       cpuRequest:
                         type: string
                       enabled:
                         type: boolean
-                      fsGroup:
-                        type: integer
                       image:
                         type: string
                       memoryLimit:
@@ -515,8 +491,6 @@ spec:
                       nodePort:
                         type: integer
                       port:
-                        type: integer
-                      runAsUser:
                         type: integer
                       storageClass:
                         type: string

@@ -26,8 +26,8 @@ spec:
           runAsUser: 0
       {{- end }}
       securityContext:
-        runAsUser: {{ .Spec.Dbs.Es.RunAsUser }}
-        fsGroup: {{ .Spec.Dbs.Es.FsGroup }}
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
       - name: elastic
         image: {{ .Spec.Dbs.Es.Image }}

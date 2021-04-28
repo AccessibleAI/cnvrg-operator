@@ -22,7 +22,6 @@ type Pg struct {
 	HugePages      HugePages         `json:"hugePages,omitempty"`
 	Fixpg          *bool             `json:"fixpg,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
-	Tolerations    map[string]string `json:"tolerations,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 }
 
@@ -40,7 +39,6 @@ type Minio struct {
 	MemoryRequest  string            `json:"memoryRequest,omitempty"`
 	SharedStorage  SharedStorage     `json:"sharedStorage,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
-	Tolerations    map[string]string `json:"tolerations,omitempty"`
 }
 
 type Redis struct {
@@ -54,7 +52,6 @@ type Redis struct {
 	Limits         Limits            `json:"limits,omitempty"`
 	Requests       Requests          `json:"requests,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
-	Tolerations    map[string]string `json:"tolerations,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 }
 
@@ -65,8 +62,6 @@ type Es struct {
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`
 	SvcName        string            `json:"svcName,omitempty"`
-	RunAsUser      int               `json:"runAsUser,omitempty"`
-	FsGroup        int               `json:"fsGroup,omitempty"`
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
 	CPURequest     string            `json:"cpuRequest,omitempty"`
@@ -76,7 +71,6 @@ type Es struct {
 	JavaOpts       string            `json:"javaOpts,omitempty"`
 	PatchEsNodes   *bool             `json:"patchEsNodes,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
-	Tolerations    map[string]string `json:"tolerations,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 }
 
@@ -128,7 +122,6 @@ var pgDefault = Pg{
 	SharedBuffers:  "64MB",
 	Fixpg:          &defaultTrue,
 	NodeSelector:   nil,
-	Tolerations:    nil,
 	HugePages: HugePages{
 		Enabled: &defaultEnabled,
 		Size:    "2Mi",
@@ -146,7 +139,6 @@ var redisDefault = Redis{
 	StorageSize:    "10Gi",
 	StorageClass:   "",
 	NodeSelector:   nil,
-	Tolerations:    nil,
 	CredsRef:       "redis-creds",
 	Limits: Limits{
 		CPU:    "1000m",
@@ -165,8 +157,6 @@ var esDefault = Es{
 	Port:           9200,
 	StorageSize:    "30Gi",
 	SvcName:        "elasticsearch",
-	RunAsUser:      1000,
-	FsGroup:        1000,
 	NodePort:       32200,
 	StorageClass:   "",
 	CPURequest:     "1000m",
@@ -175,8 +165,6 @@ var esDefault = Es{
 	MemoryLimit:    "4Gi",
 	JavaOpts:       "",
 	PatchEsNodes:   &defaultTrue,
-	NodeSelector:   nil,
-	Tolerations:    nil,
 	CredsRef:       "es-creds",
 }
 

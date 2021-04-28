@@ -7,7 +7,7 @@ data:
   config.json: |
     {
       "appName": "elastalert-server",
-      "port": {{ .Spec.Logging.Elastalert.ContainerPort }},
+      "port": 3030,
       "wsport": 3333,
       "elastalertPath": "/opt/elastalert",
       "verbose": true,

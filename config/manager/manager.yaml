@@ -23,6 +23,8 @@ spec:
           - run
           - --max-concurrent-reconciles
           - "3"
+          - --deploy-depended-crds
+          - "true"
         name: cnvrg-operator
         imagePullPolicy: Always
         resources:
