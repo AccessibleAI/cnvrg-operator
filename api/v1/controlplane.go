@@ -15,6 +15,7 @@ type Limits struct {
 	CPU    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
 }
+
 type Requests struct {
 	CPU    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
@@ -44,12 +45,14 @@ type Sidekiq struct {
 	Memory   string `json:"memory,omitempty"`
 	Replicas int    `json:"replicas,omitempty"`
 }
+
 type Searchkiq struct {
 	Enabled  *bool  `json:"enabled,omitempty"`
 	CPU      string `json:"cpu,omitempty"`
 	Memory   string `json:"memory,omitempty"`
 	Replicas int    `json:"replicas,omitempty"`
 }
+
 type Systemkiq struct {
 	Enabled  *bool  `json:"enabled,omitempty"`
 	CPU      string `json:"cpu,omitempty"`
@@ -79,11 +82,13 @@ type Hyper struct {
 	ReadinessPeriodSeconds  int    `json:"readinessPeriodSeconds,omitempty"`
 	ReadinessTimeoutSeconds int    `json:"readinessTimeoutSeconds,omitempty"`
 }
+
 type Seeder struct {
 	Image           string `json:"image,omitempty"`
 	SeedCmd         string `json:"seedCmd,omitempty"`
 	CreateBucketCmd string `json:"createBucketCmd,omitempty"`
 }
+
 type Ldap struct {
 	Enabled       *bool  `json:"enabled,omitempty"`
 	Host          string `json:"host,omitempty"`
@@ -94,11 +99,13 @@ type Ldap struct {
 	AdminPassword string `json:"adminPassword,omitempty"`
 	Ssl           string `json:"ssl,omitempty"`
 }
+
 type Rbac struct {
 	Role               string `json:"role,omitempty"`
 	ServiceAccountName string `json:"serviceAccountName,omitempty"`
 	RoleBindingName    string `json:"roleBindingName,omitempty"`
 }
+
 type SMTP struct {
 	Server   string `json:"server,omitempty"`
 	Port     string `json:"port,omitempty"`
@@ -157,16 +164,8 @@ type ControlPlane struct {
 	Ldap          Ldap          `json:"ldap,omitempty"`
 	Rbac          Rbac          `json:"rbac,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
-	Tenancy       Tenancy       `json:"tenancy,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
 	Mpi           Mpi           `json:"mpi,omitempty"`
-}
-
-type Tenancy struct {
-	Enabled        *bool  `json:"enabled,omitempty"`
-	DedicatedNodes string `json:"dedicatedNodes,omitempty"`
-	Key            string `json:"key,omitempty"`
-	Value          string `json:"value,omitempty"`
 }
 
 type Cnvrg struct {
@@ -353,12 +352,5 @@ var controlPlanDefault = ControlPlane{
 		Username: "",
 		Password: "",
 		Domain:   "",
-	},
-
-	Tenancy: Tenancy{
-		Enabled:        &defaultEnabled,
-		DedicatedNodes: "&defaultEnabled",
-		Key:            "cnvrg-taint",
-		Value:          "true",
 	},
 }

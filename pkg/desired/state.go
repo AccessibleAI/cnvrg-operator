@@ -99,10 +99,6 @@ func getGrafanaDashboards(obj interface{}) []string {
 		return GrafanaInfraDashboards
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
-		if *cnvrgApp.Spec.NamespaceTenancy == false {
-			return GrafanaInfraDashboards
-		}
 		return GrafanaAppDashboards
 	}
 	return nil
@@ -261,39 +257,6 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				return 3000
 			}
 			return cnvrgApp.Spec.ControlPlane.WebApp.Port
-		},
-		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
-			if *cnvrgApp.Spec.NamespaceTenancy == true {
-				return fmt.Sprintf(`
-- job_name: 'federate'
-  scrape_interval: 10s
-  honor_labels: true
-  honor_timestamps: false
-  metrics_path: '/federate'
-  basic_auth:
-    username: 'email@username.me'
-    password: 'cfgqvzjbhnwcomplicatedpasswordwjnqmd'
-  params:
-    'match[]':
-      - '{namespace="%s"}'
-  static_configs:
-    - targets:
-      - '%s'
-`, ns, "asd")
-			}
-			return fmt.Sprintf(`
-- job_name: 'federate'
-  scrape_interval: 10s
-  honor_labels: true
-  honor_timestamps: false
-  metrics_path: '/federate'
-  params:
-    'match[]':
-      - '{job=~".+"}'
-  static_configs:
-    - targets:
-      - '%s'
-`, "cnvrgApp.Spec.Monitoring.UpstreamPrometheus")
 		},
 		"grafanaDataSource": func(promUrl, user, pass string) string {
 			return fmt.Sprintf(`
