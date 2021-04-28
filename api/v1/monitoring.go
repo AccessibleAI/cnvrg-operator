@@ -63,7 +63,6 @@ type MetricsServer struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
-
 type CnvrgInfraMonitoring struct {
 	PrometheusOperator     PrometheusOperator     `json:"prometheusOperator,omitempty"`
 	Prometheus             Prometheus             `json:"prometheus,omitempty"`
@@ -74,7 +73,6 @@ type CnvrgInfraMonitoring struct {
 	DcgmExporter           DcgmExporter           `json:"dcgmExporter,omitempty"`
 	DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
 }
-
 type CnvrgAppMonitoring struct {
 	Prometheus Prometheus `json:"prometheus,omitempty"`
 	Grafana    Grafana    `json:"grafana,omitempty"`

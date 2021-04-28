@@ -100,7 +100,7 @@ func getGrafanaDashboards(obj interface{}) []string {
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
-		if cnvrgApp.Spec.NamespaceTenancy == false {
+		if *cnvrgApp.Spec.NamespaceTenancy == false {
 			return GrafanaInfraDashboards
 		}
 		return GrafanaAppDashboards
@@ -263,7 +263,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return cnvrgApp.Spec.ControlPlane.WebApp.Port
 		},
 		"prometheusStaticConfig": func(cnvrgApp mlopsv1.CnvrgApp, ns string) string {
-			if cnvrgApp.Spec.NamespaceTenancy == true {
+			if *cnvrgApp.Spec.NamespaceTenancy == true {
 				return fmt.Sprintf(`
 - job_name: 'federate'
   scrape_interval: 10s

@@ -579,7 +579,7 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
 	dashboards := desired.GrafanaAppDashboards
 	// if namespace tenancy is off, deploy all (infra + app) grafana dashboards
-	if cnvrgApp.Spec.NamespaceTenancy == false {
+	if *cnvrgApp.Spec.NamespaceTenancy == false {
 		dashboards = desired.GrafanaInfraDashboards
 	}
 	for _, dashboard := range dashboards {

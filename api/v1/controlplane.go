@@ -287,6 +287,8 @@ var controlPlanDefault = ControlPlane{
 		CreateBucketCmd: "mb.sh",
 	},
 
+	Mpi: mpiDefault,
+
 	BaseConfig: BaseConfig{
 		JobsStorageClass:     "",
 		FeatureFlags:         nil,
@@ -359,6 +361,4 @@ var controlPlanDefault = ControlPlane{
 		Key:            "cnvrg-taint",
 		Value:          "true",
 	},
-
-	Mpi: mpiDefault,
 }

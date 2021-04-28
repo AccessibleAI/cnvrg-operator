@@ -75,7 +75,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Own:            true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/instance/sa.tpl",
+			TemplatePath:   path + "/prometheus/instance/infra/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -308,7 +308,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Own:            false,
 		},
 		{
-			TemplatePath:   path + "/prometheus/instance/sa.tpl",
+			TemplatePath:   path + "/prometheus/instance/ccp/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -513,18 +513,17 @@ func appServiceMonitors() []*desired.State {
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	state = appServiceMonitors()
-
 	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
 		state = append(state, ccpPrometheusInstance()...)
+		state = append(state, appServiceMonitors()...)
 	}
+
 	if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
 	}
+
 	if *cnvrgApp.Spec.SSO.Enabled {
 		state = append(state, promOauthProxy()...)
-	}
-	if *cnvrgApp.Spec.SSO.Enabled {
 		state = append(state, grafanaOauthProxy()...)
 	}
 
@@ -574,6 +573,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, dcgmExporter()...)
 	}
 	if *infra.Spec.SSO.Enabled {
+		state = append(state, promOauthProxy()...)
 		state = append(state, grafanaOauthProxy()...)
 	}
 

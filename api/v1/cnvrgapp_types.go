@@ -9,7 +9,7 @@ var defaultTrue = true
 
 type CnvrgAppSpec struct {
 	ClusterDomain    string             `json:"clusterDomain,omitempty"`
-	NamespaceTenancy bool               `json:"namespaceTenancy,omitempty"`
+	NamespaceTenancy *bool              `json:"namespaceTenancy,omitempty"`
 	ControlPlane     ControlPlane       `json:"controlPlane,omitempty"`
 	Registry         Registry           `json:"registry,omitempty"`
 	Dbs              AppDbs             `json:"dbs,omitempty"`
@@ -46,7 +46,7 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain:    "",
-		NamespaceTenancy: false,
+		NamespaceTenancy: &defaultEnabled,
 		ControlPlane:     controlPlanDefault,
 		Registry:         appRegistryDefault,
 		Dbs:              appDbsDefaults,
