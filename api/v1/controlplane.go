@@ -211,7 +211,7 @@ var infraRegistryDefault = Registry{
 	Password: "",
 }
 
-var controlPlanDefault = ControlPlane{
+var controlPlaneDefault = ControlPlane{
 
 	WebApp: WebApp{
 		Enabled:                 &defaultEnabled,

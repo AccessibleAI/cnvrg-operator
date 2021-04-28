@@ -15,6 +15,15 @@ spec:
       labels:
         app: systemkiq
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- end }}
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
       securityContext:
         runAsUser: 1000

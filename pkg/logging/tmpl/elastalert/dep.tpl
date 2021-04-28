@@ -16,6 +16,23 @@ spec:
       labels:
         app: {{ .Spec.Logging.Elastalert.SvcName }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Dbs.Elastalert.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- else if (gt (len .Spec.Dbs.Elastalert.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Dbs.Elastalert.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       serviceAccountName: {{ .Spec.Logging.Elastalert.SvcName }}
       securityContext:
         runAsUser: 1000

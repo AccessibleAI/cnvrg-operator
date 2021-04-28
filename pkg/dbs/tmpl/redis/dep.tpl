@@ -14,6 +14,23 @@ spec:
       labels:
         app: {{.Spec.Dbs.Redis.SvcName }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Dbs.Redis.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- else if (gt (len .Spec.Dbs.Redis.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Dbs.Redis.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Redis.ServiceAccount }}
       securityContext:
         runAsUser: 1000

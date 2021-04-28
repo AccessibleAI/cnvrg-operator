@@ -14,6 +14,23 @@ spec:
       labels:
         k8s-app: hostpath-provisioner
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Storage.Hostpath.NodeSelector }}
+        {{ $key }}: {{ $val }}
+      {{- end }}
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- else if (gt (len .Spec.Storage.Hostpath.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Storage.Hostpath.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       serviceAccountName: hostpath-provisioner-admin
       containers:
         - name: hostpath-provisioner

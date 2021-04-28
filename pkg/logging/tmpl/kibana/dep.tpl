@@ -16,11 +16,19 @@ spec:
       labels:
         app: {{ .Spec.Logging.Kibana.SvcName }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- end }}
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
       serviceAccountName: {{ .Spec.Logging.Kibana.ServiceAccount }}
-
       volumes:
         - name: "kibana-config"
           secret:

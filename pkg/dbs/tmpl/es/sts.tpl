@@ -14,6 +14,23 @@ spec:
       labels:
         app: {{ .Spec.Dbs.Es.SvcName }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- else if (gt (len .Spec.Dbs.Es.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
       {{- if isTrue .Spec.Dbs.Es.PatchEsNodes }}
       initContainers:

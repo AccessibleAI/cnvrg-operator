@@ -17,6 +17,23 @@ spec:
       labels:
         app: {{.Spec.Dbs.Pg.SvcName }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Dbs.Pg.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- else if (gt (len .Spec.Dbs.Pg.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Dbs.Pg.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Pg.ServiceAccount }}
       securityContext:
         runAsUser: 26

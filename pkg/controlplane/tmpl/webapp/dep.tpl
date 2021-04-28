@@ -20,6 +20,15 @@ spec:
       labels:
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- end }}
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
       securityContext:
         runAsUser: 1000
@@ -143,6 +152,12 @@ spec:
           value: {{ .Spec.Dbs.Pg.CredsRef }}
         - name: "CNVRG_REDIS_CREDS"
           value: {{ .Spec.Dbs.Redis.CredsRef }}
+        - name: CNVRG_TENANCY
+          value: "{{ isTrue .Spec.Tenancy.Enabled }}"
+        - name: CNVRG_TENANCY_KEY
+          value: "{{ .Spec.Tenancy.Key }}"
+        - name: CNVRG_TENANCY_VALUE
+          value: "{{ .Spec.Tenancy.Value }}"
         {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: "{{ .Spec.ControlPlane.OjbectStorage.GcpStorageSecret }}"

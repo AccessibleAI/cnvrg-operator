@@ -260,17 +260,6 @@ spec:
                       replicas:
                         type: integer
                     type: object
-                  tenancy:
-                    properties:
-                      dedicatedNodes:
-                        type: string
-                      enabled:
-                        type: boolean
-                      key:
-                        type: string
-                      value:
-                        type: string
-                    type: object
                   webapp:
                     properties:
                       cpu:
@@ -580,8 +569,6 @@ spec:
                         type: string
                     type: object
                 type: object
-              namespaceTenancy:
-                type: boolean
               networking:
                 properties:
                   https:
@@ -646,6 +633,15 @@ spec:
                   oidcIssuerUrl:
                     type: string
                   provider:
+                    type: string
+                type: object
+              tenancy:
+                properties:
+                  enabled:
+                    type: boolean
+                  key:
+                    type: string
+                  value:
                     type: string
                 type: object
             type: object

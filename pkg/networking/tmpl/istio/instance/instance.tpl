@@ -24,6 +24,15 @@ spec:
     - enabled: true
       name: istio-ingressgateway
       k8s:
+        {{- if isTrue .Spec.Tenancy.Enabled }}
+        nodeSelector:
+          "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+        tolerations:
+          - key: "{{ .Spec.Tenancy.Key }}"
+            operator: "Equal"
+            value: "{{ .Spec.Tenancy.Value }}"
+            effect: "NoSchedule"
+        {{- end }}
         {{- if ne .Spec.Networking.Istio.IngressSvcAnnotations "" }}
         serviceAnnotations:
           {{- $annotations := split ";" .Spec.Networking.Istio.IngressSvcAnnotations }}

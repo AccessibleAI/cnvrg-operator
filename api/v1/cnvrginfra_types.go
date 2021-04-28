@@ -16,6 +16,7 @@ type CnvrgInfraSpec struct {
 	Dbs               InfraDbs             `json:"dbs,omitempty"`
 	SSO               SSO                  `json:"sso,omitempty"`
 	Gpu               Gpu                  `json:"gpu,omitempty"`
+	Tenancy           Tenancy              `json:"tenancy,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -55,6 +56,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Registry:          infraRegistryDefault,
 		Dbs:               infraDbsDefaults,
 		Gpu:               gpuDefaults,
+		Tenancy:           tenancyDefault,
 	}
 	return infraDefault
 }

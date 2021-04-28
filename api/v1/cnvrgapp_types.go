@@ -8,14 +8,15 @@ var defaultEnabled = false
 var defaultTrue = true
 
 type CnvrgAppSpec struct {
-	ClusterDomain    string             `json:"clusterDomain,omitempty"`
-	ControlPlane     ControlPlane       `json:"controlPlane,omitempty"`
-	Registry         Registry           `json:"registry,omitempty"`
-	Dbs              AppDbs             `json:"dbs,omitempty"`
-	Networking       CnvrgAppNetworking `json:"networking,omitempty"`
-	Logging          CnvrgAppLogging    `json:"logging,omitempty"`
-	Monitoring       CnvrgAppMonitoring `json:"monitoring,omitempty"`
-	SSO              SSO                `json:"sso,omitempty"`
+	ClusterDomain string             `json:"clusterDomain,omitempty"`
+	ControlPlane  ControlPlane       `json:"controlPlane,omitempty"`
+	Registry      Registry           `json:"registry,omitempty"`
+	Dbs           AppDbs             `json:"dbs,omitempty"`
+	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
+	Logging       CnvrgAppLogging    `json:"logging,omitempty"`
+	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
+	SSO           SSO                `json:"sso,omitempty"`
+	Tenancy       Tenancy            `json:"tenancy,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -44,13 +45,14 @@ func init() {
 
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
-		ClusterDomain:    "",
-		ControlPlane:     controlPlanDefault,
-		Registry:         appRegistryDefault,
-		Dbs:              appDbsDefaults,
-		Logging:          cnvrgAppLoggingDefault,
-		Networking:       cnvrgAppNetworkingDefault,
-		Monitoring:       cnvrgAppMonitoringDefault,
-		SSO:              ssoDefault,
+		ClusterDomain: "",
+		ControlPlane:  controlPlaneDefault,
+		Registry:      appRegistryDefault,
+		Dbs:           appDbsDefaults,
+		Logging:       cnvrgAppLoggingDefault,
+		Networking:    cnvrgAppNetworkingDefault,
+		Monitoring:    cnvrgAppMonitoringDefault,
+		SSO:           ssoDefault,
+		Tenancy:       tenancyDefault,
 	}
 }

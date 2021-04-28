@@ -17,6 +17,15 @@ spec:
         app.kubernetes.io/name: kube-state-metrics
         app.kubernetes.io/version: v1.9.7
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- end }}
       containers:
       - args:
         - --host=127.0.0.1

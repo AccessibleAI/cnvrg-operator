@@ -13,17 +13,18 @@ type Fluentbit struct {
 }
 
 type Elastalert struct {
-	Enabled       *bool  `json:"enabled,omitempty"`
-	Image         string `json:"image,omitempty"`
-	Port          int    `json:"port,omitempty"`
-	NodePort      int    `json:"nodePort,omitempty"`
-	StorageSize   string `json:"storageSize,omitempty"`
-	SvcName       string `json:"svcName,omitempty"`
-	StorageClass  string `json:"storageClass,omitempty"`
-	CPURequest    string `json:"cpuRequest,omitempty"`
-	MemoryRequest string `json:"memoryRequest,omitempty"`
-	CPULimit      string `json:"cpuLimit,omitempty"`
-	MemoryLimit   string `json:"memoryLimit,omitempty"`
+	Enabled       *bool             `json:"enabled,omitempty"`
+	Image         string            `json:"image,omitempty"`
+	Port          int               `json:"port,omitempty"`
+	NodePort      int               `json:"nodePort,omitempty"`
+	StorageSize   string            `json:"storageSize,omitempty"`
+	SvcName       string            `json:"svcName,omitempty"`
+	StorageClass  string            `json:"storageClass,omitempty"`
+	CPURequest    string            `json:"cpuRequest,omitempty"`
+	MemoryRequest string            `json:"memoryRequest,omitempty"`
+	CPULimit      string            `json:"cpuLimit,omitempty"`
+	MemoryLimit   string            `json:"memoryLimit,omitempty"`
+	NodeSelector  map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type Kibana struct {
@@ -67,6 +68,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		MemoryRequest: "200Mi",
 		CPULimit:      "400m",
 		MemoryLimit:   "800Mi",
+		NodeSelector:  nil,
 	},
 	Kibana: Kibana{
 		Enabled:        &defaultEnabled,

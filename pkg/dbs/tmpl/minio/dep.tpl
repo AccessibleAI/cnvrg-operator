@@ -15,6 +15,23 @@ spec:
       labels:
         app: {{ .Spec.Dbs.Minio.SvcName }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Dbs.Minio.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- else if (gt (len .Spec.Dbs.Minio.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Dbs.Minio.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       securityContext:
         runAsUser: 1000
         fsGroup: 1000

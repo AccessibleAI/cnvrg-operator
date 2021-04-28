@@ -11,18 +11,19 @@ type PrometheusOperator struct {
 	Images  Images `json:"images,omitempty"`
 }
 type Prometheus struct {
-	Enabled             *bool  `json:"enabled,omitempty"`
-	Image               string `json:"image,omitempty"`
-	BasicAuthProxyImage string `json:"basicAuthProxyImage,omitempty"`
-	CPURequest          string `json:"cpuRequest,omitempty"`
-	MemoryRequest       string `json:"memoryRequest,omitempty"`
-	SvcName             string `json:"svcName,omitempty"`
-	Port                int    `json:"port,omitempty"`
-	NodePort            int    `json:"nodePort,omitempty"`
-	StorageSize         string `json:"storageSize,omitempty"`
-	StorageClass        string `json:"storageClass,omitempty"`
-	CredsRef            string `json:"credsRef,omitempty"`
-	UpstreamRef         string `json:"upstreamRef,omitempty"`
+	Enabled             *bool             `json:"enabled,omitempty"`
+	Image               string            `json:"image,omitempty"`
+	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
+	CPURequest          string            `json:"cpuRequest,omitempty"`
+	MemoryRequest       string            `json:"memoryRequest,omitempty"`
+	SvcName             string            `json:"svcName,omitempty"`
+	Port                int               `json:"port,omitempty"`
+	NodePort            int               `json:"nodePort,omitempty"`
+	StorageSize         string            `json:"storageSize,omitempty"`
+	StorageClass        string            `json:"storageClass,omitempty"`
+	CredsRef            string            `json:"credsRef,omitempty"`
+	UpstreamRef         string            `json:"upstreamRef,omitempty"`
+	NodeSelector        map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type NodeExporter struct {
@@ -100,6 +101,7 @@ var prometheusDefault = Prometheus{
 	StorageClass:        "",
 	CredsRef:            "prom-creds",
 	UpstreamRef:         "upstream-prom-static-config",
+	NodeSelector:        nil,
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{

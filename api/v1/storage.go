@@ -7,32 +7,33 @@ type Storage struct {
 }
 
 type Hostpath struct {
-	Enabled          *bool  `json:"enabled,omitempty"`
-	Image            string `json:"image,omitempty"`
-	HostPath         string `json:"hostPath,omitempty"`
-	StorageClassName string `json:"storageClassName,omitempty"`
-	NodeName         string `json:"nodeName,omitempty"`
-	CPURequest       string `json:"cpuRequest,omitempty"`
-	MemoryRequest    string `json:"memoryRequest,omitempty"`
-	CPULimit         string `json:"cpuLimit,omitempty"`
-	MemoryLimit      string `json:"memoryLimit,omitempty"`
-	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
-	DefaultSc        *bool  `json:"defaultSc,omitempty"`
+	Enabled          *bool             `json:"enabled,omitempty"`
+	Image            string            `json:"image,omitempty"`
+	HostPath         string            `json:"hostPath,omitempty"`
+	StorageClassName string            `json:"storageClassName,omitempty"`
+	NodeName         string            `json:"nodeName,omitempty"`
+	CPURequest       string            `json:"cpuRequest,omitempty"`
+	MemoryRequest    string            `json:"memoryRequest,omitempty"`
+	CPULimit         string            `json:"cpuLimit,omitempty"`
+	MemoryLimit      string            `json:"memoryLimit,omitempty"`
+	ReclaimPolicy    string            `json:"reclaimPolicy,omitempty"`
+	DefaultSc        *bool             `json:"defaultSc,omitempty"`
+	NodeSelector     map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type Nfs struct {
-	Enabled          *bool  `json:"enabled,omitempty"`
-	Image            string `json:"image,omitempty"`
-	Provisioner      string `json:"provisioner,omitempty"`
-	StorageClassName string `json:"storageClassName,omitempty"`
-	Server           string `json:"server,omitempty"`
-	Path             string `json:"path,omitempty"`
-	CPURequest       string `json:"cpuRequest,omitempty"`
-	MemoryRequest    string `json:"memoryRequest,omitempty"`
-	CPULimit         string `json:"cpuLimit,omitempty"`
-	MemoryLimit      string `json:"memoryLimit,omitempty"`
-	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
-	DefaultSc        *bool  `json:"defaultSc,omitempty"`
+	Enabled          *bool             `json:"enabled,omitempty"`
+	Image            string            `json:"image,omitempty"`
+	Provisioner      string            `json:"provisioner,omitempty"`
+	StorageClassName string            `json:"storageClassName,omitempty"`
+	Server           string            `json:"server,omitempty"`
+	Path             string            `json:"path,omitempty"`
+	CPURequest       string            `json:"cpuRequest,omitempty"`
+	MemoryRequest    string            `json:"memoryRequest,omitempty"`
+	CPULimit         string            `json:"cpuLimit,omitempty"`
+	MemoryLimit      string            `json:"memoryLimit,omitempty"`
+	ReclaimPolicy    string            `json:"reclaimPolicy,omitempty"`
+	DefaultSc        *bool             `json:"defaultSc,omitempty"`
 }
 
 var storageDefault = Storage{
@@ -49,6 +50,7 @@ var storageDefault = Storage{
 		MemoryLimit:      "200Mi",
 		ReclaimPolicy:    "Retain",
 		DefaultSc:        &defaultEnabled,
+		NodeSelector:     nil,
 	},
 	Nfs: Nfs{
 		Enabled:          &defaultEnabled,

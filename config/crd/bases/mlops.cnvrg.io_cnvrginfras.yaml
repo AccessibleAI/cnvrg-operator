@@ -349,6 +349,15 @@ spec:
                         type: string
                     type: object
                 type: object
+              tenancy:
+                properties:
+                  enabled:
+                    type: boolean
+                  key:
+                    type: string
+                  value:
+                    type: string
+                type: object
             type: object
           status:
             properties:
