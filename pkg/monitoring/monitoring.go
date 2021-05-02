@@ -543,32 +543,30 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, promOauthProxy()...)
 		state = append(state, appServiceMonitors()...)
 		state = append(state, ccpPrometheusInstance()...)
+		switch cnvrgApp.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
+			state = append(state, promIstioVs()...)
+		case mlopsv1.NginxIngress:
+			state = append(state, promIngress()...)
+		case mlopsv1.OpenShiftIngress:
+			state = append(state, promOcpRoute()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
+		switch cnvrgApp.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
+			state = append(state, grafanaIstioVs()...)
+		case mlopsv1.NginxIngress:
+			state = append(state, grafanaIngress()...)
+		case mlopsv1.OpenShiftIngress:
+			state = append(state, grafanaOcpRoute()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.SSO.Enabled {
 		state = append(state, grafanaOauthProxy()...)
-	}
-
-	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
-			state = append(state, promIstioVs()...)
-		}
-		if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
-			state = append(state, grafanaIstioVs()...)
-		}
-	}
-
-	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
-			state = append(state, promOcpRoute()...)
-		}
-		if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
-			state = append(state, grafanaOcpRoute()...)
-		}
 	}
 
 	return state
@@ -580,6 +578,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	if *infra.Spec.Monitoring.PrometheusOperator.Enabled {
 		state = append(state, prometheusOperatorState()...)
 	}
+
 	if *infra.Spec.Monitoring.Prometheus.Enabled {
 		state = append(state, promOauthProxy()...)
 		state = append(state, infraPrometheusInstanceState()...)
@@ -608,15 +607,19 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 			state = append(state, grafanaOcpRoute()...)
 		}
 	}
+
 	if *infra.Spec.Monitoring.NodeExporter.Enabled {
 		state = append(state, nodeExporterState()...)
 	}
+
 	if *infra.Spec.Monitoring.DefaultServiceMonitors.Enabled {
 		state = append(state, defaultServiceMonitors()...)
 	}
+
 	if *infra.Spec.Monitoring.DcgmExporter.Enabled {
 		state = append(state, dcgmExporter()...)
 	}
+
 	if *infra.Spec.SSO.Enabled {
 
 		state = append(state, grafanaOauthProxy()...)

@@ -4,8 +4,6 @@ metadata:
   name: cp-base-config
   namespace: {{ ns . }}
 data:
-  DEFAULT_COMPUTE_CLUSTER_DOMAIN: "{{ defaultComputeClusterDomain .}}"
-  DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ isTrue .Spec.Networking.HTTPS.Enabled }}"
   AGENT_CUSTOM_TAG: "{{ .Spec.ControlPlane.BaseConfig.AgentCustomTag }}"
   PASSENGER_APP_ENV: "{{ .Spec.ControlPlane.BaseConfig.PassengerAppEnv }}"
   RAILS_ENV: "{{ .Spec.ControlPlane.BaseConfig.RailsEnv }}"

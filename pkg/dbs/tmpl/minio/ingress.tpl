@@ -1,6 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-send-timeout: 18000s
+    nginx.ingress.kubernetes.io/proxy-read-timeout: 18000s
+    nginx.ingress.kubernetes.io/proxy-body-size: 5G
   name: {{ .Spec.Dbs.Minio.SvcName }}
   namespace: {{ ns . }}
 spec:
@@ -9,6 +13,7 @@ spec:
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
               service:
                 name: {{ .Spec.Dbs.Minio.SvcName }}

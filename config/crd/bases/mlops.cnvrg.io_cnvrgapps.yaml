@@ -603,7 +603,7 @@ spec:
                       type:
                         enum:
                         - istio
-                        - k8singress
+                        - ingress
                         - openshift
                         - nodeport
                         type: string

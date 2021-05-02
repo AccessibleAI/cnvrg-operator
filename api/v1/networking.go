@@ -1,11 +1,11 @@
 package v1
 
-// +kubebuilder:validation:Enum=istio;k8singress;openshift;nodeport
+// +kubebuilder:validation:Enum=istio;ingress;openshift;nodeport
 type IngressType string
 
 const (
 	IstioIngress     IngressType = "istio"
-	NginxIngress     IngressType = "k8singress"
+	NginxIngress     IngressType = "ingress"
 	OpenShiftIngress IngressType = "openshift"
 	NodePortIngress  IngressType = "nodeport"
 )

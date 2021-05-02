@@ -219,6 +219,7 @@ rules:
   - networking.istio.io
   - rbac.istio.io
   - authentication.istio.io
+  - networking.k8s.io
   resources:
   -  "*"
   verbs:
