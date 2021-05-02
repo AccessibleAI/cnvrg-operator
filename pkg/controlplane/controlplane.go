@@ -156,6 +156,19 @@ func webAppOcpRoute() []*desired.State {
 	}
 }
 
+func webAppIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/webapp/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+		},
+	}
+}
+
 func sidekiqState() []*desired.State {
 	return []*desired.State{
 		{
@@ -296,6 +309,10 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		}
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 			state = append(state, webAppOcpRoute()...)
+		}
+
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
+			state = append(state, webAppIngress()...)
 		}
 	}
 

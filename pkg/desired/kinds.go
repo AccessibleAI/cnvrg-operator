@@ -22,6 +22,7 @@ const (
 	RoleGVR                 GVRName = "RoleGVR"
 	RoleBindingGVR          GVRName = "RoleBindingGVR"
 	OcpRouteGVR             GVRName = "OcpRouteGVR"
+	IngressGVR              GVRName = "IngressGVR"
 	IstioVsGVR              GVRName = "IstioVsGVR"
 	IstioGVR                GVRName = "IstioGVR"
 	IstioDestinationRuleGVR GVRName = "IstioDestinationRule"
@@ -154,5 +155,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "monitoring.coreos.com",
 		Version: "v1",
 		Kind:    "PrometheusRule",
+	},
+	IngressGVR: schema.GroupVersionKind{
+		Group:   "networking.k8s.io",
+		Version: "v1",
+		Kind:    "Ingress",
 	},
 }

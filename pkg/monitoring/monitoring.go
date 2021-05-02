@@ -360,6 +360,19 @@ func promIstioVs() []*desired.State {
 	}
 }
 
+func promIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prometheus/instance/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+		},
+	}
+}
+
 func promOcpRoute() []*desired.State {
 	return []*desired.State{
 		{
@@ -381,6 +394,19 @@ func grafanaIstioVs() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+		},
+	}
+}
+
+func grafanaIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/grafana/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
 			Own:            true,
 		},
 	}
@@ -558,12 +584,29 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, promOauthProxy()...)
 		state = append(state, infraPrometheusInstanceState()...)
 
+		switch infra.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
+			state = append(state, promIstioVs()...)
+		case mlopsv1.NginxIngress:
+			state = append(state, promIngress()...)
+		case mlopsv1.OpenShiftIngress:
+			state = append(state, promOcpRoute()...)
+		}
+
 	}
 	if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
 		state = append(state, kubeStateMetricsState()...)
 	}
 	if *infra.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
+		switch infra.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
+			state = append(state, grafanaIstioVs()...)
+		case mlopsv1.NginxIngress:
+			state = append(state, grafanaIngress()...)
+		case mlopsv1.OpenShiftIngress:
+			state = append(state, grafanaOcpRoute()...)
+		}
 	}
 	if *infra.Spec.Monitoring.NodeExporter.Enabled {
 		state = append(state, nodeExporterState()...)
@@ -577,24 +620,6 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	if *infra.Spec.SSO.Enabled {
 
 		state = append(state, grafanaOauthProxy()...)
-	}
-
-	if infra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-		if *infra.Spec.Monitoring.Prometheus.Enabled {
-			state = append(state, promIstioVs()...)
-		}
-		if *infra.Spec.Monitoring.Grafana.Enabled {
-			state = append(state, grafanaIstioVs()...)
-		}
-	}
-
-	if infra.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		if *infra.Spec.Monitoring.Prometheus.Enabled {
-			state = append(state, promOcpRoute()...)
-		}
-		if *infra.Spec.Monitoring.Grafana.Enabled {
-			state = append(state, grafanaOcpRoute()...)
-		}
 	}
 
 	return state

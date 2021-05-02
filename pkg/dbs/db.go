@@ -291,6 +291,19 @@ func esIstioVs() []*desired.State {
 	}
 }
 
+func esIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+		},
+	}
+}
+
 func esOcpRoute() []*desired.State {
 	return []*desired.State{
 		{
@@ -330,40 +343,60 @@ func minioOcpRoute() []*desired.State {
 	}
 }
 
+func minioIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/minio/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+		},
+	}
+}
+
 func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
+	// pg
 	if *cnvrgApp.Spec.Dbs.Pg.Enabled {
 		state = append(state, pgState()...)
 	}
 
+	// redis
 	if *cnvrgApp.Spec.Dbs.Redis.Enabled {
 		state = append(state, redisState()...)
 	}
 
+	// minio
 	if *cnvrgApp.Spec.Dbs.Minio.Enabled && *cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled {
 		state = append(state, sharedBackendMinio()...)
 	} else {
 		state = append(state, singleBackendMinio()...)
 	}
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled {
+		switch cnvrgApp.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
+			state = append(state, minioIstioVs()...)
+		case mlopsv1.NginxIngress:
+			state = append(state, minioIngress()...)
+		case mlopsv1.OpenShiftIngress:
+			state = append(state, minioOcpRoute()...)
+		}
+	}
+
+	// elasticsearch
 	if *cnvrgApp.Spec.Dbs.Es.Enabled {
 		state = append(state, esState()...)
-	}
-
-	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-		state = append(state, esIstioVs()...)
-	}
-
-	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		state = append(state, esOcpRoute()...)
-	}
-
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-		state = append(state, minioIstioVs()...)
-	}
-
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		state = append(state, minioOcpRoute()...)
+		switch cnvrgApp.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
+			state = append(state, esIstioVs()...)
+		case mlopsv1.NginxIngress:
+			state = append(state, esIngress()...)
+		case mlopsv1.OpenShiftIngress:
+			state = append(state, esOcpRoute()...)
+		}
 	}
 
 	return state

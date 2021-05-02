@@ -116,6 +116,19 @@ func kibanaOcpRoute() []*desired.State {
 	}
 }
 
+func kibanaIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/kibana/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+		},
+	}
+}
+
 func kibana() []*desired.State {
 	return []*desired.State{
 		{
@@ -238,13 +251,15 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 			state = append(state, kibanaOauthProxy()...)
 		}
 
-		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+		switch cnvrgApp.Spec.Networking.Ingress.Type {
+		case mlopsv1.IstioIngress:
 			state = append(state, kibanaIstioVs()...)
-		}
-
-		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+		case mlopsv1.NginxIngress:
+			state = append(state, kibanaIngress()...)
+		case mlopsv1.OpenShiftIngress:
 			state = append(state, kibanaOcpRoute()...)
 		}
+
 	}
 
 	return state
