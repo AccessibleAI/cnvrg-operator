@@ -220,13 +220,6 @@ spec:
                     type: object
                   ingress:
                     properties:
-                      ingressType:
-                        enum:
-                        - istio
-                        - k8singress
-                        - openshift
-                        - nodeport
-                        type: string
                       istioGwName:
                         type: string
                       perTryTimeout:
@@ -234,6 +227,13 @@ spec:
                       retriesAttempts:
                         type: integer
                       timeout:
+                        type: string
+                      type:
+                        enum:
+                        - istio
+                        - k8singress
+                        - openshift
+                        - nodeport
                         type: string
                     type: object
                   istio:

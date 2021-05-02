@@ -7,7 +7,7 @@ metadata:
   labels:
     app: {{ .Spec.Logging.Kibana.SvcName }}
 spec:
-  {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
+  {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort
   {{- end }}
   selector:
@@ -15,6 +15,6 @@ spec:
   ports:
     - port: {{ .Spec.Logging.Kibana.Port }}
       protocol: TCP
-      {{- if eq .Spec.Networking.Ingress.IngressType "nodeport" }}
+      {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
       nodePort: {{ .Spec.Logging.Kibana.NodePort }}
       {{- end }}

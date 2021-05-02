@@ -291,10 +291,10 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		state = append(state, webAppState()...)
-		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 			state = append(state, webAppIstioVs()...)
 		}
-		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 			state = append(state, webAppOcpRoute()...)
 		}
 	}

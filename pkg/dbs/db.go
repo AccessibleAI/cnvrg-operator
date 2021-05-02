@@ -350,19 +350,19 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, esState()...)
 	}
 
-	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 		state = append(state, esIstioVs()...)
 	}
 
-	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+	if *cnvrgApp.Spec.Dbs.Es.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 		state = append(state, esOcpRoute()...)
 	}
 
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 		state = append(state, minioIstioVs()...)
 	}
 
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+	if *cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 		state = append(state, minioOcpRoute()...)
 	}
 

@@ -79,7 +79,7 @@ type CnvrgAppMonitoring struct {
 	Grafana    Grafana    `json:"grafana,omitempty"`
 }
 
-var grafanaDefault = Grafana{
+var grafanaInfraDefault = Grafana{
 	Enabled:    &defaultEnabled,
 	Image:      "grafana/grafana:7.3.4",
 	SvcName:    "grafana",
@@ -88,7 +88,32 @@ var grafanaDefault = Grafana{
 	OauthProxy: OauthProxyServiceConf{SkipAuthRegex: []string{`\/api\/health`}},
 }
 
-var prometheusDefault = Prometheus{
+var grafanaAppDefault = Grafana{
+	Enabled:    &defaultEnabled,
+	Image:      "grafana/grafana:7.3.4",
+	SvcName:    "grafana",
+	Port:       8080,
+	NodePort:   30014,
+	OauthProxy: OauthProxyServiceConf{SkipAuthRegex: []string{`\/api\/health`}},
+}
+
+var prometheusInfraDefault = Prometheus{
+	Enabled:             &defaultEnabled,
+	Image:               "quay.io/prometheus/prometheus:v2.22.1",
+	BasicAuthProxyImage: "docker.io/nginx:1.20",
+	CPURequest:          "200m",
+	MemoryRequest:       "500Mi",
+	SvcName:             "prometheus",
+	Port:                9091, // basic auth nginx proxy is enabled by default
+	NodePort:            30910,
+	StorageSize:         "50Gi",
+	StorageClass:        "",
+	CredsRef:            "prom-creds",
+	UpstreamRef:         "upstream-prom-static-config",
+	NodeSelector:        nil,
+}
+
+var prometheusAppDefault = Prometheus{
 	Enabled:             &defaultEnabled,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
@@ -105,13 +130,13 @@ var prometheusDefault = Prometheus{
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
-	Prometheus: prometheusDefault,
-	Grafana:    grafanaDefault,
+	Prometheus: prometheusAppDefault,
+	Grafana:    grafanaAppDefault,
 }
 
 var infraMonitoringDefault = CnvrgInfraMonitoring{
-	Prometheus: prometheusDefault,
-	Grafana:    grafanaDefault,
+	Prometheus: prometheusInfraDefault,
+	Grafana:    grafanaInfraDefault,
 	PrometheusOperator: PrometheusOperator{
 		Enabled: &defaultEnabled,
 		Images: Images{

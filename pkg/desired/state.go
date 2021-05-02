@@ -147,7 +147,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return "http://"
 		},
 		"appDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
+			if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NodePortIngress {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgApp.Spec.ControlPlane.WebApp.NodePort)
 			} else {
@@ -155,7 +155,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 		},
 		"defaultComputeClusterDomain": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
+			if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NodePortIngress {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgApp.Spec.ControlPlane.WebApp.NodePort)
 			} else {
@@ -180,32 +180,36 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint != "" {
 				return cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint
-			}
-			if *cnvrgApp.Spec.Networking.HTTPS.Enabled {
-				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+			} else if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NodePortIngress {
+				return fmt.Sprintf("http://%s:%d", cnvrgApp.Spec.ClusterDomain, cnvrgApp.Spec.Dbs.Minio.NodePort)
 			} else {
-				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+				if *cnvrgApp.Spec.Networking.HTTPS.Enabled {
+					return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+				} else {
+					return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+				}
 			}
+
 		},
 		"routeBy": func(cnvrgApp mlopsv1.CnvrgApp, routeBy string) string {
 			switch routeBy {
 			case "ISTIO":
-				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+				if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 					return "true"
 				}
 				return "false"
 			case "OPENSHIFT":
-				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+				if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 					return "true"
 				}
 				return "false"
 			case "NGINX_INGRESS":
-				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NginxIngress {
+				if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
 					return "true"
 				}
 				return "false"
 			case "NODE_PORT":
-				if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.NodePortIngress {
+				if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NodePortIngress {
 					return "true"
 				}
 				return "false"
@@ -589,6 +593,24 @@ func CreatePromCredsSecret(obj v1.Object, secretName, secretNs, promUrl string, 
 	}
 	return nil
 
+}
+
+func GetNodeIp(client client.Client, log logr.Logger) (string, error) {
+	nodeList := v1core.NodeList{}
+	if err := client.List(context.Background(), &nodeList); err != nil {
+		log.Error(err, "can't list nodes")
+		return "", fmt.Errorf("can't list nodes")
+	}
+	if len(nodeList.Items) == 0 {
+		return "", fmt.Errorf("nodes list is 0, wtf?!")
+	}
+	// take ip of the first node (doesn't really matter)
+	for _, address := range nodeList.Items[0].Status.Addresses {
+		if address.Type == v1core.NodeInternalIP {
+			return address.Address, nil
+		}
+	}
+	return "", fmt.Errorf("can't detect node's internal IP")
 }
 
 func PrometheusUpstreamConfig(user, pass, ns, upstream string) string {

@@ -238,11 +238,11 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 			state = append(state, kibanaOauthProxy()...)
 		}
 
-		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 			state = append(state, kibanaIstioVs()...)
 		}
 
-		if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 			state = append(state, kibanaOcpRoute()...)
 		}
 	}

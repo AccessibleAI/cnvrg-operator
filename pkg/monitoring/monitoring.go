@@ -527,7 +527,7 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, grafanaOauthProxy()...)
 	}
 
-	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
 			state = append(state, promIstioVs()...)
 		}
@@ -536,7 +536,7 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		}
 	}
 
-	if cnvrgApp.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 		if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
 			state = append(state, promOcpRoute()...)
 		}
@@ -579,7 +579,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		state = append(state, grafanaOauthProxy()...)
 	}
 
-	if infra.Spec.Networking.Ingress.IngressType == mlopsv1.IstioIngress {
+	if infra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 		if *infra.Spec.Monitoring.Prometheus.Enabled {
 			state = append(state, promIstioVs()...)
 		}
@@ -588,7 +588,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		}
 	}
 
-	if infra.Spec.Networking.Ingress.IngressType == mlopsv1.OpenShiftIngress {
+	if infra.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 		if *infra.Spec.Monitoring.Prometheus.Enabled {
 			state = append(state, promOcpRoute()...)
 		}

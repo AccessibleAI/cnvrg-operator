@@ -25,7 +25,7 @@ type Istio struct {
 }
 
 type Ingress struct {
-	IngressType     IngressType `json:"ingressType,omitempty"`
+	Type            IngressType `json:"type,omitempty"`
 	Timeout         string      `json:"timeout,omitempty"`
 	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
@@ -72,7 +72,7 @@ var httpsDefault = HTTPS{
 }
 
 var ingressAppDefault = Ingress{
-	IngressType:     IstioIngress,
+	Type:            IstioIngress,
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
@@ -80,7 +80,7 @@ var ingressAppDefault = Ingress{
 }
 
 var ingressInfraDefault = Ingress{
-	IngressType:     IstioIngress,
+	Type:            IstioIngress,
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
