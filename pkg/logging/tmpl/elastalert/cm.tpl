@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: elastalert-config
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 data:
   config.json: |
     {

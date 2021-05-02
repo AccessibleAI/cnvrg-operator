@@ -3,6 +3,8 @@ kind: VirtualService
 metadata:
   name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   hosts:
     - "{{.Spec.Monitoring.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}"

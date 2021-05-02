@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{.Spec.Dbs.Pg.SvcName }}
+    owner: cnvrg-control-plane
+    cnvrg-component: pg
 spec:
   replicas: 1
   selector:
@@ -16,6 +18,8 @@ spec:
     metadata:
       labels:
         app: {{.Spec.Dbs.Pg.SvcName }}
+        owner: cnvrg-control-plane
+        cnvrg-component: pg
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

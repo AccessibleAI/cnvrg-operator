@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Namespace }}
   labels:
     k8s-app: fluent-bit
+    owner: cnvrg-control-plane
 data:
   fluent-bit.conf: |
     [SERVICE]

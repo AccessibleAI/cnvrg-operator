@@ -5,6 +5,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: 1.9.7
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
+    owner: cnvrg-control-plane
   name: kube-state-metrics
   namespace: {{ ns . }}
 spec:

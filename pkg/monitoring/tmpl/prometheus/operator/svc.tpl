@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: cnvrg-prometheus-operator
+    owner: cnvrg-control-plane
 spec:
   ports:
   - name: https

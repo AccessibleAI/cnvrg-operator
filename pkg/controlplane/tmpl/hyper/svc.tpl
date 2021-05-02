@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ .Spec.ControlPlane.Hyper.SvcName }}
+    owner: cnvrg-control-plane
 spec:
   ports:
     - port: {{ .Spec.ControlPlane.Hyper.Port }}

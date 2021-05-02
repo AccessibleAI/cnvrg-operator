@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: searchkiq
+    owner: cnvrg-control-plane
+    cnvrg-component: searchkiq
 spec:
   replicas: {{ .Spec.ControlPlane.Searchkiq.Replicas }}
   selector:
@@ -14,6 +16,8 @@ spec:
     metadata:
       labels:
         app: searchkiq
+        owner: cnvrg-control-plane
+        cnvrg-component: searchkiq
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

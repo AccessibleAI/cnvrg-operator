@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: {{ .Spec.ControlPlane.Rbac.Role }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 rules:
 - apiGroups:
     - security.openshift.io

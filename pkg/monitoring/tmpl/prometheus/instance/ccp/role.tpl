@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: cnvrg-ccp-prometheus
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 rules:
 - apiGroups:
     - security.openshift.io

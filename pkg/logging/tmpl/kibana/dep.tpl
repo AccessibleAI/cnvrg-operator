@@ -6,6 +6,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ .Spec.Logging.Kibana.SvcName }}
+    owner: cnvrg-control-plane
 spec:
   replicas: 1
   selector:
@@ -15,6 +16,7 @@ spec:
     metadata:
       labels:
         app: {{ .Spec.Logging.Kibana.SvcName }}
+        owner: cnvrg-control-plane
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

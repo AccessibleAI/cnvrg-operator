@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: mpi-operator
+    owner: cnvrg-control-plane
 spec:
   replicas: 1
   selector:
@@ -14,6 +15,7 @@ spec:
     metadata:
       labels:
         app: mpi-operator
+        owner: cnvrg-control-plane
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

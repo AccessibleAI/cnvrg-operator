@@ -7,6 +7,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ ns . }}
+    owner: cnvrg-control-plane
 spec:
   host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:

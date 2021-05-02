@@ -6,6 +6,7 @@ metadata:
   labels:
     app: cnvrg-jobs
     cnvrg-ccp-prometheus: {{ .Name }}-{{ ns .}}
+    owner: cnvrg-control-plane
 spec:
   jobLabel: cnvrg-job
   selector:

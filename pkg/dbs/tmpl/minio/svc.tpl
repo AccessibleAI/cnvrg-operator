@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns .  }}
   labels:
     app: {{ .Spec.Dbs.Minio.SvcName }}
+    owner: cnvrg-control-plane
 spec:
   {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort

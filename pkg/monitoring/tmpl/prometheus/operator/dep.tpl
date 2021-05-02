@@ -6,6 +6,7 @@ metadata:
   labels:
     app: cnvrg-prometheus-operator
     version: v0.44.1
+    owner: cnvrg-control-plane
 spec:
   replicas: 1
   selector:
@@ -17,6 +18,7 @@ spec:
       labels:
         app: cnvrg-prometheus-operator
         version: v0.44.1
+        owner: cnvrg-control-plane
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

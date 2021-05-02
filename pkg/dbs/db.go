@@ -115,6 +115,14 @@ func pgState() []*desired.State {
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
 		},
+		{
+			TemplatePath:   path + "/pg/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+		},
 	}
 }
 
@@ -169,11 +177,27 @@ func redisState() []*desired.State {
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
 		},
+		{
+			TemplatePath:   path + "/redis/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+		},
 	}
 }
 
 func singleBackendMinio() []*desired.State {
 	return []*desired.State{
+		{
+			TemplatePath:   path + "/minio/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+		},
 		{
 			TemplatePath:   path + "/minio/sa.tpl",
 			Template:       nil,
@@ -231,6 +255,14 @@ func singleBackendMinio() []*desired.State {
 func sharedBackendMinio() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/minio/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+		},
+		{
 			TemplatePath:   path + "/minio/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -238,7 +270,6 @@ func sharedBackendMinio() []*desired.State {
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
 		},
-
 		{
 
 			TemplatePath:   path + "/minio/pvc.tpl",

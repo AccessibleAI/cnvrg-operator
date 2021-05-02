@@ -7,6 +7,7 @@ metadata:
     k8s-app: fluent-bit-logging
     version: v1
     kubernetes.io/cluster-service: "true"
+    owner: cnvrg-control-plane
 spec:
   selector:
     matchLabels:
@@ -17,6 +18,7 @@ spec:
         k8s-app: fluent-bit-logging
         version: v1
         kubernetes.io/cluster-service: "true"
+        owner: cnvrg-control-plane
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "2020"

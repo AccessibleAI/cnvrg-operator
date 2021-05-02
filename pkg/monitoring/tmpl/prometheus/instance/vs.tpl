@@ -3,6 +3,8 @@ kind: VirtualService
 metadata:
   name: {{ .Spec.Monitoring.Prometheus.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   hosts:
   - "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"

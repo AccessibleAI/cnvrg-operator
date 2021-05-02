@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: sidekiq
+    owner: cnvrg-control-plane
+    cnvrg-component: sidekiq
 spec:
   replicas: {{ .Spec.ControlPlane.Sidekiq.Replicas }}
   selector:
@@ -14,6 +16,8 @@ spec:
     metadata:
       labels:
         app: sidekiq
+        owner: cnvrg-control-plane
+        cnvrg-component: sidekiq
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

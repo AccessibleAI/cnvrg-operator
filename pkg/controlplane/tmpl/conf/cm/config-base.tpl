@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: cp-base-config
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 data:
   AGENT_CUSTOM_TAG: "{{ .Spec.ControlPlane.BaseConfig.AgentCustomTag }}"
   PASSENGER_APP_ENV: "{{ .Spec.ControlPlane.BaseConfig.PassengerAppEnv }}"

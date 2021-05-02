@@ -2,6 +2,8 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: mpi-operator
+  labels:
+    owner: cnvrg-control-plane
 rules:
   - apiGroups:
       - ""

@@ -3,6 +3,8 @@ kind: VirtualService
 metadata:
   name: {{.Spec.Dbs.Es.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   hosts:
     - "{{.Spec.Dbs.Es.SvcName}}.{{ .Spec.ClusterDomain }}"

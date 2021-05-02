@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 rules:
   - apiGroups:
       - security.openshift.io

@@ -6,6 +6,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ .Spec.Logging.Kibana.SvcName }}
+    owner: cnvrg-control-plane
 spec:
   {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort

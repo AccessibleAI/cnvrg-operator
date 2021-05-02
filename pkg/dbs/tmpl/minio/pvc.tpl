@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Spec.Dbs.Minio.SvcName }}
   namespace: {{ ns .  }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   accessModes:
     {{- if isTrue .Spec.Dbs.Minio.SharedStorage.Enabled }}

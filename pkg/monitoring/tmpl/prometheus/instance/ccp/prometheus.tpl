@@ -18,6 +18,9 @@ spec:
         {{- end }}
   image: {{ .Spec.Monitoring.Prometheus.Image }}
   replicas: 1
+  podMetadata:
+    labels:
+      owner: cnvrg-control-plane
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.CPURequest }}

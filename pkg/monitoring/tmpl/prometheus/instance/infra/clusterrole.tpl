@@ -2,6 +2,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cnvrg-infra-prometheus
+  labels:
+    owner: cnvrg-control-plane
 rules:
 - apiGroups:
     - security.openshift.io

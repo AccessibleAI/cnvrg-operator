@@ -3,6 +3,8 @@ kind: VirtualService
 metadata:
   name: {{ .Spec.Logging.Kibana.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   hosts:
     - "{{.Spec.Logging.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}"

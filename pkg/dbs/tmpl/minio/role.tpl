@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: {{ .Spec.Dbs.Minio.ServiceAccount }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 rules:
 - apiGroups:
   - "*"

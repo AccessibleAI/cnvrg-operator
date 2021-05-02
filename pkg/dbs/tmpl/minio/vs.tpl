@@ -3,6 +3,8 @@ kind: VirtualService
 metadata:
   name: {{ .Spec.Dbs.Minio.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   hosts:
   - "{{ .Spec.Dbs.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"

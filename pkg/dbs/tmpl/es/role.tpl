@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: {{ .Spec.Dbs.Es.ServiceAccount }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 rules:
 - apiGroups:
   - "*"

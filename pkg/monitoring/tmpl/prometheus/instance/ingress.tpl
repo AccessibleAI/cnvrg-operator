@@ -7,6 +7,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 5G
   name: {{ .Spec.Monitoring.Prometheus.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   rules:
     - host: "{{.Spec.Monitoring.Prometheus.SvcName}}.{{ .Spec.ClusterDomain }}"

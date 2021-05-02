@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: systemkiq
+    owner: cnvrg-control-plane
+    cnvrg-component: systemkiq
 spec:
   replicas: {{ .Spec.ControlPlane.Systemkiq.Replicas }}
   selector:
@@ -14,6 +16,8 @@ spec:
     metadata:
       labels:
         app: systemkiq
+        owner: cnvrg-control-plane
+        cnvrg-component: systemkiq
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

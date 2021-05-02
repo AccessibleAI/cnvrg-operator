@@ -4,6 +4,7 @@ metadata:
   labels:
     app: cnvrg-ccp-prometheus
     role: alert-rules
+    owner: cnvrg-control-plane
   name: prometheus-k8s-rules
   namespace: {{ ns . }}
 spec:

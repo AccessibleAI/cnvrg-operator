@@ -3,6 +3,8 @@ kind: Secret
 metadata:
   name: cp-object-storage
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 data:
   SECRET_KEY_BASE: {{ .Spec.ControlPlane.ObjectStorage.SecretKeyBase | b64enc }}
   STS_IV: {{ .Spec.ControlPlane.ObjectStorage.StsIv | b64enc }}

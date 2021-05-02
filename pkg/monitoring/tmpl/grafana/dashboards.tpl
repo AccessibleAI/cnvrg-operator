@@ -3,6 +3,8 @@ apiVersion: v1
 metadata:
   name: grafana-dashboards
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 data:
   dashboards.yaml: |-
     {

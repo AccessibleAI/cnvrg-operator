@@ -119,12 +119,19 @@ func webAppState() []*desired.State {
 			Own:            true,
 		},
 		{
-
 			TemplatePath:   path + "/webapp/oauth.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/webapp/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
 		},
 	}
@@ -180,6 +187,14 @@ func sidekiqState() []*desired.State {
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
 		},
+		{
+			TemplatePath:   path + "/sidekiqs/sidekiq-pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+		},
 	}
 }
 
@@ -194,6 +209,14 @@ func searchkiqState() []*desired.State {
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
 		},
+		{
+			TemplatePath:   path + "/sidekiqs/searchkiq-pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+		},
 	}
 }
 
@@ -205,6 +228,14 @@ func systemkiqState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/sidekiqs/systemkiq-pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
 		},
 	}

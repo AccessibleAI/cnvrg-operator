@@ -4,6 +4,7 @@ metadata:
   labels:
     k8s-app: coredns
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
+    owner: cnvrg-control-plane
   name: coredns
   namespace: {{ ns . }}
 spec:

@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: redis-conf
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 data:
   redis.conf: |
     dir /data/

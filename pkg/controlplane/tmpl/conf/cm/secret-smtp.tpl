@@ -3,6 +3,8 @@ kind: Secret
 metadata:
   name: cp-smtp
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 data:
   SMTP_SERVER: {{ .Spec.ControlPlane.SMTP.Server | b64enc }}
   SMTP_PORT: {{ .Spec.ControlPlane.SMTP.Port | b64enc }}

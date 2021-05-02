@@ -4,6 +4,7 @@ metadata:
   labels:
     k8s-app: apiserver
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
+    owner: cnvrg-control-plane
   name: kube-apiserver
   namespace: {{ ns . }}
 spec:

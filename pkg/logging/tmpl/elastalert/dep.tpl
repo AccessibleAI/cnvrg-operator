@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: {{ .Spec.Logging.Elastalert.SvcName }}
+    owner: cnvrg-control-plane
   name: {{ .Spec.Logging.Elastalert.SvcName }}
   namespace: {{ ns . }}
 spec:
@@ -14,6 +15,7 @@ spec:
     metadata:
       labels:
         app: {{ .Spec.Logging.Elastalert.SvcName }}
+        owner: cnvrg-control-plane
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

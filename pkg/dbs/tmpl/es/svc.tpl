@@ -6,6 +6,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ .Spec.Dbs.Es.SvcName }}
+    owner: cnvrg-control-plane
 spec:
   {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort

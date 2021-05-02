@@ -3,6 +3,8 @@ kind: DaemonSet
 metadata:
   name: nvidia-device-plugin-daemonset
   namespace: {{ .Namespace }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   selector:
     matchLabels:
@@ -11,6 +13,7 @@ spec:
     metadata:
       labels:
         name: nvidia-device-plugin-ds
+        owner: cnvrg-control-plane
     spec:
       serviceAccountName: nvidia-device-plugin
       tolerations:

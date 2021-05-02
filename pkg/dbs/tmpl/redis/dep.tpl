@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{.Spec.Dbs.Redis.SvcName }}
+    owner: cnvrg-control-plane
+    cnvrg-component: redis
 spec:
   selector:
     matchLabels:
@@ -13,6 +15,8 @@ spec:
     metadata:
       labels:
         app: {{.Spec.Dbs.Redis.SvcName }}
+        owner: cnvrg-control-plane
+        cnvrg-component: redis
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

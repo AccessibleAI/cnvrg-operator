@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{.Spec.Dbs.Redis.SvcName }}
+    owner: cnvrg-control-plane
 spec:
   ports:
   - name: redis

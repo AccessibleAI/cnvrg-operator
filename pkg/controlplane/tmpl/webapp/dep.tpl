@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ .Spec.ControlPlane.WebApp.SvcName }}
+    owner: cnvrg-control-plane
+    cnvrg-component: webapp
 spec:
   replicas: {{ .Spec.ControlPlane.WebApp.Replicas }}
   strategy:
@@ -19,6 +21,8 @@ spec:
     metadata:
       labels:
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
+        owner: cnvrg-control-plane
+        cnvrg-component: webapp
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

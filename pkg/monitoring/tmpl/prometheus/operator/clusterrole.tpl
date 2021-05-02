@@ -5,6 +5,7 @@ metadata:
   labels:
     app: cnvrg-prometheus-operator
     version: v0.44.1
+    owner: cnvrg-control-plane
 rules:
 - apiGroups:
   - monitoring.coreos.com

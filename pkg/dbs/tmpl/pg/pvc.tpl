@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Spec.Dbs.Pg.SvcName }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 spec:
   accessModes:
     - ReadWriteOnce

@@ -3,3 +3,5 @@ kind: ServiceAccount
 metadata:
   name: mpi-operator
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane

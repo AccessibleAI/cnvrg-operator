@@ -3,6 +3,8 @@ kind: RoleBinding
 metadata:
   name: {{ .Spec.Dbs.Es.ServiceAccount }}
   namespace: {{ ns . }}
+  labels:
+    owner: cnvrg-control-plane
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

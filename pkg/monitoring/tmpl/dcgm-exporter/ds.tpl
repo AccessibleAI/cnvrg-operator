@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: "dcgm-exporter"
+    owner: cnvrg-control-plane
 spec:
   selector:
     matchLabels:
@@ -13,6 +14,7 @@ spec:
     metadata:
       labels:
         app: "dcgm-exporter"
+        owner: cnvrg-control-plane
     spec:
       serviceAccountName: dcgm-exporter
       volumes:

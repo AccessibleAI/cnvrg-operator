@@ -4,6 +4,7 @@ metadata:
   labels:
     k8s-app: kube-scheduler
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
+    owner: cnvrg-control-plane
   name: kube-scheduler
   namespace: {{ ns . }}
 spec:

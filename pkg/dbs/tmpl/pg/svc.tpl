@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: cnvrg-postgres
+    owner: cnvrg-control-plane
 spec:
   ports:
     - port: {{ .Spec.Dbs.Pg.Port }}

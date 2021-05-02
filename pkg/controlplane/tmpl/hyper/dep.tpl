@@ -4,6 +4,7 @@ metadata:
   name: {{ .Spec.ControlPlane.Hyper.SvcName }}
   namespace: {{ ns . }}
   labels:
+    owner: cnvrg-control-plane
     app: {{ .Spec.ControlPlane.Hyper.SvcName }}
 spec:
   replicas: {{ .Spec.ControlPlane.Hyper.Replicas }}
@@ -19,6 +20,7 @@ spec:
     metadata:
       labels:
         app: {{ .Spec.ControlPlane.Hyper.SvcName }}
+        owner: cnvrg-control-plane
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

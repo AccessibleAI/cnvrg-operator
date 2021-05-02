@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: grafana
+    owner: cnvrg-control-plane
   name: grafana
   namespace: {{ ns . }}
 spec:
@@ -14,6 +15,7 @@ spec:
     metadata:
       labels:
         app: grafana
+        owner: cnvrg-control-plane
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

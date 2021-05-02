@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: cnvrg-ccp-prometheus
+    owner: cnvrg-control-plane
 spec:
   {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort

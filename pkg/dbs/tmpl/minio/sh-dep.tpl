@@ -5,6 +5,8 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: {{ .Spec.Dbs.Minio.SvcName }}
+    owner: cnvrg-control-plane
+    cnvrg-component: minio
 spec:
   selector:
     matchLabels:
@@ -14,6 +16,8 @@ spec:
     metadata:
       labels:
         app: {{ .Spec.Dbs.Minio.SvcName }}
+        owner: cnvrg-control-plane
+        cnvrg-component: minio
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

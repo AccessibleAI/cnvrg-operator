@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: cnvrg-infra-prometheus
+    owner: cnvrg-control-plane
 spec:
   storage:
     disableMountSubPath: true
@@ -22,6 +23,9 @@ spec:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.CPURequest }}
       memory: {{ .Spec.Monitoring.Prometheus.MemoryRequest }}
+  podMetadata:
+    labels:
+      owner: cnvrg-control-plane
   ruleSelector:
     matchLabels:
       app: cnvrg-infra-prometheus

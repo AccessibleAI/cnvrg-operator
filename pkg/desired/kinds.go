@@ -28,6 +28,7 @@ const (
 	IstioDestinationRuleGVR GVRName = "IstioDestinationRule"
 	IstioGwGVR              GVRName = "IstioGwGVR"
 	StorageClassGVR         GVRName = "StorageClassGVR"
+	PodDisruptionBudgetGVR  GVRName = "PodDisruptionBudget"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -160,5 +161,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "networking.k8s.io",
 		Version: "v1",
 		Kind:    "Ingress",
+	},
+	PodDisruptionBudgetGVR: schema.GroupVersionKind{
+		Group:   "policy",
+		Version: "v1beta1",
+		Kind:    "PodDisruptionBudget",
 	},
 }

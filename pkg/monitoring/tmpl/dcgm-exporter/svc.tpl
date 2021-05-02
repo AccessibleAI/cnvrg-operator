@@ -5,6 +5,7 @@ metadata:
   namespace: {{ ns . }}
   labels:
     app: dcgm-exporter
+    owner: cnvrg-control-plane
 spec:
   type: ClusterIP
   ports:
