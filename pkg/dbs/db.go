@@ -403,7 +403,7 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	// minio
 	if *cnvrgApp.Spec.Dbs.Minio.Enabled && *cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled {
 		state = append(state, sharedBackendMinio()...)
-	} else {
+	} else if *cnvrgApp.Spec.Dbs.Minio.Enabled {
 		state = append(state, singleBackendMinio()...)
 	}
 	if *cnvrgApp.Spec.Dbs.Minio.Enabled {
