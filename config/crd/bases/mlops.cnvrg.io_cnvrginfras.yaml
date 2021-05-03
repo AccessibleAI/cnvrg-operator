@@ -286,7 +286,9 @@ spec:
                   cookieSecret:
                     type: string
                   emailDomain:
-                    type: string
+                    items:
+                      type: string
+                    type: array
                   enabled:
                     type: boolean
                   image:

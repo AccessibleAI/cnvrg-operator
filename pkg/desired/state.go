@@ -218,6 +218,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		},
 		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int) string {
 			sso := getSSOConfig(obj)
+
 			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
 			for i, url := range skipAuthRegex {
 				if i == (len(skipAuthRegex) - 1) {
@@ -227,12 +228,23 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				}
 			}
 			skipAuthUrls += "]"
+
+			emailsDomains := "["
+			for i, email := range sso.EmailDomain {
+				if i == (len(sso.EmailDomain) - 1) {
+					emailsDomains += fmt.Sprintf(`"%v"`, email)
+				} else {
+					emailsDomains += fmt.Sprintf(`"%v", `, email)
+				}
+			}
+			emailsDomains += "]"
+
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
-				fmt.Sprintf(`email_domains = ["%v"]`, sso.EmailDomain),
+				fmt.Sprintf(`email_domains = %v`, emailsDomains),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
 				fmt.Sprintf(`cookie_secret = "%v"`, sso.CookieSecret),
