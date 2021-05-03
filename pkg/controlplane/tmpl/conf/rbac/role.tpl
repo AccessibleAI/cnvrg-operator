@@ -7,6 +7,13 @@ metadata:
     owner: cnvrg-control-plane
 rules:
 - apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  - routes/custom-host
+  verbs:
+  - "*"
+- apiGroups:
     - security.openshift.io
   resourceNames:
     - anyuid
