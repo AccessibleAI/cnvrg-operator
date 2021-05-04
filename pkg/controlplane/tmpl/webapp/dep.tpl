@@ -26,7 +26,7 @@ spec:
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
-        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+        {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
       tolerations:
         - key: "{{ .Spec.Tenancy.Key }}"
           operator: "Equal"

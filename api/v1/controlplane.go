@@ -108,7 +108,7 @@ type Rbac struct {
 
 type SMTP struct {
 	Server   string `json:"server,omitempty"`
-	Port     string `json:"port,omitempty"`
+	Port     int    `json:"port,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 	Domain   string `json:"domain,omitempty"`
@@ -348,7 +348,7 @@ var controlPlaneDefault = ControlPlane{
 
 	SMTP: SMTP{
 		Server:   "",
-		Port:     "",
+		Port:     587,
 		Username: "",
 		Password: "",
 		Domain:   "",

@@ -243,7 +243,7 @@ spec:
                       password:
                         type: string
                       port:
-                        type: string
+                        type: integer
                       server:
                         type: string
                       username:
