@@ -410,8 +410,6 @@ spec:
                         type: object
                       port:
                         type: integer
-                      secretName:
-                        type: string
                       serviceAccount:
                         type: string
                       sharedBuffers:

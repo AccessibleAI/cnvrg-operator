@@ -9,7 +9,6 @@ type HugePages struct {
 type Pg struct {
 	Enabled        *bool             `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
-	SecretName     string            `json:"secretName,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`
@@ -110,7 +109,6 @@ var minioDefaults = Minio{
 var pgDefault = Pg{
 	Enabled:        &defaultEnabled,
 	ServiceAccount: "pg",
-	SecretName:     "cnvrg-pg-secret",
 	Image:          "centos/postgresql-12-centos7",
 	Port:           5432,
 	StorageSize:    "80Gi",
@@ -118,7 +116,7 @@ var pgDefault = Pg{
 	StorageClass:   "",
 	CPURequest:     "4000m",
 	MemoryRequest:  "4Gi",
-	MaxConnections: 100,
+	MaxConnections: 500,
 	SharedBuffers:  "64MB",
 	Fixpg:          &defaultTrue,
 	NodeSelector:   nil,

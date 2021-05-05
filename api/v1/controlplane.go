@@ -298,7 +298,7 @@ var controlPlaneDefault = ControlPlane{
 		DefaultComputeConfig: "/opt/kube",
 		DefaultComputeName:   "default",
 		UseStdout:            "true",
-		ExtractTagsFromCmd:   "&defaultEnabled",
+		ExtractTagsFromCmd:   "true",
 		CheckJobExpiration:   "true",
 		AgentCustomTag:       "latest",
 		Intercom:             "true",

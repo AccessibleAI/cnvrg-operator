@@ -26,22 +26,16 @@ spec:
       k8s:
         {{- if isTrue .Spec.Tenancy.Enabled }}
         nodeSelector:
-          "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+          {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
         tolerations:
           - key: "{{ .Spec.Tenancy.Key }}"
             operator: "Equal"
             value: "{{ .Spec.Tenancy.Value }}"
             effect: "NoSchedule"
         {{- end }}
-        {{- if ne .Spec.Networking.Istio.IngressSvcAnnotations "" }}
         serviceAnnotations:
-          {{- $annotations := split ";" .Spec.Networking.Istio.IngressSvcAnnotations }}
-            {{- range $idx, $annotation := $annotations }}
-              {{- $annotationItem := split ":" $annotation}}
-              {{- if eq (len $annotationItem) 2 }}
-          {{ trim $annotationItem._0 }}: {{ trim $annotationItem._1 }}
-              {{- end }}
-            {{- end }}
+        {{- range $name, $value := .Spec.Networking.Istio.IngressSvcAnnotations }}
+          {{ $name }}: {{ $value }}
         {{- end }}
         env:
           - name: ISTIO_META_ROUTER_MODE
@@ -66,23 +60,15 @@ spec:
             cpu: 100m
             memory: 128Mi
         service:
-          {{- if ne .Spec.Networking.Istio.LoadBalancerSourceRanges "" }}
           loadBalancerSourceRanges:
-            {{- $srouceRanges := split ";" .Spec.Networking.Istio.LoadBalancerSourceRanges }}
-            {{- range $idx, $range := $srouceRanges }}
-              {{- if ne (trim $range) "" }}
-            - {{trim $range}}
-              {{- end }}
-            {{- end }}
+          {{- range $idx, $range := .Spec.Networking.Istio.LBSourceRanges }}
+            - {{ $range}}
           {{- end }}
-          {{- if ne .Spec.Networking.Istio.ExternalIP "" }}
+          {{- if gt (len .Spec.Networking.Istio.ExternalIP) 0 }}
           type: ClusterIP
           externalIPs:
-          {{- $ips := split ";" .Spec.Networking.Istio.ExternalIP }}
-          {{- range $idx, $ip := $ips }}
-            {{- if ne (trim $ip) "" }}
-            - {{trim $ip}}
-            {{- end }}
+          {{- range $idx, $ip := .Spec.Networking.Istio.ExternalIP }}
+            - {{$ip}}
           {{- end }}
           {{- end }}
           ports:
@@ -92,15 +78,12 @@ spec:
           - name: https
             port: 443
             targetPort: 8443
-          {{- if ne .Spec.Networking.Istio.IngressSvcExtraPorts "" }}
-          {{- $ports := split ";" .Spec.Networking.Istio.IngressSvcExtraPorts }}
-          {{- range $idx, $port := $ports }}
-            {{- if ne (trim $port) "" }}
-          - name: port{{trim $port}}
-            port: {{trim $port}}
+          {{- if gt (len .Spec.Networking.Istio.IngressSvcExtraPorts) 0 }}
+          {{- range $idx, $port := .Spec.Networking.Istio.IngressSvcExtraPorts }}
+          - name: port{{ $port}}
+            port: {{ $port}}
             {{- end }}
           {{- end }}
-          {{- end}}
         strategy:
           rollingUpdate:
             maxSurge: 100%

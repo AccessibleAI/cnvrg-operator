@@ -241,15 +241,23 @@ spec:
                       enabled:
                         type: boolean
                       externalIp:
-                        type: string
+                        items:
+                          type: string
+                        type: array
                       hub:
                         type: string
                       ingressSvcAnnotations:
-                        type: string
+                        additionalProperties:
+                          type: string
+                        type: object
                       ingressSvcExtraPorts:
-                        type: string
-                      loadBalancerSourceRanges:
-                        type: string
+                        items:
+                          type: integer
+                        type: array
+                      lbSourceRanges:
+                        items:
+                          type: string
+                        type: array
                       mixerImage:
                         type: string
                       operatorImage:
