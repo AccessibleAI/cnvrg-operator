@@ -105,7 +105,6 @@ monitoring:
     storageClass: ""
     nodeSelector: {}
 
-
 networking:
   https:
     enabled: false
