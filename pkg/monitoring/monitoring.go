@@ -523,10 +523,10 @@ func grafanaOauthProxy() []*desired.State {
 	}
 }
 
-func appServiceMonitors() []*desired.State {
+func cnvrgIdleMetricsServiceMonitors() []*desired.State {
 	return []*desired.State{
 		{
-			TemplatePath:   path + "/default-servicemonitors/cnvrg-idle-metrics.tpl",
+			TemplatePath:   path + "/cnvrg-servicemonitors/idle-metrics.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -541,7 +541,6 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
 		state = append(state, promOauthProxy()...)
-		state = append(state, appServiceMonitors()...)
 		state = append(state, ccpPrometheusInstance()...)
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
@@ -563,6 +562,10 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		case mlopsv1.OpenShiftIngress:
 			state = append(state, grafanaOcpRoute()...)
 		}
+	}
+
+	if *cnvrgApp.Spec.Monitoring.CnvrgIdleMetricsExporter.Enabled {
+		state = append(state, cnvrgIdleMetricsServiceMonitors()...)
 	}
 
 	if *cnvrgApp.Spec.SSO.Enabled {
@@ -596,6 +599,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
 		state = append(state, kubeStateMetricsState()...)
 	}
+
 	if *infra.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
 		switch infra.Spec.Networking.Ingress.Type {
@@ -623,6 +627,10 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	if *infra.Spec.SSO.Enabled {
 
 		state = append(state, grafanaOauthProxy()...)
+	}
+
+	if *infra.Spec.Monitoring.CnvrgIdleMetricsExporter.Enabled {
+		state = append(state, cnvrgIdleMetricsServiceMonitors()...)
 	}
 
 	return state

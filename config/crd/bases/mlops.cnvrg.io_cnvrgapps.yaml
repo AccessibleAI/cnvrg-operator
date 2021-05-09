@@ -523,6 +523,15 @@ spec:
                 type: object
               monitoring:
                 properties:
+                  cnvrgIdleMetricsExporter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
                   grafana:
                     properties:
                       enabled:

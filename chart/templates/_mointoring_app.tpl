@@ -1,31 +1,17 @@
 {{- define "spec.monitoring_app" }}
+{{- if eq .Values.spec "ccp" }}
 monitoring:
-  {{- if eq (.Values.namespaceTenancy|toString) "true" }}
-  enabled: "{{ .Values.monitoring.enabled }}"
-  {{- else }}
-  enabled: "false"
-  {{- end }}
-  upstreamPrometheus: {{ .Values.monitoring.upstreamPrometheus }}
-
   grafana:
-    enabled: "{{ .Values.monitoring.grafana.enabled }}"
-    image: {{ .Values.monitoring.grafana.image }}
-    nodePort: {{ .Values.monitoring.grafana.nodePort }}
-    port: {{ .Values.monitoring.grafana.port }}
-    svcName: {{ .Values.monitoring.grafana.svcName }}
-    oauthProxy:
-      skipAuthRegex:
-        - \/api\/health
-
+    enabled: {{ .Values.monitoring.grafana.enabled }}
   prometheus:
-    cpuRequest: {{ .Values.monitoring.prometheus.cpuRequest }}
-    enabled: "{{ .Values.monitoring.prometheus.enabled }}"
-    image: {{ .Values.monitoring.prometheus.image }}
-    memoryRequest: {{ .Values.monitoring.prometheus.memoryRequest }}
-    nodePort: {{ .Values.monitoring.prometheus.nodePort }}
-    port: {{ .Values.monitoring.prometheus.port }}
+    enabled: {{ .Values.monitoring.prometheus.enabled }}
     storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}
-    svcName: {{ .Values.monitoring.prometheus.svcName }}
-
+    nodeSelector:
+    {{- range $key, $value := .Values.monitoring.prometheus.nodeSelector }}
+      {{$key}}: {{$value}}
+    {{- end }}
+  cnvrgIdleMetricsExporter:
+    enabled: {{ .Values.monitoring.cnvrgIdleMetricsExporter.enabled }}
+{{- end }}
 {{- end }}

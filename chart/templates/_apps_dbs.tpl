@@ -1,70 +1,44 @@
 {{- define "spec.app_dbs" }}
 dbs:
   es:
-    cpuLimit: {{ .Values.dbs.es.cpuLimit }}
-    cpuRequest: {{ .Values.dbs.es.cpuRequest }}
-    enabled: "{{ .Values.dbs.es.enabled }}"
-    fsGroup: {{ .Values.dbs.es.fsGroup }}
-    image: {{ .Values.dbs.es.image }}
-    memoryLimit: {{ .Values.dbs.es.memoryLimit }}
-    memoryRequest: {{ .Values.dbs.es.memoryRequest }}
-    nodePort: {{ .Values.dbs.es.nodePort }}
-    patchEsNodes: "{{ .Values.dbs.es.patchEsNodes }}"
-    port: {{ .Values.dbs.es.port }}
-    runAsUser: {{ .Values.dbs.es.runAsUser }}
-    serviceAccount: {{ .Values.dbs.es.serviceAccount }}
+    enabled: {{ .Values.dbs.es.enabled }}
     storageSize: {{ .Values.dbs.es.storageSize }}
-    svcName: {{ .Values.dbs.es.svcName }}
+    storageClass: {{ .Values.dbs.es.storageClass }}
+    nodeSelector:
+    {{- range $key, $value := .Values.dbs.es.nodeSelector }}
+      - {{$key}}: {{$value}}
+    {{- end }}
+
   minio:
-    cpuRequest: {{ .Values.dbs.minio.cpuRequest }}
-    enabled: "{{ .Values.dbs.minio.enabled }}"
-    image: {{ .Values.dbs.minio.image }}
-    memoryRequest: {{ .Values.dbs.minio.memoryRequest }}
-    nodePort: {{ .Values.dbs.minio.nodePort }}
-    port: {{ .Values.dbs.minio.port }}
-    replicas: {{ .Values.dbs.minio.replicas }}
-    serviceAccount: {{ .Values.dbs.minio.serviceAccount }}
-    sharedStorage:
-      consistentHash:
-        key: {{ .Values.dbs.minio.sharedStorage.consistentHash.key }}
-        value: {{ .Values.dbs.minio.sharedStorage.consistentHash.value }}
-      enabled: "{{ .Values.dbs.minio.sharedStorage.enabled }}"
+    enabled: {{ .Values.dbs.minio.enabled }}
     storageSize: {{ .Values.dbs.minio.storageSize }}
-    svcName: {{ .Values.dbs.minio.svcName }}
+    storageClass: {{ .Values.dbs.minio.storageClass }}
+    nodeSelector:
+    {{- range $key, $value := .Values.dbs.minio.nodeSelector }}
+      - {{$key}}: {{$value}}
+    {{- end }}
+
   pg:
-    cpuRequest: {{ .Values.dbs.pg.cpuRequest }}
-    dbname: {{ .Values.dbs.pg.dbname }}
-    enabled: "{{ .Values.dbs.pg.enabled }}"
-    fixpg: "{{ .Values.dbs.pg.fixpg }}"
-    fsGroup: {{ .Values.dbs.pg.fsGroup }}
+    enabled: {{ .Values.dbs.pg.enabled }}
+    storageSize: {{ .Values.dbs.pg.storageSize }}
+    storageClass: {{ .Values.dbs.pg.storageClass }}
+    nodeSelector:
+    {{- range $key, $value := .Values.dbs.es.nodeSelector }}
+      - {{$key}}: {{$value}}
+    {{- end }}
     hugePages:
-      enabled: "{{ .Values.dbs.pg.hugePages.enabled }}"
+      enabled: {{ .Values.dbs.pg.hugePages.enabled }}
       size: {{ .Values.dbs.pg.hugePages.size }}
       memory: "{{ .Values.dbs.pg.hugePages.memory }}"
-    image: {{ .Values.dbs.pg.image }}
-    maxConnections: {{ .Values.dbs.pg.maxConnections }}
-    memoryRequest: {{ .Values.dbs.pg.memoryRequest }}
-    pass: {{ .Values.dbs.pg.pass }}
-    port: {{ .Values.dbs.pg.port }}
-    runAsUser: {{ .Values.dbs.pg.runAsUser }}
-    secretName: {{ .Values.dbs.pg.secretName }}
-    serviceAccount: {{ .Values.dbs.pg.serviceAccount }}
-    sharedBuffers: {{ .Values.dbs.pg.sharedBuffers }}
-    storageSize: {{ .Values.dbs.pg.storageSize }}
-    svcName: {{ .Values.dbs.pg.svcName }}
-    user: {{ .Values.dbs.pg.user }}
+  {{- if eq .Values.spec "ccp"  }}
   redis:
-    appendonly: "{{ .Values.dbs.redis.appendonly }}"
-    enabled: "{{ .Values.dbs.redis.enabled }}"
-    image: {{ .Values.dbs.redis.image }}
-    limits:
-      cpu: {{ .Values.dbs.redis.limits.cpu }}
-      memory: {{ .Values.dbs.redis.limits.memory }}
-    port: {{ .Values.dbs.redis.port }}
-    requests:
-      cpu: {{ .Values.dbs.redis.requests.cpu }}
-      memory: {{ .Values.dbs.redis.requests.memory }}
-    serviceAccount: {{ .Values.dbs.redis.serviceAccount }}
+    enabled: {{ .Values.dbs.redis.enabled }}
     storageSize: {{ .Values.dbs.redis.storageSize }}
-    svcName: {{ .Values.dbs.redis.svcName }}
+    storageClass: "{{ .Values.dbs.redis.storageClass }}"
+    nodeSelector:
+    {{- range $key, $value := .Values.dbs.redis.nodeSelector }}
+      - {{$key}}: {{$value}}
+    {{- end }}
+  {{- end }}
+
 {{- end }}

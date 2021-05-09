@@ -1,39 +1,33 @@
 {{- define "spec.monitoring_infra" }}
 monitoring:
-  enabled: "{{ .Values.monitoring.enabled }}"
-  kubeletServiceMonitor: "{{ .Values.monitoring.kubeletServiceMonitor }}"
+  kubeletServiceMonitor: {{ .Values.monitoring.kubeletServiceMonitor }}
+  defaultServiceMonitors:
+    enabled: {{ .Values.monitoring.defaultServiceMonitors.enabled }}
+  {{- if eq .Values.spec "allinone" }}
+  cnvrgIdleMetricsExporter:
+    enabled: {{ .Values.monitoring.cnvrgIdleMetricsExporter.enabled }}
+    labels:
+      cnvrg-infra-prometheus: cnvrg-infra-{{ template "spec.cnvrgNs" . }}
+    {{- range $key, $value := .Values.monitoring.cnvrgIdleMetricsExporter.labels }}
+      {{$key}}: {{$value}}
+    {{- end }}
+  {{- end }}
   dcgmExporter:
-    enabled: "{{ .Values.monitoring.dcgmExporter.enabled }}"
-    image: {{ .Values.monitoring.dcgmExporter.image }}
+    enabled: {{ .Values.monitoring.dcgmExporter.enabled }}
   grafana:
-    enabled: "{{ .Values.monitoring.grafana.enabled }}"
-    image: {{ .Values.monitoring.grafana.image }}
-    nodePort: {{ .Values.monitoring.grafana.nodePort }}
-    port: {{ .Values.monitoring.grafana.port }}
-    svcName: {{ .Values.monitoring.grafana.svcName }}
-    oauthProxy:
-      skipAuthRegex:
-        - \/api\/health
+    enabled: {{ .Values.monitoring.grafana.enabled }}
   kubeStateMetrics:
-    enabled: "{{ .Values.monitoring.kubeStateMetrics.enabled }}"
-    image: {{ .Values.monitoring.kubeStateMetrics.image }}
+    enabled: {{ .Values.monitoring.kubeStateMetrics.enabled }}
   nodeExporter:
-    enabled: "{{ .Values.monitoring.nodeExporter.enabled }}"
-    image: {{ .Values.monitoring.nodeExporter.image }}
+    enabled: {{ .Values.monitoring.nodeExporter.enabled }}
   prometheus:
-    cpuRequest: {{ .Values.monitoring.prometheus.cpuRequest }}
-    enabled: "{{ .Values.monitoring.prometheus.enabled }}"
-    image: {{ .Values.monitoring.prometheus.image }}
-    memoryRequest: {{ .Values.monitoring.prometheus.memoryRequest }}
-    nodePort: {{ .Values.monitoring.prometheus.nodePort }}
-    port: {{ .Values.monitoring.prometheus.port }}
+    enabled: {{ .Values.monitoring.prometheus.enabled }}
     storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}
-    svcName: {{ .Values.monitoring.prometheus.svcName }}
+    nodeSelector:
+    {{- range $key, $value := .Values.monitoring.prometheus.nodeSelector }}
+      {{$key}}: {{$value}}
+    {{- end }}
   prometheusOperator:
-    enabled: "{{ .Values.monitoring.prometheusOperator.enabled }}"
-    images:
-      kubeRbacProxyImage: {{ .Values.monitoring.prometheusOperator.images.kubeRbacProxyImage }}
-      operatorImage: {{ .Values.monitoring.prometheusOperator.images.operatorImage }}
-      prometheusConfigReloaderImage: {{ .Values.monitoring.prometheusOperator.images.prometheusConfigReloaderImage }}
+    enabled: {{ .Values.monitoring.prometheusOperator.enabled }}
 {{- end }}

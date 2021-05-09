@@ -1,74 +1,17 @@
-{{- if eq (.Values.namespaceTenancy|toString) "false" }}
-{{ template "spec.operator" . }}
----
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgInfra
-metadata:
-  name: cnvrg-app
-spec:
-  clusterDomain: {{ .Values.appClusterDomain }}
-  infraNamespace: {{ template "spec.cnvrgNs" . }}
-  {{- include "spec.registry" . | indent 2 }}
-  {{- include "spec.storage" . | indent 2 }}
-  {{- include "spec.infra_dbs" . | indent 2 }}
-  {{- include "spec.sso" . | indent 2 }}
-  {{- include "spec.logging_infra" . | indent 2 }}
-  {{- include "spec.monitoring_infra" . | indent 2 }}
-  {{- include "spec.networking_infra" . | indent 2 }}
----
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgApp
-metadata:
-  name: cnvrg-app
-  namespace: {{ template "spec.cnvrgNs" . }}
-spec:
-  clusterDomain: {{ .Values.appClusterDomain }}
-  namespaceTenancy: "{{.Values.namespaceTenancy }}"
-  {{- include "spec.controlPlane" . | indent 2 }}
-  {{- include "spec.registry" . | indent 2 }}
-  {{- include "spec.app_dbs" . | indent 2 }}
-  {{- include "spec.logging_app" . | indent 2 }}
-  {{- include "spec.monitoring_app" . | indent 2 }}
-  {{- include "spec.networking_app" . | indent 2 }}
-  {{- include "spec.sso" . | indent 2 }}
-{{- end }}
 
+{{- if eq .Values.spec "allinone"}}
+{{/* assuming namespace tenancy disabled, deploy the operator + cnvrg infra + cnvrg controle plan  */}}
+{{ template "operator" . }}
+{{ template "infra" . }}
+{{ template "ccp" . }}
 
-{{- if eq (.Values.namespaceTenancy|toString) "true" }}
-{{- if ne .Values.infraClusterDomain ""}}
-{{ template "spec.operator" . }}
----
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgInfra
-metadata:
-  name: cnvrg-infra
-spec:
-  clusterDomain: {{ .Values.infraClusterDomain }}
-  infraNamespace: {{ .Values.infraNamespace }}
-  {{- include "spec.registry" . | indent 2 }}
-  {{- include "spec.infra_dbs" . | indent 2 }}
-  {{- include "spec.storage" . | indent 2 }}
-  {{- include "spec.sso" . | indent 2 }}
-  {{- include "spec.logging_infra" . | indent 2 }}
-  {{- include "spec.monitoring_infra" . | indent 2 }}
-  {{- include "spec.networking_infra" . | indent 2 }}
-{{- end }}
----
-{{- if ne .Values.appClusterDomain ""}}
-apiVersion: mlops.cnvrg.io/v1
-kind: CnvrgApp
-metadata:
-  name: cnvrg-app
-  namespace: {{ template "spec.cnvrgNs" . }}
-spec:
-  clusterDomain: {{ .Values.appClusterDomain }}
-  namespaceTenancy: "{{.Values.namespaceTenancy }}"
-  {{- include "spec.controlPlane" . | indent 2 }}
-  {{- include "spec.registry" . | indent 2 }}
-  {{- include "spec.app_dbs" . | indent 2 }}
-  {{- include "spec.logging_app" . | indent 2 }}
-  {{- include "spec.monitoring_app" . | indent 2 }}
-  {{- include "spec.networking_app" . | indent 2 }}
-  {{- include "spec.sso" . | indent 2 }}
-{{- end }}
+{{- else if eq .Values.spec "infra"}}
+{{/* assuming namespace tenancy enabled, deploy only the operator + cnvrg infra */}}
+{{ template "operator" . }}
+{{ template "infra" . }}
+
+{{- else if eq .Values.spec "ccp"}}
+{{/* assuming namespace tenancy enabled, deploy only cnvrg control plane */}}
+{{ template "ccp" . }}
+
 {{- end }}

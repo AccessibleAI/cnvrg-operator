@@ -6,6 +6,7 @@ metadata:
   labels:
     app: "dcgm-exporter"
     owner: cnvrg-control-plane
+    cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
 spec:
   selector:
     matchLabels:

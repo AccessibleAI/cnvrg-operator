@@ -109,6 +109,15 @@ spec:
                 type: object
               monitoring:
                 properties:
+                  cnvrgIdleMetricsExporter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
                   dcgmExporter:
                     properties:
                       enabled:
@@ -120,6 +129,10 @@ spec:
                     properties:
                       enabled:
                         type: boolean
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                     type: object
                   grafana:
                     properties:
@@ -147,6 +160,10 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                     type: object
                   kubeletServiceMonitor:
                     type: boolean
@@ -156,6 +173,10 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                     type: object
                   prometheus:
                     properties:

@@ -1,13 +1,10 @@
-{{- define "spec.operator" }}
+{{- define "operator" }}
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cnvrg-operator
-  {{- if eq (.Values.namespaceTenancy|toString) "true" }}
-  namespace: {{ .Values.infraNamespace }}
-  {{- else }}
   namespace: {{ template "spec.cnvrgNs" . }}
-  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -73,11 +70,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: cnvrg-operator
-    {{- if eq (.Values.namespaceTenancy|toString) "true" }}
-    namespace: {{ .Values.infraNamespace }}
-    {{- else }}
     namespace: {{ template "spec.cnvrgNs" . }}
-    {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -85,11 +78,7 @@ metadata:
   labels:
     control-plane: cnvrg-operator
   name: cnvrg-operator
-  {{- if eq (.Values.namespaceTenancy|toString) "true" }}
-  namespace: {{ .Values.infraNamespace }}
-  {{- else }}
   namespace: {{ template "spec.cnvrgNs" . }}
-  {{- end }}
 spec:
   replicas: 1
   selector:
@@ -106,7 +95,7 @@ spec:
             - run
             - --max-concurrent-reconciles
             - "3"
-          image: "docker.io/cnvrg/cnvrg-operator:v{{ .Chart.Version }}"
+          image: "docker.io/cnvrg/cnvrg-operator:{{ .Chart.Version }}"
           imagePullPolicy: Always
           name: cnvrg-operator
           resources:
@@ -118,4 +107,5 @@ spec:
               memory: 200Mi
       serviceAccountName: cnvrg-operator
       terminationGracePeriodSeconds: 10
+---
 {{- end }}

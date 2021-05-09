@@ -1,14 +1,15 @@
 {{- define "spec.sso" }}
 sso:
-  enabled: "{{ .Values.sso.enabled}}"
-  image: {{ .Values.sso.image }}
-  redisConnectionUrl: {{ .Values.sso.redisConnectionUrl }}
+  enabled: {{ .Values.sso.enabled}}
   adminUser: "{{ .Values.sso.adminUser }}"
   provider: "{{ .Values.sso.provider }}"
-  emailDomain: "{{ .Values.sso.emailDomain }}"
+  emailDomain:
+  {{- range $_, $value := .Values.sso.emailDomain }}
+    - {{$value}}
+  {{- end }}
   clientId: "{{ .Values.sso.clientId }}"
   clientSecret: "{{ .Values.sso.clientSecret }}"
-  cookieSecret: "{{ .Values.sso.cookieSecret }}"
   azureTenant: "{{ .Values.sso.azureTenant }}"
-  oidcIssuerUrl: "{{ .Values.sso.oidcIssuerURL }}"
+  oidcIssuerUrl: "{{ .Values.sso.oidcIssuerUrl }}"
+  cookieSecret: {{ randAlphaNum 16 | quote }}
 {{- end }}

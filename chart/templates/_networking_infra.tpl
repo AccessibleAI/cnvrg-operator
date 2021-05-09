@@ -1,30 +1,28 @@
 {{- define "spec.networking_infra" }}
 networking:
   https:
-    enabled: "{{ .Values.networking.https.enabled }}"
+    enabled: {{ .Values.networking.https.enabled }}
     cert: "{{ .Values.networking.https.cert }}"
     key: "{{ .Values.networking.https.key }}"
     certSecret: "{{ .Values.networking.https.certSecret }}"
   ingress:
-    {{- if eq (.Values.namespaceTenancy|toString) "true" }}
-    enabled: "{{ .Values.networking.ingress.enabled }}"
-    {{- else }}
-    enabled: "false"
-    {{- end }}
-    ingressType: {{ .Values.networking.ingress.ingressType }}
-    perTryTimeout: {{ .Values.networking.ingress.perTryTimeout }}
-    retriesAttempts: {{ .Values.networking.ingress.retriesAttempts }}
-    timeout: {{ .Values.networking.ingress.timeout }}
+    type: "{{ .Values.networking.ingress.type }}"
   istio:
-    enabled: "{{ .Values.networking.istio.enabled }}"
-    operatorImage: {{ .Values.networking.istio.operatorImage }}
-    hub: {{ .Values.networking.istio.hub }}
-    tag: {{ .Values.networking.istio.tag }}
-    proxyImage: {{ .Values.networking.istio.proxyImage }}
-    mixerImage: {{ .Values.networking.istio.mixerImage }}
-    pilotImage: {{ .Values.networking.istio.pilotImage }}
-    externalIp: "{{ .Values.networking.istio.externalIp }}"
-    ingressSvcAnnotations: "{{ .Values.networking.istio.ingressSvcAnnotations }}"
-    ingressSvcExtraPorts: "{{ .Values.networking.istio.ingressSvcExtraPorts }}"
-    loadBalancerSourceRanges: "{{ .Values.networking.istio.loadBalancerSourceRanges }}"
+    enabled: {{ .Values.networking.istio.enabled }}
+    externalIp:
+    {{- range $_, $value := .Values.networking.istio.externalIp }}
+      - {{$value}}
+    {{- end }}
+    ingressSvcAnnotations:
+    {{- range $key, $value := .Values.networking.istio.ingressSvcAnnotations }}
+      {{$key}}: {{$value}}
+    {{- end }}
+    ingressSvcExtraPorts:
+    {{- range $_, $value := .Values.networking.istio.ingressSvcExtraPorts }}
+      - {{$value}}
+    {{- end }}
+    lbSourceRanges:
+    {{- range $_, $value := .Values.networking.istio.lbSourceRanges }}
+      - {{$value}}
+    {{- end }}
 {{- end }}

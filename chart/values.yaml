@@ -1,6 +1,6 @@
-infraClusterDomain: ""
-appClusterDomain: ""
-infraNamespace: "cnvrg-infra"
+clusterDomain: ""
+spec: allinone # allinone|infra|ccp
+
 
 controlPlane:
   baseConfig:
@@ -25,7 +25,7 @@ controlPlane:
     split: true
   smtp:
     server: ""
-    port: ""
+    port: 587
     username: ""
     password: ""
     domain: ""
@@ -81,9 +81,6 @@ logging:
 monitoring:
   kubeletServiceMonitor: true
 
-  defaultServiceMonitors:
-    enabled: true
-
   dcgmExporter:
     enabled: true
 
@@ -105,6 +102,13 @@ monitoring:
     storageClass: ""
     nodeSelector: {}
 
+  defaultServiceMonitors:
+    enabled: true
+
+  cnvrgIdleMetricsExporter:
+    enabled: true
+    labels: {}
+
 networking:
   https:
     enabled: false
@@ -115,17 +119,16 @@ networking:
     type: "istio"
   istio:
     enabled: true
-    externalIp: {}
+    externalIp: []
     ingressSvcAnnotations: {}
-    ingressSvcExtraPorts: {}
-    loadBalancerSourceRanges: {}
+    ingressSvcExtraPorts: []
+    lbSourceRanges: []
 
 sso:
   enabled: false
-  image: "docker.io/cnvrg/cnvrg-oauth-proxy:v7.0.1.c8"
   adminUser: ""
   provider: ""
-  emailDomain: {}
+  emailDomain: []
   clientId: ""
   clientSecret: ""
   azureTenant: ""

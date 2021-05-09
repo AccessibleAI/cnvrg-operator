@@ -6,10 +6,12 @@ type Images struct {
 	PrometheusConfigReloaderImage string `json:"prometheusConfigReloaderImage,omitempty"`
 	KubeRbacProxyImage            string `json:"kubeRbacProxyImage,omitempty"`
 }
+
 type PrometheusOperator struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Images  Images `json:"images,omitempty"`
 }
+
 type Prometheus struct {
 	Enabled             *bool             `json:"enabled,omitempty"`
 	Image               string            `json:"image,omitempty"`
@@ -27,13 +29,17 @@ type Prometheus struct {
 }
 
 type NodeExporter struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Enabled *bool             `json:"enabled,omitempty"`
+	Image   string            `json:"image,omitempty"`
+	Labels  map[string]string `json:"labels,omitempty"`
 }
+
 type KubeStateMetrics struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Enabled *bool             `json:"enabled,omitempty"`
+	Image   string            `json:"image,omitempty"`
+	Labels  map[string]string `json:"labels,omitempty"`
 }
+
 type Grafana struct {
 	Enabled    *bool                 `json:"enabled,omitempty"`
 	Image      string                `json:"image,omitempty"`
@@ -42,41 +48,43 @@ type Grafana struct {
 	NodePort   int                   `json:"nodePort,omitempty"`
 	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
 }
+
 type DefaultServiceMonitors struct {
-	Enabled *bool `json:"enabled,omitempty"`
+	Enabled *bool             `json:"enabled,omitempty"`
+	Labels  map[string]string `json:"labels,omitempty"`
 }
-type SidekiqExporter struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-}
-type MinioExporter struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-}
+
 type DcgmExporter struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
-type IdleMetricsExporter struct {
-	Enabled *bool `json:"enabled,omitempty"`
+
+type CnvrgIdleMetricsExporter struct {
+	Enabled *bool             `json:"enabled,omitempty"`
+	Labels  map[string]string `json:"labels,omitempty"`
 }
+
 type MetricsServer struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
+
 type CnvrgInfraMonitoring struct {
-	PrometheusOperator     PrometheusOperator     `json:"prometheusOperator,omitempty"`
-	Prometheus             Prometheus             `json:"prometheus,omitempty"`
-	KubeletServiceMonitor  *bool                  `json:"kubeletServiceMonitor,omitempty"`
-	NodeExporter           NodeExporter           `json:"nodeExporter,omitempty"`
-	KubeStateMetrics       KubeStateMetrics       `json:"kubeStateMetrics,omitempty"`
-	Grafana                Grafana                `json:"grafana,omitempty"`
-	DcgmExporter           DcgmExporter           `json:"dcgmExporter,omitempty"`
-	DefaultServiceMonitors DefaultServiceMonitors `json:"defaultServiceMonitors,omitempty"`
+	PrometheusOperator       PrometheusOperator       `json:"prometheusOperator,omitempty"`
+	Prometheus               Prometheus               `json:"prometheus,omitempty"`
+	KubeletServiceMonitor    *bool                    `json:"kubeletServiceMonitor,omitempty"`
+	NodeExporter             NodeExporter             `json:"nodeExporter,omitempty"`
+	KubeStateMetrics         KubeStateMetrics         `json:"kubeStateMetrics,omitempty"`
+	Grafana                  Grafana                  `json:"grafana,omitempty"`
+	DcgmExporter             DcgmExporter             `json:"dcgmExporter,omitempty"`
+	DefaultServiceMonitors   DefaultServiceMonitors   `json:"defaultServiceMonitors,omitempty"`
+	CnvrgIdleMetricsExporter CnvrgIdleMetricsExporter `json:"cnvrgIdleMetricsExporter,omitempty"`
 }
+
 type CnvrgAppMonitoring struct {
-	Prometheus Prometheus `json:"prometheus,omitempty"`
-	Grafana    Grafana    `json:"grafana,omitempty"`
+	Prometheus               Prometheus               `json:"prometheus,omitempty"`
+	Grafana                  Grafana                  `json:"grafana,omitempty"`
+	CnvrgIdleMetricsExporter CnvrgIdleMetricsExporter `json:"cnvrgIdleMetricsExporter,omitempty"`
 }
 
 var grafanaInfraDefault = Grafana{
@@ -132,6 +140,9 @@ var prometheusAppDefault = Prometheus{
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 	Prometheus: prometheusAppDefault,
 	Grafana:    grafanaAppDefault,
+	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
+		Enabled: &defaultEnabled,
+	},
 }
 
 var infraMonitoringDefault = CnvrgInfraMonitoring{
@@ -158,6 +169,9 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
+		Enabled: &defaultEnabled,
+	},
+	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
 		Enabled: &defaultEnabled,
 	},
 }
