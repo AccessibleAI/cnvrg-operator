@@ -1,5 +1,6 @@
 {{- define "spec.controlPlane" }}
 controlPlane:
+  image: {{ .Values.controlPlane.image }}
   baseConfig:
     agentCustomTag: {{ .Values.controlPlane.baseConfig.agentCustomTag }}
     intercom: "{{ .Values.controlPlane.baseConfig.intercom }}"
@@ -33,7 +34,6 @@ controlPlane:
     enabled: {{ .Values.controlPlane.systemkiq.enabled }}
   webapp:
     enabled: {{ .Values.controlPlane.webapp.enabled }}
-    image: {{ .Values.controlPlane.webapp.image }}
     replicas: {{ .Values.controlPlane.webapp.replicas }}
   mpi:
     enabled: {{ .Values.controlPlane.mpi.enabled }}

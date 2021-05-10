@@ -50,7 +50,7 @@ spec:
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
       {{- end }}
-      - image: {{ .Spec.ControlPlane.WebApp.Image }}
+      - image: {{ .Spec.ControlPlane.Image }}
         env:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
@@ -145,7 +145,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SEEDER_IMAGE"
-          value: "{{.Spec.ControlPlane.WebApp.Image}}"
+          value: "{{.Spec.ControlPlane.Image}}"
         - name: "CNVRG_SEED_CMD"
           value: "{{ .Spec.ControlPlane.Seeder.SeedCmd }}"
         - name: "CNVRG_NS"

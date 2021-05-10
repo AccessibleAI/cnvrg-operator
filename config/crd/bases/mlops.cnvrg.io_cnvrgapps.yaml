@@ -17,7 +17,7 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.controlPlane.webapp.image
+    - jsonPath: .spec.controlPlane.image
       name: Version
       type: string
     - jsonPath: .status.status
@@ -114,6 +114,8 @@ spec:
                       token:
                         type: string
                     type: object
+                  image:
+                    type: string
                   ldap:
                     properties:
                       account:
@@ -268,8 +270,6 @@ spec:
                         type: boolean
                       failureThreshold:
                         type: integer
-                      image:
-                        type: string
                       initialDelaySeconds:
                         type: integer
                       memory:

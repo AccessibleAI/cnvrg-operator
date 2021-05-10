@@ -4,52 +4,54 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: "cnvrg-bootstrap"
-  namespace: "default"
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "1"
+    "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 ---
-kind: ClusterRole
+kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "cnvrg-bootstrap"
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "1"
+    "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 rules:
   - apiGroups:
       - ""
     resources:
-      - namespaces
+      - "*"
     verbs:
-      - "create"
+      - "*"
   - apiGroups:
-      - ""
+      - "batch"
     resources:
-      - namespaces
-    resourceNames:
-      - {{ template "spec.cnvrgNs" . }}
+      - "*"
     verbs:
-      - delete
+      - "*"
+  - apiGroups:
+      - mlops.cnvrg.io
+    resources:
+      - '*'
+    verbs:
+      - '*'
 ---
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "cnvrg-bootstrap"
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "1"
+    "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: "cnvrg-bootstrap"
 subjects:
   - kind: ServiceAccount
     name: "cnvrg-bootstrap"
-    namespace: "default"
 ---
 apiVersion: batch/v1
 kind: Job
@@ -62,7 +64,7 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: cnvrg-operator
+      serviceAccountName: cnvrg-bootstrap
       terminationGracePeriodSeconds: 1
       containers:
         - name: cnvrgapp
@@ -71,6 +73,8 @@ spec:
             - /bin/bash
             - -c
             - |
+              echo "running post install"
+              {{- if ne .Values.spec "infra" }}
               _term() {
                 echo "Caught SIGTERM signal!"
                 exit
@@ -82,23 +86,26 @@ spec:
               done
               echo "installation completed. . . ";
               kubectl delete job post-install -n {{ template "spec.cnvrgNs" . }}
+              {{- end }}
       restartPolicy: Never
+
 ####################################### Uninstall hooks #######################################
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: "cnvrg-cleanup"
-  namespace: "default"
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "1"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 ---
-kind: ClusterRole
+kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "cnvrg-cleanup"
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "1"
@@ -107,28 +114,13 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - pods
-    verbs:
-      - list
-      - delete
-  - apiGroups:
-      - ""
-    resources:
-      - namespaces
-    verbs:
-      - "list"
-  - apiGroups:
-      - ""
-    resources:
-      - namespaces
-    resourceNames: ["{{ template "spec.cnvrgNs" . }}"]
+      - "*"
     verbs:
       - "*"
   - apiGroups:
       - "batch"
     resources:
-      - jobs
-    resourceNames: ["pre-cnvrg-cleanup","post-cnvrg-cleanup"]
+      - "*"
     verbs:
       - "*"
   - apiGroups:
@@ -138,28 +130,28 @@ rules:
     verbs:
       - '*'
 ---
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "cnvrg-cleanup"
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "1"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: "cnvrg-cleanup"
 subjects:
   - kind: ServiceAccount
     name: "cnvrg-cleanup"
-    namespace: "default"
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: pre-cnvrg-cleanup
-  namespace: default
+  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "2"
@@ -175,19 +167,25 @@ spec:
             - /bin/bash
             - -c
             - |
+              echo "running cleanup"
+
+              {{- if or (eq .Values.spec "infra") (eq .Values.spec "allinone") }}
               kubectl delete job post-install -n {{ template "spec.cnvrgNs" . }}
               kubectl delete cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} --ignore-not-found
-              kubectl delete cnvrginfra cnvrg-infra -n {{ template "spec.cnvrgNs" . }} --ignore-not-found
 
               while (( $(kubectl get cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} | grep cnvrg-app | wc -l ) != 0 )); do
                 echo "waiting for cnvrgapp will be deleted. . . ";
                 sleep 1
               done
+              kubectl get pods -n {{ template "spec.cnvrgNs" . }} -oname | grep cnvrg-seeder | xargs kubectl delete -n {{ template "spec.cnvrgNs" . }}
 
+              kubectl delete cnvrginfra cnvrg-infra -n {{ template "spec.cnvrgNs" . }} --ignore-not-found
               while (( $(kubectl cnvrginfra cnvrg-infra -n {{ template "spec.cnvrgNs" . }} | grep cnvrg-infra | wc -l ) != 0 )); do
                 echo "waiting for cnvrginfra will be deleted. . . ";
                 sleep 1
               done
-              kubectl get pods -n {{ template "spec.cnvrgNs" . }} -oname | grep cnvrg-seeder | xargs kubectl delete -n {{ template "spec.cnvrgNs" . }}
+              {{- end }}
+
+
       restartPolicy: Never
   backoffLimit: 4

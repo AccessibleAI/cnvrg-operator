@@ -3,6 +3,7 @@ spec: allinone # allinone|infra|ccp
 
 
 controlPlane:
+  image: cnvrg/core:3.1.5
   baseConfig:
     agentCustomTag: latest
     intercom: "true"
@@ -33,7 +34,6 @@ controlPlane:
     enabled: true
   webapp:
     enabled: true
-    image: cnvrg/core:3.1.5
     replicas: 1
   mpi:
     enabled: true

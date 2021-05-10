@@ -20,7 +20,7 @@ type CnvrgAppSpec struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlane.webapp.image`
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.controlPlane.image`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
 // +kubebuilder:subresource:status

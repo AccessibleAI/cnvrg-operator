@@ -35,7 +35,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: sidekiq
-          image: {{ .Spec.ControlPlane.WebApp.Image}}
+          image: {{ .Spec.ControlPlane.Image}}
           env:
             - name: "CNVRG_RUN_MODE"
               value: "sidekiq"

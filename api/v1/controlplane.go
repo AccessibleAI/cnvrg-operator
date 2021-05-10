@@ -24,7 +24,6 @@ type Requests struct {
 type WebApp struct {
 	Replicas                int                   `json:"replicas,omitempty"`
 	Enabled                 *bool                 `json:"enabled,omitempty"`
-	Image                   string                `json:"image,omitempty"`
 	Port                    int                   `json:"port,omitempty"`
 	CPU                     string                `json:"cpu,omitempty"`
 	Memory                  string                `json:"memory,omitempty"`
@@ -154,6 +153,7 @@ type BaseConfig struct {
 }
 
 type ControlPlane struct {
+	Image         string        `json:"image,omitempty"`
 	WebApp        WebApp        `json:"webapp,omitempty"`
 	Sidekiq       Sidekiq       `json:"sidekiq,omitempty"`
 	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
@@ -212,11 +212,11 @@ var infraRegistryDefault = Registry{
 }
 
 var controlPlaneDefault = ControlPlane{
+	Image: "cnvrg/core:3.1.5",
 
 	WebApp: WebApp{
 		Enabled:                 &defaultEnabled,
 		Replicas:                1,
-		Image:                   "cnvrg/core:3.1.5",
 		Port:                    8080,
 		CPU:                     "2000m",
 		Memory:                  "4Gi",
