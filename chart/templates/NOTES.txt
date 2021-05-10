@@ -1,8 +1,14 @@
 
 🚀 Thank you for installing cnvrg.io!
 
-{{/*Your installation of cnvrg.io is now in progress.*/}}
-{{/*Wait until all the pods in the cnvrg namespace will be ready (kubectl get pods -n cnvrg)*/}}
-{{/*and access to the app via: http://app.{{.Values.clusterDomain}}*/}}
-{{/*Join our community at https://community.cnvrg.io*/}}
-{{/*Talk to our team via email at hi@cnvrg.io*/}}
+Your installation of cnvrg.io is finished!
+Access to the app via:
+{{- if eq .Values.networking.ingress.type "nodeport" }}
+🏄 http://{{.Values.clusterDomain}}:30080
+{{- else if .Values.networking.https.enabled }}
+🏄 https://app.{{.Values.clusterDomain}}
+{{- else }}
+🏄 http://app.{{.Values.clusterDomain}}
+{{- end }}
+Join our community at https://community.cnvrg.io
+Talk to our team via email at hi@cnvrg.io

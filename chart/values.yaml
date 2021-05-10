@@ -156,7 +156,6 @@ tenancy:
   value: "cnvrg-control-plane"
 
 registry:
-  name: cnvrg-registry
   url: docker.io
   user: ""
   password: ""

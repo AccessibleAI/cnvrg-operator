@@ -52,7 +52,7 @@ cnvrg operator may deploy cnvrg stack in two different ways
 ### Quick start - namespace tenancy `disabled` with single cnvrg control plane
 ```shell
 helm install cnvrg-1 . -n cnvrg-1 --create-namespace \ 
-  --set appClusterDomain="<control-plane-domain-record>" \
+  --set clusterDomain="<control-plane-domain-record>" \
   --set controlPlane.webapp.image="<cnvrg-control-plane-image>" \
   --set registry.user="<cnvrg-private-registry-user>" \
   --set registry.password="<cnvrg-private-registry-password>"  

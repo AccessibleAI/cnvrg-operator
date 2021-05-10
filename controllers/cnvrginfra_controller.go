@@ -479,6 +479,7 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 				if istioExists {
 					cnvrgInfraLog.Info("istio instance still present, will sleep of 1 sec, and check again...")
 				}
+				time.Sleep(1 * time.Second)
 			}
 		}
 	}
@@ -561,6 +562,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 			// run reconcile only changing cnvrginfra/object marked for deletion
 			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.ObjectOld) {
+				cnvrgInfraLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgInfra)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgInfra)
 				// deleting cnvrg cr

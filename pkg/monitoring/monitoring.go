@@ -554,6 +554,9 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
+		if *cnvrgApp.Spec.SSO.Enabled {
+			state = append(state, grafanaOauthProxy()...)
+		}
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
 			state = append(state, grafanaIstioVs()...)
@@ -566,10 +569,6 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.Monitoring.CnvrgIdleMetricsExporter.Enabled {
 		state = append(state, cnvrgIdleMetricsServiceMonitors()...)
-	}
-
-	if *cnvrgApp.Spec.SSO.Enabled {
-		state = append(state, grafanaOauthProxy()...)
 	}
 
 	return state
@@ -602,6 +601,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if *infra.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
+		if *infra.Spec.SSO.Enabled {
+			state = append(state, grafanaOauthProxy()...)
+		}
 		switch infra.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
 			state = append(state, grafanaIstioVs()...)
@@ -622,11 +624,6 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if *infra.Spec.Monitoring.DcgmExporter.Enabled {
 		state = append(state, dcgmExporter()...)
-	}
-
-	if *infra.Spec.SSO.Enabled {
-
-		state = append(state, grafanaOauthProxy()...)
 	}
 
 	if *infra.Spec.Monitoring.CnvrgIdleMetricsExporter.Enabled {

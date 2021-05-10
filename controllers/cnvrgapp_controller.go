@@ -127,6 +127,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if ready {
 		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
+		cnvrgAppLog.Info("stack is ready!")
 		return ctrl.Result{}, nil
 	} else {
 		requeueAfter, err := time.ParseDuration("30s")
@@ -353,6 +354,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
+
 	// dbs
 	if err := r.dbsState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
@@ -645,7 +647,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		return err
 	}
 	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
-		cnvrgAppLog.Info("infra reconciler cm does not exists, skipping", name, name)
+		cnvrgAppLog.Info("infra reconciler cm does not exists, skipping", "name", name)
 		return nil
 	} else if err != nil {
 		cnvrgAppLog.Error(err, "can't get cm", "name", name)
@@ -817,7 +819,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	p := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
-
+			cnvrgAppLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
 			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
