@@ -28,6 +28,11 @@ type param struct {
 }
 
 var (
+	BuildVersion string
+	Commit  string
+)
+
+var (
 	scheme            = runtime.NewScheme()
 	setupLog          = ctrl.Log.WithName("setup")
 	rootParams        = []param{}
@@ -66,6 +71,14 @@ var runOperatorCmd = &cobra.Command{
 		loggerMgr.Sugar()
 		zap.ReplaceGlobals(loggerMgr)
 		runOperator()
+	},
+}
+
+var operatorVersion = &cobra.Command{
+	Use:   "version",
+	Short: "Print cnvrg operator version",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("version: %s \ncommit: %s\n", BuildVersion, Commit)
 	},
 }
 
@@ -164,6 +177,7 @@ func setupCommands() {
 	// Setup commands
 	setParams(runOperatorParams, runOperatorCmd)
 	setParams(rootParams, rootCmd)
+	rootCmd.AddCommand(operatorVersion)
 	rootCmd.AddCommand(runOperatorCmd)
 	rootCmd.AddCommand(generateDocsCmd)
 }

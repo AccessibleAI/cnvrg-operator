@@ -19,6 +19,7 @@ test: generate fmt vet manifests
 pack:
 	pkger
 
+# go build -ldflags "-X 'main.BuildVersion=$BUILD_VERSION' -X 'main.Commit=$GIT_COMMIT'" -mod=readonly -o bin/cnvrg-operator main.go pkged.go
 # Build manager binary
 manager: pack generate fmt vet
 	go build -mod=readonly -o bin/cnvrg-operator main.go pkged.go
