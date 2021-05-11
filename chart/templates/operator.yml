@@ -1,4 +1,4 @@
-{{- define "operator" }}
+{{- if or (eq .Values.spec "allinone") (eq .Values.spec "infra") }}
 ---
 apiVersion: v1
 kind: ServiceAccount

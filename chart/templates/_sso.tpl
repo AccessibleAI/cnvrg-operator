@@ -3,9 +3,11 @@ sso:
   enabled: {{ .Values.sso.enabled}}
   adminUser: "{{ .Values.sso.adminUser }}"
   provider: "{{ .Values.sso.provider }}"
+  {{- if .Values.sso.emailDomain }}
   emailDomain:
   {{- range $_, $value := .Values.sso.emailDomain }}
     - {{$value}}
+  {{- end }}
   {{- end }}
   clientId: "{{ .Values.sso.clientId }}"
   clientSecret: "{{ .Values.sso.clientSecret }}"

@@ -7,9 +7,11 @@ monitoring:
     enabled: {{ .Values.monitoring.prometheus.enabled }}
     storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}
+    {{- if .Values.monitoring.prometheus.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.monitoring.prometheus.nodeSelector }}
       {{$key}}: {{$value}}
+    {{- end }}
     {{- end }}
   cnvrgIdleMetricsExporter:
     enabled: {{ .Values.monitoring.cnvrgIdleMetricsExporter.enabled }}

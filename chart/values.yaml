@@ -39,14 +39,14 @@ controlPlane:
     enabled: true
     image: "mpioperator/mpi-operator:v0.2.3"
     kubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3"
-    extraArgs: {}
+    extraArgs: { }
 
 dbs:
   es:
     enabled: true
     storageSize: 80Gi
     storageClass: ""
-    nodeSelector: {}
+    nodeSelector: { }
   minio:
     enabled: true
     storageSize: 100Gi
@@ -74,7 +74,7 @@ logging:
     enabled: true
     storageSize: "30Gi"
     storageClass: ""
-    nodeSelector: {}
+    nodeSelector: { }
   kibana:
     enabled: true
 
@@ -100,14 +100,14 @@ monitoring:
     enabled: true
     storageSize: "50Gi"
     storageClass: ""
-    nodeSelector: {}
+    nodeSelector: { }
 
   defaultServiceMonitors:
     enabled: true
 
   cnvrgIdleMetricsExporter:
     enabled: true
-    labels: {}
+    labels: { }
 
 networking:
   https:
@@ -119,16 +119,16 @@ networking:
     type: "istio"
   istio:
     enabled: true
-    externalIp: []
-    ingressSvcAnnotations: {}
-    ingressSvcExtraPorts: []
-    lbSourceRanges: []
+    externalIp: [ ]
+    ingressSvcAnnotations: { }
+    ingressSvcExtraPorts: [ ]
+    lbSourceRanges: [ ]
 
 sso:
   enabled: false
   adminUser: ""
   provider: ""
-  emailDomain: []
+  emailDomain: [ ]
   clientId: ""
   clientSecret: ""
   azureTenant: ""
@@ -141,7 +141,7 @@ storage:
     path: /cnvrg-hostpath-storage
     image: quay.io/kubevirt/hostpath-provisioner
     reclaimPolicy: Retain
-    nodeSelector: {}
+    nodeSelector: { }
   nfs:
     enabled: false
     server: ""

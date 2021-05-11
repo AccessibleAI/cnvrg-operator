@@ -4,9 +4,13 @@ controlPlane:
   baseConfig:
     agentCustomTag: {{ .Values.controlPlane.baseConfig.agentCustomTag }}
     intercom: "{{ .Values.controlPlane.baseConfig.intercom }}"
+    {{- if .Values.controlPlane.baseConfig.featureFlags }}
     featureFlags:
     {{- range $key, $value := .Values.controlPlane.baseConfig.featureFlags }}
       {{$key}}: {{$value}}
+    {{- end }}
+    {{- else }}
+    featureFlags: { }
     {{- end }}
   hyper:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
@@ -39,8 +43,12 @@ controlPlane:
     enabled: {{ .Values.controlPlane.mpi.enabled }}
     image: {{ .Values.controlPlane.mpi.image }}
     kubectlDeliveryImage: {{ .Values.controlPlane.mpi.kubectlDeliveryImage }}
+    {{- if .Values.controlPlane.mpi.extraArgs }}
     extraArgs:
     {{- range $key, $value := .Values.controlPlane.mpi.extraArgs }}
       {{$key}}: {{$value}}
+    {{- end }}
+    {{- else }}
+    extraArgs: { }
     {{- end }}
 {{- end }}

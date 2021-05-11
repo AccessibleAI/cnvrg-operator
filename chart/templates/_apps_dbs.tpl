@@ -3,28 +3,34 @@ dbs:
   es:
     enabled: {{ .Values.dbs.es.enabled }}
     storageSize: {{ .Values.dbs.es.storageSize }}
-    storageClass: {{ .Values.dbs.es.storageClass }}
+    storageClass: "{{ .Values.dbs.es.storageClass }}"
+    {{- if .Values.dbs.es.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.es.nodeSelector }}
       - {{$key}}: {{$value}}
+    {{- end }}
     {{- end }}
 
   minio:
     enabled: {{ .Values.dbs.minio.enabled }}
     storageSize: {{ .Values.dbs.minio.storageSize }}
-    storageClass: {{ .Values.dbs.minio.storageClass }}
+    storageClass: "{{ .Values.dbs.minio.storageClass }}"
+    {{- if .Values.dbs.minio.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.minio.nodeSelector }}
       - {{$key}}: {{$value}}
+    {{- end }}
     {{- end }}
 
   pg:
     enabled: {{ .Values.dbs.pg.enabled }}
     storageSize: {{ .Values.dbs.pg.storageSize }}
-    storageClass: {{ .Values.dbs.pg.storageClass }}
+    storageClass: "{{ .Values.dbs.pg.storageClass }}"
+    {{- if .Values.dbs.pg.nodeSelector }}
     nodeSelector:
-    {{- range $key, $value := .Values.dbs.es.nodeSelector }}
+    {{- range $key, $value := .Values.dbs.pg.nodeSelector }}
       - {{$key}}: {{$value}}
+    {{- end }}
     {{- end }}
     hugePages:
       enabled: {{ .Values.dbs.pg.hugePages.enabled }}
@@ -35,9 +41,11 @@ dbs:
     enabled: {{ .Values.dbs.redis.enabled }}
     storageSize: {{ .Values.dbs.redis.storageSize }}
     storageClass: "{{ .Values.dbs.redis.storageClass }}"
+    {{- if .Values.dbs.redis.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.redis.nodeSelector }}
       - {{$key}}: {{$value}}
+    {{- end }}
     {{- end }}
   {{- end }}
 

@@ -47,10 +47,10 @@ spec:
                 properties:
                   redis:
                     properties:
-                      appendonly:
+                      credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       limits:
@@ -81,12 +81,6 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
-                    required:
-                    - serviceAccount
                     type: object
                 type: object
               gpu:
@@ -94,7 +88,7 @@ spec:
                   nvidiaDp:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                     type: object
@@ -105,29 +99,45 @@ spec:
                 type: string
               logging:
                 properties:
-                  enabled:
-                    type: string
                   fluentbit:
                     properties:
+                      enabled:
+                        type: boolean
                       image:
                         type: string
                     type: object
                 type: object
               monitoring:
                 properties:
+                  cnvrgIdleMetricsExporter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
                   dcgmExporter:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                     type: object
-                  enabled:
-                    type: string
+                  defaultServiceMonitors:
+                    properties:
+                      enabled:
+                        type: boolean
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
                   grafana:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       nodePort:
@@ -147,31 +157,47 @@ spec:
                   kubeStateMetrics:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                     type: object
                   kubeletServiceMonitor:
-                    type: string
+                    type: boolean
                   nodeExporter:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
                     type: object
                   prometheus:
                     properties:
+                      basicAuthProxyImage:
+                        type: string
                       cpuRequest:
                         type: string
-                      enabled:
+                      credsRef:
                         type: string
+                      enabled:
+                        type: boolean
                       image:
                         type: string
                       memoryRequest:
                         type: string
                       nodePort:
                         type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       port:
                         type: integer
                       storageClass:
@@ -180,11 +206,13 @@ spec:
                         type: string
                       svcName:
                         type: string
+                      upstreamRef:
+                        type: string
                     type: object
                   prometheusOperator:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       images:
                         properties:
                           configReloaderImage:
@@ -207,21 +235,12 @@ spec:
                       certSecret:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       key:
                         type: string
                     type: object
                   ingress:
                     properties:
-                      enabled:
-                        type: string
-                      ingressType:
-                        enum:
-                        - istio
-                        - k8singress
-                        - openshift
-                        - nodeport
-                        type: string
                       istioGwName:
                         type: string
                       perTryTimeout:
@@ -230,21 +249,36 @@ spec:
                         type: integer
                       timeout:
                         type: string
+                      type:
+                        enum:
+                        - istio
+                        - ingress
+                        - openshift
+                        - nodeport
+                        type: string
                     type: object
                   istio:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       externalIp:
-                        type: string
+                        items:
+                          type: string
+                        type: array
                       hub:
                         type: string
                       ingressSvcAnnotations:
-                        type: string
+                        additionalProperties:
+                          type: string
+                        type: object
                       ingressSvcExtraPorts:
-                        type: string
-                      loadBalancerSourceRanges:
-                        type: string
+                        items:
+                          type: integer
+                        type: array
+                      lbSourceRanges:
+                        items:
+                          type: string
+                        type: array
                       mixerImage:
                         type: string
                       operatorImage:
@@ -281,22 +315,20 @@ spec:
                   cookieSecret:
                     type: string
                   emailDomain:
-                    type: string
+                    items:
+                      type: string
+                    type: array
                   enabled:
-                    type: string
+                    type: boolean
                   image:
                     type: string
                   oidcIssuerUrl:
                     type: string
                   provider:
                     type: string
-                  redisConnectionUrl:
-                    type: string
                 type: object
               storage:
                 properties:
-                  enabled:
-                    type: string
                   hostpath:
                     properties:
                       cpuLimit:
@@ -304,18 +336,20 @@ spec:
                       cpuRequest:
                         type: string
                       defaultSc:
-                        type: string
+                        type: boolean
                       enabled:
-                        type: string
-                      hostPath:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
                         type: string
                       memoryRequest:
                         type: string
-                      nodeName:
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      path:
                         type: string
                       reclaimPolicy:
                         type: string
@@ -329,9 +363,9 @@ spec:
                       cpuRequest:
                         type: string
                       defaultSc:
-                        type: string
+                        type: boolean
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
@@ -349,6 +383,15 @@ spec:
                       storageClassName:
                         type: string
                     type: object
+                type: object
+              tenancy:
+                properties:
+                  enabled:
+                    type: boolean
+                  key:
+                    type: string
+                  value:
+                    type: string
                 type: object
             type: object
           status:

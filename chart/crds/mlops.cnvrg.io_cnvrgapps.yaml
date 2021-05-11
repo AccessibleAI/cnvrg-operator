@@ -17,7 +17,7 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.controlPlane.webapp.image
+    - jsonPath: .spec.controlPlane.image
       name: Version
       type: string
     - jsonPath: .status.status
@@ -91,10 +91,8 @@ spec:
                         type: string
                       cpuRequest:
                         type: string
-                      enableReadinessProbe:
-                        type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
@@ -116,6 +114,8 @@ spec:
                       token:
                         type: string
                     type: object
+                  image:
+                    type: string
                   ldap:
                     properties:
                       account:
@@ -127,7 +127,7 @@ spec:
                       base:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       host:
                         type: string
                       port:
@@ -138,7 +138,7 @@ spec:
                   mpi:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       extraArgs:
                         additionalProperties:
                           type: string
@@ -210,9 +210,7 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
-                      killTimeout:
-                        type: integer
+                        type: boolean
                       memory:
                         type: string
                       replicas:
@@ -232,15 +230,13 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
-                      killTimeout:
-                        type: integer
+                        type: boolean
                       memory:
                         type: string
                       replicas:
                         type: integer
                       split:
-                        type: string
+                        type: boolean
                     type: object
                   smtp:
                     properties:
@@ -249,7 +245,7 @@ spec:
                       password:
                         type: string
                       port:
-                        type: string
+                        type: integer
                       server:
                         type: string
                       username:
@@ -260,35 +256,20 @@ spec:
                       cpu:
                         type: string
                       enabled:
-                        type: string
-                      killTimeout:
-                        type: integer
+                        type: boolean
                       memory:
                         type: string
                       replicas:
                         type: integer
-                    type: object
-                  tenancy:
-                    properties:
-                      dedicatedNodes:
-                        type: string
-                      enabled:
-                        type: string
-                      key:
-                        type: string
-                      value:
-                        type: string
                     type: object
                   webapp:
                     properties:
                       cpu:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       failureThreshold:
                         type: integer
-                      image:
-                        type: string
                       initialDelaySeconds:
                         type: integer
                       memory:
@@ -324,10 +305,10 @@ spec:
                         type: string
                       cpuRequest:
                         type: string
-                      enabled:
+                      credsRef:
                         type: string
-                      fsGroup:
-                        type: integer
+                      enabled:
+                        type: boolean
                       image:
                         type: string
                       javaOpts:
@@ -343,10 +324,8 @@ spec:
                           type: string
                         type: object
                       patchEsNodes:
-                        type: string
+                        type: boolean
                       port:
-                        type: integer
-                      runAsUser:
                         type: integer
                       serviceAccount:
                         type: string
@@ -356,17 +335,13 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                   minio:
                     properties:
                       cpuRequest:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryRequest:
@@ -393,7 +368,7 @@ spec:
                                 type: string
                             type: object
                           enabled:
-                            type: string
+                            type: boolean
                           useExistingClaim:
                             type: string
                         type: object
@@ -403,27 +378,21 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                   pg:
                     properties:
                       cpuRequest:
                         type: string
-                      dbname:
+                      credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       fixpg:
-                        type: string
-                      fsGroup:
-                        type: integer
+                        type: boolean
                       hugePages:
                         properties:
                           enabled:
-                            type: string
+                            type: boolean
                           memory:
                             type: string
                           size:
@@ -439,14 +408,8 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      pass:
-                        type: string
                       port:
                         type: integer
-                      runAsUser:
-                        type: integer
-                      secretName:
-                        type: string
                       serviceAccount:
                         type: string
                       sharedBuffers:
@@ -457,21 +420,13 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
-                      user:
-                        type: string
-                    required:
-                    - serviceAccount
                     type: object
                   redis:
                     properties:
-                      appendonly:
+                      credsRef:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       limits:
@@ -502,28 +457,18 @@ spec:
                         type: string
                       svcName:
                         type: string
-                      tolerations:
-                        additionalProperties:
-                          type: string
-                        type: object
-                    required:
-                    - serviceAccount
                     type: object
                 type: object
               logging:
                 properties:
                   elastalert:
                     properties:
-                      containerPort:
-                        type: integer
                       cpuLimit:
                         type: string
                       cpuRequest:
                         type: string
                       enabled:
-                        type: string
-                      fsGroup:
-                        type: integer
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
@@ -532,9 +477,11 @@ spec:
                         type: string
                       nodePort:
                         type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       port:
-                        type: integer
-                      runAsUser:
                         type: integer
                       storageClass:
                         type: string
@@ -543,8 +490,6 @@ spec:
                       svcName:
                         type: string
                     type: object
-                  enabled:
-                    type: string
                   kibana:
                     properties:
                       cpuLimit:
@@ -552,7 +497,7 @@ spec:
                       cpuRequest:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       memoryLimit:
@@ -578,12 +523,19 @@ spec:
                 type: object
               monitoring:
                 properties:
-                  enabled:
-                    type: string
+                  cnvrgIdleMetricsExporter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      labels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
                   grafana:
                     properties:
                       enabled:
-                        type: string
+                        type: boolean
                       image:
                         type: string
                       nodePort:
@@ -602,16 +554,24 @@ spec:
                     type: object
                   prometheus:
                     properties:
+                      basicAuthProxyImage:
+                        type: string
                       cpuRequest:
                         type: string
-                      enabled:
+                      credsRef:
                         type: string
+                      enabled:
+                        type: boolean
                       image:
                         type: string
                       memoryRequest:
                         type: string
                       nodePort:
                         type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       port:
                         type: integer
                       storageClass:
@@ -620,14 +580,10 @@ spec:
                         type: string
                       svcName:
                         type: string
+                      upstreamRef:
+                        type: string
                     type: object
-                  upstreamPrometheus:
-                    type: string
-                required:
-                - upstreamPrometheus
                 type: object
-              namespaceTenancy:
-                type: string
               networking:
                 properties:
                   https:
@@ -637,21 +593,12 @@ spec:
                       certSecret:
                         type: string
                       enabled:
-                        type: string
+                        type: boolean
                       key:
                         type: string
                     type: object
                   ingress:
                     properties:
-                      enabled:
-                        type: string
-                      ingressType:
-                        enum:
-                        - istio
-                        - k8singress
-                        - openshift
-                        - nodeport
-                        type: string
                       istioGwName:
                         type: string
                       perTryTimeout:
@@ -659,6 +606,13 @@ spec:
                       retriesAttempts:
                         type: integer
                       timeout:
+                        type: string
+                      type:
+                        enum:
+                        - istio
+                        - ingress
+                        - openshift
+                        - nodeport
                         type: string
                     type: object
                 type: object
@@ -686,16 +640,25 @@ spec:
                   cookieSecret:
                     type: string
                   emailDomain:
-                    type: string
+                    items:
+                      type: string
+                    type: array
                   enabled:
-                    type: string
+                    type: boolean
                   image:
                     type: string
                   oidcIssuerUrl:
                     type: string
                   provider:
                     type: string
-                  redisConnectionUrl:
+                type: object
+              tenancy:
+                properties:
+                  enabled:
+                    type: boolean
+                  key:
+                    type: string
+                  value:
                     type: string
                 type: object
             type: object

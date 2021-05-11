@@ -6,7 +6,7 @@ storage:
     path: "{{ .Values.storage.hostpath.path }}"
     reclaimPolicy: "{{.Values.storage.hostpath.reclaimPolicy}}"
     defaultSc: {{.Values.storage.hostpath.defaultSc}}
-    {{- if gt (len .Values.storage.hostpath.nodeSelector) 0 }}
+    {{- if .Values.storage.hostpath.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.storage.hostpath.nodeSelector }}
       {{$key}}: {{$value}}

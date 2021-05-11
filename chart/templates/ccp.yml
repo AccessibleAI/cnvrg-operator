@@ -1,4 +1,4 @@
-{{- define "ccp" }}
+{{- if or (eq .Values.spec "allinone") (eq .Values.spec "ccp") }}
 ---
 apiVersion: mlops.cnvrg.io/v1
 kind: CnvrgApp
