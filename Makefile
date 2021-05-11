@@ -10,6 +10,9 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
+# Set default version
+$(shell echo dirty-$$(git rev-parse --short HEAD) > /tmp/newVersion)
+
 all: manager
 
 # Run tests
@@ -19,10 +22,40 @@ test: generate fmt vet manifests
 pack:
 	pkger
 
-# go build -ldflags "-X 'main.BuildVersion=$BUILD_VERSION' -X 'main.Commit=$GIT_COMMIT'" -mod=readonly -o bin/cnvrg-operator main.go pkged.go
 # Build manager binary
 manager: pack generate fmt vet
-	go build -mod=readonly -o bin/cnvrg-operator main.go pkged.go
+	go build -ldflags "-X 'main.BuildVersion=$(shell cat /tmp/newVersion)'" -mod=readonly -o bin/cnvrg-operator main.go pkged.go
+	$(shell if [ $$(echo $$(cat /tmp/newVersion) | grep dirty | wc -l) -eq "0" ]; then git tag $$(cat /tmp/newVersion); fi)
+
+patch-version:
+	{ \
+	set -e ;\
+	currentVersion=$$(git fetch --tags && git tag -l --sort -version:refname | head -n 1) ;\
+	patchVersion=$$(echo $$currentVersion | tr . " " | awk '{print $$3}') ;\
+	patchVersion=$$(( $$patchVersion + 1 )) ;\
+	newVersion=$$(echo $$currentVersion | tr . " " | awk -v pv=$$patchVersion '{print $$1"."$$2"."pv}') ;\
+	echo $$newVersion > /tmp/newVersion ;\
+    }
+
+minor-version:
+	{ \
+	set -e ;\
+	currentVersion=$$(git fetch --tags && git tag -l --sort -version:refname | head -n 1) ;\
+	minorVersion=$$(echo $$currentVersion | tr . " " | awk '{print $$2}') ;\
+	minorVersion=$$(( $$minorVersion + 1 )) ;\
+	newVersion=$$(echo $$currentVersion | tr . " " | awk -v pv=$$minorVersion '{print $$1"."pv"."0}') ;\
+	echo $$newVersion > /tmp/newVersion ;\
+    }
+
+major-version:
+	{ \
+	set -e ;\
+	currentVersion=$$(git fetch --tags && git tag -l --sort -version:refname | head -n 1) ;\
+	majorVersion=$$(echo $$currentVersion | tr . " " | awk '{print $$1}') ;\
+	majorVersion=$$(( $$majorVersion + 1 )) ;\
+	newVersion=$$(echo $$currentVersion | tr . " " | awk -v pv=$$majorVersion '{print pv".0.0"}') ;\
+	echo $$newVersion > /tmp/newVersion ;\
+    }
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests

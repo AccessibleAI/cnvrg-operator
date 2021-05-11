@@ -29,7 +29,6 @@ type param struct {
 
 var (
 	BuildVersion string
-	Commit  string
 )
 
 var (
@@ -78,17 +77,7 @@ var operatorVersion = &cobra.Command{
 	Use:   "version",
 	Short: "Print cnvrg operator version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("version: %s \ncommit: %s\n", BuildVersion, Commit)
-	},
-}
-
-var generateDocsCmd = &cobra.Command{
-	Use:   "docs",
-	Short: "Generate cnvrg operator docs ",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Generating docs... ")
-		//docs.GenerateDocs()
-
+		fmt.Printf("🐾 version: %s\n", BuildVersion)
 	},
 }
 
@@ -179,7 +168,6 @@ func setupCommands() {
 	setParams(rootParams, rootCmd)
 	rootCmd.AddCommand(operatorVersion)
 	rootCmd.AddCommand(runOperatorCmd)
-	rootCmd.AddCommand(generateDocsCmd)
 }
 
 func informPkger() {
