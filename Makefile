@@ -57,6 +57,18 @@ major-version:
 	echo $$newVersion > /tmp/newVersion ;\
     }
 
+.PHONY: chart
+chart:
+	{ \
+	helm repo add cnvrgv3 https://charts.v3.cnvrg.io ;\
+	helm repo update ;\
+	cp -R chart /tmp/chart ;\
+	VERSION=$$(cat /tmp/newVersion) envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file /tmp/chart/Chart.yaml ;\
+	helm package /tmp/chart ;\
+	if [ $$(echo $$(cat /tmp/newVersion) | grep dirty | wc -l) -eq "0" ]; then helm push /tmp/chart cnvrgv3 -u=${HELM_USER} -p=${HELM_PASS}; fi ;\
+	}
+
+
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
 	go run ./main.go operator run
