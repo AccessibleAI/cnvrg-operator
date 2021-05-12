@@ -6,15 +6,15 @@ type Storage struct {
 }
 
 type Hostpath struct {
-	Enabled          *bool    `json:"enabled,omitempty"`
-	Image            string   `json:"image,omitempty"`
-	Path             string   `json:"path,omitempty"`
-	StorageClassName string   `json:"storageClassName,omitempty"`
-	Requests         Requests `json:"requests,omitempty"`
-	Limits           Limits   `json:"limits,omitempty"`
-	ReclaimPolicy string            `json:"reclaimPolicy,omitempty"`
-	DefaultSc     *bool             `json:"defaultSc,omitempty"`
-	NodeSelector  map[string]string `json:"nodeSelector,omitempty"`
+	Enabled          *bool             `json:"enabled,omitempty"`
+	Image            string            `json:"image,omitempty"`
+	Path             string            `json:"path,omitempty"`
+	StorageClassName string            `json:"storageClassName,omitempty"`
+	Requests         Requests          `json:"requests,omitempty"`
+	Limits           Limits            `json:"limits,omitempty"`
+	ReclaimPolicy    string            `json:"reclaimPolicy,omitempty"`
+	DefaultSc        *bool             `json:"defaultSc,omitempty"`
+	NodeSelector     map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type Nfs struct {
@@ -26,8 +26,8 @@ type Nfs struct {
 	Path             string   `json:"path,omitempty"`
 	Requests         Requests `json:"requests,omitempty"`
 	Limits           Limits   `json:"limits,omitempty"`
-	ReclaimPolicy string `json:"reclaimPolicy,omitempty"`
-	DefaultSc     *bool  `json:"defaultSc,omitempty"`
+	ReclaimPolicy    string   `json:"reclaimPolicy,omitempty"`
+	DefaultSc        *bool    `json:"defaultSc,omitempty"`
 }
 
 var storageDefault = Storage{

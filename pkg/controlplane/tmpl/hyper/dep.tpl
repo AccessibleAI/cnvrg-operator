@@ -60,8 +60,8 @@ spec:
             timeoutSeconds: {{ .Spec.ControlPlane.Hyper.ReadinessTimeoutSeconds }}
           resources:
             requests:
-              cpu: {{.Spec.ControlPlane.Hyper.CPURequest}}
-              memory: {{.Spec.ControlPlane.Hyper.MemoryRequest}}
+              cpu: {{.Spec.ControlPlane.Hyper.Requests.Cpu}}
+              memory: {{.Spec.ControlPlane.Hyper.Requests.Memory}}
             limits:
-              cpu: {{ .Spec.ControlPlane.Hyper.CPULimit }}
-              memory: {{ .Spec.ControlPlane.Hyper.MemoryLimit }}
+              cpu: {{ .Spec.ControlPlane.Hyper.Limits.Cpu }}
+              memory: {{ .Spec.ControlPlane.Hyper.Limits.Memory }}

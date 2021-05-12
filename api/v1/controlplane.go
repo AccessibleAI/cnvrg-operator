@@ -22,10 +22,10 @@ type Requests struct {
 }
 
 type WebApp struct {
-	Replicas int      `json:"replicas,omitempty"`
-	Enabled  *bool    `json:"enabled,omitempty"`
-	Port     int      `json:"port,omitempty"`
-	Requests Requests `json:"requests,omitempty"`
+	Replicas                int                   `json:"replicas,omitempty"`
+	Enabled                 *bool                 `json:"enabled,omitempty"`
+	Port                    int                   `json:"port,omitempty"`
+	Requests                Requests              `json:"requests,omitempty"`
 	SvcName                 string                `json:"svcName,omitempty"`
 	NodePort                int                   `json:"nodePort,omitempty"`
 	PassengerMaxPoolSize    int                   `json:"passengerMaxPoolSize,omitempty"`
@@ -40,19 +40,19 @@ type Sidekiq struct {
 	Enabled  *bool    `json:"enabled,omitempty"`
 	Split    *bool    `json:"split,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
-	Replicas int `json:"replicas,omitempty"`
+	Replicas int      `json:"replicas,omitempty"`
 }
 
 type Searchkiq struct {
 	Enabled  *bool    `json:"enabled,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
-	Replicas int `json:"replicas,omitempty"`
+	Replicas int      `json:"replicas,omitempty"`
 }
 
 type Systemkiq struct {
 	Enabled  *bool    `json:"enabled,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
-	Replicas int `json:"replicas,omitempty"`
+	Replicas int      `json:"replicas,omitempty"`
 }
 
 type Registry struct {

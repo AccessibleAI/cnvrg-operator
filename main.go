@@ -153,6 +153,7 @@ func runOperator() {
 		os.Exit(1)
 	}
 
+	zap.S().Infof("cnvrg operator version: %s", BuildVersion)
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")

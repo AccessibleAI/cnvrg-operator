@@ -23,8 +23,8 @@ spec:
       owner: cnvrg-control-plane
   resources:
     requests:
-      cpu: {{ .Spec.Monitoring.Prometheus.CPURequest }}
-      memory: {{ .Spec.Monitoring.Prometheus.MemoryRequest }}
+      cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}
+      memory: {{ .Spec.Monitoring.Prometheus.Requests.Memory }}
   ruleSelector:
     matchLabels:
       app: cnvrg-ccp-prometheus
