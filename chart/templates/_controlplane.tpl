@@ -7,7 +7,7 @@ controlPlane:
     {{- if .Values.controlPlane.baseConfig.featureFlags }}
     featureFlags:
     {{- range $key, $value := .Values.controlPlane.baseConfig.featureFlags }}
-      {{$key}}: {{$value}}
+      {{$key}}: "{{$value}}"
     {{- end }}
     {{- else }}
     featureFlags: { }

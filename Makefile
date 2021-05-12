@@ -11,7 +11,7 @@ GOBIN=$(shell go env GOBIN)
 endif
 
 # Set default version
-$(shell echo dirty-$$(git rev-parse --short HEAD) > /tmp/newVersion)
+$(shell echo $$(git fetch --tags && git tag -l --sort -version:refname | head -n 1)-dirty-$$(git rev-parse --short HEAD) > /tmp/newVersion)
 
 all: manager
 
@@ -71,7 +71,7 @@ uninstall: manifests
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
-	cd config/manager && kustomize edit set image controller=docker.io/cnvrg/cnvrg-operator:${TAG}
+	cd config/manager && kustomize edit set image controller=docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
 	kustomize build config/default | kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
@@ -92,11 +92,11 @@ generate: controller-gen
 
 # Build the docker image
 docker-build: pack generate manifests
-		docker build . -t docker.io/cnvrg/cnvrg-operator:${TAG}
+		docker build . -t docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
 
 # Push the docker image
 docker-push:
-	docker push docker.io/cnvrg/cnvrg-operator:${TAG}
+	docker push docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
 
 # find or download controller-gen
 # download controller-gen if necessary
