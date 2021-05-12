@@ -16,8 +16,9 @@ type Prometheus struct {
 	Enabled             *bool             `json:"enabled,omitempty"`
 	Image               string            `json:"image,omitempty"`
 	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
-	CPURequest          string            `json:"cpuRequest,omitempty"`
-	MemoryRequest       string            `json:"memoryRequest,omitempty"`
+	Requests            Requests          `json:"requests,omitempty"`
+	//CPURequest          string            `json:"cpuRequest,omitempty"`
+	//MemoryRequest       string            `json:"memoryRequest,omitempty"`
 	SvcName             string            `json:"svcName,omitempty"`
 	Port                int               `json:"port,omitempty"`
 	NodePort            int               `json:"nodePort,omitempty"`
@@ -109,8 +110,10 @@ var prometheusInfraDefault = Prometheus{
 	Enabled:             &defaultEnabled,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
-	CPURequest:          "200m",
-	MemoryRequest:       "500Mi",
+	Requests: Requests{
+		Cpu:    "200m",
+		Memory: "500Mi",
+	},
 	SvcName:             "prometheus",
 	Port:                9091, // basic auth nginx proxy is enabled by default
 	NodePort:            30910,
@@ -125,8 +128,10 @@ var prometheusAppDefault = Prometheus{
 	Enabled:             &defaultEnabled,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
-	CPURequest:          "200m",
-	MemoryRequest:       "500Mi",
+	Requests: Requests{
+		Cpu:    "200m",
+		Memory: "500Mi",
+	},
 	SvcName:             "prometheus",
 	Port:                9091, // basic auth nginx proxy is enabled by default
 	NodePort:            30909,

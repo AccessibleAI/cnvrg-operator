@@ -12,21 +12,20 @@ type SharedStorage struct {
 }
 
 type Limits struct {
-	CPU    string `json:"cpu,omitempty"`
+	Cpu    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
 }
 
 type Requests struct {
-	CPU    string `json:"cpu,omitempty"`
+	Cpu    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
 }
 
 type WebApp struct {
-	Replicas                int                   `json:"replicas,omitempty"`
-	Enabled                 *bool                 `json:"enabled,omitempty"`
-	Port                    int                   `json:"port,omitempty"`
-	CPU                     string                `json:"cpu,omitempty"`
-	Memory                  string                `json:"memory,omitempty"`
+	Replicas int      `json:"replicas,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
+	Port     int      `json:"port,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
 	SvcName                 string                `json:"svcName,omitempty"`
 	NodePort                int                   `json:"nodePort,omitempty"`
 	PassengerMaxPoolSize    int                   `json:"passengerMaxPoolSize,omitempty"`
@@ -38,25 +37,22 @@ type WebApp struct {
 }
 
 type Sidekiq struct {
-	Enabled  *bool  `json:"enabled,omitempty"`
-	Split    *bool  `json:"split,omitempty"`
-	CPU      string `json:"cpu,omitempty"`
-	Memory   string `json:"memory,omitempty"`
-	Replicas int    `json:"replicas,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
+	Split    *bool    `json:"split,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
+	Replicas int `json:"replicas,omitempty"`
 }
 
 type Searchkiq struct {
-	Enabled  *bool  `json:"enabled,omitempty"`
-	CPU      string `json:"cpu,omitempty"`
-	Memory   string `json:"memory,omitempty"`
-	Replicas int    `json:"replicas,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
+	Replicas int `json:"replicas,omitempty"`
 }
 
 type Systemkiq struct {
-	Enabled  *bool  `json:"enabled,omitempty"`
-	CPU      string `json:"cpu,omitempty"`
-	Memory   string `json:"memory,omitempty"`
-	Replicas int    `json:"replicas,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
+	Replicas int `json:"replicas,omitempty"`
 }
 
 type Registry struct {
@@ -67,19 +63,19 @@ type Registry struct {
 }
 
 type Hyper struct {
-	Enabled                 *bool  `json:"enabled,omitempty"`
-	Image                   string `json:"image,omitempty"`
-	Port                    int    `json:"port,omitempty"`
-	Replicas                int    `json:"replicas,omitempty"`
-	NodePort                int    `json:"nodePort,omitempty"`
-	SvcName                 string `json:"svcName,omitempty"`
-	Token                   string `json:"token,omitempty"`
-	CPURequest              string `json:"cpuRequest,omitempty"`
-	MemoryRequest           string `json:"memoryRequest,omitempty"`
-	CPULimit                string `json:"cpuLimit,omitempty"`
-	MemoryLimit             string `json:"memoryLimit,omitempty"`
-	ReadinessPeriodSeconds  int    `json:"readinessPeriodSeconds,omitempty"`
-	ReadinessTimeoutSeconds int    `json:"readinessTimeoutSeconds,omitempty"`
+	Enabled                 *bool    `json:"enabled,omitempty"`
+	Image                   string   `json:"image,omitempty"`
+	Port                    int      `json:"port,omitempty"`
+	Replicas                int      `json:"replicas,omitempty"`
+	NodePort                int      `json:"nodePort,omitempty"`
+	SvcName                 string   `json:"svcName,omitempty"`
+	Token                   string   `json:"token,omitempty"`
+	Requests                Requests `json:"requests,omitempty"`
+	Limits                  Limits   `json:"limits,omitempty"`
+	CPULimit                string   `json:"cpuLimit,omitempty"`
+	MemoryLimit             string   `json:"memoryLimit,omitempty"`
+	ReadinessPeriodSeconds  int      `json:"readinessPeriodSeconds,omitempty"`
+	ReadinessTimeoutSeconds int      `json:"readinessTimeoutSeconds,omitempty"`
 }
 
 type Seeder struct {
@@ -215,11 +211,13 @@ var controlPlaneDefault = ControlPlane{
 	Image: "cnvrg/core:3.1.5",
 
 	WebApp: WebApp{
-		Enabled:                 &defaultEnabled,
-		Replicas:                1,
-		Port:                    8080,
-		CPU:                     "2000m",
-		Memory:                  "4Gi",
+		Enabled:  &defaultEnabled,
+		Replicas: 1,
+		Port:     8080,
+		Requests: Requests{
+			Cpu:    "2000m",
+			Memory: "4Gi",
+		},
 		SvcName:                 "app",
 		NodePort:                30080,
 		PassengerMaxPoolSize:    20,
@@ -242,39 +240,49 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Sidekiq: Sidekiq{
-		Enabled:  &defaultEnabled,
-		Split:    &defaultEnabled,
-		CPU:      "1000m",
-		Memory:   "3750Mi",
+		Enabled: &defaultEnabled,
+		Split:   &defaultEnabled,
+		Requests: Requests{
+			Cpu:    "1000m",
+			Memory: "3750Mi",
+		},
 		Replicas: 2,
 	},
 
 	Searchkiq: Searchkiq{
-		Enabled:  &defaultEnabled,
-		CPU:      "750m",
-		Memory:   "750Mi",
+		Enabled: &defaultEnabled,
+		Requests: Requests{
+			Cpu:    "750m",
+			Memory: "750Mi",
+		},
 		Replicas: 1,
 	},
 
 	Systemkiq: Systemkiq{
-		Enabled:  &defaultEnabled,
-		CPU:      "500m",
-		Memory:   "500Mi",
+		Enabled: &defaultEnabled,
+		Requests: Requests{
+			Cpu:    "500m",
+			Memory: "500Mi",
+		},
 		Replicas: 1,
 	},
 
 	Hyper: Hyper{
-		Enabled:                 &defaultEnabled,
-		Image:                   "cnvrg/hyper-server:latest",
-		Port:                    5050,
-		Replicas:                1,
-		NodePort:                30050,
-		SvcName:                 "hyper",
-		Token:                   "token",
-		CPURequest:              "100m",
-		MemoryRequest:           "200Mi",
-		CPULimit:                "2000m",
-		MemoryLimit:             "4Gi",
+		Enabled:  &defaultEnabled,
+		Image:    "cnvrg/hyper-server:latest",
+		Port:     5050,
+		Replicas: 1,
+		NodePort: 30050,
+		SvcName:  "hyper",
+		Token:    "token",
+		Requests: Requests{
+			Cpu:    "100m",
+			Memory: "200Mi",
+		},
+		Limits: Limits{
+			Cpu:    "2000m",
+			Memory: "4Gi",
+		},
 		ReadinessPeriodSeconds:  100,
 		ReadinessTimeoutSeconds: 60,
 	},

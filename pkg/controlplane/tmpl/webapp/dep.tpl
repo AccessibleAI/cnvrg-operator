@@ -90,8 +90,8 @@ spec:
           timeoutSeconds: {{ .Spec.ControlPlane.WebApp.ReadinessTimeoutSeconds }}
         resources:
           requests:
-            cpu: "{{.Spec.ControlPlane.WebApp.CPU}}"
-            memory: "{{.Spec.ControlPlane.WebApp.Memory}}"
+            cpu: "{{.Spec.ControlPlane.WebApp.Requests.Cpu}}"
+            memory: "{{.Spec.ControlPlane.WebApp.Requests.Memory}}"
         {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
         volumeMounts:
         - name: "{{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}"

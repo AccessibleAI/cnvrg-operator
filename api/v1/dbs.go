@@ -14,14 +14,14 @@ type Pg struct {
 	StorageSize    string            `json:"storageSize,omitempty"`
 	SvcName        string            `json:"svcName,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	CPURequest     string            `json:"cpuRequest,omitempty"`
-	MemoryRequest  string            `json:"memoryRequest,omitempty"`
+	Requests       Requests          `json:"requests,omitempty"`
 	MaxConnections int               `json:"maxConnections,omitempty"`
 	SharedBuffers  string            `json:"sharedBuffers,omitempty"`
 	HugePages      HugePages         `json:"hugePages,omitempty"`
 	Fixpg          *bool             `json:"fixpg,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
+	PvcName        string            `json:"pvcName,omitempty"`
 }
 
 type Minio struct {
@@ -34,10 +34,10 @@ type Minio struct {
 	SvcName        string            `json:"svcName,omitempty"`
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	CPURequest     string            `json:"cpuRequest,omitempty"`
-	MemoryRequest  string            `json:"memoryRequest,omitempty"`
+	Requests       Requests          `json:"requests,omitempty"`
 	SharedStorage  SharedStorage     `json:"sharedStorage,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
+	PvcName        string            `json:"pvcName,omitempty"`
 }
 
 type Redis struct {
@@ -52,6 +52,7 @@ type Redis struct {
 	Requests       Requests          `json:"requests,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
+	PvcName        string            `json:"pvcName,omitempty"`
 }
 
 type Es struct {
@@ -63,14 +64,13 @@ type Es struct {
 	SvcName        string            `json:"svcName,omitempty"`
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	CPURequest     string            `json:"cpuRequest,omitempty"`
-	MemoryRequest  string            `json:"memoryRequest,omitempty"`
-	CPULimit       string            `json:"cpuLimit,omitempty"`
-	MemoryLimit    string            `json:"memoryLimit,omitempty"`
+	Requests       Requests          `json:"requests,omitempty"`
+	Limits         Limits            `json:"limits,omitempty"`
 	JavaOpts       string            `json:"javaOpts,omitempty"`
 	PatchEsNodes   *bool             `json:"patchEsNodes,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
+	PvcName        string            `json:"pvcName,omitempty"`
 }
 
 type AppDbs struct {
@@ -94,8 +94,11 @@ var minioDefaults = Minio{
 	SvcName:        "minio",
 	NodePort:       30090,
 	StorageClass:   "",
-	CPURequest:     "1000m",
-	MemoryRequest:  "2Gi",
+	Requests: Requests{
+		Cpu:    "1000m",
+		Memory: "2Gi",
+	},
+	PvcName: "",
 	SharedStorage: SharedStorage{
 		Enabled:          &defaultEnabled,
 		UseExistingClaim: "",
@@ -114,12 +117,15 @@ var pgDefault = Pg{
 	StorageSize:    "80Gi",
 	SvcName:        "postgres",
 	StorageClass:   "",
-	CPURequest:     "4000m",
-	MemoryRequest:  "4Gi",
+	Requests: Requests{
+		Cpu:    "4000m",
+		Memory: "4Gi",
+	},
 	MaxConnections: 500,
 	SharedBuffers:  "64MB",
 	Fixpg:          &defaultTrue,
 	NodeSelector:   nil,
+	PvcName:        "",
 	HugePages: HugePages{
 		Enabled: &defaultEnabled,
 		Size:    "2Mi",
@@ -138,12 +144,13 @@ var redisDefault = Redis{
 	StorageClass:   "",
 	NodeSelector:   nil,
 	CredsRef:       "redis-creds",
+	PvcName:        "",
 	Limits: Limits{
-		CPU:    "1000m",
+		Cpu:    "1000m",
 		Memory: "2Gi",
 	},
 	Requests: Requests{
-		CPU:    "100m",
+		Cpu:    "100m",
 		Memory: "200Mi",
 	},
 }
@@ -157,13 +164,17 @@ var esDefault = Es{
 	SvcName:        "elasticsearch",
 	NodePort:       32200,
 	StorageClass:   "",
-	CPURequest:     "1000m",
-	MemoryRequest:  "1Gi",
-	CPULimit:       "2000m",
-	MemoryLimit:    "4Gi",
-	JavaOpts:       "",
-	PatchEsNodes:   &defaultTrue,
-	CredsRef:       "es-creds",
+	Requests: Requests{
+		Cpu:    "1000m",
+		Memory: "1Gi",
+	},
+	Limits: Limits{
+		Cpu:    "2000m",
+		Memory: "4Gi",
+	},
+	JavaOpts:     "",
+	PatchEsNodes: &defaultTrue,
+	CredsRef:     "es-creds",
 }
 
 var appDbsDefaults = AppDbs{

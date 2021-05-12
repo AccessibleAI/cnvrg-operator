@@ -79,11 +79,11 @@ spec:
         - containerPort: {{ .Spec.Dbs.Es.Port }}
         resources:
           limits:
-            cpu: {{ .Spec.Dbs.Es.CPULimit }}
-            memory: {{ .Spec.Dbs.Es.MemoryLimit }}
+            cpu: {{ .Spec.Dbs.Es.Limits.Cpu }}
+            memory: {{ .Spec.Dbs.Es.Limits.Memory }}
           requests:
-            cpu: {{ .Spec.Dbs.Es.CPURequest }}
-            memory: {{ .Spec.Dbs.Es.MemoryRequest }}
+            cpu: {{ .Spec.Dbs.Es.Requests.Cpu }}
+            memory: {{ .Spec.Dbs.Es.Requests.Memory }}
         readinessProbe:
           exec:
             command:
