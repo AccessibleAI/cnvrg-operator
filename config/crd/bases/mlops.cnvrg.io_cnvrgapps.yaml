@@ -52,8 +52,6 @@ spec:
                     properties:
                       agentCustomTag:
                         type: string
-                      ccpStorageClass:
-                        type: string
                       cnvrgJobUid:
                         type: string
                       featureFlags:

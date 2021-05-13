@@ -22,6 +22,12 @@ test: generate fmt vet manifests
 pack:
 	pkger
 
+override-release: current-version docker-build docker-push chart
+	git tag -d $$(cat /tmp/newVersion)
+	git push origin -d $$(cat /tmp/newVersion)
+	git tag $$(cat /tmp/newVersion)
+	git push origin $$(cat /tmp/newVersion)
+
 patch-release: patch-version docker-build docker-push chart
 	git tag $$(cat /tmp/newVersion);
 	git push origin $$(cat /tmp/newVersion)
@@ -38,6 +44,16 @@ major-release: major-version docker-build docker-push chart
 manager: pack generate fmt vet
 	go build -ldflags "-X 'main.BuildVersion=$(shell cat /tmp/newVersion)'" -mod=readonly -o bin/cnvrg-operator main.go pkged.go
 	$(shell if [ $$(echo $$(cat /tmp/newVersion) | grep dirty | wc -l) -eq "0" ]; then git tag $$(cat /tmp/newVersion); fi)
+
+
+
+current-version:
+	{ \
+	set -e ;\
+	currentVersion=$$(git fetch --tags && git tag -l --sort -version:refname | head -n 1) ;\
+	echo $$currentVersion > /tmp/newVersion ;\
+    }
+
 
 patch-version:
 	{ \
@@ -74,6 +90,7 @@ chart:
 	{ \
 	helm repo add cnvrgv3 https://charts.v3.cnvrg.io ;\
 	helm repo update ;\
+	rm -fr /tmp/chart ;\
 	cp -R chart /tmp/chart ;\
 	VERSION=$$(cat /tmp/newVersion) envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file /tmp/chart/Chart.yaml ;\
 	helm package /tmp/chart -d /tmp ;\

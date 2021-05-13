@@ -136,7 +136,6 @@ type BaseConfig struct {
 	AgentCustomTag       string            `json:"agentCustomTag,omitempty"`
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
-	CcpStorageClass      string            `json:"ccpStorageClass,omitempty"`
 }
 
 type ControlPlane struct {
@@ -282,7 +281,6 @@ var controlPlaneDefault = ControlPlane{
 		AgentCustomTag:   "latest",
 		Intercom:         "true",
 		CnvrgJobUID:      "1000",
-		CcpStorageClass:  "",
 	},
 
 	ObjectStorage: ObjectStorage{
