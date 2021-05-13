@@ -11,11 +11,14 @@ controlPlane:
   hyper:
     enabled: true
   objectStorage:
-    cnvrgStorageAccessKey: AKIAIOSFODNN7EXAMPLE
-    cnvrgStorageBucket: cnvrg-storage
-    cnvrgStorageRegion: eastus
-    cnvrgStorageSecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-    cnvrgStorageType: minio
+    type: minio
+    bucket: cnvrg-storage
+    region: eastus
+    accessKey: ""
+    secretKey: ""
+    endpoint: ""
+    azureAccountName: ""
+    azureContainer: ""
     gcpKeyfileMountPath: /tmp/gcp_keyfile
     gcpKeyfileName: key.json
     gcpStorageSecret: gcp-storage-secret

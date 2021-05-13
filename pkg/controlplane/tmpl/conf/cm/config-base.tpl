@@ -6,15 +6,14 @@ metadata:
   labels:
     owner: cnvrg-control-plane
 data:
+  PASSENGER_APP_ENV: "app"
+  RAILS_ENV: "app"
+  RUN_JOBS_ON_SELF_CLUSTER: "true"
+  DEFAULT_COMPUTE_NAME: "default"
+  CHECK_JOB_EXPIRATION: "true"
+  USE_STDOUT: "true"
+  EXTRACT_TAGS_FROM_CMD: "true"
   AGENT_CUSTOM_TAG: "{{ .Spec.ControlPlane.BaseConfig.AgentCustomTag }}"
-  PASSENGER_APP_ENV: "{{ .Spec.ControlPlane.BaseConfig.PassengerAppEnv }}"
-  RAILS_ENV: "{{ .Spec.ControlPlane.BaseConfig.RailsEnv }}"
-  RUN_JOBS_ON_SELF_CLUSTER: "{{ .Spec.ControlPlane.BaseConfig.RunJobsOnSelfCluster }}"
-  DEFAULT_COMPUTE_CONFIG: "{{ .Spec.ControlPlane.BaseConfig.DefaultComputeConfig }}"
-  DEFAULT_COMPUTE_NAME: "{{ .Spec.ControlPlane.BaseConfig.DefaultComputeName }}"
-  CHECK_JOB_EXPIRATION: "{{ .Spec.ControlPlane.BaseConfig.CheckJobExpiration }}"
-  USE_STDOUT: "{{ .Spec.ControlPlane.BaseConfig.UseStdout }}"
-  EXTRACT_TAGS_FROM_CMD: "{{ .Spec.ControlPlane.BaseConfig.ExtractTagsFromCmd }}"
   KUBE_NAMESPACE: "{{ ns . }}"
   SHOW_INTERCOM: "{{ .Spec.ControlPlane.BaseConfig.Intercom }}"
   SPLIT_SIDEKIQ: "{{ .Spec.ControlPlane.Sidekiq.Split }}"

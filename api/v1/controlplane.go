@@ -114,42 +114,29 @@ type SMTP struct {
 }
 
 type ObjectStorage struct {
-	CnvrgStorageType             string `json:"cnvrgStorageType,omitempty"`
-	CnvrgStorageBucket           string `json:"cnvrgStorageBucket,omitempty"`
-	CnvrgStorageAccessKey        string `json:"cnvrgStorageAccessKey,omitempty"`
-	CnvrgStorageSecretKey        string `json:"cnvrgStorageSecretKey,omitempty"`
-	CnvrgStorageEndpoint         string `json:"cnvrgStorageEndpoint,omitempty"`
-	MinioSseMasterKey            string `json:"minioSseMasterKey,omitempty"`
-	CnvrgStorageAzureAccessKey   string `json:"cnvrgStorageAzureAccessKey,omitempty"`
-	CnvrgStorageAzureAccountName string `json:"cnvrgStorageAzureAccountName,omitempty"`
-	CnvrgStorageAzureContainer   string `json:"cnvrgStorageAzureContainer,omitempty"`
-	CnvrgStorageRegion           string `json:"cnvrgStorageRegion,omitempty"`
-	CnvrgStorageProject          string `json:"cnvrgStorageProject,omitempty"`
-	GcpStorageSecret             string `json:"gcpStorageSecret,omitempty"`
-	GcpKeyfileMountPath          string `json:"gcpKeyfileMountPath,omitempty"`
-	GcpKeyfileName               string `json:"gcpKeyfileName,omitempty"`
-	SecretKeyBase                string `json:"secretKeyBase,omitempty"`
-	StsIv                        string `json:"stsIv,omitempty"`
-	StsKey                       string `json:"stsKey,omitempty"`
+	Type                string `json:"type,omitempty"`
+	Bucket              string `json:"bucket,omitempty"`
+	Region              string `json:"region,omitempty"`
+	AccessKey           string `json:"accessKey,omitempty"`
+	SecretKey           string `json:"secretKey,omitempty"`
+	Endpoint            string `json:"endpoint,omitempty"`
+	AzureAccountName    string `json:"azureAccountName,omitempty"`
+	AzureContainer      string `json:"azureContainer,omitempty"`
+	GcpProject          string `json:"gcpProject,omitempty"`
+	GcpStorageSecret    string `json:"gcpStorageSecret,omitempty"`
+	GcpKeyfileMountPath string `json:"gcpKeyfileMountPath,omitempty"`
+	GcpKeyfileName      string `json:"gcpKeyfileName,omitempty"`
 }
 
 type BaseConfig struct {
 	JobsStorageClass     string            `json:"jobsStorageClass,omitempty"`
 	FeatureFlags         map[string]string `json:"featureFlags,omitempty"`
 	SentryURL            string            `json:"sentryUrl,omitempty"`
-	PassengerAppEnv      string            `json:"passengerAppEnv,omitempty"`
-	RailsEnv             string            `json:"railsEnv,omitempty"`
 	RunJobsOnSelfCluster string            `json:"runJobsOnSelfCluster,omitempty"`
-	DefaultComputeConfig string            `json:"defaultComputeConfig,omitempty"`
-	DefaultComputeName   string            `json:"defaultComputeName,omitempty"`
-	UseStdout            string            `json:"useStdout,omitempty"`
-	ExtractTagsFromCmd   string            `json:"extractTagsFromCmd,omitempty"`
-	CheckJobExpiration   string            `json:"checkJobExpiration,omitempty"`
 	AgentCustomTag       string            `json:"agentCustomTag,omitempty"`
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
 	CcpStorageClass      string            `json:"ccpStorageClass,omitempty"`
-	HostpathNode         string            `json:"hostpathNode,omitempty"`
 }
 
 type ControlPlane struct {
@@ -289,43 +276,29 @@ var controlPlaneDefault = ControlPlane{
 	Mpi: mpiDefault,
 
 	BaseConfig: BaseConfig{
-		JobsStorageClass:     "",
-		FeatureFlags:         nil,
-		SentryURL:            "https://4409141e4a204282bd1f5c021e587509:dc15f684faa9479a839cf913b98b4ee2@sentry.cnvrg.io/32",
-		PassengerAppEnv:      "app",
-		RailsEnv:             "app",
-		RunJobsOnSelfCluster: "true",
-		DefaultComputeConfig: "/opt/kube",
-		DefaultComputeName:   "default",
-		UseStdout:            "true",
-		ExtractTagsFromCmd:   "true",
-		CheckJobExpiration:   "true",
-		AgentCustomTag:       "latest",
-		Intercom:             "true",
-		CnvrgJobUID:          "1000",
-		CcpStorageClass:      "",
-		HostpathNode:         "",
+		JobsStorageClass: "",
+		FeatureFlags:     nil,
+		SentryURL:        "",
+		AgentCustomTag:   "latest",
+		Intercom:         "true",
+		CnvrgJobUID:      "1000",
+		CcpStorageClass:  "",
 	},
 
 	ObjectStorage: ObjectStorage{
 
-		CnvrgStorageType:             "minio",
-		CnvrgStorageBucket:           "cnvrg-storage",
-		CnvrgStorageAccessKey:        "AKIAIOSFODNN7EXAMPLE",
-		CnvrgStorageSecretKey:        "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-		CnvrgStorageEndpoint:         "",
-		MinioSseMasterKey:            "my-minio-key:a310aadcefdb634b748ae31225f175e3f64591f955dfc66ccc20e128a6817ff9",
-		CnvrgStorageAzureAccessKey:   "",
-		CnvrgStorageAzureAccountName: "",
-		CnvrgStorageAzureContainer:   "",
-		CnvrgStorageRegion:           "eastus",
-		CnvrgStorageProject:          "",
-		SecretKeyBase:                "0d2b33c2cc19cfaa838d3c354354a18fcc92beaaa8e97889ef99341c8aaf963ad3afcf0f7c20454cabb5c573c3fc35b60221034e109f4fb651ed1415bf61e9d5",
-		StsIv:                        "DeJ/CGz/Hkb/IbRe4t1xLg==",
-		StsKey:                       "05646d3cbf8baa5be7150b4283eda07d",
-		GcpStorageSecret:             "gcp-storage-secret",
-		GcpKeyfileMountPath:          "/tmp/gcp_keyfile",
-		GcpKeyfileName:               "key.json",
+		Type:                "minio",
+		Bucket:              "cnvrg-storage",
+		AccessKey:           "",
+		SecretKey:           "",
+		Endpoint:            "",
+		AzureAccountName:    "",
+		AzureContainer:      "",
+		Region:              "eastus",
+		GcpProject:          "",
+		GcpStorageSecret:    "gcp-storage-secret",
+		GcpKeyfileMountPath: "/tmp/gcp_keyfile",
+		GcpKeyfileName:      "key.json",
 	},
 
 	Ldap: Ldap{

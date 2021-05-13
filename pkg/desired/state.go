@@ -178,8 +178,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				cnvrgApp.Spec.Dbs.Es.Port)
 		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			if cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint != "" {
-				return cnvrgApp.Spec.ControlPlane.ObjectStorage.CnvrgStorageEndpoint
+			if cnvrgApp.Spec.ControlPlane.ObjectStorage.Endpoint != "" {
+				return cnvrgApp.Spec.ControlPlane.ObjectStorage.Endpoint
 			} else if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NodePortIngress {
 				return fmt.Sprintf("http://%s:%d", cnvrgApp.Spec.ClusterDomain, cnvrgApp.Spec.Dbs.Minio.NodePort)
 			} else {
@@ -455,6 +455,18 @@ func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
 
 	// todo: need to figure out what's wrong with MPI CRD (might be related to apiextensions.k8s.io/v1beta1)
 	if manifest.GVR == Kinds[CrdGVR] && obj.GetName() == "mpijobs.kubeflow.org" {
+		return false
+	}
+
+	// this secret is unique one, since by default it will generate access/secret keys for Minio each this template rendered
+	// this secret should be applied only once, to keep same minio creds between reconcile loops
+	if manifest.GVR == Kinds[SecretGVR] && obj.GetName() == "cp-object-storage" {
+		return false
+	}
+
+	// this secret is unique one, since by default it will generate rails key base and sts_key for app each this template rendered
+	// this secret should be applied only once, to keep same app keys between reconcile loops
+	if manifest.GVR == Kinds[SecretGVR] && obj.GetName() == "cp-base-secret" {
 		return false
 	}
 

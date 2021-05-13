@@ -40,7 +40,7 @@ spec:
             - name: "CNVRG_RUN_MODE"
               value: "sidekiq"
           imagePullPolicy: Always
-          {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
+          {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
           volumeMounts:
             - name: "{{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}"
               mountPath: "{{ .Spec.ControlPlane.ObjectStorage.GcpKeyfileMountPath }}"
@@ -75,7 +75,7 @@ spec:
             preStop:
               exec:
                 command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid 60"]
-      {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
+      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       volumes:
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}
           secret:

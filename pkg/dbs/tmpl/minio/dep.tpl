@@ -48,11 +48,6 @@ spec:
             - nas
             - /data
           env:
-            - name: MINIO_SSE_MASTER_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: cp-object-storage
-                  key: MINIO_SSE_MASTER_KEY
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
