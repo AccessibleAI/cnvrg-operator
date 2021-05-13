@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -15,9 +15,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: {{ .Spec.Dbs.Minio.SvcName }}
-                port:
-                  number: {{ .Spec.Dbs.Minio.Port }}
+              serviceName: {{ .Spec.Dbs.Minio.SvcName }}
+              servicePort: {{ .Spec.Dbs.Minio.Port }}

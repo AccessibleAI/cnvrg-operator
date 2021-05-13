@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -15,9 +15,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: {{ .Spec.Monitoring.Grafana.SvcName }}
-                port:
-                  number: {{ .Spec.Monitoring.Grafana.Port }}
+              serviceName: {{ .Spec.Monitoring.Grafana.SvcName }}
+              servicePort: {{ .Spec.Monitoring.Grafana.Port }}

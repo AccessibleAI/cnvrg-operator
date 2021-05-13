@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -15,9 +15,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: {{ .Spec.Logging.Kibana.SvcName }}
-                port:
-                  number: {{ .Spec.Logging.Kibana.Port }}
+              serviceName: {{ .Spec.Logging.Kibana.SvcName }}
+              servicePort: {{ .Spec.Logging.Kibana.SvcName }}

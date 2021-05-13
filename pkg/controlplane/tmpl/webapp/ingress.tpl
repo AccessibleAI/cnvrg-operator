@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -13,9 +13,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: {{ .Spec.ControlPlane.WebApp.SvcName }}
-                port:
-                  number:  {{ .Spec.ControlPlane.WebApp.Port }}
+              serviceName: {{ .Spec.ControlPlane.WebApp.SvcName }}
+              servicePort:  {{ .Spec.ControlPlane.WebApp.Port }}

@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -15,9 +15,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: {{ .Spec.Monitoring.Prometheus.SvcName }}
-                port:
-                  number: {{ .Spec.Monitoring.Prometheus.Port }}
+              serviceName: {{ .Spec.Monitoring.Prometheus.SvcName }}
+              servicePort: {{ .Spec.Monitoring.Prometheus.Port }}
