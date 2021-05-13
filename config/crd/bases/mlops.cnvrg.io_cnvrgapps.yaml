@@ -51,11 +51,6 @@ spec:
                   baseConfig:
                     properties:
                       agentCustomTag:
-                        description: DefaultComputeConfig string            `json:"defaultComputeConfig,omitempty"`
-                          DefaultComputeName   string            `json:"defaultComputeName,omitempty"`
-                          UseStdout            string            `json:"useStdout,omitempty"`
-                          ExtractTagsFromCmd   string            `json:"extractTagsFromCmd,omitempty"`
-                          CheckJobExpiration   string            `json:"checkJobExpiration,omitempty"`
                         type: string
                       ccpStorageClass:
                         type: string
@@ -70,8 +65,6 @@ spec:
                       jobsStorageClass:
                         type: string
                       runJobsOnSelfCluster:
-                        description: PassengerAppEnv      string            `json:"passengerAppEnv,omitempty"`
-                          RailsEnv             string            `json:"railsEnv,omitempty"`
                         type: string
                       sentryUrl:
                         type: string
@@ -155,7 +148,6 @@ spec:
                       accessKey:
                         type: string
                       azureAccountName:
-                        description: CnvrgStorageAzureAccessKey   string `json:"cnvrgStorageAzureAccessKey,omitempty"`
                         type: string
                       azureContainer:
                         type: string

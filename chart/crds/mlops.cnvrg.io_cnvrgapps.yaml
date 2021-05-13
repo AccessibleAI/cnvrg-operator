@@ -54,35 +54,19 @@ spec:
                         type: string
                       ccpStorageClass:
                         type: string
-                      checkJobExpiration:
-                        type: string
                       cnvrgJobUid:
-                        type: string
-                      defaultComputeConfig:
-                        type: string
-                      defaultComputeName:
-                        type: string
-                      extractTagsFromCmd:
                         type: string
                       featureFlags:
                         additionalProperties:
                           type: string
                         type: object
-                      hostpathNode:
-                        type: string
                       intercom:
                         type: string
                       jobsStorageClass:
                         type: string
-                      passengerAppEnv:
-                        type: string
-                      railsEnv:
-                        type: string
                       runJobsOnSelfCluster:
                         type: string
                       sentryUrl:
-                        type: string
-                      useStdout:
                         type: string
                     type: object
                   hyper:
@@ -161,39 +145,29 @@ spec:
                     type: object
                   objectStorage:
                     properties:
-                      cnvrgStorageAccessKey:
+                      accessKey:
                         type: string
-                      cnvrgStorageAzureAccessKey:
+                      azureAccountName:
                         type: string
-                      cnvrgStorageAzureAccountName:
+                      azureContainer:
                         type: string
-                      cnvrgStorageAzureContainer:
+                      bucket:
                         type: string
-                      cnvrgStorageBucket:
-                        type: string
-                      cnvrgStorageEndpoint:
-                        type: string
-                      cnvrgStorageProject:
-                        type: string
-                      cnvrgStorageRegion:
-                        type: string
-                      cnvrgStorageSecretKey:
-                        type: string
-                      cnvrgStorageType:
+                      endpoint:
                         type: string
                       gcpKeyfileMountPath:
                         type: string
                       gcpKeyfileName:
                         type: string
+                      gcpProject:
+                        type: string
                       gcpStorageSecret:
                         type: string
-                      minioSseMasterKey:
+                      region:
                         type: string
-                      secretKeyBase:
+                      secretKey:
                         type: string
-                      stsIv:
-                        type: string
-                      stsKey:
+                      type:
                         type: string
                     type: object
                   rbac:

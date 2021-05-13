@@ -15,11 +15,11 @@ controlPlane:
   hyper:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
   objectStorage:
-    cnvrgStorageAccessKey: {{ .Values.controlPlane.objectStorage.cnvrgStorageAccessKey }}
-    cnvrgStorageBucket: {{ .Values.controlPlane.objectStorage.cnvrgStorageBucket }}
-    cnvrgStorageRegion: {{ .Values.controlPlane.objectStorage.cnvrgStorageRegion }}
-    cnvrgStorageSecretKey: {{ .Values.controlPlane.objectStorage.cnvrgStorageSecretKey }}
-    cnvrgStorageType: {{ .Values.controlPlane.objectStorage.cnvrgStorageType }}
+    accessKey: {{ .Values.controlPlane.objectStorage.accessKey }}
+    bucket: {{ .Values.controlPlane.objectStorage.bucket }}
+    region: {{ .Values.controlPlane.objectStorage.region }}
+    secretKey: {{ .Values.controlPlane.objectStorage.secretKey }}
+    type: {{ .Values.controlPlane.objectStorage.type }}
     gcpKeyfileMountPath: {{ .Values.controlPlane.objectStorage.gcpKeyfileMountPath }}
     gcpKeyfileName: {{ .Values.controlPlane.objectStorage.gcpKeyfileName }}
     gcpStorageSecret: {{ .Values.controlPlane.objectStorage.gcpStorageSecret }}

@@ -22,6 +22,18 @@ test: generate fmt vet manifests
 pack:
 	pkger
 
+patch-release: patch-version docker-build docker-push chart
+	git tag $$(cat /tmp/newVersion);
+	git push origin $$(cat /tmp/newVersion)
+
+minor-release: minor-version docker-build docker-push chart
+	git tag $$(cat /tmp/newVersion);
+	git push origin $$(cat /tmp/newVersion)
+
+major-release: major-version docker-build docker-push chart
+	git tag $$(cat /tmp/newVersion);
+	git push origin $$(cat /tmp/newVersion)
+
 # Build manager binary
 manager: pack generate fmt vet
 	go build -ldflags "-X 'main.BuildVersion=$(shell cat /tmp/newVersion)'" -mod=readonly -o bin/cnvrg-operator main.go pkged.go
@@ -64,10 +76,12 @@ chart:
 	helm repo update ;\
 	cp -R chart /tmp/chart ;\
 	VERSION=$$(cat /tmp/newVersion) envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file /tmp/chart/Chart.yaml ;\
-	helm package /tmp/chart ;\
-	if [ $$(echo $$(cat /tmp/newVersion) | grep dirty | wc -l) -eq "0" ]; then helm push /tmp/chart cnvrgv3 -u=${HELM_USER} -p=${HELM_PASS}; fi ;\
+	helm package /tmp/chart -d /tmp ;\
+	if [ $$(echo $$(cat /tmp/newVersion) | grep dirty | wc -l) -eq "0" ]; then helm push /tmp/chart cnvrgv3 -u=${HELM_USER} -p=${HELM_PASS} --force; fi ;\
 	}
 
+chart-delete:
+	curl -XDELETE https://$$HELM_USER:$$HELM_PASS@charts.v3.cnvrg.io/api/charts/cnvrg/${V}
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
