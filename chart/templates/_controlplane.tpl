@@ -15,12 +15,12 @@ controlPlane:
   hyper:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
   objectStorage:
-    accessKey: {{ .Values.controlPlane.objectStorage.accessKey }}
-    bucket: {{ .Values.controlPlane.objectStorage.bucket }}
-    region: {{ .Values.controlPlane.objectStorage.region }}
-    secretKey: {{ .Values.controlPlane.objectStorage.secretKey }}
+    accessKey: "{{ .Values.controlPlane.objectStorage.accessKey }}"
+    bucket: "{{ .Values.controlPlane.objectStorage.bucket }}"
+    region: "{{ .Values.controlPlane.objectStorage.region }}"
+    secretKey: "{{ .Values.controlPlane.objectStorage.secretKey }}"
     type: {{ .Values.controlPlane.objectStorage.type }}
-    gcpKeyfileMountPath: {{ .Values.controlPlane.objectStorage.gcpKeyfileMountPath }}
+    gcpKeyfileMountPath: "{{ .Values.controlPlane.objectStorage.gcpKeyfileMountPath }}"
     gcpKeyfileName: {{ .Values.controlPlane.objectStorage.gcpKeyfileName }}
     gcpStorageSecret: {{ .Values.controlPlane.objectStorage.gcpStorageSecret }}
   searchkiq:
