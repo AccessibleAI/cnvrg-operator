@@ -159,7 +159,7 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 	},
 	IngressGVR: schema.GroupVersionKind{
 		Group:   "networking.k8s.io",
-		Version: "v1",
+		Version: "v1beta1",
 		Kind:    "Ingress",
 	},
 	PodDisruptionBudgetGVR: schema.GroupVersionKind{
