@@ -189,8 +189,8 @@ spec:
             periodSeconds: 20
           resources:
             requests:
-              cpu: {{ .Spec.Dbs.Minio.CPURequest }}
-              memory: {{ .Spec.Dbs.Minio.MemoryRequest }}
+              cpu: {{ .Spec.Dbs.Minio.Requests.Cpu }}
+              memory: {{ .Spec.Dbs.Minio.Requests.Memory }}
       initContainers:
         - args:
             - istio-iptables

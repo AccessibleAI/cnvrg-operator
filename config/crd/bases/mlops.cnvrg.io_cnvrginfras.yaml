@@ -66,6 +66,8 @@ spec:
                         type: object
                       port:
                         type: integer
+                      pvcName:
+                        type: string
                       requests:
                         properties:
                           cpu:
@@ -182,15 +184,11 @@ spec:
                     properties:
                       basicAuthProxyImage:
                         type: string
-                      cpuRequest:
-                        type: string
                       credsRef:
                         type: string
                       enabled:
                         type: boolean
                       image:
-                        type: string
-                      memoryRequest:
                         type: string
                       nodePort:
                         type: integer
@@ -200,11 +198,20 @@ spec:
                         type: object
                       port:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       storageClass:
                         type: string
                       storageSize:
                         type: string
                       svcName:
+                        description: CPURequest          string            `json:"cpuRequest,omitempty"`
+                          MemoryRequest       string            `json:"memoryRequest,omitempty"`
                         type: string
                       upstreamRef:
                         type: string
@@ -331,20 +338,19 @@ spec:
                 properties:
                   hostpath:
                     properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
                       defaultSc:
                         type: boolean
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       nodeSelector:
                         additionalProperties:
                           type: string
@@ -353,31 +359,44 @@ spec:
                         type: string
                       reclaimPolicy:
                         type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       storageClassName:
                         type: string
                     type: object
                   nfs:
                     properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
                       defaultSc:
                         type: boolean
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       path:
                         type: string
                       provisioner:
                         type: string
                       reclaimPolicy:
                         type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       server:
                         type: string
                       storageClassName:

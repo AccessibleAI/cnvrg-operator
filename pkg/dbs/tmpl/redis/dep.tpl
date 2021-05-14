@@ -47,10 +47,10 @@ spec:
             - containerPort: {{ .Spec.Dbs.Redis.Port }}
           resources:
             limits:
-              cpu: {{ .Spec.Dbs.Redis.Limits.CPU }}
+              cpu: {{ .Spec.Dbs.Redis.Limits.Cpu }}
               memory: {{ .Spec.Dbs.Redis.Limits.Memory }}
             requests:
-              cpu: {{ .Spec.Dbs.Redis.Requests.CPU }}
+              cpu: {{ .Spec.Dbs.Redis.Requests.Cpu }}
               memory: {{ .Spec.Dbs.Redis.Requests.Memory }}
           volumeMounts:
             - name: redis-data

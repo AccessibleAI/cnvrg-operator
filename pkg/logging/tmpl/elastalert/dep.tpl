@@ -49,11 +49,11 @@ spec:
               name: {{ .Spec.Dbs.Es.CredsRef }}
         resources:
           requests:
-            cpu: {{.Spec.Logging.Elastalert.CPURequest}}
-            memory: {{.Spec.Logging.Elastalert.MemoryRequest}}
+            cpu: {{.Spec.Logging.Elastalert.Requests.Cpu}}
+            memory: {{.Spec.Logging.Elastalert.Requests.Memory}}
           limits:
-            cpu: {{ .Spec.Logging.Elastalert.CPULimit }}
-            memory: {{ .Spec.Logging.Elastalert.MemoryLimit }}
+            cpu: {{ .Spec.Logging.Elastalert.Limits.Cpu }}
+            memory: {{ .Spec.Logging.Elastalert.Limits.Memory }}
         volumeMounts:
         - mountPath: /opt/elastalert-server/config/config.json
           subPath: config.json

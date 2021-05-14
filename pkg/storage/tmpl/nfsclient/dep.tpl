@@ -40,11 +40,11 @@ spec:
               value: "{{ .Spec.Storage.Nfs.Path }}"
           resources:
             limits:
-              cpu: {{ .Spec.Storage.Nfs.CPULimit }}
-              memory: {{ .Spec.Storage.Nfs.MemoryLimit }}
+              cpu: {{ .Spec.Storage.Nfs.Limits.Cpu }}
+              memory: {{ .Spec.Storage.Nfs.Limits.Memory }}
             requests:
-              cpu: {{ .Spec.Storage.Nfs.CPURequest }}
-              memory: {{ .Spec.Storage.Nfs.MemoryRequest }}
+              cpu: {{ .Spec.Storage.Nfs.Requests.Cpu }}
+              memory: {{ .Spec.Storage.Nfs.Requests.Memory }}
       volumes:
         - name: nfs-client-root
           nfs:

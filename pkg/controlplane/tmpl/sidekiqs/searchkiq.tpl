@@ -71,8 +71,8 @@ spec:
               name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
         resources:
           requests:
-            cpu: {{ .Spec.ControlPlane.Searchkiq.CPU }}
-            memory: {{ .Spec.ControlPlane.Searchkiq.Memory }}
+            cpu: {{ .Spec.ControlPlane.Searchkiq.Requests.Cpu }}
+            memory: {{ .Spec.ControlPlane.Searchkiq.Requests.Memory }}
         lifecycle:
           preStop:
             exec:

@@ -10,28 +10,24 @@ type Hostpath struct {
 	Image            string            `json:"image,omitempty"`
 	Path             string            `json:"path,omitempty"`
 	StorageClassName string            `json:"storageClassName,omitempty"`
-	CPURequest       string            `json:"cpuRequest,omitempty"`
-	MemoryRequest    string            `json:"memoryRequest,omitempty"`
-	CPULimit         string            `json:"cpuLimit,omitempty"`
-	MemoryLimit      string            `json:"memoryLimit,omitempty"`
+	Requests         Requests          `json:"requests,omitempty"`
+	Limits           Limits            `json:"limits,omitempty"`
 	ReclaimPolicy    string            `json:"reclaimPolicy,omitempty"`
 	DefaultSc        *bool             `json:"defaultSc,omitempty"`
 	NodeSelector     map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type Nfs struct {
-	Enabled          *bool  `json:"enabled,omitempty"`
-	Image            string `json:"image,omitempty"`
-	Provisioner      string `json:"provisioner,omitempty"`
-	StorageClassName string `json:"storageClassName,omitempty"`
-	Server           string `json:"server,omitempty"`
-	Path             string `json:"path,omitempty"`
-	CPURequest       string `json:"cpuRequest,omitempty"`
-	MemoryRequest    string `json:"memoryRequest,omitempty"`
-	CPULimit         string `json:"cpuLimit,omitempty"`
-	MemoryLimit      string `json:"memoryLimit,omitempty"`
-	ReclaimPolicy    string `json:"reclaimPolicy,omitempty"`
-	DefaultSc        *bool  `json:"defaultSc,omitempty"`
+	Enabled          *bool    `json:"enabled,omitempty"`
+	Image            string   `json:"image,omitempty"`
+	Provisioner      string   `json:"provisioner,omitempty"`
+	StorageClassName string   `json:"storageClassName,omitempty"`
+	Server           string   `json:"server,omitempty"`
+	Path             string   `json:"path,omitempty"`
+	Requests         Requests `json:"requests,omitempty"`
+	Limits           Limits   `json:"limits,omitempty"`
+	ReclaimPolicy    string   `json:"reclaimPolicy,omitempty"`
+	DefaultSc        *bool    `json:"defaultSc,omitempty"`
 }
 
 var storageDefault = Storage{
@@ -40,13 +36,17 @@ var storageDefault = Storage{
 		Image:            "quay.io/kubevirt/hostpath-provisioner",
 		Path:             "/cnvrg-hostpath-storage",
 		StorageClassName: "cnvrg-hostpath-storage",
-		CPURequest:       "100m",
-		MemoryRequest:    "100Mi",
-		CPULimit:         "200m",
-		MemoryLimit:      "200Mi",
-		ReclaimPolicy:    "Retain",
-		DefaultSc:        &defaultEnabled,
-		NodeSelector:     nil,
+		Requests: Requests{
+			Cpu:    "100m",
+			Memory: "100Mi",
+		},
+		Limits: Limits{
+			Cpu:    "200m",
+			Memory: "200Mi",
+		},
+		ReclaimPolicy: "Retain",
+		DefaultSc:     &defaultEnabled,
+		NodeSelector:  nil,
 	},
 	Nfs: Nfs{
 		Enabled:          &defaultEnabled,
@@ -55,11 +55,15 @@ var storageDefault = Storage{
 		StorageClassName: "cnvrg-nfs-storage",
 		Server:           "",
 		Path:             "",
-		CPURequest:       "100m",
-		MemoryRequest:    "100Mi",
-		CPULimit:         "100m",
-		MemoryLimit:      "200Mi",
-		ReclaimPolicy:    "Retain",
-		DefaultSc:        &defaultEnabled,
+		Requests: Requests{
+			Cpu:    "100m",
+			Memory: "100Mi",
+		},
+		Limits: Limits{
+			Cpu:    "200m",
+			Memory: "200Mi",
+		},
+		ReclaimPolicy: "Retain",
+		DefaultSc:     &defaultEnabled,
 	},
 }

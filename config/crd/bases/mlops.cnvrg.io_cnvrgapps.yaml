@@ -71,15 +71,18 @@ spec:
                     properties:
                       cpuLimit:
                         type: string
-                      cpuRequest:
-                        type: string
                       enabled:
                         type: boolean
                       image:
                         type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       memoryLimit:
-                        type: string
-                      memoryRequest:
                         type: string
                       nodePort:
                         type: integer
@@ -91,6 +94,13 @@ spec:
                         type: integer
                       replicas:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       svcName:
                         type: string
                       token:
@@ -179,14 +189,17 @@ spec:
                     type: object
                   searchkiq:
                     properties:
-                      cpu:
-                        type: string
                       enabled:
                         type: boolean
-                      memory:
-                        type: string
                       replicas:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                     type: object
                   seeder:
                     properties:
@@ -199,14 +212,17 @@ spec:
                     type: object
                   sidekiq:
                     properties:
-                      cpu:
-                        type: string
                       enabled:
                         type: boolean
-                      memory:
-                        type: string
                       replicas:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       split:
                         type: boolean
                     type: object
@@ -225,27 +241,26 @@ spec:
                     type: object
                   systemkiq:
                     properties:
-                      cpu:
-                        type: string
                       enabled:
                         type: boolean
-                      memory:
-                        type: string
                       replicas:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                     type: object
                   webapp:
                     properties:
-                      cpu:
-                        type: string
                       enabled:
                         type: boolean
                       failureThreshold:
                         type: integer
                       initialDelaySeconds:
                         type: integer
-                      memory:
-                        type: string
                       nodePort:
                         type: integer
                       oauthProxy:
@@ -265,6 +280,13 @@ spec:
                         type: integer
                       replicas:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       svcName:
                         type: string
                     type: object
@@ -273,10 +295,6 @@ spec:
                 properties:
                   es:
                     properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
                       credsRef:
                         type: string
                       enabled:
@@ -285,10 +303,13 @@ spec:
                         type: string
                       javaOpts:
                         type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       nodePort:
                         type: integer
                       nodeSelector:
@@ -299,6 +320,15 @@ spec:
                         type: boolean
                       port:
                         type: integer
+                      pvcName:
+                        type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       serviceAccount:
                         type: string
                       storageClass:
@@ -310,13 +340,9 @@ spec:
                     type: object
                   minio:
                     properties:
-                      cpuRequest:
-                        type: string
                       enabled:
                         type: boolean
                       image:
-                        type: string
-                      memoryRequest:
                         type: string
                       nodePort:
                         type: integer
@@ -326,8 +352,17 @@ spec:
                         type: object
                       port:
                         type: integer
+                      pvcName:
+                        type: string
                       replicas:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       serviceAccount:
                         type: string
                       sharedStorage:
@@ -353,8 +388,6 @@ spec:
                     type: object
                   pg:
                     properties:
-                      cpuRequest:
-                        type: string
                       credsRef:
                         type: string
                       enabled:
@@ -374,14 +407,21 @@ spec:
                         type: string
                       maxConnections:
                         type: integer
-                      memoryRequest:
-                        type: string
                       nodeSelector:
                         additionalProperties:
                           type: string
                         type: object
                       port:
                         type: integer
+                      pvcName:
+                        type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       serviceAccount:
                         type: string
                       sharedBuffers:
@@ -414,6 +454,8 @@ spec:
                         type: object
                       port:
                         type: integer
+                      pvcName:
+                        type: string
                       requests:
                         properties:
                           cpu:
@@ -435,26 +477,36 @@ spec:
                 properties:
                   elastalert:
                     properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       nodePort:
                         type: integer
                       nodeSelector:
                         additionalProperties:
                           type: string
+                        description: CPURequest    string            `json:"cpuRequest,omitempty"`
+                          MemoryRequest string            `json:"memoryRequest,omitempty"`
+                          CPULimit      string            `json:"cpuLimit,omitempty"`
+                          MemoryLimit   string            `json:"memoryLimit,omitempty"`
                         type: object
                       port:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       storageClass:
                         type: string
                       storageSize:
@@ -464,21 +516,24 @@ spec:
                     type: object
                   kibana:
                     properties:
-                      cpuLimit:
-                        type: string
-                      cpuRequest:
-                        type: string
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      memoryLimit:
-                        type: string
-                      memoryRequest:
-                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       nodePort:
                         type: integer
                       oauthProxy:
+                        description: CPURequest     string                `json:"cpuRequest,omitempty"`
+                          MemoryRequest  string                `json:"memoryRequest,omitempty"`
+                          CPULimit       string                `json:"cpuLimit,omitempty"`
+                          MemoryLimit    string                `json:"memoryLimit,omitempty"`
                         properties:
                           skipAuthRegex:
                             items:
@@ -487,6 +542,13 @@ spec:
                         type: object
                       port:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       serviceAccount:
                         type: string
                       svcName:
@@ -528,15 +590,11 @@ spec:
                     properties:
                       basicAuthProxyImage:
                         type: string
-                      cpuRequest:
-                        type: string
                       credsRef:
                         type: string
                       enabled:
                         type: boolean
                       image:
-                        type: string
-                      memoryRequest:
                         type: string
                       nodePort:
                         type: integer
@@ -546,11 +604,20 @@ spec:
                         type: object
                       port:
                         type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       storageClass:
                         type: string
                       storageSize:
                         type: string
                       svcName:
+                        description: CPURequest          string            `json:"cpuRequest,omitempty"`
+                          MemoryRequest       string            `json:"memoryRequest,omitempty"`
                         type: string
                       upstreamRef:
                         type: string

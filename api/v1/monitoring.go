@@ -13,19 +13,20 @@ type PrometheusOperator struct {
 }
 
 type Prometheus struct {
-	Enabled             *bool             `json:"enabled,omitempty"`
-	Image               string            `json:"image,omitempty"`
-	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
-	CPURequest          string            `json:"cpuRequest,omitempty"`
-	MemoryRequest       string            `json:"memoryRequest,omitempty"`
-	SvcName             string            `json:"svcName,omitempty"`
-	Port                int               `json:"port,omitempty"`
-	NodePort            int               `json:"nodePort,omitempty"`
-	StorageSize         string            `json:"storageSize,omitempty"`
-	StorageClass        string            `json:"storageClass,omitempty"`
-	CredsRef            string            `json:"credsRef,omitempty"`
-	UpstreamRef         string            `json:"upstreamRef,omitempty"`
-	NodeSelector        map[string]string `json:"nodeSelector,omitempty"`
+	Enabled             *bool    `json:"enabled,omitempty"`
+	Image               string   `json:"image,omitempty"`
+	BasicAuthProxyImage string   `json:"basicAuthProxyImage,omitempty"`
+	Requests            Requests `json:"requests,omitempty"`
+	//CPURequest          string            `json:"cpuRequest,omitempty"`
+	//MemoryRequest       string            `json:"memoryRequest,omitempty"`
+	SvcName      string            `json:"svcName,omitempty"`
+	Port         int               `json:"port,omitempty"`
+	NodePort     int               `json:"nodePort,omitempty"`
+	StorageSize  string            `json:"storageSize,omitempty"`
+	StorageClass string            `json:"storageClass,omitempty"`
+	CredsRef     string            `json:"credsRef,omitempty"`
+	UpstreamRef  string            `json:"upstreamRef,omitempty"`
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type NodeExporter struct {
@@ -109,32 +110,36 @@ var prometheusInfraDefault = Prometheus{
 	Enabled:             &defaultEnabled,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
-	CPURequest:          "200m",
-	MemoryRequest:       "500Mi",
-	SvcName:             "prometheus",
-	Port:                9091, // basic auth nginx proxy is enabled by default
-	NodePort:            30910,
-	StorageSize:         "50Gi",
-	StorageClass:        "",
-	CredsRef:            "prom-creds",
-	UpstreamRef:         "upstream-prom-static-config",
-	NodeSelector:        nil,
+	Requests: Requests{
+		Cpu:    "200m",
+		Memory: "500Mi",
+	},
+	SvcName:      "prometheus",
+	Port:         9091, // basic auth nginx proxy is enabled by default
+	NodePort:     30910,
+	StorageSize:  "50Gi",
+	StorageClass: "",
+	CredsRef:     "prom-creds",
+	UpstreamRef:  "upstream-prom-static-config",
+	NodeSelector: nil,
 }
 
 var prometheusAppDefault = Prometheus{
 	Enabled:             &defaultEnabled,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
-	CPURequest:          "200m",
-	MemoryRequest:       "500Mi",
-	SvcName:             "prometheus",
-	Port:                9091, // basic auth nginx proxy is enabled by default
-	NodePort:            30909,
-	StorageSize:         "50Gi",
-	StorageClass:        "",
-	CredsRef:            "prom-creds",
-	UpstreamRef:         "upstream-prom-static-config",
-	NodeSelector:        nil,
+	Requests: Requests{
+		Cpu:    "200m",
+		Memory: "500Mi",
+	},
+	SvcName:      "prometheus",
+	Port:         9091, // basic auth nginx proxy is enabled by default
+	NodePort:     30909,
+	StorageSize:  "50Gi",
+	StorageClass: "",
+	CredsRef:     "prom-creds",
+	UpstreamRef:  "upstream-prom-static-config",
+	NodeSelector: nil,
 }
 
 var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{

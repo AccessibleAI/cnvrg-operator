@@ -71,11 +71,11 @@ spec:
           - containerPort: {{ .Spec.Logging.Kibana.Port }}
           resources:
             limits:
-              cpu: {{ .Spec.Logging.Kibana.CPULimit }}
-              memory: {{ .Spec.Logging.Kibana.MemoryLimit }}
+              cpu: {{ .Spec.Logging.Kibana.Limits.Cpu }}
+              memory: {{ .Spec.Logging.Kibana.Limits.Memory }}
             requests:
-              cpu: {{ .Spec.Logging.Kibana.CPURequest }}
-              memory: {{ .Spec.Logging.Kibana.MemoryRequest }}
+              cpu: {{ .Spec.Logging.Kibana.Requests.Cpu }}
+              memory: {{ .Spec.Logging.Kibana.Requests.Memory }}
           lifecycle:
             postStart:
               exec:

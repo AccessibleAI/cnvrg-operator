@@ -88,8 +88,8 @@ spec:
               {{- end }}
             {{- end }}
             requests:
-              cpu: {{ .Spec.Dbs.Pg.CPURequest }}
-              memory: {{ .Spec.Dbs.Pg.MemoryRequest }}
+              cpu: {{ .Spec.Dbs.Pg.Requests.Cpu }}
+              memory: {{ .Spec.Dbs.Pg.Requests.Memory }}
       volumes:
         - name: postgres-data
           persistentVolumeClaim:

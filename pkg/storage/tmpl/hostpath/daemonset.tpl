@@ -50,11 +50,11 @@ spec:
               mountPath: {{ .Spec.Storage.Hostpath.Path }}
           resources:
             limits:
-              cpu: {{ .Spec.Storage.Hostpath.CPULimit }}
-              memory: {{ .Spec.Storage.Hostpath.MemoryLimit }}
+              cpu: {{ .Spec.Storage.Hostpath.Limits.Cpu }}
+              memory: {{ .Spec.Storage.Hostpath.Limits.Memory }}
             requests:
-              cpu: {{ .Spec.Storage.Hostpath.CPURequest }}
-              memory: {{ .Spec.Storage.Hostpath.MemoryRequest }}
+              cpu: {{ .Spec.Storage.Hostpath.Requests.Cpu }}
+              memory: {{ .Spec.Storage.Hostpath.Requests.Memory }}
       volumes:
         - name: pv-volume
           hostPath:
