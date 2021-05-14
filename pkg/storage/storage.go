@@ -16,7 +16,7 @@ func hostPathState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.StorageClassGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -25,7 +25,7 @@ func hostPathState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -34,7 +34,7 @@ func hostPathState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -43,7 +43,7 @@ func hostPathState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DaemonSetGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -52,7 +52,7 @@ func hostPathState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
-			Own:            true,
+			Own:            false,
 		},
 	}
 }
@@ -66,7 +66,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.StorageClassGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -75,7 +75,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -84,7 +84,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -93,7 +93,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -102,7 +102,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -111,7 +111,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
-			Own:            true,
+			Own:            false,
 		},
 		{
 
@@ -120,7 +120,7 @@ func nfsClientState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
-			Own:            true,
+			Own:            false,
 		},
 	}
 }

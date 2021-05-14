@@ -160,7 +160,7 @@ var esDefault = Es{
 	ServiceAccount: "es",
 	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1.a1",
 	Port:           9200,
-	StorageSize:    "30Gi",
+	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
 	NodePort:       32200,
 	StorageClass:   "",

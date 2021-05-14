@@ -423,6 +423,10 @@ func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 }
 
 func (r *CnvrgInfraReconciler) cleanupPVCs(infra *mlopsv1.CnvrgInfra) error {
+	if !viper.GetBool("cleanup-pvc") {
+		cnvrgAppLog.Info("cleanup-pvc is false, skipping pvc deletion!")
+		return nil
+	}
 	cnvrgAppLog.Info("running pvc cleanup")
 	ctx := context.Background()
 	pvcList := v1core.PersistentVolumeClaimList{}

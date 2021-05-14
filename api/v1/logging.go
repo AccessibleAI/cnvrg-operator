@@ -22,10 +22,6 @@ type Elastalert struct {
 	StorageClass string   `json:"storageClass,omitempty"`
 	Requests     Requests `json:"requests,omitempty"`
 	Limits       Limits   `json:"limits,omitempty"`
-	//CPURequest    string            `json:"cpuRequest,omitempty"`
-	//MemoryRequest string            `json:"memoryRequest,omitempty"`
-	//CPULimit      string            `json:"cpuLimit,omitempty"`
-	//MemoryLimit   string            `json:"memoryLimit,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 }
 

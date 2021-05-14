@@ -4,7 +4,7 @@
 
 ### Architecture overview 
 cnvrg operator may deploy cnvrg stack in two different ways
-1. Multiple cnvrg control plans within the same cluster separated by namespaces - suitable for multi tenancy deployments  
+1. Multiple cnvrg control planes within the same cluster separated by namespaces - suitable for multi tenancy deployments  
 ```shell
                             ---------cnvrg infra namespace----------
                             | Cluster scope prometheus             |
@@ -12,11 +12,11 @@ cnvrg operator may deploy cnvrg stack in two different ways
                             | Kube state metrics                   |
                             | Cluster scope service monitors       |     
                             | Fluentbit                            |
-                            | Istio control plan                   |
+                            | Istio control plane                  |
                             | Storage provisioners (hostpath/nfs)  |
                             ----------------------------------------           
----------cnvrg control plan 1 namespace-------  ---------cnvrg control plan 2 namespace-------
-| cnvrg control plan (webapp, sidekiqs, etc.)|  | cnvrg control plan (webapp, sidekiqs, etc.)|
+---------cnvrg control plane 1 namespace-------  ---------cnvrg control plane 2 namespace-------
+| cnvrg control plane (webapp, sidekiqs, etc.)|  | cnvrg control plane (webapp, sidekiqs, etc.)|
 | PostgreSQL                                 |  | PostgreSQL                                 |
 | ElasticSearch + Kibana                     |  | ElasticSearch + Kibana                     |
 | Minio                                      |  | Minio                                      |
@@ -27,7 +27,7 @@ cnvrg operator may deploy cnvrg stack in two different ways
 ----------------------------------------------  ----------------------------------------------
                     
 ```
-2. Single cnvrg control plan in dedicated namespace 
+2. Single cnvrg control plane in dedicated namespace 
 ```shell
                         ----------------cnvrg namespace--------------------
                         | Cluster scope prometheus                        |
@@ -36,9 +36,9 @@ cnvrg operator may deploy cnvrg stack in two different ways
                         | Cluster scope service monitors                  |     
                         | Namespace scope service monitors                |     
                         | Fluentbit                                       |
-                        | Istio control plan                              |
+                        | Istio control plane                              |
                         | Storage provisioners (hostpath/nfs)             |   
-                        | cnvrg control plan (webapp, sidekiqs, etc.)     |
+                        | cnvrg control plane (webapp, sidekiqs, etc.)     |
                         | PostgreSQL                                      |
                         | ElasticSearch + Kibana                          | 
                         | Minio                                           |
