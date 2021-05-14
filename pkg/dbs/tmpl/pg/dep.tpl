@@ -82,7 +82,7 @@ spec:
             {{- if isTrue .Spec.Dbs.Pg.HugePages.Enabled }}
             limits:
               {{- if eq .Spec.Dbs.Pg.HugePages.Memory ""}}
-              hugepages-{{ .Spec.Dbs.Pg.HugePages.Size }}: {{ .Spec.Dbs.Pg.MemoryRequest }}
+              hugepages-{{ .Spec.Dbs.Pg.HugePages.Size }}: {{ .Spec.Dbs.Pg.Requests.Memory }}
               {{- else }}
               hugepages-{{ .Spec.Dbs.Pg.HugePages.Size }}: {{ .Spec.Dbs.Pg.HugePages.Memory }}
               {{- end }}

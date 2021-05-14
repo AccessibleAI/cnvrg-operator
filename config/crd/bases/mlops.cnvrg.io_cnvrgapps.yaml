@@ -493,10 +493,6 @@ spec:
                       nodeSelector:
                         additionalProperties:
                           type: string
-                        description: CPURequest    string            `json:"cpuRequest,omitempty"`
-                          MemoryRequest string            `json:"memoryRequest,omitempty"`
-                          CPULimit      string            `json:"cpuLimit,omitempty"`
-                          MemoryLimit   string            `json:"memoryLimit,omitempty"`
                         type: object
                       port:
                         type: integer
@@ -530,10 +526,6 @@ spec:
                       nodePort:
                         type: integer
                       oauthProxy:
-                        description: CPURequest     string                `json:"cpuRequest,omitempty"`
-                          MemoryRequest  string                `json:"memoryRequest,omitempty"`
-                          CPULimit       string                `json:"cpuLimit,omitempty"`
-                          MemoryLimit    string                `json:"memoryLimit,omitempty"`
                         properties:
                           skipAuthRegex:
                             items:
@@ -616,8 +608,6 @@ spec:
                       storageSize:
                         type: string
                       svcName:
-                        description: CPURequest          string            `json:"cpuRequest,omitempty"`
-                          MemoryRequest       string            `json:"memoryRequest,omitempty"`
                         type: string
                       upstreamRef:
                         type: string

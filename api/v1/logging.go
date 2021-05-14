@@ -34,10 +34,6 @@ type Kibana struct {
 	NodePort       int      `json:"nodePort,omitempty"`
 	Requests       Requests `json:"requests,omitempty"`
 	Limits         Limits   `json:"limits,omitempty"`
-	//CPURequest     string                `json:"cpuRequest,omitempty"`
-	//MemoryRequest  string                `json:"memoryRequest,omitempty"`
-	//CPULimit       string                `json:"cpuLimit,omitempty"`
-	//MemoryLimit    string                `json:"memoryLimit,omitempty"`
 	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
 }
 

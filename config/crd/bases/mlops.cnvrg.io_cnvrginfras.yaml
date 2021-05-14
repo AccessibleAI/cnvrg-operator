@@ -210,8 +210,6 @@ spec:
                       storageSize:
                         type: string
                       svcName:
-                        description: CPURequest          string            `json:"cpuRequest,omitempty"`
-                          MemoryRequest       string            `json:"memoryRequest,omitempty"`
                         type: string
                       upstreamRef:
                         type: string
