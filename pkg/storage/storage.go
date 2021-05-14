@@ -17,6 +17,7 @@ func hostPathState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.StorageClassGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -26,6 +27,7 @@ func hostPathState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -35,6 +37,7 @@ func hostPathState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -44,6 +47,7 @@ func hostPathState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DaemonSetGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -53,6 +57,7 @@ func hostPathState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 	}
 }
@@ -67,6 +72,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.StorageClassGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -76,6 +82,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -85,6 +92,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -94,6 +102,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -103,6 +112,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -112,6 +122,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -121,6 +132,7 @@ func nfsClientState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 	}
 }

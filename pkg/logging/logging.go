@@ -17,6 +17,7 @@ func elastAlert() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/elastalert/role.tpl",
@@ -25,6 +26,7 @@ func elastAlert() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/elastalert/rolebinding.tpl",
@@ -33,6 +35,7 @@ func elastAlert() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/elastalert/pvc.tpl",
@@ -42,6 +45,7 @@ func elastAlert() []*desired.State {
 			GVR:            desired.Kinds[desired.PvcGVR],
 			Own:            true,
 			TemplateData:   nil,
+			Updatable:      false,
 		},
 		{
 
@@ -52,6 +56,7 @@ func elastAlert() []*desired.State {
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
 			TemplateData:   nil,
+			Updatable:      true,
 		},
 		{
 
@@ -62,6 +67,7 @@ func elastAlert() []*desired.State {
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
 			TemplateData:   nil,
+			Updatable:      true,
 		},
 		{
 
@@ -72,6 +78,7 @@ func elastAlert() []*desired.State {
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
 			TemplateData:   nil,
+			Updatable:      true,
 		},
 	}
 }
@@ -86,6 +93,7 @@ func KibanaConfSecret(data desired.TemplateData) []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -99,6 +107,7 @@ func kibanaIstioVs() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -112,6 +121,7 @@ func kibanaOcpRoute() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.OcpRouteGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -125,6 +135,7 @@ func kibanaIngress() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IngressGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -138,6 +149,7 @@ func kibana() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/kibana/role.tpl",
@@ -146,6 +158,7 @@ func kibana() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kibana/rolebinding.tpl",
@@ -154,6 +167,7 @@ func kibana() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kibana/dep.tpl",
@@ -162,6 +176,7 @@ func kibana() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kibana/svc.tpl",
@@ -170,6 +185,7 @@ func kibana() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -197,6 +213,7 @@ func fluentbitState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/clusterrole.tpl",
@@ -205,6 +222,7 @@ func fluentbitState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/clusterrolebinding.tpl",
@@ -213,6 +231,7 @@ func fluentbitState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/ds.tpl",
@@ -221,6 +240,7 @@ func fluentbitState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DaemonSetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }

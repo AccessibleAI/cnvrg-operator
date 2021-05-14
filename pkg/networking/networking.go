@@ -21,6 +21,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -29,7 +30,8 @@ func istioInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
-			Own:            true,
+			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -38,7 +40,8 @@ func istioInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
-			Own:            true,
+			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -47,7 +50,8 @@ func istioInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
-			Own:            true,
+			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -56,7 +60,8 @@ func istioInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
-			Own:            true,
+			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -65,7 +70,8 @@ func istioInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioGVR],
-			Own:            true,
+			Own:            false,
+			Updatable:      false,
 		},
 	}
 }
@@ -78,7 +84,8 @@ func ingressState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioGwGVR],
-			Own:            false,
+			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -118,6 +125,7 @@ func IstioCrds() (crds []*desired.State) {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.CrdGVR],
 			Own:            false,
+			Updatable:      false,
 		}
 		crds = append(crds, crd)
 		return nil

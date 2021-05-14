@@ -17,6 +17,7 @@ func nvidiaDp() []*desired.State {
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
 			TemplateData:   nil,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/nvidiadp/ds.tpl",

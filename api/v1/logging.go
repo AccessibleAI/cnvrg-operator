@@ -13,28 +13,28 @@ type Fluentbit struct {
 }
 
 type Elastalert struct {
-	Enabled      *bool    `json:"enabled,omitempty"`
-	Image        string   `json:"image,omitempty"`
-	Port         int      `json:"port,omitempty"`
-	NodePort     int      `json:"nodePort,omitempty"`
-	StorageSize  string   `json:"storageSize,omitempty"`
-	SvcName      string   `json:"svcName,omitempty"`
-	StorageClass string   `json:"storageClass,omitempty"`
-	Requests     Requests `json:"requests,omitempty"`
-	Limits       Limits   `json:"limits,omitempty"`
+	Enabled      *bool             `json:"enabled,omitempty"`
+	Image        string            `json:"image,omitempty"`
+	Port         int               `json:"port,omitempty"`
+	NodePort     int               `json:"nodePort,omitempty"`
+	StorageSize  string            `json:"storageSize,omitempty"`
+	SvcName      string            `json:"svcName,omitempty"`
+	StorageClass string            `json:"storageClass,omitempty"`
+	Requests     Requests          `json:"requests,omitempty"`
+	Limits       Limits            `json:"limits,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type Kibana struct {
-	Enabled        *bool    `json:"enabled,omitempty"`
-	ServiceAccount string   `json:"serviceAccount,omitempty"`
-	SvcName        string   `json:"svcName,omitempty"`
-	Port           int      `json:"port,omitempty"`
-	Image          string   `json:"image,omitempty"`
-	NodePort       int      `json:"nodePort,omitempty"`
-	Requests       Requests `json:"requests,omitempty"`
-	Limits         Limits   `json:"limits,omitempty"`
-	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
+	Enabled        *bool                 `json:"enabled,omitempty"`
+	ServiceAccount string                `json:"serviceAccount,omitempty"`
+	SvcName        string                `json:"svcName,omitempty"`
+	Port           int                   `json:"port,omitempty"`
+	Image          string                `json:"image,omitempty"`
+	NodePort       int                   `json:"nodePort,omitempty"`
+	Requests       Requests              `json:"requests,omitempty"`
+	Limits         Limits                `json:"limits,omitempty"`
+	OauthProxy     OauthProxyServiceConf `json:"oauthProxy,omitempty"`
 }
 
 type CnvrgAppLogging struct {

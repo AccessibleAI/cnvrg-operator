@@ -19,5 +19,6 @@ type State struct {
 	GVR            schema.GroupVersionKind
 	Own            bool
 	Override       bool
+	Updatable      bool
 	TemplateData   interface{}
 }

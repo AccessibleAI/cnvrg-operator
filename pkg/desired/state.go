@@ -410,7 +410,8 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 			}
 		} else {
 
-			if !shouldUpdate(manifest, fetchInto) {
+			if !manifest.Updatable {
+				log.Info("skipping update, manifest is not updatable", "manifest", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
 				continue
 			}
 
@@ -453,11 +454,6 @@ func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
 		return false
 	}
 
-	// todo: need to figure out what's wrong with MPI CRD (might be related to apiextensions.k8s.io/v1beta1)
-	if manifest.GVR == Kinds[CrdGVR] && obj.GetName() == "mpijobs.kubeflow.org" {
-		return false
-	}
-
 	// this secret is unique one, since by default it will generate access/secret keys for Minio each this template rendered
 	// this secret should be applied only once, to keep same minio creds between reconcile loops
 	if manifest.GVR == Kinds[SecretGVR] && obj.GetName() == "cp-object-storage" {
@@ -467,6 +463,12 @@ func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
 	// this secret is unique one, since by default it will generate rails key base and sts_key for app each this template rendered
 	// this secret should be applied only once, to keep same app keys between reconcile loops
 	if manifest.GVR == Kinds[SecretGVR] && obj.GetName() == "cp-base-secret" {
+		return false
+	}
+
+	// operator shouldn't manage K8s storage - but it does - because we want to make our customer happy!
+	// so, at least, operator won't own
+	if manifest.GVR == Kinds[DeploymentGVR] && (obj.GetName() == "hostpath-provisioner" || obj.GetName() == "nfs-client-provisioner") {
 		return false
 	}
 

@@ -20,6 +20,7 @@ func prometheusOperatorState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/clusterrolebinding.tpl",
@@ -28,6 +29,7 @@ func prometheusOperatorState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/sa.tpl",
@@ -36,6 +38,7 @@ func prometheusOperatorState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/dep.tpl",
@@ -44,6 +47,7 @@ func prometheusOperatorState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/svc.tpl",
@@ -52,6 +56,7 @@ func prometheusOperatorState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -65,6 +70,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/clusterrolebinding.tpl",
@@ -73,6 +79,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/sa.tpl",
@@ -81,6 +88,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/prometheus.tpl",
@@ -89,6 +97,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PrometheusGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/svc.tpl",
@@ -97,6 +106,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/rules.tpl",
@@ -105,6 +115,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PrometheusRuleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -118,6 +129,7 @@ func kubeStateMetricsState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/clusterrolebinding.tpl",
@@ -126,6 +138,7 @@ func kubeStateMetricsState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/dep.tpl",
@@ -134,6 +147,7 @@ func kubeStateMetricsState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/sa.tpl",
@@ -142,6 +156,7 @@ func kubeStateMetricsState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/servicemonitor.tpl",
@@ -150,6 +165,7 @@ func kubeStateMetricsState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/svc.tpl",
@@ -158,6 +174,7 @@ func kubeStateMetricsState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -172,6 +189,7 @@ func GrafanaDSState(data interface{}) []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -185,6 +203,7 @@ func grafanaState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/grafana/role.tpl",
@@ -193,6 +212,7 @@ func grafanaState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/grafana/rolebinding.tpl",
@@ -201,6 +221,7 @@ func grafanaState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/grafana/svc.tpl",
@@ -209,6 +230,7 @@ func grafanaState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/grafana/dep.tpl",
@@ -217,6 +239,7 @@ func grafanaState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/grafana/dashboards.tpl",
@@ -225,6 +248,7 @@ func grafanaState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 
@@ -239,6 +263,7 @@ func nodeExporterState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 
 		{
@@ -248,6 +273,7 @@ func nodeExporterState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 
 		{
@@ -257,6 +283,7 @@ func nodeExporterState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 
 		{
@@ -266,6 +293,7 @@ func nodeExporterState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 
 		{
@@ -275,6 +303,7 @@ func nodeExporterState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DaemonSetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 
 		{
@@ -284,6 +313,7 @@ func nodeExporterState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -298,6 +328,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            false,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/rolebinding.tpl",
@@ -306,6 +337,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            false,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/sa.tpl",
@@ -314,6 +346,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/prometheus.tpl",
@@ -322,6 +355,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PrometheusGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/svc.tpl",
@@ -330,6 +364,7 @@ func ccpPrometheusInstance() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -343,6 +378,7 @@ func promOauthProxy() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -356,6 +392,7 @@ func promIstioVs() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -369,6 +406,7 @@ func promIngress() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IngressGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -382,6 +420,7 @@ func promOcpRoute() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.OcpRouteGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -395,6 +434,7 @@ func grafanaIstioVs() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -408,6 +448,7 @@ func grafanaIngress() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IngressGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -421,6 +462,7 @@ func grafanaOcpRoute() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.OcpRouteGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -434,6 +476,7 @@ func defaultServiceMonitors() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/controller-manager.tpl",
@@ -442,6 +485,7 @@ func defaultServiceMonitors() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/coredns.tpl",
@@ -450,6 +494,7 @@ func defaultServiceMonitors() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/kubelet.tpl",
@@ -458,6 +503,7 @@ func defaultServiceMonitors() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/scheduler.tpl",
@@ -466,6 +512,7 @@ func defaultServiceMonitors() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -479,6 +526,7 @@ func dcgmExporter() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DaemonSetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 
 		{
@@ -488,6 +536,7 @@ func dcgmExporter() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 
 		{
@@ -497,6 +546,7 @@ func dcgmExporter() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 
 		{
@@ -506,6 +556,7 @@ func dcgmExporter() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -519,6 +570,7 @@ func grafanaOauthProxy() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -532,6 +584,7 @@ func cnvrgIdleMetricsServiceMonitors() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ServiceMonitorGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -646,6 +699,7 @@ func Crds() (crds []*desired.State) {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.CrdGVR],
 			Own:            false,
+			Updatable:      false,
 		}
 		crds = append(crds, crd)
 		return nil

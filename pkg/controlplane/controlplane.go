@@ -21,6 +21,7 @@ func rbacState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -30,6 +31,7 @@ func rbacState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -39,6 +41,7 @@ func rbacState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 	}
 }
@@ -53,6 +56,7 @@ func controlPlaneConfigState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -62,6 +66,7 @@ func controlPlaneConfigState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -71,6 +76,7 @@ func controlPlaneConfigState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 
@@ -80,6 +86,7 @@ func controlPlaneConfigState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/conf/cm/secret-object-storage.tpl",
@@ -88,6 +95,7 @@ func controlPlaneConfigState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/conf/cm/secret-smtp.tpl",
@@ -96,6 +104,7 @@ func controlPlaneConfigState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -109,6 +118,7 @@ func webAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/webapp/svc.tpl",
@@ -117,6 +127,7 @@ func webAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/webapp/oauth.tpl",
@@ -125,6 +136,7 @@ func webAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/webapp/pdb.tpl",
@@ -133,6 +145,7 @@ func webAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -146,6 +159,7 @@ func webAppIstioVs() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -159,6 +173,7 @@ func webAppOcpRoute() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.OcpRouteGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -172,6 +187,7 @@ func webAppIngress() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IngressGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -186,6 +202,7 @@ func sidekiqState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/sidekiqs/sidekiq-pdb.tpl",
@@ -194,6 +211,7 @@ func sidekiqState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -208,6 +226,7 @@ func searchkiqState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/sidekiqs/searchkiq-pdb.tpl",
@@ -216,6 +235,7 @@ func searchkiqState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -229,6 +249,7 @@ func systemkiqState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/sidekiqs/systemkiq-pdb.tpl",
@@ -237,6 +258,7 @@ func systemkiqState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -251,6 +273,7 @@ func hyperState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -260,6 +283,7 @@ func hyperState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -273,6 +297,7 @@ func ssoState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -287,6 +312,7 @@ func mpiAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/mpi/rolebinding.tpl",
@@ -295,6 +321,7 @@ func mpiAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/mpi/secret.tpl",
@@ -303,6 +330,7 @@ func mpiAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/mpi/dep.tpl",
@@ -311,6 +339,7 @@ func mpiAppState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -324,6 +353,7 @@ func mpiInfraState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -394,6 +424,7 @@ func Crds() (crds []*desired.State) {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.CrdGVR],
 			Own:            false,
+			Updatable:      false,
 		}
 		crds = append(crds, crd)
 		return nil

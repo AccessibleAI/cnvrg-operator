@@ -17,6 +17,7 @@ func esState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/es/role.tpl",
@@ -25,6 +26,7 @@ func esState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/es/rolebinding.tpl",
@@ -33,6 +35,7 @@ func esState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/es/sts.tpl",
@@ -41,6 +44,7 @@ func esState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.StatefulSetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/es/svc.tpl",
@@ -49,6 +53,7 @@ func esState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -62,6 +67,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/pg/role.tpl",
@@ -70,6 +76,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/pg/rolebinding.tpl",
@@ -78,6 +85,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -87,6 +95,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 
@@ -96,6 +105,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -105,6 +115,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 
@@ -114,6 +125,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/pg/pdb.tpl",
@@ -122,6 +134,7 @@ func pgState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -135,6 +148,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/redis/role.tpl",
@@ -143,6 +157,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/redis/rolebinding.tpl",
@@ -151,6 +166,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/redis/pvc.tpl",
@@ -159,6 +175,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 
@@ -168,6 +185,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/redis/dep.tpl",
@@ -176,6 +194,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/redis/pdb.tpl",
@@ -184,6 +203,7 @@ func redisState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -197,6 +217,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/minio/sa.tpl",
@@ -205,6 +226,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/minio/role.tpl",
@@ -213,6 +235,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/minio/rolebinding.tpl",
@@ -221,6 +244,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.RoleBindingGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -230,6 +254,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 
@@ -239,6 +264,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -248,6 +274,7 @@ func singleBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }

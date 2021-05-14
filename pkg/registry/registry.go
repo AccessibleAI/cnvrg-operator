@@ -16,6 +16,7 @@ func registryState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SecretGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
