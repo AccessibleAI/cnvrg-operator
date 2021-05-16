@@ -623,7 +623,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 	}
 
 	name := types.NamespacedName{
-		Name:      infra.Spec.InfraReconcilerCm,
+		Name:      mlopsv1.InfraReconcilerCm,
 		Namespace: infra.Spec.InfraNamespace,
 	}
 

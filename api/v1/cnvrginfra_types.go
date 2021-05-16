@@ -4,10 +4,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var InfraReconcilerCm = "infra-reconciler-cm"
+
 type CnvrgInfraSpec struct {
 	ClusterDomain     string               `json:"clusterDomain,omitempty"`
 	InfraNamespace    string               `json:"infraNamespace,omitempty"`
-	InfraReconcilerCm string               `json:"infraReconcilerCm,omitempty"`
 	Monitoring        CnvrgInfraMonitoring `json:"monitoring,omitempty"`
 	Networking        CnvrgInfraNetworking `json:"networking,omitempty"`
 	Logging           CnvrgInfraLogging    `json:"logging,omitempty"`
@@ -47,7 +48,6 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	infraDefault := CnvrgInfraSpec{
 		ClusterDomain:     "",
 		InfraNamespace:    "cnvrg-infra",
-		InfraReconcilerCm: "infra-reconciler-cm",
 		SSO:               ssoDefault,
 		Storage:           storageDefault,
 		Networking:        cnvrgInfraNetworkingDefault,

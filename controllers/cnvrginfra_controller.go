@@ -125,10 +125,8 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 
 func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
 
-	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: infra.Spec.InfraReconcilerCm}
-	if cmName.Name == "" {
-		cmName.Name = mlopsv1.DefaultCnvrgInfraSpec().InfraReconcilerCm
-	}
+	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: mlopsv1.InfraReconcilerCm}
+
 	cnvrgAppCm := &v1.ConfigMap{}
 	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
 		return nil, nil
@@ -515,16 +513,16 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 
 func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 	cm := &v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{Name: cnvrgInfra.Spec.InfraReconcilerCm, Namespace: cnvrgInfra.Spec.InfraNamespace},
+		ObjectMeta: metav1.ObjectMeta{Name: mlopsv1.InfraReconcilerCm, Namespace: cnvrgInfra.Spec.InfraNamespace},
 	}
 	if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
-		cnvrgInfraLog.Error(err, "failed to set ControllerReference", "cm", cnvrgInfra.Spec.InfraReconcilerCm)
+		cnvrgInfraLog.Error(err, "failed to set ControllerReference", "cm", mlopsv1.InfraReconcilerCm)
 		return err
 	}
 	if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-		cnvrgInfraLog.Info("already exists", "cm", cnvrgInfra.Spec.InfraReconcilerCm)
+		cnvrgInfraLog.Info("already exists", "cm", mlopsv1.InfraReconcilerCm)
 	} else if err != nil {
-		cnvrgInfraLog.Error(err, "error creating", "cm", cnvrgInfra.Spec.InfraReconcilerCm)
+		cnvrgInfraLog.Error(err, "error creating", "cm", mlopsv1.InfraReconcilerCm)
 		return err
 	}
 

@@ -200,6 +200,7 @@ func fluentbitConfigState() []*desired.State {
 			GVR:            desired.Kinds[desired.ConfigMapGVR],
 			Own:            true,
 			Override:       true,
+			Updatable:      true,
 		},
 	}
 }
