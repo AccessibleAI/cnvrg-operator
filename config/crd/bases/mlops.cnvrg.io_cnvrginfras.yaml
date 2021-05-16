@@ -167,8 +167,6 @@ spec:
                           type: string
                         type: object
                     type: object
-                  kubeletServiceMonitor:
-                    type: boolean
                   nodeExporter:
                     properties:
                       enabled:

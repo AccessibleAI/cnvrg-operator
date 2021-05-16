@@ -105,7 +105,7 @@ func IstioInstanceState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgApp.Spec.Networking.Ingress.IstioGwName != mlopsv1.DoNotDeployIstioGwFlag {
 		state = append(state, ingressState()...)
 	}
 

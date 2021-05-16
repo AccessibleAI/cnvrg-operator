@@ -3,6 +3,8 @@ package v1
 // +kubebuilder:validation:Enum=istio;ingress;openshift;nodeport
 type IngressType string
 
+var DoNotDeployIstioGwFlag string = "do-not-deploy"
+
 const (
 	IstioIngress     IngressType = "istio"
 	NginxIngress     IngressType = "ingress"

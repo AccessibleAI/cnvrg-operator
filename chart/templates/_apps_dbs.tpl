@@ -10,7 +10,7 @@ dbs:
       - {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
-  {{- if eq .Values.controlPlane.objectStorage.endpoint "" }}
+  {{- if and (eq .Values.controlPlane.objectStorage.endpoint "") (eq .Values.controlPlane.objectStorage.type "minio")}}
   minio:
     enabled: {{ .Values.dbs.minio.enabled }}
     storageSize: {{ .Values.dbs.minio.storageSize }}

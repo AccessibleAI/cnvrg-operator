@@ -334,11 +334,6 @@ func (in *CnvrgInfraMonitoring) DeepCopyInto(out *CnvrgInfraMonitoring) {
 	*out = *in
 	in.PrometheusOperator.DeepCopyInto(&out.PrometheusOperator)
 	in.Prometheus.DeepCopyInto(&out.Prometheus)
-	if in.KubeletServiceMonitor != nil {
-		in, out := &in.KubeletServiceMonitor, &out.KubeletServiceMonitor
-		*out = new(bool)
-		**out = **in
-	}
 	in.NodeExporter.DeepCopyInto(&out.NodeExporter)
 	in.KubeStateMetrics.DeepCopyInto(&out.KubeStateMetrics)
 	in.Grafana.DeepCopyInto(&out.Grafana)

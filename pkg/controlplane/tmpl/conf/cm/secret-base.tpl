@@ -10,4 +10,5 @@ data:
   HYPER_SERVER_TOKEN: {{ .Spec.ControlPlane.Hyper.Token | b64enc }}
   SECRET_KEY_BASE: {{ randAlphaNum 128 | lower | b64enc }}
   STS_IV: {{ "DeJ/CGz/Hkb/IbRe4t1xLg==" | b64enc }}
+{{/*  STS_KEY: {{ randAlphaNum 32 | lower | b64enc }}*/}}
   STS_KEY: {{ randAlphaNum 32 | lower | b64enc }}
