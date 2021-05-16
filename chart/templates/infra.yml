@@ -5,7 +5,7 @@ kind: CnvrgInfra
 metadata:
   name: cnvrg-infra
 spec:
-  clusterDomain: {{ .Values.clusterDomain }}
+  clusterDomain: "{{ .Values.clusterDomain }}"
   infraNamespace: {{ template "spec.cnvrgNs" . }}
   {{- include "spec.registry" . | indent 2 }}
   {{- include "spec.storage" . | indent 2 }}

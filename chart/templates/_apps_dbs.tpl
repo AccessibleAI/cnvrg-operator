@@ -10,7 +10,7 @@ dbs:
       - {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
-
+  {{- if eq .Values.controlPlane.objectStorage.endpoint "" }}
   minio:
     enabled: {{ .Values.dbs.minio.enabled }}
     storageSize: {{ .Values.dbs.minio.storageSize }}
@@ -21,7 +21,7 @@ dbs:
       - {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
-
+  {{- end }}
   pg:
     enabled: {{ .Values.dbs.pg.enabled }}
     storageSize: {{ .Values.dbs.pg.storageSize }}

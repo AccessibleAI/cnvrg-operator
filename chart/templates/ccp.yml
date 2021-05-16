@@ -6,7 +6,7 @@ metadata:
   name: cnvrg-app
   namespace: {{ template "spec.cnvrgNs" . }}
 spec:
-  clusterDomain: {{ .Values.clusterDomain }}
+  clusterDomain: "{{ .Values.clusterDomain }}"
   {{- include "spec.controlPlane" . | indent 2 }}
   {{- include "spec.registry" . | indent 2 }}
   {{- include "spec.app_dbs" . | indent 2 }}

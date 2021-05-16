@@ -92,7 +92,7 @@ spec:
           requests:
             cpu: "{{.Spec.ControlPlane.WebApp.Requests.Cpu}}"
             memory: "{{.Spec.ControlPlane.WebApp.Requests.Memory}}"
-        {{- if eq .Spec.ControlPlane.ObjectStorage.CnvrgStorageType "gcp" }}
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         volumeMounts:
         - name: "{{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}"
           mountPath: "{{ .Spec.ControlPlane.ObjectStorage.GcpKeyfileMountPath }}"

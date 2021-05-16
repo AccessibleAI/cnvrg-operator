@@ -71,7 +71,6 @@ type MetricsServer struct {
 type CnvrgInfraMonitoring struct {
 	PrometheusOperator       PrometheusOperator       `json:"prometheusOperator,omitempty"`
 	Prometheus               Prometheus               `json:"prometheus,omitempty"`
-	KubeletServiceMonitor    *bool                    `json:"kubeletServiceMonitor,omitempty"`
 	NodeExporter             NodeExporter             `json:"nodeExporter,omitempty"`
 	KubeStateMetrics         KubeStateMetrics         `json:"kubeStateMetrics,omitempty"`
 	Grafana                  Grafana                  `json:"grafana,omitempty"`

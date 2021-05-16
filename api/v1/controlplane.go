@@ -194,7 +194,7 @@ var infraRegistryDefault = Registry{
 }
 
 var controlPlaneDefault = ControlPlane{
-	Image: "cnvrg/core:3.1.5",
+	Image: "cnvrg/core:3.6.99",
 
 	WebApp: WebApp{
 		Enabled:  &defaultEnabled,

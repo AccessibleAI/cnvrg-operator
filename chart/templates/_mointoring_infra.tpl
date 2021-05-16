@@ -1,6 +1,5 @@
 {{- define "spec.monitoring_infra" }}
 monitoring:
-  kubeletServiceMonitor: {{ .Values.monitoring.kubeletServiceMonitor }}
   defaultServiceMonitors:
     enabled: {{ .Values.monitoring.defaultServiceMonitors.enabled }}
   {{- if eq .Values.spec "allinone" }}

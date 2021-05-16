@@ -78,7 +78,7 @@ func getIstioGwName(obj interface{}) string {
 	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
 		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
 		if cnvrgInfra.Spec.Networking.Ingress.IstioGwName == "" {
-			return fmt.Sprintf("isito-gw-%v", getNs(obj))
+			return fmt.Sprintf("isito-app-gw-%v", getNs(obj))
 		} else {
 			return cnvrgInfra.Spec.Networking.Ingress.IstioGwName
 		}
@@ -86,12 +86,12 @@ func getIstioGwName(obj interface{}) string {
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
 		if cnvrgApp.Spec.Networking.Ingress.IstioGwName == "" {
-			return fmt.Sprintf("isito-gw-%v", getNs(obj))
+			return fmt.Sprintf("isito-infra-gw-%v", getNs(obj))
 		} else {
 			return cnvrgApp.Spec.Networking.Ingress.IstioGwName
 		}
 	}
-	return "" // what can go wrong? :)
+	return "" // what can go wrong?
 }
 
 func getGrafanaDashboards(obj interface{}) []string {
