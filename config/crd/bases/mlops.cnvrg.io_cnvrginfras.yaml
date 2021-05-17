@@ -97,8 +97,6 @@ spec:
                 type: object
               infraNamespace:
                 type: string
-              infraReconcilerCm:
-                type: string
               logging:
                 properties:
                   fluentbit:

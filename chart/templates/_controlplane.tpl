@@ -20,6 +20,8 @@ controlPlane:
     region: "{{ .Values.controlPlane.objectStorage.region }}"
     secretKey: "{{ .Values.controlPlane.objectStorage.secretKey }}"
     type: {{ .Values.controlPlane.objectStorage.type }}
+    azureAccountName: "{{ .Values.controlPlane.objectStorage.azureAccountName}}"
+    azureContainer: "{{.Values.controlPlane.objectStorage.azureContainer}}"
     gcpKeyfileMountPath: "{{ .Values.controlPlane.objectStorage.gcpKeyfileMountPath }}"
     gcpKeyfileName: {{ .Values.controlPlane.objectStorage.gcpKeyfileName }}
     gcpStorageSecret: {{ .Values.controlPlane.objectStorage.gcpStorageSecret }}
