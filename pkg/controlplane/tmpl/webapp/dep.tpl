@@ -92,19 +92,19 @@ spec:
           requests:
             cpu: "{{.Spec.ControlPlane.WebApp.Requests.Cpu}}"
             memory: "{{.Spec.ControlPlane.WebApp.Requests.Memory}}"
-        {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         volumeMounts:
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           mountPath: /opt/app-root/conf/gcp-keyfile
           readOnly: true
         {{- end }}
-      {{- if isTrue .Spec.SSO.Enabled }}
       volumes:
+      {{- if isTrue .Spec.SSO.Enabled }}
       - name: "oauth-proxy-webapp"
         secret:
          secretName: "oauth-proxy-webapp"
       {{- end }}
-      {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
+      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
         secret:
           secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
@@ -116,12 +116,12 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq (.Spec.ControlPlane.ObjectStorage.Type | toString)  "minio") }}
+          {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
           value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
           {{- else }}
           value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }}"
           {{ end }}
-      {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "minio") }}
+      {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
       - name: create-cnvrg-bucket
         image: {{ .Spec.ControlPlane.Seeder.Image }}
         command: ["/bin/bash","-c", "{{ .Spec.ControlPlane.Seeder.CreateBucketCmd }}"]
@@ -162,7 +162,7 @@ spec:
           value: "{{ .Spec.Tenancy.Key }}"
         - name: CNVRG_TENANCY_VALUE
           value: "{{ .Spec.Tenancy.Value }}"
-        {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         - name: "CNVRG_GCP_KEYFILE_SECRET"
           value: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
         - name: "CNVRG_GCP_KEYFILE_MOUNT_PATH"

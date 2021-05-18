@@ -42,7 +42,7 @@ spec:
         - name: "SIDEKIQ_SEARCHKICK"
           value: "true"
         imagePullPolicy: Always
-        {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         volumeMounts:
           - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
             mountPath: /opt/app-root/conf/gcp-keyfile
@@ -77,7 +77,7 @@ spec:
           preStop:
             exec:
               command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid 60"]
-      {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
+      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       volumes:
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           secret:
