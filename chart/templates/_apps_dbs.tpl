@@ -7,7 +7,7 @@ dbs:
     {{- if .Values.dbs.es.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.es.nodeSelector }}
-      - {{$key}}: {{$value}}
+      {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
   {{- if and (eq .Values.controlPlane.objectStorage.endpoint "") (eq .Values.controlPlane.objectStorage.type "minio")}}
@@ -18,7 +18,7 @@ dbs:
     {{- if .Values.dbs.minio.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.minio.nodeSelector }}
-      - {{$key}}: {{$value}}
+      {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
   {{- end }}
@@ -29,7 +29,7 @@ dbs:
     {{- if .Values.dbs.pg.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.pg.nodeSelector }}
-      - {{$key}}: {{$value}}
+      {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
     hugePages:
@@ -44,7 +44,7 @@ dbs:
     {{- if .Values.dbs.redis.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.redis.nodeSelector }}
-      - {{$key}}: {{$value}}
+      {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
   {{- end }}

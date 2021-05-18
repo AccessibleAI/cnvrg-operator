@@ -20,6 +20,7 @@ controlPlane:
     region: "{{ .Values.controlPlane.objectStorage.region }}"
     secretKey: "{{ .Values.controlPlane.objectStorage.secretKey }}"
     type: {{ .Values.controlPlane.objectStorage.type }}
+    endpoint: "{{ .Values.controlPlane.objectStorage.endpoint }}"
     azureAccountName: "{{ .Values.controlPlane.objectStorage.azureAccountName}}"
     azureContainer: "{{.Values.controlPlane.objectStorage.azureContainer}}"
     gcpSecretRef: "{{ .Values.controlPlane.objectStorage.gcpSecretRef }}"
