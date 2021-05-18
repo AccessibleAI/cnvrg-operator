@@ -42,10 +42,10 @@ spec:
         - name: "SIDEKIQ_SEARCHKICK"
           value: "true"
         imagePullPolicy: Always
-        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
+        {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
         volumeMounts:
-          - name: "{{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}"
-            mountPath: "{{ .Spec.ControlPlane.ObjectStorage.GcpKeyfileMountPath }}"
+          - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
+            mountPath: /opt/app-root/conf/gcp-keyfile
             readOnly: true
         {{- end }}
         envFrom:
@@ -77,11 +77,11 @@ spec:
           preStop:
             exec:
               command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid 60"]
-      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
+      {{- if eq (.Spec.ControlPlane.ObjectStorage.Type | toString) "gcp" }}
       volumes:
-        - name: {{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}
+        - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           secret:
-            secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpStorageSecret }}
+            secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
       {{- end }}
       initContainers:
       - name: seeder

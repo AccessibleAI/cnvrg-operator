@@ -6,7 +6,7 @@ metadata:
   labels:
     owner: cnvrg-control-plane
 data:
-  CNVRG_STORAGE_TYPE: {{ .Spec.ControlPlane.ObjectStorage.Type | b64enc }}
+  CNVRG_STORAGE_TYPE: {{ .Spec.ControlPlane.ObjectStorage.Type | toString | b64enc }}
   CNVRG_STORAGE_ENDPOINT: {{ objectStorageUrl . | b64enc }}
   ################## minio/aws storage ObjectStorage  ###########################
   CNVRG_STORAGE_BUCKET: {{ .Spec.ControlPlane.ObjectStorage.Bucket | b64enc }}
@@ -26,5 +26,5 @@ data:
   CNVRG_STORAGE_AZURE_ACCOUNT_NAME: {{ .Spec.ControlPlane.ObjectStorage.AzureAccountName | b64enc }}
   CNVRG_STORAGE_AZURE_CONTAINER: {{ .Spec.ControlPlane.ObjectStorage.AzureContainer | b64enc }}
   ################## gcp ###########################
-  CNVRG_STORAGE_KEYFILE: {{ printf "%s/%s" .Spec.ControlPlane.ObjectStorage.GcpKeyfileMountPath .Spec.ControlPlane.ObjectStorage.GcpKeyfileName | b64enc }}
+  CNVRG_STORAGE_KEYFILE: {{ "/opt/app-root/conf/gcp-keyfile/key.json"  | b64enc }}
   CNVRG_STORAGE_PROJECT: {{ .Spec.ControlPlane.ObjectStorage.GcpProject | b64enc }}

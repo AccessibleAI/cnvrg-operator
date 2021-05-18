@@ -16,6 +16,7 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
+	"gopkg.in/d4l3k/messagediff.v1"
 	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
@@ -716,6 +717,12 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride); err != nil {
 		cnvrgAppLog.Error(err, "can't merge")
 		return false, err
+	}
+
+	if viper.GetBool("verbose") {
+		cnvrgInfraLog.V(1).Info("printing the diff between desiredSpec and actual")
+		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgApp.Spec)
+		cnvrgInfraLog.V(1).Info(diff)
 	}
 
 	equal := reflect.DeepEqual(desiredSpec, cnvrgApp.Spec)

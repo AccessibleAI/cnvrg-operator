@@ -7,17 +7,17 @@ import (
 var InfraReconcilerCm = "infra-reconciler-cm"
 
 type CnvrgInfraSpec struct {
-	ClusterDomain     string               `json:"clusterDomain,omitempty"`
-	InfraNamespace    string               `json:"infraNamespace,omitempty"`
-	Monitoring        CnvrgInfraMonitoring `json:"monitoring,omitempty"`
-	Networking        CnvrgInfraNetworking `json:"networking,omitempty"`
-	Logging           CnvrgInfraLogging    `json:"logging,omitempty"`
-	Registry          Registry             `json:"registry,omitempty"`
-	Storage           Storage              `json:"storage,omitempty"`
-	Dbs               InfraDbs             `json:"dbs,omitempty"`
-	SSO               SSO                  `json:"sso,omitempty"`
-	Gpu               Gpu                  `json:"gpu,omitempty"`
-	Tenancy           Tenancy              `json:"tenancy,omitempty"`
+	ClusterDomain  string               `json:"clusterDomain,omitempty"`
+	InfraNamespace string               `json:"infraNamespace,omitempty"`
+	Monitoring     CnvrgInfraMonitoring `json:"monitoring,omitempty"`
+	Networking     CnvrgInfraNetworking `json:"networking,omitempty"`
+	Logging        CnvrgInfraLogging    `json:"logging,omitempty"`
+	Registry       Registry             `json:"registry,omitempty"`
+	Storage        Storage              `json:"storage,omitempty"`
+	Dbs            InfraDbs             `json:"dbs,omitempty"`
+	SSO            SSO                  `json:"sso,omitempty"`
+	Gpu            Gpu                  `json:"gpu,omitempty"`
+	Tenancy        Tenancy              `json:"tenancy,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -46,17 +46,17 @@ func init() {
 
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	infraDefault := CnvrgInfraSpec{
-		ClusterDomain:     "",
-		InfraNamespace:    "cnvrg-infra",
-		SSO:               ssoDefault,
-		Storage:           storageDefault,
-		Networking:        cnvrgInfraNetworkingDefault,
-		Monitoring:        infraMonitoringDefault,
-		Logging:           cnvrgInfraLoggingDefault,
-		Registry:          infraRegistryDefault,
-		Dbs:               infraDbsDefaults,
-		Gpu:               gpuDefaults,
-		Tenancy:           tenancyDefault,
+		ClusterDomain:  "",
+		InfraNamespace: "cnvrg-infra",
+		SSO:            ssoDefault,
+		Storage:        storageDefault,
+		Networking:     cnvrgInfraNetworkingDefault,
+		Monitoring:     infraMonitoringDefault,
+		Logging:        cnvrgInfraLoggingDefault,
+		Registry:       infraRegistryDefault,
+		Dbs:            infraDbsDefaults,
+		Gpu:            gpuDefaults,
+		Tenancy:        tenancyDefault,
 	}
 	return infraDefault
 }

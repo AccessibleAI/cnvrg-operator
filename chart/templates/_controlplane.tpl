@@ -22,9 +22,8 @@ controlPlane:
     type: {{ .Values.controlPlane.objectStorage.type }}
     azureAccountName: "{{ .Values.controlPlane.objectStorage.azureAccountName}}"
     azureContainer: "{{.Values.controlPlane.objectStorage.azureContainer}}"
-    gcpKeyfileMountPath: "{{ .Values.controlPlane.objectStorage.gcpKeyfileMountPath }}"
-    gcpKeyfileName: {{ .Values.controlPlane.objectStorage.gcpKeyfileName }}
-    gcpStorageSecret: {{ .Values.controlPlane.objectStorage.gcpStorageSecret }}
+    gcpSecretRef: "{{ .Values.controlPlane.objectStorage.gcpSecretRef }}"
+    gcpProject: "{{ .Values.controlPlane.objectStorage.gcpProject }}"
   searchkiq:
     enabled: {{ .Values.controlPlane.searchkiq.enabled }}
   sidekiq:

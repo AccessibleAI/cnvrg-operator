@@ -19,9 +19,8 @@ controlPlane:
     endpoint: ""
     azureAccountName: ""
     azureContainer: ""
-    gcpKeyfileMountPath: /tmp/gcp_keyfile
-    gcpKeyfileName: key.json
-    gcpStorageSecret: gcp-storage-secret
+    gcpSecretRef: gcp-storage-secret
+    gcpProject: ""
   searchkiq:
     enabled: true
   sidekiq:

@@ -163,19 +163,20 @@ spec:
                         type: string
                       endpoint:
                         type: string
-                      gcpKeyfileMountPath:
-                        type: string
-                      gcpKeyfileName:
-                        type: string
                       gcpProject:
                         type: string
-                      gcpStorageSecret:
+                      gcpSecretRef:
                         type: string
                       region:
                         type: string
                       secretKey:
                         type: string
                       type:
+                        enum:
+                        - minio
+                        - aws
+                        - azure
+                        - gcp
                         type: string
                     type: object
                   rbac:

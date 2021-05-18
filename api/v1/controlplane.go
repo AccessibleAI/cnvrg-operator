@@ -1,5 +1,15 @@
 package v1
 
+// +kubebuilder:validation:Enum=minio;aws;azure;gcp
+type ObjectStorageType string
+
+const (
+	MinioObjectStorageType ObjectStorageType = "minio"
+	AwsObjectStorageType   ObjectStorageType = "aws"
+	AzureObjectStorageType ObjectStorageType = "azure"
+	GcpObjectStorageType   ObjectStorageType = "gcp"
+)
+
 type ConsistentHash struct {
 	Key   string `json:"key,omitempty"`
 	Value string `json:"value,omitempty"`
@@ -110,18 +120,16 @@ type SMTP struct {
 }
 
 type ObjectStorage struct {
-	Type                string `json:"type,omitempty"`
-	Bucket              string `json:"bucket,omitempty"`
-	Region              string `json:"region,omitempty"`
-	AccessKey           string `json:"accessKey,omitempty"`
-	SecretKey           string `json:"secretKey,omitempty"`
-	Endpoint            string `json:"endpoint,omitempty"`
-	AzureAccountName    string `json:"azureAccountName,omitempty"`
-	AzureContainer      string `json:"azureContainer,omitempty"`
-	GcpProject          string `json:"gcpProject,omitempty"`
-	GcpStorageSecret    string `json:"gcpStorageSecret,omitempty"`
-	GcpKeyfileMountPath string `json:"gcpKeyfileMountPath,omitempty"`
-	GcpKeyfileName      string `json:"gcpKeyfileName,omitempty"`
+	Type             ObjectStorageType `json:"type,omitempty"`
+	Bucket           string            `json:"bucket,omitempty"`
+	Region           string            `json:"region,omitempty"`
+	AccessKey        string            `json:"accessKey,omitempty"`
+	SecretKey        string            `json:"secretKey,omitempty"`
+	Endpoint         string            `json:"endpoint,omitempty"`
+	AzureAccountName string            `json:"azureAccountName,omitempty"`
+	AzureContainer   string            `json:"azureContainer,omitempty"`
+	GcpProject       string            `json:"gcpProject,omitempty"`
+	GcpSecretRef     string            `json:"gcpSecretRef,omitempty"`
 }
 
 type BaseConfig struct {
@@ -293,18 +301,16 @@ var controlPlaneDefault = ControlPlane{
 
 	ObjectStorage: ObjectStorage{
 
-		Type:                "minio",
-		Bucket:              "cnvrg-storage",
-		AccessKey:           "",
-		SecretKey:           "",
-		Endpoint:            "",
-		AzureAccountName:    "",
-		AzureContainer:      "",
-		Region:              "eastus",
-		GcpProject:          "",
-		GcpStorageSecret:    "gcp-storage-secret",
-		GcpKeyfileMountPath: "/tmp/gcp_keyfile",
-		GcpKeyfileName:      "key.json",
+		Type:             MinioObjectStorageType,
+		Bucket:           "cnvrg-storage",
+		AccessKey:        "",
+		SecretKey:        "",
+		Endpoint:         "",
+		AzureAccountName: "",
+		AzureContainer:   "",
+		Region:           "eastus",
+		GcpProject:       "",
+		GcpSecretRef:     "gcp-storage-secret",
 	},
 
 	Ldap: Ldap{
@@ -315,7 +321,7 @@ var controlPlaneDefault = ControlPlane{
 		Base:          "", // dc=my-domain,dc=local
 		AdminUser:     "",
 		AdminPassword: "",
-		Ssl:           "", // true/&defaultEnabled
+		Ssl:           "", // true/false
 	},
 
 	Rbac: Rbac{
