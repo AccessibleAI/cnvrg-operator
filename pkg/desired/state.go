@@ -436,43 +436,8 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 	return nil
 }
 
-func shouldUpdate(manifest *State, obj *unstructured.Unstructured) bool {
+func (s *State) patchManifest() {
 
-	// do not try to update PVC, they are immutable (probably)
-	if manifest.GVR == Kinds[PvcGVR] {
-		return false
-	}
-
-	// todo: figure out what to do with this (happens only on OCP, why?)
-	if manifest.GVR == Kinds[SaGVR] {
-		return false
-	}
-
-	// do not apply CRDs if already exists
-	// todo: have to ensure that existing CRD version is compatible with actually CR
-	if manifest.GVR == Kinds[CrdGVR] {
-		return false
-	}
-
-	// this secret is unique one, since by default it will generate access/secret keys for Minio each this template rendered
-	// this secret should be applied only once, to keep same minio creds between reconcile loops
-	if manifest.GVR == Kinds[SecretGVR] && obj.GetName() == "cp-object-storage" {
-		return false
-	}
-
-	// this secret is unique one, since by default it will generate rails key base and sts_key for app each this template rendered
-	// this secret should be applied only once, to keep same app keys between reconcile loops
-	if manifest.GVR == Kinds[SecretGVR] && obj.GetName() == "cp-base-secret" {
-		return false
-	}
-
-	// operator shouldn't manage K8s storage - but it does - because we want to make our customer happy!
-	// so, at least, operator won't own
-	if manifest.GVR == Kinds[DeploymentGVR] && (obj.GetName() == "hostpath-provisioner" || obj.GetName() == "nfs-client-provisioner") {
-		return false
-	}
-
-	return true
 }
 
 func (s *State) dumpTemplateToFile() error {

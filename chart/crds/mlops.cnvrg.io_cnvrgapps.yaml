@@ -377,8 +377,6 @@ spec:
                             type: object
                           enabled:
                             type: boolean
-                          useExistingClaim:
-                            type: string
                         type: object
                       storageClass:
                         type: string
@@ -497,6 +495,8 @@ spec:
                         type: object
                       port:
                         type: integer
+                      pvcName:
+                        type: string
                       requests:
                         properties:
                           cpu:
