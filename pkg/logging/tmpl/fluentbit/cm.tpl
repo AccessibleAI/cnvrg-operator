@@ -4,12 +4,12 @@ metadata:
   name: fluent-bit-config
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Spec.Annotations }}
+    {{- range $k, $v := .Data.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
     k8s-app: fluent-bit
-    {{- range $k, $v := .Spec.Labels }}
+    {{- range $k, $v := .Data.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
 data:

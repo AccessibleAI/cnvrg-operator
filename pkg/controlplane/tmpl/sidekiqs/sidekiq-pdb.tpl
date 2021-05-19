@@ -8,10 +8,9 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    owner: cnvrg-control-plan
-      {{- range $k, $v := .Spec.Labels }}
-      {{$k}}: "{{$v}}"
-      {{- end }}
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   minAvailable: 1
   selector:

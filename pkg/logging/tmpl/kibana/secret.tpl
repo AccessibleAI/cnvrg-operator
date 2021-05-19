@@ -4,11 +4,11 @@ metadata:
   name: kibana-config
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Spec.Annotations }}
+    {{- range $k, $v := .Data.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    {{- range $k, $v := .Spec.Labels }}
+    {{- range $k, $v := .Data.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
 data:

@@ -349,7 +349,11 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	cnvrgInfraLog.Info("applying registry")
 	registryData := desired.TemplateData{
 		Namespace: cnvrgApp.Namespace,
-		Data:      map[string]interface{}{"Registry": cnvrgApp.Spec.Registry},
+		Data: map[string]interface{}{
+			"Registry":    cnvrgApp.Spec.Registry,
+			"Annotations": cnvrgApp.Annotations,
+			"Labels":      cnvrgApp.Labels,
+		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
@@ -563,11 +567,13 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 	return &desired.TemplateData{
 		Namespace: app.Namespace,
 		Data: map[string]interface{}{
-			"Host":   kibanaHost,
-			"Port":   kibanaPort,
-			"EsHost": fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port),
-			"EsUser": esUser,
-			"EsPass": esPass,
+			"Host":        kibanaHost,
+			"Port":        kibanaPort,
+			"EsHost":      fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port),
+			"EsUser":      esUser,
+			"EsPass":      esPass,
+			"Annotations": app.Annotations,
+			"Labels":      app.Labels,
 		},
 	}, nil
 

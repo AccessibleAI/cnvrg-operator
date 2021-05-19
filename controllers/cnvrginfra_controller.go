@@ -154,7 +154,11 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	cnvrgInfraLog.Info("applying registry")
 	registryData := desired.TemplateData{
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
-		Data:      map[string]interface{}{"Registry": cnvrgInfra.Spec.Registry},
+		Data: map[string]interface{}{
+			"Registry":    cnvrgInfra.Spec.Registry,
+			"Annotations": cnvrgInfra.Annotations,
+			"Labels":      cnvrgInfra.Labels,
+		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
@@ -196,7 +200,11 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 	fluentbitData := desired.TemplateData{
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
-		Data:      map[string]interface{}{"AppInstance": cnvrgApps},
+		Data: map[string]interface{}{
+			"AppInstance": cnvrgApps,
+			"Annotations": cnvrgInfra.Annotations,
+			"Labels":      cnvrgInfra.Labels,
+		},
 	}
 	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
@@ -279,9 +287,11 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 		grafanaDatasourceData := desired.TemplateData{
 			Namespace: infra.Spec.InfraNamespace,
 			Data: map[string]interface{}{
-				"Url":  url,
-				"User": basicAuthUser,
-				"Pass": basicAuthPass,
+				"Url":         url,
+				"User":        basicAuthUser,
+				"Pass":        basicAuthPass,
+				"Annotations": infra.Annotations,
+				"Labels":      infra.Labels,
 			},
 		}
 		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {

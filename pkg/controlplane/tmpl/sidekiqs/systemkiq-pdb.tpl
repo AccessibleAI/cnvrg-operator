@@ -8,7 +8,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    owner: cnvrg-control-plan
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
