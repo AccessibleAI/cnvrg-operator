@@ -119,7 +119,7 @@ spec:
           mountPath: "/usr/share/elasticsearch/data"
   volumeClaimTemplates:
   - metadata:
-      name: es-storage
+      name: {{ .Spec.Dbs.Es.PvcName  }}
     spec:
       accessModes: [ ReadWriteOnce ]
       resources:

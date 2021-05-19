@@ -17,7 +17,6 @@ type ConsistentHash struct {
 
 type SharedStorage struct {
 	Enabled          *bool          `json:"enabled,omitempty"`
-	UseExistingClaim string         `json:"useExistingClaim,omitempty"`
 	ConsistentHash   ConsistentHash `json:"consistentHash,omitempty"`
 }
 

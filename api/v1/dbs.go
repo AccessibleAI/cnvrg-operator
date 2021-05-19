@@ -98,10 +98,9 @@ var minioDefaults = Minio{
 		Cpu:    "1000m",
 		Memory: "2Gi",
 	},
-	PvcName: "",
+	PvcName: "minio-storage",
 	SharedStorage: SharedStorage{
 		Enabled:          &defaultEnabled,
-		UseExistingClaim: "",
 		ConsistentHash: ConsistentHash{
 			Key:   "httpQueryParameterName",
 			Value: "uploadId",
@@ -125,7 +124,7 @@ var pgDefault = Pg{
 	SharedBuffers:  "64MB",
 	Fixpg:          &defaultTrue,
 	NodeSelector:   nil,
-	PvcName:        "",
+	PvcName:        "pg-storage",
 	HugePages: HugePages{
 		Enabled: &defaultEnabled,
 		Size:    "2Mi",
@@ -144,7 +143,7 @@ var redisDefault = Redis{
 	StorageClass:   "",
 	NodeSelector:   nil,
 	CredsRef:       "redis-creds",
-	PvcName:        "",
+	PvcName:        "redis-storage",
 	Limits: Limits{
 		Cpu:    "1000m",
 		Memory: "2Gi",
@@ -175,6 +174,7 @@ var esDefault = Es{
 	JavaOpts:     "",
 	PatchEsNodes: &defaultTrue,
 	CredsRef:     "es-creds",
+	PvcName:      "es-storage",
 }
 
 var appDbsDefaults = AppDbs{

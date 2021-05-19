@@ -93,7 +93,7 @@ spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: {{.Spec.Dbs.Pg.SvcName}}
+            claimName: {{.Spec.Dbs.Pg.PvcName}}
         - name: dshm
           emptyDir:
             medium: Memory

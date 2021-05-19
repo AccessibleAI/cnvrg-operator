@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name:  {{.Spec.Dbs.Redis.SvcName}}
+  name:  {{.Spec.Dbs.Redis.PvcName}}
   namespace: {{ ns . }}
   labels:
     owner: cnvrg-control-plane

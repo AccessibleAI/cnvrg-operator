@@ -94,7 +94,7 @@ func pgState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            true,
+			Own:            false,
 			Updatable:      false,
 		},
 		{
@@ -106,16 +106,6 @@ func pgState() []*desired.State {
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
 			Updatable:      true,
-		},
-		{
-
-			TemplatePath:   path + "/pg/pvc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            true,
-			Updatable:      false,
 		},
 		{
 
@@ -174,7 +164,7 @@ func redisState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            true,
+			Own:            false,
 			Updatable:      false,
 		},
 		{
@@ -253,7 +243,7 @@ func singleBackendMinio() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            true,
+			Own:            false,
 			Updatable:      false,
 		},
 		{
@@ -288,6 +278,7 @@ func sharedBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 			TemplatePath:   path + "/minio/sa.tpl",
@@ -296,6 +287,7 @@ func sharedBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            true,
+			Updatable:      false,
 		},
 		{
 
@@ -304,7 +296,8 @@ func sharedBackendMinio() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            true,
+			Own:            false,
+			Updatable:      false,
 		},
 		{
 
@@ -314,6 +307,7 @@ func sharedBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -323,6 +317,7 @@ func sharedBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 		{
 
@@ -332,6 +327,7 @@ func sharedBackendMinio() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioDestinationRuleGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }

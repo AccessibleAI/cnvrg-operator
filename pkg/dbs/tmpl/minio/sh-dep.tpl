@@ -238,11 +238,7 @@ spec:
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            {{- if eq .Spec.Dbs.Minio.SharedStorage.UseExistingClaim "" }}
-            claimName: {{Minio.SvcName}}
-            {{- else }}
-            claimName: {{ Minio.SharedStorage.SseExistingClaim }}
-            {{- end }}
+            claimName: {{ .Spec.Dbs.Minio.PvcName }}
         - emptyDir:
             medium: Memory
           name: istio-envoy

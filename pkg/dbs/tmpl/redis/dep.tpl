@@ -60,7 +60,7 @@ spec:
       volumes:
         - name: redis-data
           persistentVolumeClaim:
-            claimName: {{ .Spec.Dbs.Redis.SvcName }}
+            claimName: {{ .Spec.Dbs.Redis.PvcName }}
         - name: redis-config
           secret:
             secretName: {{ .Spec.Dbs.Redis.CredsRef }}

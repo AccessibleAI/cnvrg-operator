@@ -67,7 +67,7 @@ spec:
       volumes:
       - name: {{ .Spec.Logging.Elastalert.SvcName }}
         persistentVolumeClaim:
-          claimName: {{ .Spec.Logging.Elastalert.SvcName }}
+          claimName: {{ .Spec.Logging.Elastalert.PvcName }}
       - configMap:
           name: elastalert-config
         name: elastalert-config

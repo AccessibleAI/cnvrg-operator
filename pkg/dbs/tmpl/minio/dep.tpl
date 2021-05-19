@@ -82,4 +82,4 @@ spec:
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            claimName: {{ .Spec.Dbs.Minio.SvcName }}
+            claimName: {{ .Spec.Dbs.Minio.PvcName }}

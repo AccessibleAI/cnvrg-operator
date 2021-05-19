@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Spec.Dbs.Pg.SvcName }}
+  name: {{ .Spec.Dbs.Pg.PvcName }}
   namespace: {{ ns . }}
   labels:
     owner: cnvrg-control-plane

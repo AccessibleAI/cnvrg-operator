@@ -23,6 +23,7 @@ type Elastalert struct {
 	Requests     Requests          `json:"requests,omitempty"`
 	Limits       Limits            `json:"limits,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+	PvcName      string            `json:"pvcName,omitempty"`
 }
 
 type Kibana struct {
