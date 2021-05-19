@@ -21,9 +21,12 @@ spec:
       app: systemkiq
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: systemkiq
-        owner: cnvrg-control-plane
         cnvrg-component: systemkiq
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"

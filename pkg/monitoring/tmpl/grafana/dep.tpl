@@ -1,9 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: grafana
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: grafana
   namespace: {{ ns . }}
 spec:
@@ -15,7 +21,9 @@ spec:
     metadata:
       labels:
         app: grafana
-        owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

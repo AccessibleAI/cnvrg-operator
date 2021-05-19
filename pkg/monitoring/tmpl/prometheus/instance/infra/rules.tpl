@@ -1,10 +1,16 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: cnvrg-infra-prometheus
     role: alert-rules
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: prometheus-k8s-rules
   namespace: {{ ns . }}
 spec:

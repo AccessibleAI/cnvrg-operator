@@ -3,10 +3,17 @@ kind: Deployment
 metadata:
   name: searchkiq
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: searchkiq
     owner: cnvrg-control-plane
     cnvrg-component: searchkiq
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: {{ .Spec.ControlPlane.Searchkiq.Replicas }}
   selector:
@@ -14,10 +21,17 @@ spec:
       app: searchkiq
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: searchkiq
         owner: cnvrg-control-plane
         cnvrg-component: searchkiq
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

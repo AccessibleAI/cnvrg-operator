@@ -3,9 +3,15 @@ kind: Service
 metadata:
   name: cnvrg-prometheus-operator
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: cnvrg-prometheus-operator
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   ports:
   - name: https

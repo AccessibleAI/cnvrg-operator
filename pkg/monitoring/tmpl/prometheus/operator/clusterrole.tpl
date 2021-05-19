@@ -2,10 +2,16 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cnvrg-prometheus-operator
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: cnvrg-prometheus-operator
     version: v0.44.1
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 rules:
 - apiGroups:
   - monitoring.coreos.com

@@ -3,11 +3,17 @@ kind: Route
 metadata:
   annotations:
     haproxy.router.openshift.io/timeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
+
   labels:
     app: {{ ns . }}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   host: "{{ .Spec.Monitoring.Grafana.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:

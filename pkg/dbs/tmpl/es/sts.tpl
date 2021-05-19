@@ -3,8 +3,14 @@ kind: StatefulSet
 metadata:
   name: {{ .Spec.Dbs.Es.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   serviceName: {{ .Spec.Dbs.Es.SvcName }}
   selector:
@@ -13,9 +19,15 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{ .Spec.Dbs.Es.SvcName }}
-        owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

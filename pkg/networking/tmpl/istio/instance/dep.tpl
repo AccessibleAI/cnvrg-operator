@@ -3,6 +3,14 @@ kind: Deployment
 metadata:
   namespace: {{ ns . }}
   name: istio-operator
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
+  labels:
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: 1
   selector:
@@ -10,8 +18,15 @@ spec:
       name: istio-operator
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         name: istio-operator
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       imagePullSecrets:
         - name: {{ .Spec.Registry.Name }}

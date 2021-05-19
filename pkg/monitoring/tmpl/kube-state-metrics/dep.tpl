@@ -1,10 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: v1.9.7
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: kube-state-metrics
   namespace: {{ ns . }}
 spec:
@@ -14,10 +20,16 @@ spec:
       app.kubernetes.io/name: kube-state-metrics
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app.kubernetes.io/name: kube-state-metrics
         app.kubernetes.io/version: v1.9.7
-        owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

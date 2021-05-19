@@ -3,8 +3,14 @@ kind: Secret
 metadata:
   name: cp-sso-grafana
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   conf: {{ oauthProxyConfig . .Spec.Monitoring.Grafana.SvcName | b64enc }}
 

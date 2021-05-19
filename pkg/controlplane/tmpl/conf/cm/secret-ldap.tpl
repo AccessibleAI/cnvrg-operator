@@ -3,8 +3,14 @@ kind: Secret
 metadata:
   name: cp-ldap
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   LDAP_ACTIVE: {{ isTrue .Spec.ControlPlane.Ldap.Enabled | toString | b64enc }}
   LDAP_HOST: {{ .Spec.ControlPlane.Ldap.Host | b64enc }}

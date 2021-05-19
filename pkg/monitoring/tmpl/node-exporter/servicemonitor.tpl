@@ -1,11 +1,17 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/version: v1.0.1
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: node-exporter
   namespace: {{ ns . }}
 spec:

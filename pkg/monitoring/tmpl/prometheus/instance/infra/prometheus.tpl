@@ -3,9 +3,15 @@ kind: Prometheus
 metadata:
   name: cnvrg-infra-prometheus
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: cnvrg-infra-prometheus
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   storage:
     disableMountSubPath: true
@@ -24,8 +30,14 @@ spec:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}
       memory: {{ .Spec.Monitoring.Prometheus.Requests.Memory }}
   podMetadata:
+    annotations:
+      {{- range $k, $v := .Spec.Annotations }}
+      {{$k}}: "{{$v}}"
+      {{- end }}
     labels:
-      owner: cnvrg-control-plane
+      {{- range $k, $v := .Spec.Labels }}
+      {{$k}}: "{{$v}}"
+      {{- end }}
   ruleSelector:
     matchLabels:
       app: cnvrg-infra-prometheus

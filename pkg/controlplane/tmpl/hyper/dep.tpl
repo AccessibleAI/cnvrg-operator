@@ -3,9 +3,16 @@ kind: Deployment
 metadata:
   name: {{ .Spec.ControlPlane.Hyper.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     owner: cnvrg-control-plane
     app: {{ .Spec.ControlPlane.Hyper.SvcName }}
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: {{ .Spec.ControlPlane.Hyper.Replicas }}
   strategy:
@@ -18,9 +25,16 @@ spec:
       app: {{ .Spec.ControlPlane.Hyper.SvcName }}
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{ .Spec.ControlPlane.Hyper.SvcName }}
         owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

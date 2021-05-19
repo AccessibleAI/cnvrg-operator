@@ -3,8 +3,14 @@ kind: Prometheus
 metadata:
   name: cnvrg-ccp-prometheus
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    app: cnvrg-ccp-prometheus
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   storage:
     disableMountSubPath: true
@@ -19,8 +25,14 @@ spec:
   image: {{ .Spec.Monitoring.Prometheus.Image }}
   replicas: 1
   podMetadata:
+    annotations:
+      {{- range $k, $v := .Spec.Annotations }}
+      {{$k}}: "{{$v}}"
+      {{- end }}
     labels:
-      owner: cnvrg-control-plane
+      {{- range $k, $v := .Spec.Labels }}
+      {{$k}}: "{{$v}}"
+      {{- end }}
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}

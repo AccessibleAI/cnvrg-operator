@@ -3,8 +3,14 @@ kind: DestinationRule
 metadata:
   name: {{ .Spec.Dbs.Minio.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ ns . }}.svc.cluster.local"
   trafficPolicy:

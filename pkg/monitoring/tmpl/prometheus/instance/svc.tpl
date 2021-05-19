@@ -3,9 +3,15 @@ kind: Service
 metadata:
   name: {{ .Spec.Monitoring.Prometheus.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: cnvrg-ccp-prometheus
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort

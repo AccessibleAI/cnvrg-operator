@@ -3,6 +3,14 @@ kind: IstioOperator
 metadata:
   name: cnvrg-istio
   namespace:  {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
+  labels:
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   profile: minimal
   namespace:  {{ ns . }}
@@ -24,6 +32,14 @@ spec:
     - enabled: true
       name: istio-ingressgateway
       k8s:
+        annotations:
+          {{- range $k, $v := .Spec.Annotations }}
+          {{$k}}: "{{$v}}"
+          {{- end }}
+        labels:
+          {{- range $k, $v := .Spec.Labels }}
+          {{$k}}: "{{$v}}"
+          {{- end }}
         {{- if isTrue .Spec.Tenancy.Enabled }}
         nodeSelector:
           {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"

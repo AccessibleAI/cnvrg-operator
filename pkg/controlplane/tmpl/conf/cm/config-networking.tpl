@@ -3,8 +3,14 @@ kind: ConfigMap
 metadata:
   name: cp-networking-config
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   APP_DOMAIN: "{{ appDomain . }}"
   DEFAULT_URL: "{{ httpScheme . }}{{ appDomain . }}"

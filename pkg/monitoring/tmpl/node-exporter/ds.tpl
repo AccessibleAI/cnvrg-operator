@@ -1,10 +1,16 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/version: v1.0.1
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: node-exporter
   namespace: {{ ns .}}
 spec:
@@ -13,10 +19,16 @@ spec:
       app.kubernetes.io/name: node-exporter
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app.kubernetes.io/name: node-exporter
         app.kubernetes.io/version: v1.0.1
-        owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       containers:
       - args:

@@ -3,8 +3,14 @@ kind: PersistentVolumeClaim
 metadata:
   name:  {{.Spec.Dbs.Redis.PvcName}}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   accessModes:
     - ReadWriteOnce

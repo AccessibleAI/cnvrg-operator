@@ -3,8 +3,14 @@ kind: ConfigMap
 metadata:
   name: cp-base-config
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   PASSENGER_APP_ENV: "app"
   RAILS_ENV: "app"

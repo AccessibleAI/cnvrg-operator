@@ -3,10 +3,16 @@ kind: Deployment
 metadata:
   name: {{.Spec.Dbs.Pg.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{.Spec.Dbs.Pg.SvcName }}
-    owner: cnvrg-control-plane
     cnvrg-component: pg
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: 1
   selector:
@@ -16,10 +22,16 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{.Spec.Dbs.Pg.SvcName }}
-        owner: cnvrg-control-plane
         cnvrg-component: pg
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

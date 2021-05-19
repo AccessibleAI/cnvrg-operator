@@ -1,11 +1,17 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/version: 1.9.7
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: kube-state-metrics
   namespace: {{ ns . }}
 spec:

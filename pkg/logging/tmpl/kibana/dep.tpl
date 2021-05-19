@@ -4,9 +4,15 @@ kind: Deployment
 metadata:
   name: {{ .Spec.Logging.Kibana.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{ .Spec.Logging.Kibana.SvcName }}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: 1
   selector:
@@ -14,9 +20,15 @@ spec:
       app: {{ .Spec.Logging.Kibana.SvcName }}
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{ .Spec.Logging.Kibana.SvcName }}
-        owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

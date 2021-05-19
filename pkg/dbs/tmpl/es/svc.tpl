@@ -4,9 +4,15 @@ kind: Service
 metadata:
   name: {{ .Spec.Dbs.Es.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{ .Spec.Dbs.Es.SvcName }}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
   type: NodePort

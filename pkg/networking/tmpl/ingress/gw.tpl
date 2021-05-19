@@ -3,6 +3,10 @@ kind: Gateway
 metadata:
   name: {{ istioGwName .}}
   namespace: {{ ns . }}
+  labels:
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   selector:
     istio: ingressgateway

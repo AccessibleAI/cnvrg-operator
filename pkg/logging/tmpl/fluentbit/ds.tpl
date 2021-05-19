@@ -3,11 +3,17 @@ kind: DaemonSet
 metadata:
   name: fluent-bit
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     k8s-app: fluent-bit-logging
     version: v1
     kubernetes.io/cluster-service: "true"
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   selector:
     matchLabels:
@@ -18,11 +24,16 @@ spec:
         k8s-app: fluent-bit-logging
         version: v1
         kubernetes.io/cluster-service: "true"
-        owner: cnvrg-control-plane
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "2020"
         prometheus.io/path: /api/v1/metrics/prometheus
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       containers:
         - name: fluent-bit

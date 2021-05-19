@@ -3,16 +3,26 @@ kind: Deployment
 metadata:
   name: {{.Spec.Dbs.Redis.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{.Spec.Dbs.Redis.SvcName }}
-    owner: cnvrg-control-plane
     cnvrg-component: redis
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   selector:
     matchLabels:
       app: {{.Spec.Dbs.Redis.SvcName }}
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{.Spec.Dbs.Redis.SvcName }}
         owner: cnvrg-control-plane

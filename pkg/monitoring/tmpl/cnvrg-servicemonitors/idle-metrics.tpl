@@ -6,7 +6,9 @@ metadata:
   labels:
     app: cnvrg-jobs
     cnvrg-ccp-prometheus: {{ .Name }}-{{ ns .}}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
     {{- range $name, $value := .Spec.Monitoring.CnvrgIdleMetricsExporter.Labels }}
     {{ $name }}: {{ $value }}
     {{- end }}

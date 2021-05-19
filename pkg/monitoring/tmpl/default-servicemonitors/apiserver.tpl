@@ -1,10 +1,16 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     k8s-app: apiserver
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: kube-apiserver
   namespace: {{ ns . }}
 spec:

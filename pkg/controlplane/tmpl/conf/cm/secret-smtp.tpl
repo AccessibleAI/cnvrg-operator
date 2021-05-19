@@ -3,8 +3,14 @@ kind: Secret
 metadata:
   name: cp-smtp
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   SMTP_SERVER: {{ .Spec.ControlPlane.SMTP.Server | b64enc }}
   SMTP_PORT: {{ .Spec.ControlPlane.SMTP.Port | toString | b64enc }}

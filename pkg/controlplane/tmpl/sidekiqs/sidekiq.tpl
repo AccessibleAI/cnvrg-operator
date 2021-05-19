@@ -21,6 +21,10 @@ spec:
       app: sidekiq
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: sidekiq
         owner: cnvrg-control-plane

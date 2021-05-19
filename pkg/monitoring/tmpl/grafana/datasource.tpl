@@ -3,8 +3,14 @@ kind: Secret
 metadata:
   name: grafana-datasources
   namespace: {{ .Namespace }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 type: Opaque
 data:
   datasources.yaml: {{ grafanaDataSource .Data.Url .Data.User .Data.Pass | b64enc }}

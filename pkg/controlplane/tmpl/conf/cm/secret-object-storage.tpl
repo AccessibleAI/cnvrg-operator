@@ -3,8 +3,14 @@ kind: Secret
 metadata:
   name: cp-object-storage
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   CNVRG_STORAGE_TYPE: {{ .Spec.ControlPlane.ObjectStorage.Type | toString | b64enc }}
   CNVRG_STORAGE_ENDPOINT: {{ objectStorageUrl . | b64enc }}

@@ -3,10 +3,16 @@ kind: ServiceMonitor
 metadata:
   name: dcgm-exporter
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: "dcgm-exporter"
-    owner: cnvrg-control-plane
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   selector:
     matchLabels:

@@ -3,8 +3,14 @@ kind: RoleBinding
 metadata:
   name: {{ .Spec.Logging.Kibana.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

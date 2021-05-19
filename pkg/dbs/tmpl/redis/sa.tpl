@@ -3,7 +3,13 @@ kind: ServiceAccount
 metadata:
   name: {{ .Spec.Dbs.Redis.ServiceAccount }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 imagePullSecrets:
   - name: {{ .Spec.Registry.Name }}

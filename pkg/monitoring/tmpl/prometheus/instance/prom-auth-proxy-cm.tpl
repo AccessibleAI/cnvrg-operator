@@ -3,8 +3,14 @@ kind: ConfigMap
 metadata:
   name: prom-auth-proxy
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   nginx.conf: |
     pid        /tmp/nginx.pid;

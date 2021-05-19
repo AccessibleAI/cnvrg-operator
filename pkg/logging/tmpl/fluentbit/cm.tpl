@@ -3,9 +3,15 @@ kind: ConfigMap
 metadata:
   name: fluent-bit-config
   namespace: {{ .Namespace }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     k8s-app: fluent-bit
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 data:
   fluent-bit.conf: |
     [SERVICE]

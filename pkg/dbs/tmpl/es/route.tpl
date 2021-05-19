@@ -1,13 +1,18 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  annotations:
-    haproxy.router.openshift.io/timeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
   name: {{ .Spec.Dbs.Es.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    haproxy.router.openshift.io/timeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{ ns . }}
-    owner: cnvrg-control-plane
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   host: "{{ .Spec.Dbs.Es.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:

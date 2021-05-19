@@ -3,10 +3,16 @@ kind: Deployment
 metadata:
   name: {{ .Spec.Dbs.Minio.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{ .Spec.Dbs.Minio.SvcName }}
-    owner: cnvrg-control-plane
     cnvrg-component: minio
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   selector:
     matchLabels:
@@ -14,6 +20,10 @@ spec:
   replicas: {{ .Spec.Dbs.Minio.Replicas }}
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{ .Spec.Dbs.Minio.SvcName }}
         owner: cnvrg-control-plane
