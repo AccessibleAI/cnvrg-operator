@@ -1,6 +1,8 @@
 clusterDomain: ""
 spec: allinone # allinone|infra|ccp
 
+labels: {}
+annotations: {}
 
 controlPlane:
   image: cnvrg/core:3.6.99

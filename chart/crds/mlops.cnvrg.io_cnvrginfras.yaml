@@ -41,6 +41,10 @@ spec:
             type: object
           spec:
             properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
               clusterDomain:
                 type: string
               dbs:
@@ -97,6 +101,10 @@ spec:
                 type: object
               infraNamespace:
                 type: string
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
               logging:
                 properties:
                   fluentbit:

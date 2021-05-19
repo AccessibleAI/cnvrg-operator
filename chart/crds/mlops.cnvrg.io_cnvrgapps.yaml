@@ -44,6 +44,10 @@ spec:
             type: object
           spec:
             properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
               clusterDomain:
                 type: string
               controlPlane:
@@ -471,6 +475,10 @@ spec:
                       svcName:
                         type: string
                     type: object
+                type: object
+              labels:
+                additionalProperties:
+                  type: string
                 type: object
               logging:
                 properties:
