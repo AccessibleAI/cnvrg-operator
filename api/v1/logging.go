@@ -70,6 +70,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 			Memory: "800Mi",
 		},
 		NodeSelector: nil,
+		PvcName:      "elastalert-storage",
 	},
 	Kibana: Kibana{
 		Enabled:        &defaultEnabled,

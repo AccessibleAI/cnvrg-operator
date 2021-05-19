@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Spec.Logging.Elastalert.PvcName}}
+  name: {{ .Spec.Logging.Elastalert.PvcName }}
   namespace: {{ ns . }}
   labels:
     owner: cnvrg-control-plane
