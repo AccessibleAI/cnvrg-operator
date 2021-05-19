@@ -3,10 +3,17 @@ kind: Deployment
 metadata:
   name: systemkiq
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: systemkiq
     owner: cnvrg-control-plane
     cnvrg-component: systemkiq
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: {{ .Spec.ControlPlane.Systemkiq.Replicas }}
   selector:
@@ -18,6 +25,9 @@ spec:
         app: systemkiq
         owner: cnvrg-control-plane
         cnvrg-component: systemkiq
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

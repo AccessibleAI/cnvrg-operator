@@ -3,10 +3,17 @@ kind: Deployment
 metadata:
   name: sidekiq
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: sidekiq
     owner: cnvrg-control-plane
     cnvrg-component: sidekiq
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: {{ .Spec.ControlPlane.Sidekiq.Replicas }}
   selector:
@@ -18,6 +25,9 @@ spec:
         app: sidekiq
         owner: cnvrg-control-plane
         cnvrg-component: sidekiq
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

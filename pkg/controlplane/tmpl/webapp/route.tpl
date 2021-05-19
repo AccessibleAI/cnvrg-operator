@@ -3,10 +3,16 @@ kind: Route
 metadata:
   annotations:
     haproxy.router.openshift.io/timeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ ns . }}
   labels:
     app: {{ ns . }}
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:

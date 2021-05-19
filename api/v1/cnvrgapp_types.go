@@ -17,6 +17,8 @@ type CnvrgAppSpec struct {
 	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
 	SSO           SSO                `json:"sso,omitempty"`
 	Tenancy       Tenancy            `json:"tenancy,omitempty"`
+	Labels        map[string]string  `json:"labels,omitempty"`
+	Annotations   map[string]string  `json:"annotations,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -54,5 +56,7 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Monitoring:    cnvrgAppMonitoringDefault,
 		SSO:           ssoDefault,
 		Tenancy:       tenancyDefault,
+		Labels:        map[string]string{"owner": "cnvrg-control-plane"},
+		Annotations:   nil,
 	}
 }

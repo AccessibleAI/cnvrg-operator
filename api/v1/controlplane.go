@@ -16,8 +16,8 @@ type ConsistentHash struct {
 }
 
 type SharedStorage struct {
-	Enabled          *bool          `json:"enabled,omitempty"`
-	ConsistentHash   ConsistentHash `json:"consistentHash,omitempty"`
+	Enabled        *bool          `json:"enabled,omitempty"`
+	ConsistentHash ConsistentHash `json:"consistentHash,omitempty"`
 }
 
 type Limits struct {

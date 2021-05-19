@@ -100,7 +100,7 @@ var minioDefaults = Minio{
 	},
 	PvcName: "minio-storage",
 	SharedStorage: SharedStorage{
-		Enabled:          &defaultEnabled,
+		Enabled: &defaultEnabled,
 		ConsistentHash: ConsistentHash{
 			Key:   "httpQueryParameterName",
 			Value: "uploadId",

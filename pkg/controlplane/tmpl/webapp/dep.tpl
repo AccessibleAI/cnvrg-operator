@@ -3,10 +3,17 @@ kind: Deployment
 metadata:
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ ns . }}
+  annotations:
+    {{- range $k, $v := .Spec.Annotations }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
   labels:
     app: {{ .Spec.ControlPlane.WebApp.SvcName }}
     owner: cnvrg-control-plane
     cnvrg-component: webapp
+    {{- range $k, $v := .Spec.Labels }}
+    {{$k}}: "{{$v}}"
+    {{- end }}
 spec:
   replicas: {{ .Spec.ControlPlane.WebApp.Replicas }}
   strategy:
@@ -19,10 +26,17 @@ spec:
       app: {{.Spec.ControlPlane.WebApp.SvcName}}
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
         owner: cnvrg-control-plane
         cnvrg-component: webapp
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

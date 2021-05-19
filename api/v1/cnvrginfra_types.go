@@ -18,6 +18,8 @@ type CnvrgInfraSpec struct {
 	SSO            SSO                  `json:"sso,omitempty"`
 	Gpu            Gpu                  `json:"gpu,omitempty"`
 	Tenancy        Tenancy              `json:"tenancy,omitempty"`
+	Labels         map[string]string    `json:"labels,omitempty"`
+	Annotations    map[string]string    `json:"annotations,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -57,6 +59,8 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Dbs:            infraDbsDefaults,
 		Gpu:            gpuDefaults,
 		Tenancy:        tenancyDefault,
+		Labels:         map[string]string{"owner": "cnvrg-control-plane"},
+		Annotations:    nil,
 	}
 	return infraDefault
 }
