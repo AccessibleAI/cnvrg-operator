@@ -36,7 +36,7 @@ spec:
       nodeSelector:
         accelerator: nvidia
       containers:
-        - image: {{ .Data.NvidiaDp.Image }}
+        - image: {{.Spec.ImageHub }}/{{ .Data.NvidiaDp.Image }}
           name: nvidia-device-plugin-ctr
           args: ["--fail-on-init-error=true"]
           securityContext:

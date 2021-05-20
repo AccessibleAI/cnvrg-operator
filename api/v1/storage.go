@@ -33,7 +33,7 @@ type Nfs struct {
 var storageDefault = Storage{
 	Hostpath: Hostpath{
 		Enabled:          &defaultFalse,
-		Image:            "quay.io/kubevirt/hostpath-provisioner",
+		Image:            "hostpath-provisioner:latest",
 		Path:             "/cnvrg-hostpath-storage",
 		StorageClassName: "cnvrg-hostpath-storage",
 		Requests: Requests{
@@ -50,7 +50,7 @@ var storageDefault = Storage{
 	},
 	Nfs: Nfs{
 		Enabled:          &defaultFalse,
-		Image:            "gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0",
+		Image:            "nfs-subdir-external-provisioner:v4.0.0",
 		Provisioner:      "cnvrg.io/ifs",
 		StorageClassName: "cnvrg-nfs-storage",
 		Server:           "",

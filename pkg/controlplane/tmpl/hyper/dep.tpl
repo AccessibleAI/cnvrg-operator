@@ -47,7 +47,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
       containers:
-        - image: {{ .Spec.ControlPlane.Hyper.Image }}
+        - image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Hyper.Image }}
           name: {{ .Spec.ControlPlane.Hyper.SvcName }}
           envFrom:
             - configMapRef:

@@ -52,7 +52,7 @@ spec:
       serviceAccountName: {{ .Spec.Dbs.Minio.ServiceAccount }}
       containers:
         - name: minio
-          image: {{ .Spec.Dbs.Minio.Image }}
+          image: {{.Spec.ImageHub }}/{{ .Spec.Dbs.Minio.Image }}
           args:
             - gateway
             - nas

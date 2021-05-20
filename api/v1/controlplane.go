@@ -201,7 +201,7 @@ var infraRegistryDefault = Registry{
 }
 
 var controlPlaneDefault = ControlPlane{
-	Image: "cnvrg/core:3.6.99",
+	Image: "core:3.6.99",
 
 	WebApp: WebApp{
 		Enabled:  &defaultFalse,
@@ -262,7 +262,7 @@ var controlPlaneDefault = ControlPlane{
 
 	Hyper: Hyper{
 		Enabled:  &defaultFalse,
-		Image:    "cnvrg/hyper-server:latest",
+		Image:    "hyper-server:latest",
 		Port:     5050,
 		Replicas: 1,
 		NodePort: 30050,
@@ -282,7 +282,7 @@ var controlPlaneDefault = ControlPlane{
 
 	Seeder: Seeder{
 
-		Image:           "docker.io/cnvrg/cnvrg-boot:v0.31-tenancy",
+		Image:           "cnvrg-boot:v0.31-tenancy",
 		SeedCmd:         "if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then rails db:migrate && rails db:seed && rails libraries:update && kubectl create cm cnvrg-db-init -n ${KUBE_NAMESPACE}; fi",
 		CreateBucketCmd: "mb.sh",
 	},

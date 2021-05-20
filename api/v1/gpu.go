@@ -11,7 +11,7 @@ type Gpu struct {
 
 var nvidiaDpDefault = NvidiaDp{
 	Enabled: &defaultFalse,
-	Image:   "nvcr.io/nvidia/k8s-device-plugin:v0.9.0",
+	Image:   "k8s-device-plugin:v0.9.0",
 }
 
 var gpuDefaults = Gpu{

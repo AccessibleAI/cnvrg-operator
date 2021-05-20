@@ -1,15 +1,10 @@
 package v1
 
-type Images struct {
+type PrometheusOperator struct {
+	Enabled                       *bool  `json:"enabled,omitempty"`
 	OperatorImage                 string `json:"operatorImage,omitempty"`
-	ConfigReloaderImage           string `json:"configReloaderImage,omitempty"`
 	PrometheusConfigReloaderImage string `json:"prometheusConfigReloaderImage,omitempty"`
 	KubeRbacProxyImage            string `json:"kubeRbacProxyImage,omitempty"`
-}
-
-type PrometheusOperator struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Images  Images `json:"images,omitempty"`
 }
 
 type Prometheus struct {
@@ -87,7 +82,7 @@ type CnvrgAppMonitoring struct {
 
 var grafanaInfraDefault = Grafana{
 	Enabled:    &defaultFalse,
-	Image:      "grafana/grafana:7.3.4",
+	Image:      "grafana:7.3.4",
 	SvcName:    "grafana",
 	Port:       8080,
 	NodePort:   30012,
@@ -96,7 +91,7 @@ var grafanaInfraDefault = Grafana{
 
 var grafanaAppDefault = Grafana{
 	Enabled:    &defaultFalse,
-	Image:      "grafana/grafana:7.3.4",
+	Image:      "grafana:7.3.4",
 	SvcName:    "grafana",
 	Port:       8080,
 	NodePort:   30014,
@@ -105,8 +100,8 @@ var grafanaAppDefault = Grafana{
 
 var prometheusInfraDefault = Prometheus{
 	Enabled:             &defaultFalse,
-	Image:               "quay.io/prometheus/prometheus:v2.22.1",
-	BasicAuthProxyImage: "docker.io/nginx:1.20",
+	Image:               "prometheus:v2.22.1",
+	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
 		Cpu:    "200m",
 		Memory: "500Mi",
@@ -123,8 +118,8 @@ var prometheusInfraDefault = Prometheus{
 
 var prometheusAppDefault = Prometheus{
 	Enabled:             &defaultFalse,
-	Image:               "quay.io/prometheus/prometheus:v2.22.1",
-	BasicAuthProxyImage: "docker.io/nginx:1.20",
+	Image:               "prometheus:v2.22.1",
+	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
 		Cpu:    "200m",
 		Memory: "500Mi",
@@ -151,24 +146,22 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	Prometheus: prometheusInfraDefault,
 	Grafana:    grafanaInfraDefault,
 	PrometheusOperator: PrometheusOperator{
-		Enabled: &defaultFalse,
-		Images: Images{
-			OperatorImage:                 "quay.io/prometheus-operator/prometheus-operator:v0.44.1",
-			PrometheusConfigReloaderImage: "quay.io/prometheus-operator/prometheus-config-reloader:v0.44.1",
-			KubeRbacProxyImage:            "quay.io/brancz/kube-rbac-proxy:v0.8.0",
-		},
+		Enabled:                       &defaultFalse,
+		OperatorImage:                 "prometheus-operator:v0.44.1",
+		PrometheusConfigReloaderImage: "prometheus-config-reloader:v0.44.1",
+		KubeRbacProxyImage:            "kube-rbac-proxy:v0.8.0",
 	},
 	KubeStateMetrics: KubeStateMetrics{
 		Enabled: &defaultFalse,
-		Image:   "quay.io/coreos/kube-state-metrics:v1.9.7",
+		Image:   "kube-state-metrics:v1.9.7",
 	},
 	NodeExporter: NodeExporter{
 		Enabled: &defaultFalse,
-		Image:   "quay.io/prometheus/node-exporter:v1.0.1",
+		Image:   "node-exporter:v1.0.1",
 	},
 	DcgmExporter: DcgmExporter{
 		Enabled: &defaultFalse,
-		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
+		Image:   "dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
 		Enabled: &defaultFalse,

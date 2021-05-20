@@ -49,7 +49,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
       - name: sidekiq
-        image: {{ .Spec.ControlPlane.Image}}
+        image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image}}
         env:
         - name: "CNVRG_RUN_MODE"
           value: "sidekiq"
@@ -99,7 +99,7 @@ spec:
       {{- end }}
       initContainers:
       - name: seeder
-        image:  {{ .Spec.ControlPlane.Image }}
+        image:  {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image }}
         command: ["/bin/bash", "-lc", "while true; do if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then echo 'cnvrg seed not ready'; sleep 1; else echo 'cnvrg seed is done'; exit 0; fi; done"]
         env:
         - name: "CNVRG_NS"

@@ -43,7 +43,7 @@ spec:
       serviceAccountName: nfs-client-provisioner
       containers:
         - name: nfs-client-provisioner
-          image: {{ .Spec.Storage.Nfs.Image }}
+          image: {{.Spec.ImageHub }}/{{ .Spec.Storage.Nfs.Image }}
           volumeMounts:
             - name: nfs-client-root
               mountPath: /persistentvolumes

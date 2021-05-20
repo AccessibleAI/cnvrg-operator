@@ -14,7 +14,7 @@ metadata:
 spec:
   profile: minimal
   tag: {{.Spec.Networking.Istio.Tag}}
-  hub: {{.Spec.Networking.Istio.Hub}}
+  hub: {{.Spec.ImageHub }}
   components:
     base:
       enabled: true

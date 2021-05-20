@@ -20,6 +20,7 @@ type CnvrgInfraSpec struct {
 	Tenancy        Tenancy              `json:"tenancy,omitempty"`
 	Labels         map[string]string    `json:"labels,omitempty"`
 	Annotations    map[string]string    `json:"annotations,omitempty"`
+	ImageHub       string               `json:"imageHub,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -49,6 +50,7 @@ func init() {
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	infraDefault := CnvrgInfraSpec{
 		ClusterDomain:  "",
+		ImageHub:       "docker.io/cnvrg",
 		InfraNamespace: "cnvrg-infra",
 		SSO:            ssoDefault,
 		Storage:        storageDefault,

@@ -23,7 +23,7 @@ spec:
         {{- if ne .Spec.Monitoring.Prometheus.StorageClass "" }}
         storageClassName: {{ .Spec.Monitoring.Prometheus.StorageClass }}
         {{- end }}
-  image: {{ .Spec.Monitoring.Prometheus.Image }}
+  image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.Prometheus.Image }}
   replicas: 1
   retention: 8w # 2 months
   retentionSize: {{ promRetentionSize .Spec.Monitoring.Prometheus.StorageSize }} # total PVC size - 2 Gi
@@ -60,7 +60,7 @@ spec:
   listenLocal: true
   containers:
   - name: "prom-auth-proxy"
-    image: {{ .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}
+    image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}
     ports:
     - containerPort: 9091
       name: web

@@ -50,7 +50,6 @@ type CnvrgInfraNetworking struct {
 
 var istioDefault = Istio{
 	Enabled:               &defaultFalse,
-	Hub:                   "docker.io/istio",
 	Tag:                   "1.10.0",
 	ExternalIP:            nil,
 	IngressSvcAnnotations: nil,

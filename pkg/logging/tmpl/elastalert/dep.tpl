@@ -51,7 +51,7 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-      - image: {{ .Spec.Logging.Elastalert.Image }}
+      - image: {{.Spec.ImageHub }}/{{ .Spec.Logging.Elastalert.Image }}
         name: {{ .Spec.Logging.Elastalert.SvcName }}
         ports:
         - containerPort: 3030

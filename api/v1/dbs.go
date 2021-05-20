@@ -88,7 +88,7 @@ var minioDefaults = Minio{
 	Enabled:        &defaultFalse,
 	ServiceAccount: "minio",
 	Replicas:       1,
-	Image:          "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
+	Image:          "minio:RELEASE.2020-09-17T04-49-20Z",
 	Port:           9000,
 	StorageSize:    "100Gi",
 	SvcName:        "minio",
@@ -111,7 +111,7 @@ var minioDefaults = Minio{
 var pgDefault = Pg{
 	Enabled:        &defaultFalse,
 	ServiceAccount: "pg",
-	Image:          "docker.io/cnvrg/postgresql-12-centos7",
+	Image:          "postgresql-12-centos7:latest",
 	Port:           5432,
 	StorageSize:    "80Gi",
 	SvcName:        "postgres",
@@ -136,7 +136,7 @@ var pgDefault = Pg{
 var redisDefault = Redis{
 	Enabled:        &defaultFalse,
 	ServiceAccount: "redis",
-	Image:          "docker.io/cnvrg/cnvrg-redis:v3.0.5.c2",
+	Image:          "cnvrg-redis:v3.0.5.c2",
 	SvcName:        "redis",
 	Port:           6379,
 	StorageSize:    "10Gi",
@@ -157,7 +157,7 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        &defaultFalse,
 	ServiceAccount: "es",
-	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1.a1",
+	Image:          "cnvrg-es:v7.8.1.a1",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",

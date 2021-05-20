@@ -54,7 +54,7 @@ spec:
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"
-        image: {{ .Spec.SSO.Image }}
+        image: {{.Spec.ImageHub }}/{{ .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
         envFrom:
           - secretRef:
@@ -64,7 +64,7 @@ spec:
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
       {{- end }}
-      - image: {{ .Spec.ControlPlane.Image }}
+      - image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image }}
         env:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
@@ -125,7 +125,7 @@ spec:
       {{- end }}
       initContainers:
       - name: services-check
-        image: {{.Spec.ControlPlane.Seeder.Image}}
+        image: {{.Spec.ImageHub }}/{{.Spec.ControlPlane.Seeder.Image}}
         command: ["/bin/bash", "-c", "python3 cnvrg-boot.py services-check"]
         imagePullPolicy: Always
         env:
@@ -137,7 +137,7 @@ spec:
           {{ end }}
       {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
       - name: create-cnvrg-bucket
-        image: {{ .Spec.ControlPlane.Seeder.Image }}
+        image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Seeder.Image }}
         command: ["/bin/bash","-c", "{{ .Spec.ControlPlane.Seeder.CreateBucketCmd }}"]
         imagePullPolicy: Always
         envFrom:
@@ -145,7 +145,7 @@ spec:
             name: cp-object-storage
       {{- end }}
       - name: seeder
-        image: {{ .Spec.ControlPlane.Image }}
+        image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image }}
         command: ["/bin/bash", "-lc", "{{ .Spec.ControlPlane.Seeder.SeedCmd }}"]
         imagePullPolicy: Always
         envFrom:

@@ -55,7 +55,7 @@ spec:
       containers:
         {{- if isTrue .Spec.SSO.Enabled }}
         - name: "cnvrg-oauth-proxy"
-          image: {{ .Spec.SSO.Image }}
+          image: {{.Spec.ImageHub }}/{{ .Spec.SSO.Image }}
           command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
           envFrom:
             - secretRef:
@@ -66,7 +66,7 @@ spec:
               readOnly: true
         {{- end }}
         - name: {{ .Spec.Logging.Kibana.SvcName }}
-          image: {{ .Spec.Logging.Kibana.Image }}
+          image: {{.Spec.ImageHub }}/{{ .Spec.Logging.Kibana.Image }}
           volumeMounts:
             - name: "kibana-config"
               mountPath: "/usr/share/kibana/config"

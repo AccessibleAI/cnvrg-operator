@@ -48,8 +48,8 @@ spec:
       containers:
       - args:
         - --kubelet-service=kube-system/kubelet
-        - --prometheus-config-reloader={{ .Spec.Monitoring.PrometheusOperator.Images.PrometheusConfigReloaderImage }}
-        image: {{ .Spec.Monitoring.PrometheusOperator.Images.OperatorImage }}
+        - --prometheus-config-reloader={{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.PrometheusConfigReloaderImage }}
+        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.Images.OperatorImage }}
         name: prometheus-operator
         ports:
         - containerPort: 8080
@@ -68,7 +68,7 @@ spec:
         - --secure-listen-address=:8443
         - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
         - --upstream=http://127.0.0.1:8080/
-        image: {{ .Spec.Monitoring.PrometheusOperator.Images.KubeRbacProxyImage }}
+        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
         name: kube-rbac-proxy
         ports:
         - containerPort: 8443
