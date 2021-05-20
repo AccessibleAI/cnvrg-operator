@@ -144,43 +144,30 @@ spec:
         - secretRef:
             name: cp-object-storage
       {{- end }}
-      {{- if isTrue .Spec.Dbs.Pg.Fixpg }}
-      - name: fixpg
-        image: {{.Spec.ControlPlane.Seeder.Image}}
-        command: ["/bin/bash", "-c", "python3 cnvrg-boot.py fixpg"]
+      - name: seeder
+        image: {{ .Spec.ControlPlane.Image }}
+        command: ["/bin/bash", "-lc", "{{ .Spec.ControlPlane.Seeder.SeedCmd }}"]
+        imagePullPolicy: Always
         envFrom:
+        - configMapRef:
+            name: cp-base-config
+        - configMapRef:
+            name: cp-networking-config
+        - secretRef:
+            name: cp-base-secret
+        - secretRef:
+            name: cp-ldap
+        - secretRef:
+            name: cp-object-storage
+        - secretRef:
+            name: cp-smtp
+        - secretRef:
+            name: {{ .Spec.Dbs.Es.CredsRef }}
         - secretRef:
             name: {{ .Spec.Dbs.Pg.CredsRef }}
-        imagePullPolicy: Always
-      {{- end }}
-      - name: seeder
-        image: {{ .Spec.ControlPlane.Seeder.Image }}
-        command: ["/bin/bash", "-c", "python3 cnvrg-boot.py seeder --mode master"]
-        imagePullPolicy: Always
-        env:
-        - name: "CNVRG_SEEDER_IMAGE"
-          value: "{{.Spec.ControlPlane.Image}}"
-        - name: "CNVRG_SEED_CMD"
-          value: "{{ .Spec.ControlPlane.Seeder.SeedCmd }}"
-        - name: "CNVRG_NS"
-          value: {{ ns . }}
-        - name: "CNVRG_SA_NAME"
-          value: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
-        - name: "CNVRG_PG_CREDS"
-          value: {{ .Spec.Dbs.Pg.CredsRef }}
-        - name: "CNVRG_REDIS_CREDS"
-          value: {{ .Spec.Dbs.Redis.CredsRef }}
-        - name: CNVRG_TENANCY
-          value: "{{ isTrue .Spec.Tenancy.Enabled }}"
-        - name: CNVRG_TENANCY_KEY
-          value: "{{ .Spec.Tenancy.Key }}"
-        - name: CNVRG_TENANCY_VALUE
-          value: "{{ .Spec.Tenancy.Value }}"
-        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
-        - name: "CNVRG_GCP_KEYFILE_SECRET"
-          value: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
-        - name: "CNVRG_GCP_KEYFILE_MOUNT_PATH"
-          value: /opt/app-root/conf/gcp-keyfile
-        {{- end }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Redis.CredsRef }}
+        - secretRef:
+            name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
 
 

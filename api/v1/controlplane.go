@@ -171,7 +171,7 @@ type Mpi struct {
 }
 
 var mpiDefault = Mpi{
-	Enabled:              &defaultEnabled,
+	Enabled:              &defaultFalse,
 	Image:                "mpioperator/mpi-operator:v0.2.3",
 	KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
 	ExtraArgs:            nil,
@@ -204,7 +204,7 @@ var controlPlaneDefault = ControlPlane{
 	Image: "cnvrg/core:3.6.99",
 
 	WebApp: WebApp{
-		Enabled:  &defaultEnabled,
+		Enabled:  &defaultFalse,
 		Replicas: 1,
 		Port:     8080,
 		Requests: Requests{
@@ -233,8 +233,8 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Sidekiq: Sidekiq{
-		Enabled: &defaultEnabled,
-		Split:   &defaultEnabled,
+		Enabled: &defaultFalse,
+		Split:   &defaultFalse,
 		Requests: Requests{
 			Cpu:    "1000m",
 			Memory: "3750Mi",
@@ -243,7 +243,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Searchkiq: Searchkiq{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Requests: Requests{
 			Cpu:    "750m",
 			Memory: "750Mi",
@@ -252,7 +252,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Systemkiq: Systemkiq{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Requests: Requests{
 			Cpu:    "500m",
 			Memory: "500Mi",
@@ -261,7 +261,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Hyper: Hyper{
-		Enabled:  &defaultEnabled,
+		Enabled:  &defaultFalse,
 		Image:    "cnvrg/hyper-server:latest",
 		Port:     5050,
 		Replicas: 1,
@@ -283,7 +283,7 @@ var controlPlaneDefault = ControlPlane{
 	Seeder: Seeder{
 
 		Image:           "docker.io/cnvrg/cnvrg-boot:v0.31-tenancy",
-		SeedCmd:         "rails db:migrate && rails db:seed && rails libraries:update",
+		SeedCmd:         "if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then rails db:migrate && rails db:seed && rails libraries:update && kubectl create cm cnvrg-db-init -n ${KUBE_NAMESPACE}; fi",
 		CreateBucketCmd: "mb.sh",
 	},
 
@@ -313,7 +313,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Ldap: Ldap{
-		Enabled:       &defaultEnabled,
+		Enabled:       &defaultFalse,
 		Host:          "",
 		Port:          "",
 		Account:       "userPrincipalName",

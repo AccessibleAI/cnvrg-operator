@@ -98,8 +98,8 @@ spec:
       {{- end }}
       initContainers:
         - name: seeder
-          image: {{.Spec.ControlPlane.Seeder.Image}}
-          command: ["/bin/bash", "-c", "python3 cnvrg-boot.py seeder --mode worker"]
+          image:  {{ .Spec.ControlPlane.Image }}
+          command: ["/bin/bash", "-lc", "while true; do if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then echo 'cnvrg seed not ready'; sleep 1; else echo 'cnvrg seed is done'; exit 0; fi; done"]
           env:
             - name: "CNVRG_NS"
               value: {{ ns . }}

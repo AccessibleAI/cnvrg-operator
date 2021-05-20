@@ -48,13 +48,13 @@ type CnvrgInfraLogging struct {
 }
 
 var fluentbitDefault = Fluentbit{
-	Enabled: &defaultEnabled,
+	Enabled: &defaultFalse,
 	Image:   "cnvrg/cnvrg-fluentbit:v1.7.2",
 }
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{
 	Elastalert: Elastalert{
-		Enabled:      &defaultEnabled,
+		Enabled:      &defaultFalse,
 		Image:        "bitsensor/elastalert:3.0.0-beta.1",
 		Port:         80,
 		NodePort:     32030,
@@ -73,7 +73,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		PvcName:      "elastalert-storage",
 	},
 	Kibana: Kibana{
-		Enabled:        &defaultEnabled,
+		Enabled:        &defaultFalse,
 		ServiceAccount: "kibana",
 		SvcName:        "kibana",
 		Port:           8080,

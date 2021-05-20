@@ -201,12 +201,13 @@ func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
 		pass := desired.RandomString()
 		database := "cnvrg_production"
 		creds.Data = map[string][]byte{
-			"POSTGRESQL_USER":            []byte(user),
-			"POSTGRESQL_PASSWORD":        []byte(pass),
-			"POSTGRESQL_ADMIN_PASSWORD":  []byte(pass),
-			"POSTGRESQL_DATABASE":        []byte(database),
-			"POSTGRESQL_MAX_CONNECTIONS": []byte(strconv.Itoa(app.Spec.Dbs.Pg.MaxConnections)),
-			"POSTGRESQL_SHARED_BUFFERS":  []byte(app.Spec.Dbs.Pg.SharedBuffers),
+			"POSTGRESQL_USER":                 []byte(user),
+			"POSTGRESQL_PASSWORD":             []byte(pass),
+			"POSTGRESQL_ADMIN_PASSWORD":       []byte(pass),
+			"POSTGRESQL_DATABASE":             []byte(database),
+			"POSTGRESQL_MAX_CONNECTIONS":      []byte(strconv.Itoa(app.Spec.Dbs.Pg.MaxConnections)),
+			"POSTGRESQL_SHARED_BUFFERS":       []byte(app.Spec.Dbs.Pg.SharedBuffers),
+			"POSTGRESQL_EFFECTIVE_CACHE_SIZE": []byte(app.Spec.Dbs.Pg.EffectiveCacheSize),
 			// required vars for the app
 			"POSTGRES_DB":       []byte(database),
 			"POSTGRES_PASSWORD": []byte(pass),

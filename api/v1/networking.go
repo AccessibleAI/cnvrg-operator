@@ -49,7 +49,7 @@ type CnvrgInfraNetworking struct {
 }
 
 var istioDefault = Istio{
-	Enabled:               &defaultEnabled,
+	Enabled:               &defaultFalse,
 	Hub:                   "docker.io/istio",
 	Tag:                   "1.10.0",
 	ExternalIP:            nil,
@@ -59,7 +59,7 @@ var istioDefault = Istio{
 }
 
 var httpsDefault = HTTPS{
-	Enabled:    &defaultEnabled,
+	Enabled:    &defaultFalse,
 	Cert:       "",
 	Key:        "",
 	CertSecret: "",

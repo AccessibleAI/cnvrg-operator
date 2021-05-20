@@ -7,7 +7,7 @@ type Tenancy struct {
 }
 
 var tenancyDefault = Tenancy{
-	Enabled: &defaultEnabled,
+	Enabled: &defaultFalse,
 	Key:     "purpose",
 	Value:   "cnvrg-control-plane",
 }

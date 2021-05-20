@@ -1096,11 +1096,6 @@ func (in *Pg) DeepCopyInto(out *Pg) {
 	}
 	out.Requests = in.Requests
 	in.HugePages.DeepCopyInto(&out.HugePages)
-	if in.Fixpg != nil {
-		in, out := &in.Fixpg, &out.Fixpg
-		*out = new(bool)
-		**out = **in
-	}
 	if in.NodeSelector != nil {
 		in, out := &in.NodeSelector, &out.NodeSelector
 		*out = make(map[string]string, len(*in))

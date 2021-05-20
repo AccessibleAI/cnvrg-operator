@@ -393,9 +393,9 @@ spec:
                     properties:
                       credsRef:
                         type: string
+                      effectiveCacheSize:
+                        type: string
                       enabled:
-                        type: boolean
-                      fixpg:
                         type: boolean
                       hugePages:
                         properties:

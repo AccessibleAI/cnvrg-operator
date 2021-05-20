@@ -86,7 +86,7 @@ type CnvrgAppMonitoring struct {
 }
 
 var grafanaInfraDefault = Grafana{
-	Enabled:    &defaultEnabled,
+	Enabled:    &defaultFalse,
 	Image:      "grafana/grafana:7.3.4",
 	SvcName:    "grafana",
 	Port:       8080,
@@ -95,7 +95,7 @@ var grafanaInfraDefault = Grafana{
 }
 
 var grafanaAppDefault = Grafana{
-	Enabled:    &defaultEnabled,
+	Enabled:    &defaultFalse,
 	Image:      "grafana/grafana:7.3.4",
 	SvcName:    "grafana",
 	Port:       8080,
@@ -104,7 +104,7 @@ var grafanaAppDefault = Grafana{
 }
 
 var prometheusInfraDefault = Prometheus{
-	Enabled:             &defaultEnabled,
+	Enabled:             &defaultFalse,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
 	Requests: Requests{
@@ -122,7 +122,7 @@ var prometheusInfraDefault = Prometheus{
 }
 
 var prometheusAppDefault = Prometheus{
-	Enabled:             &defaultEnabled,
+	Enabled:             &defaultFalse,
 	Image:               "quay.io/prometheus/prometheus:v2.22.1",
 	BasicAuthProxyImage: "docker.io/nginx:1.20",
 	Requests: Requests{
@@ -143,7 +143,7 @@ var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 	Prometheus: prometheusAppDefault,
 	Grafana:    grafanaAppDefault,
 	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 	},
 }
 
@@ -151,7 +151,7 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	Prometheus: prometheusInfraDefault,
 	Grafana:    grafanaInfraDefault,
 	PrometheusOperator: PrometheusOperator{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Images: Images{
 			OperatorImage:                 "quay.io/prometheus-operator/prometheus-operator:v0.44.1",
 			PrometheusConfigReloaderImage: "quay.io/prometheus-operator/prometheus-config-reloader:v0.44.1",
@@ -159,21 +159,21 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 		},
 	},
 	KubeStateMetrics: KubeStateMetrics{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Image:   "quay.io/coreos/kube-state-metrics:v1.9.7",
 	},
 	NodeExporter: NodeExporter{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Image:   "quay.io/prometheus/node-exporter:v1.0.1",
 	},
 	DcgmExporter: DcgmExporter{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 	},
 	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 	},
 }

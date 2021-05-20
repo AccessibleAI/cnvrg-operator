@@ -7,21 +7,21 @@ type HugePages struct {
 }
 
 type Pg struct {
-	Enabled        *bool             `json:"enabled,omitempty"`
-	ServiceAccount string            `json:"serviceAccount,omitempty"`
-	Image          string            `json:"image,omitempty"`
-	Port           int               `json:"port,omitempty"`
-	StorageSize    string            `json:"storageSize,omitempty"`
-	SvcName        string            `json:"svcName,omitempty"`
-	StorageClass   string            `json:"storageClass,omitempty"`
-	Requests       Requests          `json:"requests,omitempty"`
-	MaxConnections int               `json:"maxConnections,omitempty"`
-	SharedBuffers  string            `json:"sharedBuffers,omitempty"`
-	HugePages      HugePages         `json:"hugePages,omitempty"`
-	Fixpg          *bool             `json:"fixpg,omitempty"`
-	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
-	CredsRef       string            `json:"credsRef,omitempty"`
-	PvcName        string            `json:"pvcName,omitempty"`
+	Enabled            *bool             `json:"enabled,omitempty"`
+	ServiceAccount     string            `json:"serviceAccount,omitempty"`
+	Image              string            `json:"image,omitempty"`
+	Port               int               `json:"port,omitempty"`
+	StorageSize        string            `json:"storageSize,omitempty"`
+	SvcName            string            `json:"svcName,omitempty"`
+	StorageClass       string            `json:"storageClass,omitempty"`
+	Requests           Requests          `json:"requests,omitempty"`
+	MaxConnections     int               `json:"maxConnections,omitempty"`
+	SharedBuffers      string            `json:"sharedBuffers,omitempty"`      // https://github.com/sclorg/postgresql-container/tree/generated/12
+	EffectiveCacheSize string            `json:"effectiveCacheSize,omitempty"` // https://github.com/sclorg/postgresql-container/tree/generated/12
+	HugePages          HugePages         `json:"hugePages,omitempty"`
+	NodeSelector       map[string]string `json:"nodeSelector,omitempty"`
+	CredsRef           string            `json:"credsRef,omitempty"`
+	PvcName            string            `json:"pvcName,omitempty"`
 }
 
 type Minio struct {
@@ -85,7 +85,7 @@ type InfraDbs struct {
 }
 
 var minioDefaults = Minio{
-	Enabled:        &defaultEnabled,
+	Enabled:        &defaultFalse,
 	ServiceAccount: "minio",
 	Replicas:       1,
 	Image:          "docker.io/minio/minio:RELEASE.2020-09-17T04-49-20Z",
@@ -100,7 +100,7 @@ var minioDefaults = Minio{
 	},
 	PvcName: "minio-storage",
 	SharedStorage: SharedStorage{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		ConsistentHash: ConsistentHash{
 			Key:   "httpQueryParameterName",
 			Value: "uploadId",
@@ -109,9 +109,9 @@ var minioDefaults = Minio{
 }
 
 var pgDefault = Pg{
-	Enabled:        &defaultEnabled,
+	Enabled:        &defaultFalse,
 	ServiceAccount: "pg",
-	Image:          "centos/postgresql-12-centos7",
+	Image:          "docker.io/cnvrg/postgresql-12-centos7",
 	Port:           5432,
 	StorageSize:    "80Gi",
 	SvcName:        "postgres",
@@ -120,13 +120,13 @@ var pgDefault = Pg{
 		Cpu:    "4000m",
 		Memory: "4Gi",
 	},
-	MaxConnections: 500,
-	SharedBuffers:  "64MB",
-	Fixpg:          &defaultTrue,
-	NodeSelector:   nil,
-	PvcName:        "pg-storage",
+	MaxConnections:     500,
+	SharedBuffers:      "1024MB", // for the shared_buffers we use 1/4 of given memory
+	EffectiveCacheSize: "2048MB", // for the effective_cache_size we set the value to 1/2 of the given memory
+	NodeSelector:       nil,
+	PvcName:            "pg-storage",
 	HugePages: HugePages{
-		Enabled: &defaultEnabled,
+		Enabled: &defaultFalse,
 		Size:    "2Mi",
 		Memory:  "",
 	},
@@ -134,7 +134,7 @@ var pgDefault = Pg{
 }
 
 var redisDefault = Redis{
-	Enabled:        &defaultEnabled,
+	Enabled:        &defaultFalse,
 	ServiceAccount: "redis",
 	Image:          "docker.io/cnvrg/cnvrg-redis:v3.0.5.c2",
 	SvcName:        "redis",
@@ -155,7 +155,7 @@ var redisDefault = Redis{
 }
 
 var esDefault = Es{
-	Enabled:        &defaultEnabled,
+	Enabled:        &defaultFalse,
 	ServiceAccount: "es",
 	Image:          "docker.io/cnvrg/cnvrg-es:v7.8.1.a1",
 	Port:           9200,
