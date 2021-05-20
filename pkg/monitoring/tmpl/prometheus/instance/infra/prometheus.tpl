@@ -25,6 +25,8 @@ spec:
         {{- end }}
   image: {{ .Spec.Monitoring.Prometheus.Image }}
   replicas: 1
+  retention: 8w # 2 months
+  retentionSize: {{ promRetentionSize .Spec.Monitoring.Prometheus.StorageSize }} # total PVC size - 2 Gi
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}

@@ -62,42 +62,6 @@ var GrafanaInfraDashboards = append([]string{
 	"node-exporter.json",
 }, GrafanaAppDashboards...)
 
-func getTenancy(obj interface{}) (*mlopsv1.Tenancy, error) {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-		return &cnvrgInfra.Spec.Tenancy, nil
-	}
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		app := obj.(*mlopsv1.CnvrgApp)
-		return &app.Spec.Tenancy, nil
-	}
-	return nil, fmt.Errorf("can't detect object type")
-}
-
-func getLabels(obj interface{}) (*map[string]string, error) {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-		return &cnvrgInfra.Spec.Labels, nil
-	}
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		app := obj.(*mlopsv1.CnvrgApp)
-		return &app.Spec.Labels, nil
-	}
-	return nil, fmt.Errorf("can't detect object type")
-}
-
-func getAnnotations(obj interface{}) (*map[string]string, error) {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-		return &cnvrgInfra.Spec.Annotations, nil
-	}
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		app := obj.(*mlopsv1.CnvrgApp)
-		return &app.Spec.Annotations, nil
-	}
-	return nil, fmt.Errorf("can't detect object type")
-}
-
 func getNs(obj interface{}) string {
 	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
 		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
@@ -365,6 +329,13 @@ elasticsearch:
 		},
 		"isTrue": func(boolPointer *bool) bool {
 			return *boolPointer
+		},
+		"promRetentionSize": func(retentionSize string) string {
+			size, err := strconv.Atoi(strings.TrimSuffix(retentionSize, "Gi"))
+			if err != nil {
+				zap.S().Error(err)
+			}
+			return fmt.Sprintf("%dGB", size-2)
 		},
 	}
 }
