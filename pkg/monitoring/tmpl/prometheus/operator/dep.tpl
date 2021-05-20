@@ -49,7 +49,7 @@ spec:
       - args:
         - --kubelet-service=kube-system/kubelet
         - --prometheus-config-reloader={{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.PrometheusConfigReloaderImage }}
-        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.Images.OperatorImage }}
+        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.OperatorImage }}
         name: prometheus-operator
         ports:
         - containerPort: 8080

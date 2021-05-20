@@ -412,25 +412,30 @@ func MpiInfraState() []*desired.State {
 }
 
 func Crds() (crds []*desired.State) {
-	err := pkger.Walk(path+"/mpi/crds", func(path string, info os.FileInfo, err error) error {
+	err := pkger.Walk(path+"/crds", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
+		updatable := true
+		// mpi crds can't be updatable, b/c of the crd version (v1beta1)
+		// do not change the mpi crd file name!
+		if info.Name() == "mpijobs.yaml" {
+			updatable = false
+		}
 		crd := &desired.State{
-
 			TemplatePath:   path,
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.CrdGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      updatable,
 		}
 		crds = append(crds, crd)
 		return nil
 	})
 	if err != nil {
-		zap.S().Error(err, "error loading mpi crds")
+		zap.S().Error(err, "error loading control plane crds")
 	}
 	return
 }

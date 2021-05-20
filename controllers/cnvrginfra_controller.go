@@ -564,7 +564,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 		err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 		if err != nil {
-			cnvrgInfraLog.Error(err, "can't apply MPI CRDs")
+			cnvrgInfraLog.Error(err, "can't apply control plane crds")
 			os.Exit(1)
 		}
 	}

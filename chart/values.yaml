@@ -1,11 +1,12 @@
 clusterDomain: ""
 spec: allinone # allinone|infra|ccp
+imageHub: docker.io/cnvrg
 
 labels: {}
 annotations: {}
 
 controlPlane:
-  image: cnvrg/core:3.6.99
+  image: core:3.6.99
   baseConfig:
     agentCustomTag: latest
     intercom: "true"
@@ -140,7 +141,6 @@ storage:
     enabled: false
     defaultSc: false
     path: /cnvrg-hostpath-storage
-    image: quay.io/kubevirt/hostpath-provisioner
     reclaimPolicy: Retain
     nodeSelector: { }
   nfs:
@@ -148,7 +148,6 @@ storage:
     server: ""
     path: ""
     defaultSc: false
-    image: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0
     reclaimPolicy: Retain
 
 tenancy:
