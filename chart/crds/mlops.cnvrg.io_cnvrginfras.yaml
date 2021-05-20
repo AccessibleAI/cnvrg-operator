@@ -288,14 +288,6 @@ spec:
                         items:
                           type: string
                         type: array
-                      mixerImage:
-                        type: string
-                      operatorImage:
-                        type: string
-                      pilotImage:
-                        type: string
-                      proxyImage:
-                        type: string
                       tag:
                         type: string
                     type: object
