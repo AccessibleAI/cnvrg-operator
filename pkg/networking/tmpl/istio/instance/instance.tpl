@@ -13,31 +13,27 @@ metadata:
     {{- end }}
 spec:
   profile: minimal
-  namespace:  {{ ns . }}
-  hub: {{ .Spec.Networking.Istio.Hub }}
-  tag: {{ .Spec.Networking.Istio.Tag }}
-  values:
-    global:
-      istioNamespace:  {{ ns . }}
-      imagePullSecrets:
-        - {{ .Spec.Registry.Name }}
-    meshConfig:
-      rootNamespace:  {{ ns . }}
+  tag: {{.Spec.Networking.Istio.Tag}}
+  hub: {{.Spec.Networking.Istio.Hub}}
   components:
     base:
       enabled: true
-    pilot:
-      enabled: true
+    cni:
+      enabled: false
+    egressGateways:
+    - enabled: false
+      name: istio-egressgateway
     ingressGateways:
     - enabled: true
-      name: istio-ingressgateway
+      name: cnvrg-ingressgateway
+      label:
+        istio: cnvrg-ingressgateway
+        {{- range $k, $v := .Spec.Labels }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       k8s:
-        annotations:
+        podAnnotations:
           {{- range $k, $v := .Spec.Annotations }}
-          {{$k}}: "{{$v}}"
-          {{- end }}
-        labels:
-          {{- range $k, $v := .Spec.Labels }}
           {{$k}}: "{{$v}}"
           {{- end }}
         {{- if isTrue .Spec.Tenancy.Enabled }}
@@ -53,9 +49,6 @@ spec:
         {{- range $name, $value := .Spec.Networking.Istio.IngressSvcAnnotations }}
           {{ $name }}: {{ $value }}
         {{- end }}
-        env:
-          - name: ISTIO_META_ROUTER_MODE
-            value: sni-dnat
         hpaSpec:
           maxReplicas: 5
           metrics:
@@ -67,7 +60,7 @@ spec:
           scaleTargetRef:
             apiVersion: apps/v1
             kind: Deployment
-            name: istio-ingressgateway
+            name: cnvrg-ingressgateway
         resources:
           limits:
             cpu: 2000m
@@ -100,7 +93,14 @@ spec:
             port: {{ $port}}
             {{- end }}
           {{- end }}
-        strategy:
-          rollingUpdate:
-            maxSurge: 100%
-            maxUnavailable: 25%
+    istiodRemote:
+      enabled: false
+    pilot:
+      enabled: true
+  values:
+    global:
+      istioNamespace:  {{ ns . }}
+      imagePullSecrets:
+        - {{ .Spec.Registry.Name }}
+    meshConfig:
+      rootNamespace: {{ ns . }}

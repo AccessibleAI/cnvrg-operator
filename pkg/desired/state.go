@@ -7,23 +7,19 @@ import (
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	yamlghodss "github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"io/ioutil"
-	v1apps "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes/scheme"
 	mathrand "math/rand"
 	"os"
 	"reflect"
@@ -401,7 +397,6 @@ func (s *State) GenerateDeployable() error {
 		return err
 	}
 	s.ParsedTemplate = tpl.String()
-	//s.enrichDeployable()
 	zap.S().Debug("parsing: %v ", s.TemplatePath)
 	zap.S().Debug("template: " + s.TemplatePath + "\n" + s.ParsedTemplate)
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
@@ -475,68 +470,6 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 		}
 	}
 	return nil
-}
-
-func (s *State) enrichDeployable() {
-
-	if s.GVR == Kinds[DeploymentGVR] || s.GVR == Kinds[StatefulSetGVR] {
-		decoder := serializer.NewCodecFactory(scheme.Scheme).UniversalDecoder()
-		object := v1apps.Deployment{}
-
-		if err := runtime.DecodeInto(decoder, []byte(s.ParsedTemplate), &object); err != nil {
-			zap.S().Infof("can't decode object %s", s.TemplatePath)
-			return
-		}
-		// get labels
-		labels, err := getLabels(s.TemplateData)
-		if err != nil {
-			zap.S().Errorf("can't detect template data type, skipping object enrichment for object: %v", s.TemplatePath)
-			return
-		}
-
-		// get annotations
-		annotations, err := getAnnotations(s.TemplateData)
-		if err != nil {
-			zap.S().Errorf("can't detect template data type, skipping object enrichment for object: %v", s.TemplatePath)
-			return
-		}
-
-		for k, v := range *labels {
-			object.Labels[k] = v
-			object.Spec.Template.Labels[k] = v
-		}
-
-		for k, v := range *annotations {
-			object.Labels[k] = v
-			object.Spec.Template.Labels[k] = v
-		}
-		y, err := yamlghodss.Marshal(object)
-		if err != nil {
-			zap.S().Errorf("can't marshal object: %v", s.TemplatePath)
-			return
-		}
-		s.ParsedTemplate = string(y)
-	}
-}
-
-func enrichPodSpec(podSpec *v1core.PodSpec, tenancy *mlopsv1.Tenancy) {
-
-	if *tenancy.Enabled {
-		if podSpec.NodeSelector == nil {
-			podSpec.NodeSelector = map[string]string{tenancy.Key: tenancy.Value}
-		} else {
-			podSpec.NodeSelector[tenancy.Key] = tenancy.Value
-		}
-
-		podSpec.Tolerations = append(podSpec.Tolerations,
-			v1core.Toleration{
-				Key:      tenancy.Key,
-				Operator: "Equal",
-				Value:    tenancy.Value,
-				Effect:   "NoSchedule",
-			},
-		)
-	}
 }
 
 func (s *State) dumpTemplateToFile() error {

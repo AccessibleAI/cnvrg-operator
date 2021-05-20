@@ -33,7 +33,7 @@ spec:
       serviceAccountName: istio-operator
       containers:
         - name: istio-operator
-          image: {{ .Spec.Networking.Istio.OperatorImage }}
+          image: "{{.Spec.Networking.Istio.Hub}}/operator:{{.Spec.Networking.Istio.Tag}}"
           command:
             - operator
             - server

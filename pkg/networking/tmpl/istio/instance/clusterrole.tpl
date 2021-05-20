@@ -111,3 +111,9 @@ rules:
       - serviceaccounts
     verbs:
       - '*'
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - '*'

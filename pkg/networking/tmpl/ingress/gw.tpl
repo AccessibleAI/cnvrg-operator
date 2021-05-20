@@ -9,7 +9,7 @@ metadata:
     {{- end }}
 spec:
   selector:
-    istio: ingressgateway
+    istio: cnvrg-ingressgateway
   servers:
     - port:
         number: 80

@@ -31,7 +31,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 		},
 		{
 

@@ -156,8 +156,8 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
 		Data: map[string]interface{}{
 			"Registry":    cnvrgInfra.Spec.Registry,
-			"Annotations": cnvrgInfra.Annotations,
-			"Labels":      cnvrgInfra.Labels,
+			"Annotations": cnvrgInfra.Spec.Annotations,
+			"Labels":      cnvrgInfra.Spec.Labels,
 		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
@@ -202,8 +202,8 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
 		Data: map[string]interface{}{
 			"AppInstance": cnvrgApps,
-			"Annotations": cnvrgInfra.Annotations,
-			"Labels":      cnvrgInfra.Labels,
+			"Annotations": cnvrgInfra.Spec.Annotations,
+			"Labels":      cnvrgInfra.Spec.Labels,
 		},
 	}
 	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
@@ -290,8 +290,8 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 				"Url":         url,
 				"User":        basicAuthUser,
 				"Pass":        basicAuthPass,
-				"Annotations": infra.Annotations,
-				"Labels":      infra.Labels,
+				"Annotations": infra.Spec.Annotations,
+				"Labels":      infra.Spec.Labels,
 			},
 		}
 		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {

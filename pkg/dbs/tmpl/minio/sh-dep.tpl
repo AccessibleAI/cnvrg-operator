@@ -124,7 +124,7 @@ spec:
             - name: DNS_AGENT
             - name: ISTIO_KUBE_APP_PROBERS
               value: '{"/app-health/minio/livez":{"httpGet":{"path":"/minio/health/live","port":9000}},"/app-health/minio/readyz":{"httpGet":{"path":"/minio/health/ready","port":9000}}}'
-          image: "{{ .Spec.Networking.Ingress.Istio.Hub }}/{{ .Spec.Networking.Ingress.Istio.ProxyImage }}:{{ .Spec.Networking.Ingress.Istio.Tag }}"
+          image: "{{ .Spec.Networking.Ingress.Istio.Hub }}/proxyv2:{{ .Spec.Networking.Ingress.Istio.Tag }}"
           imagePullPolicy: Always
           name: istio-proxy
           ports:
@@ -224,7 +224,7 @@ spec:
             - 15090,15021,15020
           env:
             - name: DNS_AGENT
-          image: "{{ .Spec.Networking.Ingress.Istio.Hub }}/{{ .Spec.Networking.Ingress.Istio.ProxyImage }}:{{ .Spec.Networking.Ingress.Istio.Tag }}"
+          image: "{{ .Spec.Networking.Ingress.Istio.Hub }}/proxyv2:{{ .Spec.Networking.Ingress.Istio.Tag }}"
           imagePullPolicy: Always
           name: istio-init
           resources:

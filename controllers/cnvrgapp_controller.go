@@ -351,8 +351,8 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		Namespace: cnvrgApp.Namespace,
 		Data: map[string]interface{}{
 			"Registry":    cnvrgApp.Spec.Registry,
-			"Annotations": cnvrgApp.Annotations,
-			"Labels":      cnvrgApp.Labels,
+			"Annotations": cnvrgApp.Spec.Annotations,
+			"Labels":      cnvrgApp.Spec.Labels,
 		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
@@ -572,8 +572,8 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 			"EsHost":      fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port),
 			"EsUser":      esUser,
 			"EsPass":      esPass,
-			"Annotations": app.Annotations,
-			"Labels":      app.Labels,
+			"Annotations": app.Spec.Annotations,
+			"Labels":      app.Spec.Labels,
 		},
 	}, nil
 

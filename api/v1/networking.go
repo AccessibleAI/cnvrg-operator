@@ -14,12 +14,8 @@ const (
 
 type Istio struct {
 	Enabled               *bool             `json:"enabled,omitempty"`
-	OperatorImage         string            `json:"operatorImage,omitempty"`
 	Hub                   string            `json:"hub,omitempty"`
 	Tag                   string            `json:"tag,omitempty"`
-	ProxyImage            string            `json:"proxyImage,omitempty"`
-	MixerImage            string            `json:"mixerImage,omitempty"`
-	PilotImage            string            `json:"pilotImage,omitempty"`
 	IngressSvcExtraPorts  []int             `json:"ingressSvcExtraPorts,omitempty"`
 	ExternalIP            []string          `json:"externalIp,omitempty"`
 	LBSourceRanges        []string          `json:"lbSourceRanges,omitempty"`
@@ -54,12 +50,8 @@ type CnvrgInfraNetworking struct {
 
 var istioDefault = Istio{
 	Enabled:               &defaultEnabled,
-	OperatorImage:         "docker.io/istio/operator:1.8.5",
 	Hub:                   "docker.io/istio",
-	Tag:                   "1.8.5",
-	ProxyImage:            "proxyv2",
-	MixerImage:            "mixer",
-	PilotImage:            "pilot",
+	Tag:                   "1.10.0",
 	ExternalIP:            nil,
 	IngressSvcAnnotations: nil,
 	IngressSvcExtraPorts:  nil,
