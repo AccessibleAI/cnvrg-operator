@@ -476,6 +476,8 @@ spec:
                         type: string
                     type: object
                 type: object
+              imageHub:
+                type: string
               labels:
                 additionalProperties:
                   type: string

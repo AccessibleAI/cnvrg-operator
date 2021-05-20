@@ -99,6 +99,8 @@ spec:
                         type: string
                     type: object
                 type: object
+              imageHub:
+                type: string
               infraNamespace:
                 type: string
               labels:
@@ -222,17 +224,12 @@ spec:
                     properties:
                       enabled:
                         type: boolean
-                      images:
-                        properties:
-                          configReloaderImage:
-                            type: string
-                          kubeRbacProxyImage:
-                            type: string
-                          operatorImage:
-                            type: string
-                          prometheusConfigReloaderImage:
-                            type: string
-                        type: object
+                      kubeRbacProxyImage:
+                        type: string
+                      operatorImage:
+                        type: string
+                      prometheusConfigReloaderImage:
+                        type: string
                     type: object
                 type: object
               networking:
