@@ -94,7 +94,7 @@ func pgState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            false,
+			Own:            true,
 			Updatable:      false,
 		},
 		{
@@ -164,7 +164,7 @@ func redisState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            false,
+			Own:            true,
 			Updatable:      false,
 		},
 		{
@@ -243,7 +243,7 @@ func singleBackendMinio() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            false,
+			Own:            true,
 			Updatable:      false,
 		},
 		{
@@ -296,7 +296,7 @@ func sharedBackendMinio() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PvcGVR],
-			Own:            false,
+			Own:            true,
 			Updatable:      false,
 		},
 		{
