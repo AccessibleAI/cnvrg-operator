@@ -5,30 +5,31 @@ import "k8s.io/apimachinery/pkg/runtime/schema"
 type GVRName string
 
 const (
-	DeploymentGVR           GVRName = "DeploymentGVR"
-	StatefulSetGVR          GVRName = "StatefulSetGVR"
-	DaemonSetGVR            GVRName = "DaemonSetGVR"
-	ConfigMapGVR            GVRName = "ConfigMapGVR"
-	PvcGVR                  GVRName = "PvcGVR"
-	SecretGVR               GVRName = "SecretGVR"
-	SvcGVR                  GVRName = "SvcGVR"
-	SaGVR                   GVRName = "SaGVR"
-	CrdGVR                  GVRName = "CrdGVR"
-	PrometheusGVR           GVRName = "PrometheusGVR"
-	ServiceMonitorGVR       GVRName = "ServiceMonitorGVR"
-	PrometheusRuleGVR       GVRName = "PrometheusRuleGVR"
-	ClusterRoleGVR          GVRName = "ClusterRoleGVR"
-	ClusterRoleBindingGVR   GVRName = "ClusterRoleBindingGVR"
-	RoleGVR                 GVRName = "RoleGVR"
-	RoleBindingGVR          GVRName = "RoleBindingGVR"
-	OcpRouteGVR             GVRName = "OcpRouteGVR"
-	IngressGVR              GVRName = "IngressGVR"
-	IstioVsGVR              GVRName = "IstioVsGVR"
-	IstioGVR                GVRName = "IstioGVR"
-	IstioDestinationRuleGVR GVRName = "IstioDestinationRule"
-	IstioGwGVR              GVRName = "IstioGwGVR"
-	StorageClassGVR         GVRName = "StorageClassGVR"
-	PodDisruptionBudgetGVR  GVRName = "PodDisruptionBudget"
+	DeploymentGVR              GVRName = "DeploymentGVR"
+	StatefulSetGVR             GVRName = "StatefulSetGVR"
+	DaemonSetGVR               GVRName = "DaemonSetGVR"
+	ConfigMapGVR               GVRName = "ConfigMapGVR"
+	PvcGVR                     GVRName = "PvcGVR"
+	SecretGVR                  GVRName = "SecretGVR"
+	SvcGVR                     GVRName = "SvcGVR"
+	SaGVR                      GVRName = "SaGVR"
+	CrdGVR                     GVRName = "CrdGVR"
+	PrometheusGVR              GVRName = "PrometheusGVR"
+	ServiceMonitorGVR          GVRName = "ServiceMonitorGVR"
+	PrometheusRuleGVR          GVRName = "PrometheusRuleGVR"
+	ClusterRoleGVR             GVRName = "ClusterRoleGVR"
+	ClusterRoleBindingGVR      GVRName = "ClusterRoleBindingGVR"
+	RoleGVR                    GVRName = "RoleGVR"
+	RoleBindingGVR             GVRName = "RoleBindingGVR"
+	OcpRouteGVR                GVRName = "OcpRouteGVR"
+	IngressGVR                 GVRName = "IngressGVR"
+	IstioVsGVR                 GVRName = "IstioVsGVR"
+	IstioGVR                   GVRName = "IstioGVR"
+	IstioDestinationRuleGVR    GVRName = "IstioDestinationRule"
+	IstioGwGVR                 GVRName = "IstioGwGVR"
+	StorageClassGVR            GVRName = "StorageClassGVR"
+	PodDisruptionBudgetGVR     GVRName = "PodDisruptionBudget"
+	HorizontalPodAutoscalerGVR GVRName = "HorizontalPodAutoscalerGVR"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -166,5 +167,11 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "policy",
 		Version: "v1beta1",
 		Kind:    "PodDisruptionBudget",
+	},
+
+	HorizontalPodAutoscalerGVR: schema.GroupVersionKind{
+		Group:   "autoscaling",
+		Version: "v2beta2",
+		Kind:    "HorizontalPodAutoscaler",
 	},
 }
