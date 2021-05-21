@@ -32,14 +32,18 @@ spec:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}
       memory: {{ .Spec.Monitoring.Prometheus.Requests.Memory }}
   podMetadata:
+    {{- if .Spec.Annotations }}
     annotations:
       {{- range $k, $v := .Spec.Annotations }}
       {{$k}}: "{{$v}}"
       {{- end }}
+    {{- end }}
+    {{- if .Spec.Labels}}
     labels:
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
+    {{- end }}
   ruleSelector:
     matchLabels:
       app: cnvrg-infra-prometheus

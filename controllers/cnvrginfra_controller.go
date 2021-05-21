@@ -49,14 +49,14 @@ type CnvrgInfraReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-var cnvrgInfraLog logr.Logger
+var infraLog logr.Logger
 
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrginfras,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrginfras/status,verbs=get;update;patch
 
 func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	cnvrgInfraLog = r.Log.WithValues("name", req.NamespacedName)
-	cnvrgInfraLog.Info("starting cnvrginfra reconciliation")
+	infraLog = r.Log.WithValues("name", req.NamespacedName)
+	infraLog.Info("starting cnvrginfra reconciliation")
 
 	equal, err := r.syncCnvrgInfraSpec(req.NamespacedName)
 	if err != nil {
@@ -80,7 +80,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		if !containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
 			cnvrgInfra.ObjectMeta.Finalizers = append(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
 			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
-				cnvrgInfraLog.Error(err, "failed to add finalizer")
+				infraLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
@@ -99,7 +99,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			}
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
 			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
-				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
+				infraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
 				return ctrl.Result{}, err
 			}
 		}
@@ -119,7 +119,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	}
 
 	r.updateStatusMessage(mlopsv1.StatusHealthy, "successfully reconciled", cnvrgInfra)
-	cnvrgInfraLog.Info("successfully reconciled")
+	infraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
 }
 
@@ -138,7 +138,7 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 	for _, appJson := range cnvrgAppCm.Data {
 		var app mlopsv1.AppInstance
 		if err := json.Unmarshal([]byte(appJson), &app); err != nil {
-			cnvrgInfraLog.Error(err, "error decoding AppInstance")
+			infraLog.Error(err, "error decoding AppInstance")
 			return nil, err
 		}
 		apps = append(apps, app)
@@ -151,7 +151,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	var reconcileResult error
 
 	// registry
-	cnvrgInfraLog.Info("applying registry")
+	infraLog.Info("applying registry")
 	registryData := desired.TemplateData{
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
 		Data: map[string]interface{}{
@@ -160,39 +160,39 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			"Labels":      cnvrgInfra.Spec.Labels,
 		},
 	}
-	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// storage
-	cnvrgInfraLog.Info("applying storage")
-	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	infraLog.Info("applying storage")
+	if err := desired.Apply(storage.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// redis
 	if *cnvrgInfra.Spec.Dbs.Redis.Enabled || *cnvrgInfra.Spec.SSO.Enabled {
-		cnvrgInfraLog.Info("applying redis")
+		infraLog.Info("applying redis")
 		if err := desired.CreateRedisCredsSecret(cnvrgInfra,
 			cnvrgInfra.Spec.Dbs.Redis.CredsRef,
 			cnvrgInfra.Spec.InfraNamespace,
 			fmt.Sprintf("%s:%d", cnvrgInfra.Spec.Dbs.Redis.SvcName, cnvrgInfra.Spec.Dbs.Redis.Port),
 			r,
 			r.Scheme,
-			cnvrgInfraLog); err != nil {
+			infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
-		if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
 	}
 
 	// logging
-	cnvrgInfraLog.Info("applying logging")
+	infraLog.Info("applying logging")
 	cnvrgApps, err := r.getCnvrgAppInstances(cnvrgInfra)
 	if err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
@@ -206,39 +206,39 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			"Labels":      cnvrgInfra.Spec.Labels,
 		},
 	}
-	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
-	if err := desired.Apply(logging.InfraLoggingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	if err := desired.Apply(logging.InfraLoggingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// istio
-	cnvrgInfraLog.Info("applying istio")
-	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	infraLog.Info("applying istio")
+	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// monitoring
-	cnvrgInfraLog.Info("applying monitoring")
+	infraLog.Info("applying monitoring")
 	if err := r.monitoringState(cnvrgInfra); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// mpi infra
-	cnvrgInfraLog.Info("applying mpi infra")
-	if err := desired.Apply(controlplane.MpiInfraState(), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	infraLog.Info("applying mpi infra")
+	if err := desired.Apply(controlplane.MpiInfraState(), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
 
 	// nvidia device plugin
 	if *cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled {
-		cnvrgInfraLog.Info("nvidia device plugin")
+		infraLog.Info("nvidia device plugin")
 		nvidiaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
 			Data: map[string]interface{}{
@@ -246,7 +246,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 				"Registry": cnvrgInfra.Spec.Registry,
 			},
 		}
-		if err := desired.Apply(gpu.NvidiaDpState(nvidiaDpData), cnvrgInfra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		if err := desired.Apply(gpu.NvidiaDpState(nvidiaDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
@@ -264,7 +264,7 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 			fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
 			r,
 			r.Scheme,
-			cnvrgInfraLog)
+			infraLog)
 		if err != nil {
 
 			return err
@@ -273,14 +273,14 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 
 	if *infra.Spec.Monitoring.Grafana.Enabled {
 		// grafana dashboards
-		cnvrgInfraLog.Info("applying grafana dashboards")
+		infraLog.Info("applying grafana dashboards")
 		if err := r.createGrafanaDashboards(infra); err != nil {
 			return err
 		}
 
 		// grafana datasource
-		cnvrgInfraLog.Info("applying grafana datasource")
-		url, basicAuthUser, basicAuthPass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, cnvrgInfraLog)
+		infraLog.Info("applying grafana datasource")
+		url, basicAuthUser, basicAuthPass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, infraLog)
 		if err != nil {
 			return err
 		}
@@ -294,13 +294,13 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 				"Labels":      infra.Spec.Labels,
 			},
 		}
-		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, infraLog); err != nil {
 			return err
 		}
 	}
 	// monitoring
-	cnvrgInfraLog.Info("applying monitoring")
-	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	infraLog.Info("applying monitoring")
+	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
 		return err
 	}
 
@@ -310,7 +310,7 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
 	if !*cnvrgInfra.Spec.Monitoring.Grafana.Enabled {
-		cnvrgInfraLog.Info("grafana disabled, skipping grafana deployment")
+		infraLog.Info("grafana disabled, skipping grafana deployment")
 		return nil
 	}
 
@@ -318,12 +318,12 @@ func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.Cnvrg
 	for _, dashboard := range desired.GrafanaInfraDashboards {
 		f, err := pkger.Open(basePath + dashboard)
 		if err != nil {
-			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)
+			infraLog.Error(err, "error reading path", "path", dashboard)
 			return err
 		}
 		b, err := ioutil.ReadAll(f)
 		if err != nil {
-			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			infraLog.Error(err, "error reading", "file", dashboard)
 			return err
 		}
 		cm := &v1core.ConfigMap{
@@ -334,14 +334,14 @@ func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.Cnvrg
 			Data: map[string]string{filepath.Base(f.Name()): string(b)},
 		}
 		if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
-			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
+			infraLog.Error(err, "error setting controller reference", "file", f.Name())
 			return err
 		}
 		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-			cnvrgAppLog.V(1).Info("grafana dashboard already exists", "file", dashboard)
+			infraLog.V(1).Info("grafana dashboard already exists", "file", dashboard)
 			continue
 		} else if err != nil {
-			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			infraLog.Error(err, "error reading", "file", dashboard)
 			return err
 		}
 	}
@@ -352,7 +352,7 @@ func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.Cnvrg
 
 func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bool, error) {
 
-	cnvrgInfraLog.Info("synchronizing cnvrgInfra spec")
+	infraLog.Info("synchronizing cnvrgInfra spec")
 
 	// Fetch current cnvrgInfra spec
 	cnvrgInfra, err := r.getCnvrgInfraSpec(name)
@@ -362,21 +362,21 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	if cnvrgInfra == nil {
 		return false, nil // probably cnvrgapp was removed
 	}
-	cnvrgInfraLog = r.Log.WithValues("name", name, "ns", cnvrgInfra.Spec.InfraNamespace)
+	infraLog = r.Log.WithValues("name", name, "ns", cnvrgInfra.Spec.InfraNamespace)
 
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
 
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride); err != nil {
-		cnvrgInfraLog.Error(err, "can't merge")
+		infraLog.Error(err, "can't merge")
 		return false, err
 	}
 
 	if viper.GetBool("verbose") {
-		cnvrgInfraLog.V(1).Info("printing the diff between desiredSpec and actual")
+		infraLog.V(1).Info("printing the diff between desiredSpec and actual")
 		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
-		cnvrgInfraLog.V(1).Info(diff)
+		infraLog.V(1).Info(diff)
 	}
 
 	// Compare desiredSpec and current cnvrgInfra spec,
@@ -384,10 +384,10 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	// and return true for triggering new reconciliation
 	equal := reflect.DeepEqual(desiredSpec, cnvrgInfra.Spec)
 	if !equal {
-		cnvrgInfraLog.Info("states are not equals, syncing and requeuing")
+		infraLog.Info("states are not equals, syncing and requeuing")
 		cnvrgInfra.Spec = desiredSpec
 		if err := r.Update(context.Background(), cnvrgInfra); err != nil && errors.IsConflict(err) {
-			cnvrgAppLog.Error(err, "conflict updating cnvrgInfra object, requeue for reconciliations...")
+			infraLog.Error(err, "conflict updating cnvrgInfra object, requeue for reconciliations...")
 			return true, nil
 		} else if err != nil {
 			return false, err
@@ -395,7 +395,7 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		return equal, nil
 	}
 
-	cnvrgInfraLog.Info("states are equals, no need to sync")
+	infraLog.Info("states are equals, no need to sync")
 	return equal, nil
 }
 
@@ -404,10 +404,10 @@ func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.Namespaced
 	var cnvrgInfra mlopsv1.CnvrgInfra
 	if err := r.Get(ctx, namespacedName, &cnvrgInfra); err != nil {
 		if errors.IsNotFound(err) {
-			cnvrgInfraLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
+			infraLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
 			return nil, nil
 		}
-		cnvrgInfraLog.Error(err, "unable to fetch CnvrgApp")
+		infraLog.Error(err, "unable to fetch CnvrgApp")
 		return nil, err
 	}
 	return &cnvrgInfra, nil
@@ -415,7 +415,7 @@ func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.Namespaced
 
 func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
-	cnvrgInfraLog.Info("running finalizer cleanup")
+	infraLog.Info("running finalizer cleanup")
 
 	// todo: completely remove istio cleanup when you are emotional ready
 	// remove istio
@@ -433,14 +433,14 @@ func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
 func (r *CnvrgInfraReconciler) cleanupPVCs(infra *mlopsv1.CnvrgInfra) error {
 	if !viper.GetBool("cleanup-pvc") {
-		cnvrgAppLog.Info("cleanup-pvc is false, skipping pvc deletion!")
+		infraLog.Info("cleanup-pvc is false, skipping pvc deletion!")
 		return nil
 	}
-	cnvrgAppLog.Info("running pvc cleanup")
+	infraLog.Info("running pvc cleanup")
 	ctx := context.Background()
 	pvcList := v1core.PersistentVolumeClaimList{}
 	if err := r.List(ctx, &pvcList); err != nil {
-		cnvrgAppLog.Error(err, "failed cleanup pvcs")
+		infraLog.Error(err, "failed cleanup pvcs")
 		return err
 	}
 	for _, pvc := range pvcList.Items {
@@ -448,9 +448,9 @@ func (r *CnvrgInfraReconciler) cleanupPVCs(infra *mlopsv1.CnvrgInfra) error {
 			if _, ok := pvc.ObjectMeta.Labels["app"]; ok {
 				if pvc.ObjectMeta.Labels["app"] == "prometheus" {
 					if err := r.Delete(ctx, &pvc); err != nil && errors.IsNotFound(err) {
-						cnvrgInfraLog.Info("prometheus pvc already deleted")
+						infraLog.Info("prometheus pvc already deleted")
 					} else if err != nil {
-						cnvrgInfraLog.Error(err, "error deleting prometheus pvc")
+						infraLog.Error(err, "error deleting prometheus pvc")
 						return err
 					}
 				}
@@ -461,7 +461,7 @@ func (r *CnvrgInfraReconciler) cleanupPVCs(infra *mlopsv1.CnvrgInfra) error {
 }
 
 func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) error {
-	cnvrgInfraLog.Info("running istio cleanup")
+	infraLog.Info("running istio cleanup")
 	ctx := context.Background()
 	istioManifests := networking.IstioInstanceState(cnvrgInfra)
 	for _, m := range istioManifests {
@@ -471,26 +471,26 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 				m.TemplateData = cnvrgInfra
 			}
 			if err := m.GenerateDeployable(); err != nil {
-				cnvrgInfraLog.Error(err, "can't make manifest deployable")
+				infraLog.Error(err, "can't make manifest deployable")
 				return err
 			}
 			if err := r.Delete(ctx, m.Obj); err != nil {
 				if errors.IsNotFound(err) {
-					cnvrgInfraLog.Info("istio instance not found - probably removed previously")
+					infraLog.Info("istio instance not found - probably removed previously")
 					return nil
 				}
 				return err
 			}
 			istioExists := true
-			cnvrgInfraLog.Info("wait for istio instance removal")
+			infraLog.Info("wait for istio instance removal")
 			for istioExists {
 				err := r.Get(ctx, types.NamespacedName{Name: m.Obj.GetName(), Namespace: m.Obj.GetNamespace()}, m.Obj)
 				if err != nil && errors.IsNotFound(err) {
-					cnvrgInfraLog.Info("istio instance was successfully removed")
+					infraLog.Info("istio instance was successfully removed")
 					istioExists = false
 				}
 				if istioExists {
-					cnvrgInfraLog.Info("istio instance still present, will sleep of 1 sec, and check again...")
+					infraLog.Info("istio instance still present, will sleep of 1 sec, and check again...")
 				}
 				time.Sleep(1 * time.Second)
 			}
@@ -501,7 +501,7 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 
 func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgInfra *mlopsv1.CnvrgInfra) {
 	if cnvrgInfra.Status.Status == mlopsv1.StatusRemoving {
-		cnvrgInfraLog.Info("skipping status update, current cnvrg spec under removing status...")
+		infraLog.Info("skipping status update, current cnvrg spec under removing status...")
 		return
 	}
 	ctx := context.Background()
@@ -517,7 +517,7 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 		return err
 	})
 	if err != nil {
-		cnvrgInfraLog.Error(err, "can't update status")
+		infraLog.Error(err, "can't update status")
 	}
 }
 
@@ -526,13 +526,13 @@ func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv
 		ObjectMeta: metav1.ObjectMeta{Name: mlopsv1.InfraReconcilerCm, Namespace: cnvrgInfra.Spec.InfraNamespace},
 	}
 	if err := ctrl.SetControllerReference(cnvrgInfra, cm, r.Scheme); err != nil {
-		cnvrgInfraLog.Error(err, "failed to set ControllerReference", "cm", mlopsv1.InfraReconcilerCm)
+		infraLog.Error(err, "failed to set ControllerReference", "cm", mlopsv1.InfraReconcilerCm)
 		return err
 	}
 	if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-		cnvrgInfraLog.Info("already exists", "cm", mlopsv1.InfraReconcilerCm)
+		infraLog.Info("already exists", "cm", mlopsv1.InfraReconcilerCm)
 	} else if err != nil {
-		cnvrgInfraLog.Error(err, "error creating", "cm", mlopsv1.InfraReconcilerCm)
+		infraLog.Error(err, "error creating", "cm", mlopsv1.InfraReconcilerCm)
 		return err
 	}
 
@@ -540,7 +540,7 @@ func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv
 }
 
 func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	cnvrgInfraLog = r.Log.WithValues("initializing", "crds")
+	infraLog = r.Log.WithValues("initializing", "crds")
 
 	if viper.GetBool("deploy-depended-crds") == false {
 		zap.S().Info("deploy-depended-crds is false, I hope CRDs was deployed ahead and match expected versions, if not I will fail...")
@@ -549,7 +549,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		if viper.GetBool("own-istio-resources") {
 			err := desired.Apply(networking.IstioCrds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 			if err != nil {
-				cnvrgInfraLog.Error(err, "can't apply istio CRDs")
+				infraLog.Error(err, "can't apply istio CRDs")
 				os.Exit(1)
 			}
 		}
@@ -557,14 +557,14 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		if viper.GetBool("own-prometheus-resources") {
 			err := desired.Apply(monitoring.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 			if err != nil {
-				cnvrgInfraLog.Error(err, "can't apply prometheus CRDs")
+				infraLog.Error(err, "can't apply prometheus CRDs")
 				os.Exit(1)
 			}
 		}
 
 		err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
 		if err != nil {
-			cnvrgInfraLog.Error(err, "can't apply control plane crds")
+			infraLog.Error(err, "can't apply control plane crds")
 			os.Exit(1)
 		}
 	}
@@ -575,7 +575,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 			// run reconcile only changing cnvrginfra/object marked for deletion
 			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.ObjectOld) {
-				cnvrgInfraLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
+				infraLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgInfra)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgInfra)
 				// deleting cnvrg cr
@@ -585,12 +585,12 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrginfra spec wasn't changed, assuming status update, won't reconcile
 
 				if !shouldReconcileOnSpecChange && viper.GetBool("verbose") {
-					cnvrgInfraLog.V(1).Info("printing the diff between oldObject.Spec and newObject.Spec")
+					infraLog.V(1).Info("printing the diff between oldObject.Spec and newObject.Spec")
 					diff, _ := messagediff.PrettyDiff(oldObject.Spec, newObject.Spec)
-					cnvrgInfraLog.V(1).Info(diff)
+					infraLog.V(1).Info(diff)
 				}
 
-				cnvrgInfraLog.V(1).Info("cnvrginfra update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+				infraLog.V(1).Info("cnvrginfra update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
 
 				return !shouldReconcileOnSpecChange
 
@@ -619,7 +619,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		u.SetGroupVersionKind(v)
 		cnvrgInfraController.Owns(u)
 	}
-	cnvrgInfraLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
+	infraLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
 	return cnvrgInfraController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
 		Complete(r)

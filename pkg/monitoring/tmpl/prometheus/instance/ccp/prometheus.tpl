@@ -27,14 +27,18 @@ spec:
   retention: 8w # 2 months
   retentionSize: {{ promRetentionSize .Spec.Monitoring.Prometheus.StorageSize }} # total PVC size - 2 Gi
   podMetadata:
+    {{- if .Spec.Annotations }}
     annotations:
       {{- range $k, $v := .Spec.Annotations }}
       {{$k}}: "{{$v}}"
       {{- end }}
+    {{- end }}
+    {{- if .Spec.Labels}}
     labels:
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
+    {{- end }}
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}

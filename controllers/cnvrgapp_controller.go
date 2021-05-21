@@ -24,6 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
 	"path/filepath"
@@ -46,7 +47,7 @@ type CnvrgAppReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-var cnvrgAppLog logr.Logger
+var appLog logr.Logger
 
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
@@ -54,8 +55,8 @@ var cnvrgAppLog logr.Logger
 
 func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
-	cnvrgAppLog = r.Log.WithValues("name", req.NamespacedName)
-	cnvrgAppLog.Info("starting cnvrgapp reconciliation")
+	appLog = r.Log.WithValues("name", req.NamespacedName)
+	appLog.Info("starting cnvrgapp reconciliation")
 
 	equal, err := r.syncCnvrgAppSpec(req.NamespacedName)
 	if err != nil {
@@ -78,7 +79,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(context.Background(), cnvrgApp); err != nil {
-				cnvrgInfraLog.Error(err, "failed to add finalizer")
+				appLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
@@ -97,7 +98,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
-				cnvrgInfraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
+				appLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
 				return ctrl.Result{}, err
 			}
 		}
@@ -124,19 +125,19 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", percentageReady)
-	cnvrgAppLog.Info(statusMsg)
+	appLog.Info(statusMsg)
 
 	if ready {
 		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
-		cnvrgAppLog.Info("stack is ready!")
+		appLog.Info("stack is ready!")
 		return ctrl.Result{}, nil
 	} else {
 		requeueAfter, err := time.ParseDuration("30s")
 		if err != nil {
-			cnvrgAppLog.Error(err, "wrong duration for requeueAfter")
+			appLog.Error(err, "wrong duration for requeueAfter")
 			return ctrl.Result{}, err
 		}
-		cnvrgAppLog.Info("stack not ready yet, requeuing...")
+		appLog.Info("stack not ready yet, requeuing...")
 		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
 }
@@ -147,7 +148,7 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
 		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
-			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
+			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return "", "", err
 		}
 
@@ -164,24 +165,24 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 
 		}
 		if err := r.Create(context.Background(), &creds); err != nil {
-			cnvrgAppLog.Error(err, "error creating es creds", "name", namespacedName.Name)
+			appLog.Error(err, "error creating es creds", "name", namespacedName.Name)
 			return "", "", err
 		}
 		return user, pass, nil
 	} else if err != nil {
-		cnvrgAppLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
+		appLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
 		return "", "", err
 	}
 
 	if _, ok := creds.Data["CNVRG_ES_USER"]; !ok {
 		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_USER", namespacedName.Name)
-		cnvrgAppLog.Error(err, "missing required field")
+		appLog.Error(err, "missing required field")
 		return "", "", err
 	}
 
 	if _, ok := creds.Data["CNVRG_ES_PASS"]; !ok {
 		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_PASS", namespacedName.Name)
-		cnvrgAppLog.Error(err, "missing required field")
+		appLog.Error(err, "missing required field")
 		return "", "", err
 	}
 
@@ -194,7 +195,7 @@ func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
 	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
 		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
-			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
+			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return err
 		}
 		user := "cnvrg"
@@ -215,12 +216,12 @@ func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
 			"POSTGRES_HOST":     []byte(app.Spec.Dbs.Pg.SvcName),
 		}
 		if err := r.Create(context.Background(), &creds); err != nil {
-			cnvrgAppLog.Error(err, "error creating pg creds", "name", namespacedName.Name)
+			appLog.Error(err, "error creating pg creds", "name", namespacedName.Name)
 			return err
 		}
 		return nil
 	} else if err != nil {
-		cnvrgAppLog.Error(err, "can't check if pg creds secret exists", "name", namespacedName.Name)
+		appLog.Error(err, "can't check if pg creds secret exists", "name", namespacedName.Name)
 		return err
 	}
 	return nil
@@ -309,7 +310,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		}
 		// if es is ready, trigger fluentbit reconfiguration
 		if ready {
-			cnvrgAppLog.Info("es is ready, triggering fluentbit reconfiguration")
+			appLog.Info("es is ready, triggering fluentbit reconfiguration")
 			if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
 				return false, 0, err
 			}
@@ -347,7 +348,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// registry
-	cnvrgInfraLog.Info("applying registry")
+	appLog.Info("applying registry")
 	registryData := desired.TemplateData{
 		Namespace: cnvrgApp.Namespace,
 		Data: map[string]interface{}{
@@ -356,7 +357,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 			"Labels":      cnvrgApp.Spec.Labels,
 		},
 	}
-	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
@@ -368,8 +369,8 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// networking
-	cnvrgAppLog.Info("applying networking")
-	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	appLog.Info("applying networking")
+	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
@@ -381,8 +382,8 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// controlplane
-	cnvrgAppLog.Info("applying controlplane")
-	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	appLog.Info("applying controlplane")
+	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
 	}
@@ -397,18 +398,18 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
-	cnvrgAppLog.Info("applying logging")
+	appLog.Info("applying logging")
 	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
 	if err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
-	if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), app, r.Client, r.Scheme, cnvrgInfraLog); err != nil {
+	if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
 
-	if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
@@ -417,7 +418,7 @@ func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 	// dbs
-	cnvrgAppLog.Info("applying dbs")
+	appLog.Info("applying dbs")
 	// creds for es
 	if _, _, err := r.esCredsSecret(app); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
@@ -436,11 +437,11 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		fmt.Sprintf("%s:%d", app.Spec.Dbs.Redis.SvcName, app.Spec.Dbs.Redis.Port),
 		r,
 		r.Scheme,
-		cnvrgAppLog); err != nil {
+		appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
-	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
@@ -450,13 +451,13 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
 	if *app.Spec.Monitoring.Prometheus.Enabled {
-		cnvrgAppLog.Info("applying monitoring")
+		appLog.Info("applying monitoring")
 		if err := desired.CreatePromCredsSecret(app,
 			app.Spec.Monitoring.Prometheus.CredsRef,
 			app.Namespace, fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
 			r,
 			r.Scheme,
-			cnvrgAppLog); err != nil {
+			appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
@@ -468,14 +469,14 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
 	if *app.Spec.Monitoring.Grafana.Enabled {
 		// grafana dashboards
-		cnvrgAppLog.Info("applying grafana dashboards ")
+		appLog.Info("applying grafana dashboards ")
 		if err := r.createGrafanaDashboards(app); err != nil {
 			return err
 		}
 		// grafana datasource
-		cnvrgInfraLog.Info("applying grafana datasource")
+		appLog.Info("applying grafana datasource")
 
-		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, cnvrgAppLog)
+		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, appLog)
 		if err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
@@ -489,13 +490,13 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 			},
 		}
 
-		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
 	}
 
-	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, cnvrgAppLog); err != nil {
+	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
@@ -508,13 +509,13 @@ func (r *CnvrgAppReconciler) getCnvrgInfra() (*mlopsv1.CnvrgInfra, error) {
 	cnvrgAppInfra := &mlopsv1.CnvrgInfraList{}
 
 	if err := r.List(context.Background(), cnvrgAppInfra); err != nil {
-		cnvrgAppLog.Error(err, "can't list CnvrgInfra objects")
+		appLog.Error(err, "can't list CnvrgInfra objects")
 		return nil, err
 	}
 
 	if len(cnvrgAppInfra.Items) == 0 {
-		cnvrgAppLog.Info("no CnvrgInfra objects was deployed, skipping infra reconciler")
-		return nil, fmt.Errorf("no CnvrgInfra objects was deployed, skipping infra reconciler")
+		appLog.Info("no CnvrgInfra objects was deployed, skipping infra reconciler")
+		return nil, errors.NewNotFound(schema.GroupResource{Group: "mlops.cnvrg.io", Resource: "CnvrgInfra"}, "cnvrg-infra")
 	}
 
 	return &cnvrgAppInfra.Items[0], nil
@@ -525,27 +526,27 @@ func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) err
 	upstreamSecret := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := r.Get(context.Background(), namespacedName, &upstreamSecret); err != nil && errors.IsNotFound(err) {
 		if err := ctrl.SetControllerReference(app, &upstreamSecret, r.Scheme); err != nil {
-			cnvrgAppLog.Error(err, "error set controller reference", "name", namespacedName.Name)
+			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
 			return err
 		}
 
 		infra, err := r.getCnvrgInfra()
 		if err != nil {
-			cnvrgAppLog.Error(err, "can't get cnvrgInfra object", "name", namespacedName.Name)
+			appLog.Error(err, "can't get cnvrgInfra object", "name", namespacedName.Name)
 			return err
 		}
 
-		_, user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, cnvrgInfraLog)
+		_, user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, appLog)
 		if err != nil {
-			cnvrgAppLog.Error(err, "can't get cnvrgInfra prometheus creds", "name", namespacedName.Name)
+			appLog.Error(err, "can't get cnvrgInfra prometheus creds", "name", namespacedName.Name)
 			return err
 		}
 		upstreamPrometheus := fmt.Sprintf("prometheus-operated.%s.svc:%d", infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port)
 		promUpstreamConfig := desired.PrometheusUpstreamConfig(user, pass, app.Namespace, upstreamPrometheus)
-		cnvrgAppLog.V(1).Info(promUpstreamConfig)
+		appLog.V(1).Info(promUpstreamConfig)
 		upstreamSecret.Data = map[string][]byte{"prometheus-additional.yaml": []byte(promUpstreamConfig)}
 		if err := r.Create(context.Background(), &upstreamSecret); err != nil {
-			cnvrgAppLog.Error(err, "error crating upstream prometheus static configs")
+			appLog.Error(err, "error crating upstream prometheus static configs")
 			return err
 		}
 	}
@@ -557,7 +558,7 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 	kibanaPort := strconv.Itoa(app.Spec.Logging.Kibana.Port)
 	esUser, esPass, err := r.esCredsSecret(app)
 	if err != nil {
-		cnvrgAppLog.Error(err, "can't fetch es creds")
+		appLog.Error(err, "can't fetch es creds")
 		return nil, err
 	}
 	if *app.Spec.SSO.Enabled {
@@ -583,19 +584,19 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	if !*cnvrgApp.Spec.Monitoring.Grafana.Enabled {
-		cnvrgInfraLog.Info("grafana disabled, skipping grafana deployment")
+		appLog.Info("grafana disabled, skipping grafana deployment")
 		return nil
 	}
 	basePath := "/pkg/monitoring/tmpl/grafana/dashboards-data/"
 	for _, dashboard := range desired.GrafanaAppDashboards {
 		f, err := pkger.Open(basePath + dashboard)
 		if err != nil {
-			cnvrgAppLog.Error(err, "error reading path", "path", dashboard)
+			appLog.Error(err, "error reading path", "path", dashboard)
 			return err
 		}
 		b, err := ioutil.ReadAll(f)
 		if err != nil {
-			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			appLog.Error(err, "error reading", "file", dashboard)
 			return err
 		}
 		cm := &v1core.ConfigMap{
@@ -606,14 +607,14 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 			Data: map[string]string{filepath.Base(f.Name()): string(b)},
 		}
 		if err := ctrl.SetControllerReference(cnvrgApp, cm, r.Scheme); err != nil {
-			cnvrgAppLog.Error(err, "error setting controller reference", "file", f.Name())
+			appLog.Error(err, "error setting controller reference", "file", f.Name())
 			return err
 		}
 		if err := r.Create(context.Background(), cm); err != nil && errors.IsAlreadyExists(err) {
-			cnvrgAppLog.V(1).Info("grafana dashboard already exists", "file", dashboard)
+			appLog.V(1).Info("grafana dashboard already exists", "file", dashboard)
 			continue
 		} else if err != nil {
-			cnvrgAppLog.Error(err, "error reading", "file", dashboard)
+			appLog.Error(err, "error reading", "file", dashboard)
 			return err
 		}
 	}
@@ -626,7 +627,9 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 
 	infra, err := r.getCnvrgInfra()
 
-	if err != nil {
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -644,21 +647,21 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 
 	esUser, esPass, err := r.esCredsSecret(cnvrgApp)
 	if err != nil {
-		cnvrgAppLog.Error(err, "failed to fetch es creds ")
+		appLog.Error(err, "failed to fetch es creds ")
 		return err
 	}
 
 	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass}
 	appInstanceBytes, err := json.Marshal(appInstance)
 	if err != nil {
-		cnvrgAppLog.Error(err, "failed to marshal app instance ")
+		appLog.Error(err, "failed to marshal app instance ")
 		return err
 	}
 	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
-		cnvrgAppLog.Info("infra reconciler cm does not exists, skipping", "name", name)
+		appLog.Info("infra reconciler cm does not exists, skipping", "name", name)
 		return nil
 	} else if err != nil {
-		cnvrgAppLog.Error(err, "can't get cm", "name", name)
+		appLog.Error(err, "can't get cm", "name", name)
 		return err
 	}
 
@@ -673,7 +676,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		delete(cm.Data, cnvrgApp.Namespace)
 	}
 	if err := r.Update(context.Background(), cm); err != nil {
-		cnvrgAppLog.Error(err, "can't update cm", "cm", name)
+		appLog.Error(err, "can't update cm", "cm", name)
 		return err
 	}
 
@@ -682,7 +685,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 
 func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgApp *mlopsv1.CnvrgApp) {
 	if cnvrgApp.Status.Status == mlopsv1.StatusRemoving {
-		cnvrgAppLog.Info("skipping status update, current cnvrg spec under removing status...")
+		appLog.Info("skipping status update, current cnvrg spec under removing status...")
 		return
 	}
 	ctx := context.Background()
@@ -698,14 +701,14 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, 
 		return err
 	})
 	if err != nil {
-		cnvrgAppLog.Error(err, "can't update status")
+		appLog.Error(err, "can't update status")
 	}
 
 }
 
 func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, error) {
 
-	cnvrgAppLog.Info("synchronizing cnvrgApp spec")
+	appLog.Info("synchronizing cnvrgApp spec")
 
 	// Fetch current cnvrgApp spec
 	cnvrgApp, err := r.getCnvrgAppSpec(name)
@@ -715,29 +718,29 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	if cnvrgApp == nil {
 		return false, nil // probably cnvrgapp was removed
 	}
-	cnvrgAppLog = r.Log.WithValues("name", name, "ns", cnvrgApp.Namespace)
+	appLog = r.Log.WithValues("name", name, "ns", cnvrgApp.Namespace)
 
 	// Get default cnvrgApp spec
 	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
 
 	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride); err != nil {
-		cnvrgAppLog.Error(err, "can't merge")
+		appLog.Error(err, "can't merge")
 		return false, err
 	}
 
 	if viper.GetBool("verbose") {
-		cnvrgInfraLog.V(1).Info("printing the diff between desiredSpec and actual")
+		appLog.V(1).Info("printing the diff between desiredSpec and actual")
 		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgApp.Spec)
-		cnvrgInfraLog.V(1).Info(diff)
+		appLog.V(1).Info(diff)
 	}
 
 	equal := reflect.DeepEqual(desiredSpec, cnvrgApp.Spec)
 	if !equal {
-		cnvrgAppLog.Info("states are not equals, syncing and requeuing")
+		appLog.Info("states are not equals, syncing and requeuing")
 		cnvrgApp.Spec = desiredSpec
 		if err := r.Update(context.Background(), cnvrgApp); err != nil && errors.IsConflict(err) {
-			cnvrgAppLog.Info("conflict updating cnvrgApp object, requeue for reconciliations...")
+			appLog.Info("conflict updating cnvrgApp object, requeue for reconciliations...")
 			return true, nil
 		} else if err != nil {
 			return false, err
@@ -745,7 +748,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 		return equal, nil
 	}
 
-	cnvrgAppLog.Info("states are equals, no need to sync")
+	appLog.Info("states are equals, no need to sync")
 	return equal, nil
 }
 
@@ -754,10 +757,10 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 	var cnvrgApp mlopsv1.CnvrgApp
 	if err := r.Get(ctx, namespacedName, &cnvrgApp); err != nil {
 		if errors.IsNotFound(err) {
-			cnvrgAppLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
+			appLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
 			return nil, nil
 		}
-		cnvrgAppLog.Error(err, "unable to fetch CnvrgApp")
+		appLog.Error(err, "unable to fetch CnvrgApp")
 		return nil, err
 	}
 	return &cnvrgApp, nil
@@ -765,7 +768,7 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 
 func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 
-	cnvrgAppLog.Info("running finalizer cleanup")
+	appLog.Info("running finalizer cleanup")
 
 	// remove cnvrg-db-init
 	if err := r.cleanupDbInitCm(cnvrgApp); err != nil {
@@ -775,7 +778,7 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 	// update infra reconciler cm
 	if err := r.triggerInfraReconciler(cnvrgApp, "remove"); err != nil {
 		if err.Error() == "no CnvrgInfra objects was deployed, skipping infra reconciler" {
-			cnvrgInfraLog.Info("cnvrgInfra object not found, no need to trigger infra reconciler")
+			appLog.Info("cnvrgInfra object not found, no need to trigger infra reconciler")
 		} else {
 			return err
 		}
@@ -792,23 +795,23 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) cleanupPVCs() error {
 	if !viper.GetBool("cleanup-pvc") {
-		cnvrgInfraLog.Info("cleanup-pvc is false, skipping pvc deletion!")
+		appLog.Info("cleanup-pvc is false, skipping pvc deletion!")
 		return nil
 	}
-	cnvrgAppLog.Info("running pvc cleanup")
+	appLog.Info("running pvc cleanup")
 	ctx := context.Background()
 	pvcList := v1core.PersistentVolumeClaimList{}
 	if err := r.List(ctx, &pvcList); err != nil {
-		cnvrgAppLog.Error(err, "failed cleanup pvcs")
+		appLog.Error(err, "failed cleanup pvcs")
 		return err
 	}
 	for _, pvc := range pvcList.Items {
 		if _, ok := pvc.ObjectMeta.Labels["app"]; ok {
 			if pvc.ObjectMeta.Labels["app"] == "prometheus" || pvc.ObjectMeta.Labels["app"] == "elasticsearch" {
 				if err := r.Delete(ctx, &pvc); err != nil && errors.IsNotFound(err) {
-					cnvrgInfraLog.Info("pvc already deleted")
+					appLog.Info("pvc already deleted")
 				} else if err != nil {
-					cnvrgInfraLog.Error(err, "error deleting prometheus pvc")
+					appLog.Error(err, "error deleting prometheus pvc")
 					return err
 				}
 			}
@@ -818,26 +821,26 @@ func (r *CnvrgAppReconciler) cleanupPVCs() error {
 }
 
 func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) error {
-	cnvrgAppLog.Info("running cnvrg-db-init cleanup")
+	appLog.Info("running cnvrg-db-init cleanup")
 	ctx := context.Background()
 	dbInitCm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "cnvrg-db-init", Namespace: desiredSpec.Namespace}}
 	err := r.Delete(ctx, dbInitCm)
 	if err != nil && errors.IsNotFound(err) {
-		cnvrgAppLog.Info("no need to delete cnvrg-db-init, cm not found")
+		appLog.Info("no need to delete cnvrg-db-init, cm not found")
 	} else {
-		cnvrgAppLog.Error(err, "error deleting cnvrg-db-init")
+		appLog.Error(err, "error deleting cnvrg-db-init")
 		return err
 	}
 	return nil
 }
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	cnvrgAppLog = r.Log.WithValues("initializing", "crds")
+	appLog = r.Log.WithValues("initializing", "crds")
 
 	p := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			cnvrgAppLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
+			appLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
 			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
@@ -846,7 +849,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return true
 				}
 				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
-				cnvrgAppLog.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+				appLog.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
 
 				return !shouldReconcileOnSpecChange
 			}
@@ -874,7 +877,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		u.SetGroupVersionKind(v)
 		cnvrgAppController.Owns(u)
 	}
-	cnvrgAppLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
+	appLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
 	return cnvrgAppController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
 		Complete(r)

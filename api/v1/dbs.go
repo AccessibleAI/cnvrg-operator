@@ -127,7 +127,7 @@ var pgDefault = Pg{
 	PvcName:            "pg-storage",
 	HugePages: HugePages{
 		Enabled: &defaultFalse,
-		Size:    "2Mi",
+		Size:    "2Mi", // 2Mi/1Gi https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-hugepages/ ,  https://wiki.debian.org/Hugepages#Huge_pages_sizes
 		Memory:  "",
 	},
 	CredsRef: "pg-creds",

@@ -16,8 +16,8 @@ $(shell echo $$(git fetch --tags && git tag -l --sort -version:refname | head -n
 all: manager
 
 # Run tests
-test: generate fmt vet manifests
-	go test ./... -coverprofile cover.out
+test: pack generate fmt vet manifests
+	go test ./controllers/ -v
 
 pack:
 	pkger

@@ -19,6 +19,10 @@ spec:
       app: grafana
   template:
     metadata:
+      annotations:
+        {{- range $k, $v := .Spec.Annotations }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       labels:
         app: grafana
         {{- range $k, $v := .Spec.Labels }}
