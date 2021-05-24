@@ -9,6 +9,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
+    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-kibana-oauth"
     app: {{ .Spec.Logging.Kibana.SvcName }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"

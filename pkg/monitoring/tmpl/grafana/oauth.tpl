@@ -4,6 +4,7 @@ metadata:
   name: oauth-proxy-grafana
   namespace: {{ ns . }}
   annotations:
+    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-grafana-oauth"
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}

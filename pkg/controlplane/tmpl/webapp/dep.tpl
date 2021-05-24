@@ -8,6 +8,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
+    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     app: {{ .Spec.ControlPlane.WebApp.SvcName }}
     owner: cnvrg-control-plane
     cnvrg-component: webapp

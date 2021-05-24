@@ -8,6 +8,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
+    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     owner: cnvrg-control-plane
     app: {{ .Spec.ControlPlane.Hyper.SvcName }}
     {{- range $k, $v := .Spec.Labels }}

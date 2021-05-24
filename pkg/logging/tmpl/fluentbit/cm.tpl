@@ -8,6 +8,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
+    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-fluentbit"
     k8s-app: fluent-bit
     {{- range $k, $v := .Data.Labels }}
     {{$k}}: "{{$v}}"
