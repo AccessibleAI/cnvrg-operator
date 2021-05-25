@@ -8,9 +8,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    k8s-app: fluent-bit-logging
-    version: v1
-    kubernetes.io/cluster-service: "true"
+    app: fluentbit
     cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-fluentbit"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
@@ -18,20 +16,15 @@ metadata:
 spec:
   selector:
     matchLabels:
-      k8s-app: fluent-bit-logging
+      app: fluentbit
   template:
     metadata:
       labels:
-        k8s-app: fluent-bit-logging
-        version: v1
-        kubernetes.io/cluster-service: "true"
+        app: fluentbit
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "2020"
-        prometheus.io/path: /api/v1/metrics/prometheus
         {{- range $k, $v := .Spec.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}

@@ -49,7 +49,7 @@ type CnvrgInfraLogging struct {
 
 var fluentbitDefault = Fluentbit{
 	Enabled: &defaultFalse,
-	Image:   "cnvrg-fluentbit:v1.7.2",
+	Image:   "cnvrg-fluentbit:v1.7.3",
 }
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{
