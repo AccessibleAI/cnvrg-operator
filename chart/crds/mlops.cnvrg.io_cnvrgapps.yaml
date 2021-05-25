@@ -183,15 +183,6 @@ spec:
                         - gcp
                         type: string
                     type: object
-                  rbac:
-                    properties:
-                      role:
-                        type: string
-                      roleBindingName:
-                        type: string
-                      serviceAccountName:
-                        type: string
-                    type: object
                   searchkiq:
                     properties:
                       enabled:
@@ -205,15 +196,6 @@ spec:
                           memory:
                             type: string
                         type: object
-                    type: object
-                  seeder:
-                    properties:
-                      createBucketCmd:
-                        type: string
-                      image:
-                        type: string
-                      seedCmd:
-                        type: string
                     type: object
                   sidekiq:
                     properties:

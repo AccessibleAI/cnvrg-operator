@@ -43,7 +43,7 @@ spec:
           value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+      serviceAccountName: cnvrg
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000

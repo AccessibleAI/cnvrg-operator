@@ -53,10 +53,9 @@ spec:
       containers:
         - name: minio
           image: {{.Spec.ImageHub }}/{{ .Spec.Dbs.Minio.Image }}
-          args:
-            - gateway
-            - nas
-            - /data
+          envFrom:
+          - secretRef:
+              name: cp-object-storage
           env:
             - name: MINIO_ACCESS_KEY
               valueFrom:
@@ -72,7 +71,7 @@ spec:
             - containerPort: {{ .Spec.Dbs.Minio.Port }}
           volumeMounts:
             - name: minio-storage
-              mountPath: /data
+              mountPath: /data # the Minio mount path have to be /data -> it's hardcoded into Minio server startup command
           readinessProbe:
             httpGet:
               path: /minio/health/ready

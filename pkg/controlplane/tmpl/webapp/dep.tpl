@@ -48,7 +48,7 @@ spec:
           value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+      serviceAccountName: cnvrg
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -126,29 +126,74 @@ spec:
       {{- end }}
       initContainers:
       - name: services-check
-        image: {{.Spec.ImageHub }}/{{.Spec.ControlPlane.Seeder.Image}}
-        command: ["/bin/bash", "-c", "python3 cnvrg-boot.py services-check"]
-        imagePullPolicy: Always
-        env:
-        - name: "CNVRG_SERVICE_LIST"
-          {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
-          value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }};{{ objectStorageUrl . }}/minio/health/ready"
-          {{- else }}
-          value: "{{ .Spec.Dbs.Pg.SvcName }}:{{ .Spec.Dbs.Pg.Port }}"
-          {{ end }}
-      {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
-      - name: create-cnvrg-bucket
-        image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Seeder.Image }}
-        command: ["/bin/bash","-c", "{{ .Spec.ControlPlane.Seeder.CreateBucketCmd }}"]
-        imagePullPolicy: Always
+        image: {{.Spec.ImageHub }}/{{.Spec.ControlPlane.Image}}
         envFrom:
         - secretRef:
             name: cp-object-storage
-      {{- end }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Es.CredsRef }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Pg.CredsRef }}
+        - secretRef:
+            name: {{ .Spec.Dbs.Redis.CredsRef }}
+        - secretRef:
+            name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
+        command:
+        - "/bin/bash"
+        - "-lc"
+        - |
+          #!/bin/bash
+          flagFile=/tmp/services_not_ready
+          echo true > ${flagFile}
+          while $(cat ${flagFile}); do
+
+            timeout 2 bash -c "</dev/tcp/{{.Spec.Dbs.Redis.SvcName}}/{{.Spec.Dbs.Redis.Port}}";
+            if [[ $? != 0 ]]; then
+              echo "[$(date)] redis not ready"
+              sleep 1
+              continue
+            fi
+            echo "[$(date)] redis is ready!"
+
+            timeout 2 bash -c "</dev/tcp/${POSTGRES_HOST}/{{.Spec.Dbs.Pg.Port}}";
+            if [[ $? != 0 ]]; then
+              echo "[$(date)] postgres [${POSTGRES_HOST}:{{.Spec.Dbs.Pg.Port}}] not ready"
+              sleep 1
+              continue
+            fi
+            echo "[$(date)] postgres is ready!"
+
+            if [[ $(curl -s $ELASTICSEARCH_URL/_cluster/health -o /dev/null -w '%{http_code}') != 200 ]]; then
+              echo "[$(date)] elasticsearch not ready"
+              sleep 1
+              continue
+            fi
+            echo "[$(date)] elasticsearch is ready!"
+
+            {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
+            if [[ $(curl -s $CNVRG_STORAGE_ENDPOINT/minio/health/ready -o /dev/null -w '%{http_code}') != 200 ]]; then
+              echo "[$(date)] minio [$CNVRG_STORAGE_ENDPOINT/minio/health/ready] not ready"
+              sleep 1
+              continue
+            fi
+            echo "[$(date)] minio is ready!"
+            {{- end }}
+
+            echo false > ${flagFile}
+            echo "[$(date)] all services are ready!"
+          done
       - name: seeder
         image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image }}
-        command: ["/bin/bash", "-lc", "{{ .Spec.ControlPlane.Seeder.SeedCmd }}"]
-        imagePullPolicy: Always
+        command:
+          - /bin/bash
+          - -lc
+          - |
+            if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then
+              rails db:migrate \
+              && rails db:seed \
+              && rails libraries:update \
+              && kubectl create cm cnvrg-db-init -n ${KUBE_NAMESPACE}
+            fi
         envFrom:
         - configMapRef:
             name: cp-base-config

@@ -11,6 +11,7 @@ metadata:
     k8s-app: fluent-bit-logging
     version: v1
     kubernetes.io/cluster-service: "true"
+    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-fluentbit"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -42,7 +43,7 @@ spec:
           command:
             - /bin/bash
             - -c
-            - /opt/app-root/fluentbit -c /opt/app-root/etc/fluent-bit.conf & inotifywait -e close_write /opt/app-root/etc/fluent-bit.conf
+            - /opt/app-root/fluentbit -c /opt/app-root/etc/fluent-bit.conf
           ports:
             - containerPort: 2020
           volumeMounts:

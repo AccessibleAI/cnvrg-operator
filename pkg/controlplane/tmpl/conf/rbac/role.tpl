@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ .Spec.ControlPlane.Rbac.Role }}
+  name: cnvrg-control-plane
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}

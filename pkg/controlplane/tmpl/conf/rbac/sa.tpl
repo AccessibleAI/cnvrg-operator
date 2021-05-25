@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+  name: cnvrg
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}

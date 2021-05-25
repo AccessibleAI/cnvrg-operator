@@ -88,7 +88,7 @@ var minioDefaults = Minio{
 	Enabled:        &defaultFalse,
 	ServiceAccount: "minio",
 	Replicas:       1,
-	Image:          "minio:RELEASE.2020-09-17T04-49-20Z",
+	Image:          "minio:RELEASE.2021-05-22T02-34-39Z",
 	Port:           9000,
 	StorageSize:    "100Gi",
 	SvcName:        "minio",

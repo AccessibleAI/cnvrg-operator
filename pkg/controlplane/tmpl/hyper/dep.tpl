@@ -46,7 +46,7 @@ spec:
           value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      serviceAccountName: {{ .Spec.ControlPlane.Rbac.ServiceAccountName }}
+      serviceAccountName: cnvrg
       containers:
         - image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Hyper.Image }}
           name: {{ .Spec.ControlPlane.Hyper.SvcName }}

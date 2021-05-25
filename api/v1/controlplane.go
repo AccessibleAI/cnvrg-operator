@@ -87,12 +87,6 @@ type Hyper struct {
 	ReadinessTimeoutSeconds int      `json:"readinessTimeoutSeconds,omitempty"`
 }
 
-type Seeder struct {
-	Image           string `json:"image,omitempty"`
-	SeedCmd         string `json:"seedCmd,omitempty"`
-	CreateBucketCmd string `json:"createBucketCmd,omitempty"`
-}
-
 type Ldap struct {
 	Enabled       *bool  `json:"enabled,omitempty"`
 	Host          string `json:"host,omitempty"`
@@ -102,12 +96,6 @@ type Ldap struct {
 	AdminUser     string `json:"adminUser,omitempty"`
 	AdminPassword string `json:"adminPassword,omitempty"`
 	Ssl           string `json:"ssl,omitempty"`
-}
-
-type Rbac struct {
-	Role               string `json:"role,omitempty"`
-	ServiceAccountName string `json:"serviceAccountName,omitempty"`
-	RoleBindingName    string `json:"roleBindingName,omitempty"`
 }
 
 type SMTP struct {
@@ -148,10 +136,8 @@ type ControlPlane struct {
 	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
 	Systemkiq     Systemkiq     `json:"systemkiq,omitempty"`
 	Hyper         Hyper         `json:"hyper,omitempty"`
-	Seeder        Seeder        `json:"seeder,omitempty"`
 	BaseConfig    BaseConfig    `json:"baseConfig,omitempty"`
 	Ldap          Ldap          `json:"ldap,omitempty"`
-	Rbac          Rbac          `json:"rbac,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
 	Mpi           Mpi           `json:"mpi,omitempty"`
@@ -280,13 +266,6 @@ var controlPlaneDefault = ControlPlane{
 		ReadinessTimeoutSeconds: 60,
 	},
 
-	Seeder: Seeder{
-
-		Image:           "cnvrg-boot:v0.31-tenancy",
-		SeedCmd:         "if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then rails db:migrate && rails db:seed && rails libraries:update && kubectl create cm cnvrg-db-init -n ${KUBE_NAMESPACE}; fi",
-		CreateBucketCmd: "mb.sh",
-	},
-
 	Mpi: mpiDefault,
 
 	BaseConfig: BaseConfig{
@@ -321,13 +300,6 @@ var controlPlaneDefault = ControlPlane{
 		AdminUser:     "",
 		AdminPassword: "",
 		Ssl:           "", // true/false
-	},
-
-	Rbac: Rbac{
-
-		Role:               "cnvrg-control-plane-role",
-		ServiceAccountName: "cnvrg",
-		RoleBindingName:    "cnvrg-control-plane-binding",
 	},
 
 	SMTP: SMTP{
