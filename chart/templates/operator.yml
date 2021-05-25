@@ -90,20 +90,6 @@ spec:
         control-plane: cnvrg-operator
     spec:
       containers:
-        - name: config-reloader
-          image: "docker.io/cnvrg/config-reloader:latest"
-          imagePullPolicy: Always
-          command:
-            - /opt/app-root/config-reloader
-            - --match-label
-            - cnvrg-config-reloader.mlops.cnvrg.io
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 1000Mi
-            requests:
-              cpu: 100m
-              memory: 200Mi
         - command:
             - /opt/app-root/cnvrg-operator
             - run

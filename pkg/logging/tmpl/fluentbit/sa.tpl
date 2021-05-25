@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: fluent-bit
+  name: cnvrg-fluentbit
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}

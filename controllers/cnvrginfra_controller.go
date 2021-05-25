@@ -13,6 +13,7 @@ import (
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
 	"github.com/cnvrg-operator/pkg/registry"
+	"github.com/cnvrg-operator/pkg/reloader"
 	"github.com/cnvrg-operator/pkg/storage"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -139,6 +140,13 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
+	// config reloader
+	infraLog.Info("applying config reloader")
+	if err := desired.Apply(reloader.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}

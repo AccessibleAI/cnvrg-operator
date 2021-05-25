@@ -8,8 +8,10 @@ type AppInstance struct {
 }
 
 type Fluentbit struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Enabled      *bool             `json:"enabled,omitempty"`
+	Image        string            `json:"image,omitempty"`
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+	LogsMounts   map[string]string `json:"logsMounts,omitempty"`
 }
 
 type Elastalert struct {
@@ -48,8 +50,13 @@ type CnvrgInfraLogging struct {
 }
 
 var fluentbitDefault = Fluentbit{
-	Enabled: &defaultFalse,
-	Image:   "cnvrg-fluentbit:v1.7.3",
+	Enabled:      &defaultFalse,
+	Image:        "cnvrg-fluentbit:v1.7.3",
+	NodeSelector: nil,
+	LogsMounts: map[string]string{
+		"varlog":                 "/var/log",
+		"varlibdockercontainers": "/var/lib/docker/containers",
+	},
 }
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{

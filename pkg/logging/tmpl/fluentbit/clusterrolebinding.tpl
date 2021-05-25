@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: fluent-bit-read
+  name: cnvrg-fluentbit-read
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
@@ -13,8 +13,8 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: fluent-bit-read
+  name: cnvrg-fluentbit-read
 subjects:
 - kind: ServiceAccount
-  name: fluent-bit
+  name: cnvrg-fluentbit
   namespace: {{ ns . }}

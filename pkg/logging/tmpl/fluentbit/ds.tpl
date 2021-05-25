@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fluent-bit
+  name: cnvrg-fluentbit
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: fluentbit
+    app: cnvrg-fluentbit
     cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-fluentbit"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
@@ -16,11 +16,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: fluentbit
+      app: cnvrg-fluentbit
   template:
     metadata:
       labels:
-        app: fluentbit
+        app: cnvrg-fluentbit
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
@@ -29,8 +29,20 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
+        {{- range $key, $val := .Spec.Logging.Fluentbit.NodeSelector }}
+        {{ $key }}: {{ $val }}
+      {{- end }}
+      {{- else if (gt (len .Spec.Logging.Fluentbit.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.Logging.Fluentbit.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       containers:
-        - name: fluent-bit
+        - name: fluentbit
           image: {{.Spec.ImageHub }}/{{ .Spec.Logging.Fluentbit.Image }}
           imagePullPolicy: Always
           command:
@@ -40,11 +52,11 @@ spec:
           ports:
             - containerPort: 2020
           volumeMounts:
-            - name: varlog
-              mountPath: /var/log
-            - name: varlibdockercontainers
-              mountPath: /var/lib/docker/containers
+            {{- range $name, $path := .Spec.Logging.Fluentbit.LogsMounts }}
+            - name: {{ $name }}
+              mountPath: {{ $path }}
               readOnly: true
+            {{- end }}
             - name: fluent-bit-config
               mountPath: /opt/app-root/etc/
           securityContext:
@@ -53,12 +65,11 @@ spec:
             runAsGroup: 0
       terminationGracePeriodSeconds: 10
       volumes:
-        - name: varlog
+        {{- range $name, $path := .Spec.Logging.Fluentbit.LogsMounts }}
+        - name: {{ $name }}
           hostPath:
-            path: /var/log
-        - name: varlibdockercontainers
-          hostPath:
-            path: /var/lib/docker/containers
+            path: {{ $path}}
+        {{- end }}
         - name: fluent-bit-config
           configMap:
             name: fluent-bit-config

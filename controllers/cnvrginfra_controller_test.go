@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
@@ -16,9 +17,11 @@ import (
 // +kubebuilder:docs-gen:collapse=Imports
 
 var enabledInfraTests = map[string]bool{
-	"monitoring": true,
-	"storage":    true,
-	"networking": true,
+	"monitoring":     true,
+	"storage":        true,
+	"networking":     true,
+	"logging":        true,
+	"configReloader": true,
 }
 
 var _ = Describe("CnvrgInfra controller", func() {
@@ -345,6 +348,154 @@ var _ = Describe("CnvrgInfra controller", func() {
 				Expect(port2222).Should(HaveKeyWithValue("name", "port2222"))
 				Expect(port2222).Should(HaveKeyWithValue("port", port2222int64))
 			})
+		})
+	}
+
+	if enabledInfraTests["configReloader"] {
+		Context("Test Config Reloader", func() {
+			It("Config Reloader Labels/Annotations", func() {
+				ns := createNs()
+				ctx := context.Background()
+				labels := map[string]string{"foo": "bar"}
+				annotations := map[string]string{"foo1": "bar1"}
+				infra := getDefaultTestInfraSpec(ns)
+				infra.Spec.ConfigReloader.Enabled = &defaultTrue
+				infra.Spec.InfraNamespace = ns
+				infra.Spec.Labels = labels
+				infra.Spec.Annotations = annotations
+				Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+				d := v1.Deployment{}
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "config-reloader", Namespace: ns}, &d)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+				Expect(d.Labels).Should(HaveKeyWithValue("foo", "bar"))
+				Expect(d.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			})
+
+		})
+	}
+
+	if enabledInfraTests["logging"] {
+		Context("Test Logging", func() {
+			It("Fluentbit Labels/Annotations", func() {
+				ns := createNs()
+				ctx := context.Background()
+				labels := map[string]string{"foo": "bar"}
+				annotations := map[string]string{"foo1": "bar1"}
+				infra := getDefaultTestInfraSpec(ns)
+				infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+				infra.Spec.InfraNamespace = ns
+				infra.Spec.Labels = labels
+				infra.Spec.Annotations = annotations
+				Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+				ds := v1.DaemonSet{}
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-fluentbit", Namespace: ns}, &ds)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+				Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
+				Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			})
+			It("Fluentbit Default Logs Volumes", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				infra := getDefaultTestInfraSpec(ns)
+				infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+				infra.Spec.InfraNamespace = ns
+				Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+				ds := v1.DaemonSet{}
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-fluentbit", Namespace: ns}, &ds)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+				hostPathUnset := corev1.HostPathUnset
+				v := corev1.Volume{
+					Name: "varlog",
+					VolumeSource: corev1.VolumeSource{
+						HostPath: &corev1.HostPathVolumeSource{
+							Path: "/var/log",
+							Type: &hostPathUnset,
+						},
+					},
+				}
+				v1 := corev1.Volume{
+					Name: "varlibdockercontainers",
+					VolumeSource: corev1.VolumeSource{
+						HostPath: &corev1.HostPathVolumeSource{
+							Path: "/var/lib/docker/containers",
+							Type: &hostPathUnset,
+						},
+					},
+				}
+				Expect(ds.Spec.Template.Spec.Volumes).Should(ContainElement(v))
+				Expect(ds.Spec.Template.Spec.Volumes).Should(ContainElement(v1))
+
+			})
+
+			It("Fluentbit Extra Logs Volumes", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				infra := getDefaultTestInfraSpec(ns)
+				infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+				infra.Spec.Logging.Fluentbit.LogsMounts = map[string]string{"foobar": "/foo/bar"}
+				infra.Spec.InfraNamespace = ns
+				Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+				ds := v1.DaemonSet{}
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-fluentbit", Namespace: ns}, &ds)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+				hostPathUnset := corev1.HostPathUnset
+				v := corev1.Volume{
+					Name: "foobar",
+					VolumeSource: corev1.VolumeSource{
+						HostPath: &corev1.HostPathVolumeSource{
+							Path: "/foo/bar",
+							Type: &hostPathUnset,
+						},
+					},
+				}
+				Expect(ds.Spec.Template.Spec.Volumes).Should(ContainElement(v))
+			})
+
+			It("Fluentbit Tolerations", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				infra := getDefaultTestInfraSpec(ns)
+				infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+				infra.Spec.Logging.Fluentbit.NodeSelector = map[string]string{"foo": "bar"}
+				infra.Spec.Tenancy.Enabled = &defaultTrue
+				infra.Spec.InfraNamespace = ns
+				Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+				ds := v1.DaemonSet{}
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-fluentbit", Namespace: ns}, &ds)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+
+				Expect(ds.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+				Expect(ds.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			})
+
 		})
 	}
 

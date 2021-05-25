@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: fluentbit-exporter
+  name: cnvrg-fluentbit-exporter
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -16,7 +16,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: fluentbit
+      app: cnvrg-fluentbit
   namespaceSelector:
     matchNames:
       - {{ ns . }}

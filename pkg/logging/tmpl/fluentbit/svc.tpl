@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fluentbit-exporter
+  name: cnvrg-fluentbit-exporter
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: fluentbit
+    app: cnvrg-fluentbit
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -20,4 +20,4 @@ spec:
       targetPort: 2020
       protocol: TCP
   selector:
-    app: fluentbit
+    app: cnvrg-fluentbit

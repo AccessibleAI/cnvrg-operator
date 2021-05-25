@@ -47,6 +47,13 @@ spec:
                 type: object
               clusterDomain:
                 type: string
+              configReloader:
+                properties:
+                  enabled:
+                    type: boolean
+                  image:
+                    type: string
+                type: object
               dbs:
                 properties:
                   redis:
@@ -115,6 +122,14 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      logsMounts:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                     type: object
                 type: object
               monitoring:
