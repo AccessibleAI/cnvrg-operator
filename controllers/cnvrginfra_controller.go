@@ -37,6 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sort"
 	"strings"
 	"time"
 )
@@ -121,29 +122,6 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	r.updateStatusMessage(mlopsv1.StatusHealthy, "successfully reconciled", cnvrgInfra)
 	infraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
-}
-
-func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
-
-	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: mlopsv1.InfraReconcilerCm}
-
-	cnvrgAppCm := &v1.ConfigMap{}
-	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
-	}
-
-	var apps []mlopsv1.AppInstance
-	for _, appJson := range cnvrgAppCm.Data {
-		var app mlopsv1.AppInstance
-		if err := json.Unmarshal([]byte(appJson), &app); err != nil {
-			infraLog.Error(err, "error decoding AppInstance")
-			return nil, err
-		}
-		apps = append(apps, app)
-	}
-	return apps, nil
 }
 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
@@ -253,6 +231,34 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	return reconcileResult
+}
+
+func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
+
+	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: mlopsv1.InfraReconcilerCm}
+
+	cnvrgAppCm := &v1.ConfigMap{}
+	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	var cmKeys []string
+	var apps []mlopsv1.AppInstance
+	for key, _ := range cnvrgAppCm.Data {
+		cmKeys = append(cmKeys, key)
+	}
+	sort.Strings(cmKeys)
+	for _, key := range cmKeys {
+		var app mlopsv1.AppInstance
+		if err := json.Unmarshal([]byte(cnvrgAppCm.Data[key]), &app); err != nil {
+			infraLog.Error(err, "error decoding AppInstance")
+			return nil, err
+		}
+		apps = append(apps, app)
+	}
+	return apps, nil
 }
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {

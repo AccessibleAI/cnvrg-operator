@@ -341,6 +341,7 @@ func esIstioVs() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }
@@ -380,6 +381,7 @@ func minioIstioVs() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioVsGVR],
 			Own:            true,
+			Updatable:      true,
 		},
 	}
 }

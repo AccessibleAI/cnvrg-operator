@@ -403,13 +403,14 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 				return err
 			}
 		}
+
 		if viper.GetBool("dry-run") {
 			log.Info("dry run enabled, skipping applying...")
 			continue
 		}
-		fetchInto := &unstructured.Unstructured{}
-		fetchInto.SetGroupVersionKind(manifest.GVR)
-		err := client.Get(ctx, types.NamespacedName{Name: manifest.Obj.GetName(), Namespace: manifest.Obj.GetNamespace()}, fetchInto)
+		actualObject := &unstructured.Unstructured{}
+		actualObject.SetGroupVersionKind(manifest.GVR)
+		err := client.Get(ctx, types.NamespacedName{Name: manifest.Obj.GetName(), Namespace: manifest.Obj.GetNamespace()}, actualObject)
 		if err != nil && errors.IsNotFound(err) {
 			log.V(1).Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
 			if err := client.Create(ctx, manifest.Obj); err != nil {
@@ -423,18 +424,20 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 				continue
 			}
 
-			if err := mergo.Merge(fetchInto, manifest.Obj, mergo.WithOverride); err != nil {
-				log.Error(err, "can't merge")
-				return err
-			}
-
-			finalObjToApply := fetchInto
-
+			// if override true, do not merge object with existing state
+			// currently, Override=true set only for fluentbit CM
+			// this required when removing cnvrgapp, and fluentbit CM has to be overridden and not merged
+			// in case of merge, CM will have not existing cnvrgapp ES configuration/instance
 			if manifest.Override {
-				finalObjToApply = manifest.Obj // if override true, do not merge object with existing state
+				actualObject = manifest.Obj
+			} else {
+				if err := mergo.Merge(actualObject, manifest.Obj, mergo.WithOverride); err != nil {
+					log.Error(err, "can't merge")
+					return err
+				}
 			}
 
-			err := client.Update(ctx, finalObjToApply)
+			err := client.Update(ctx, actualObject)
 			if err != nil {
 				log.Info("error updating object", "manifest", manifest.TemplatePath)
 				return err
