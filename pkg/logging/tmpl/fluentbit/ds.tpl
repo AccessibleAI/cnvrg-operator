@@ -73,6 +73,6 @@ spec:
         - name: fluent-bit-config
           configMap:
             name: fluent-bit-config
-      serviceAccountName: fluent-bit
+      serviceAccountName: cnvrg-fluentbit
       tolerations:
         - operator: Exists

@@ -8,6 +8,8 @@ spec:
   clusterDomain: "{{ .Values.clusterDomain }}"
   infraNamespace: {{ template "spec.cnvrgNs" . }}
   imageHub: {{ .Values.imageHub }}
+  configReloader:
+    enabled: {{.Values.configReloader.enabled}}
   {{- include "spec.labelsAndAnnotations" . | indent 2 }}
   {{- include "spec.registry" . | indent 2 }}
   {{- include "spec.storage" . | indent 2 }}
