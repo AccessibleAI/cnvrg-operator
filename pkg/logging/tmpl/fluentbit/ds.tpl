@@ -43,7 +43,7 @@ spec:
       {{- end }}
       containers:
         - name: fluentbit
-          image: {{.Spec.ImageHub }}/{{ .Spec.Logging.Fluentbit.Image }}
+          image: {{ image .Spec.ImageHub .Spec.Logging.Fluentbit.Image }}
           imagePullPolicy: Always
           command:
             - /bin/bash

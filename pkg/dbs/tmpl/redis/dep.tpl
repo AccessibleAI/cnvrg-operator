@@ -50,7 +50,7 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-        - image: {{.Spec.ImageHub }}/{{ .Spec.Dbs.Redis.Image }}
+        - image: {{ image .Spec.ImageHub .Spec.Dbs.Redis.Image }}
           name: redis
           command: [ "/bin/bash", "-lc", "redis-server /config/redis.conf" ]
           ports:

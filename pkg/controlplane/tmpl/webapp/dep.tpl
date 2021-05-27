@@ -55,7 +55,7 @@ spec:
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"
-        image: {{.Spec.ImageHub }}/{{ .Spec.SSO.Image }}
+        image: {{ image .Spec.ImageHub .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
         envFrom:
           - secretRef:
@@ -65,7 +65,7 @@ spec:
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
       {{- end }}
-      - image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image }}
+      - image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         env:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
@@ -126,7 +126,7 @@ spec:
       {{- end }}
       initContainers:
       - name: services-check
-        image: {{.Spec.ImageHub }}/{{.Spec.ControlPlane.Image}}
+        image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         envFrom:
         - secretRef:
             name: cp-object-storage
@@ -183,7 +183,7 @@ spec:
             echo "[$(date)] all services are ready!"
           done
       - name: seeder
-        image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Image }}
+        image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         command:
           - /bin/bash
           - -lc

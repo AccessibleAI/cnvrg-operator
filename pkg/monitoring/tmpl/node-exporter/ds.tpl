@@ -39,7 +39,7 @@ spec:
         - --no-collector.wifi
         - --no-collector.hwmon
         - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
-        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.NodeExporter.Image }}
+        image: {{ image .Spec.ImageHub .Spec.Monitoring.NodeExporter.Image }}
         name: node-exporter
         resources:
           limits:
@@ -71,7 +71,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
+        image: {{ image .Spec.ImageHub .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
         name: kube-rbac-proxy
         ports:
         - containerPort: 9100

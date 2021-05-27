@@ -59,7 +59,7 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ .Spec.Dbs.Pg.CredsRef }}
-          image: {{.Spec.ImageHub }}/{{.Spec.Dbs.Pg.Image}}
+          image: {{ image .Spec.ImageHub .Spec.Dbs.Pg.Image}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: {{.Spec.Dbs.Pg.Port}}

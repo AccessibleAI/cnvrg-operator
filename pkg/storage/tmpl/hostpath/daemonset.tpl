@@ -48,7 +48,7 @@ spec:
       serviceAccountName: hostpath-provisioner-admin
       containers:
         - name: hostpath-provisioner
-          image: {{.Spec.ImageHub }}/{{ .Spec.Storage.Hostpath.Image }}
+          image: {{image .Spec.ImageHub .Spec.Storage.Hostpath.Image }}
           imagePullPolicy: Always
           env:
             - name: USE_NAMING_PREFIX

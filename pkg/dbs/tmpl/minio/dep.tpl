@@ -52,7 +52,7 @@ spec:
       serviceAccountName: {{ .Spec.Dbs.Minio.ServiceAccount }}
       containers:
         - name: minio
-          image: {{.Spec.ImageHub }}/{{ .Spec.Dbs.Minio.Image }}
+          image: {{ image .Spec.ImageHub .Spec.Dbs.Minio.Image }}
           envFrom:
           - secretRef:
               name: cp-object-storage
