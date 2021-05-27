@@ -107,6 +107,9 @@ spec:
           requests:
             cpu: "{{.Spec.ControlPlane.WebApp.Requests.Cpu}}"
             memory: "{{.Spec.ControlPlane.WebApp.Requests.Memory}}"
+          limits:
+            cpu: "{{.Spec.ControlPlane.WebApp.Limits.Cpu}}"
+            memory: "{{.Spec.ControlPlane.WebApp.Limits.Memory}}"
         {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         volumeMounts:
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
@@ -138,6 +141,13 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "200Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
         command:
         - "/bin/bash"
         - "-lc"
@@ -194,6 +204,13 @@ spec:
               && rails libraries:update \
               && kubectl create cm cnvrg-db-init -n ${KUBE_NAMESPACE}
             fi
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "200Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
         envFrom:
         - configMapRef:
             name: cp-base-config

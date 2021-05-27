@@ -35,6 +35,7 @@ type WebApp struct {
 	Enabled                 *bool                 `json:"enabled,omitempty"`
 	Port                    int                   `json:"port,omitempty"`
 	Requests                Requests              `json:"requests,omitempty"`
+	Limits                  Limits                `json:"limits,omitempty"`
 	SvcName                 string                `json:"svcName,omitempty"`
 	NodePort                int                   `json:"nodePort,omitempty"`
 	PassengerMaxPoolSize    int                   `json:"passengerMaxPoolSize,omitempty"`
@@ -49,26 +50,22 @@ type Sidekiq struct {
 	Enabled  *bool    `json:"enabled,omitempty"`
 	Split    *bool    `json:"split,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
 }
 
 type Searchkiq struct {
 	Enabled  *bool    `json:"enabled,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
 }
 
 type Systemkiq struct {
 	Enabled  *bool    `json:"enabled,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
-}
-
-type Registry struct {
-	Name     string `json:"name,omitempty"`
-	URL      string `json:"url,omitempty"`
-	User     string `json:"user,omitempty"`
-	Password string `json:"password,omitempty"`
 }
 
 type Hyper struct {
@@ -85,6 +82,13 @@ type Hyper struct {
 	MemoryLimit             string   `json:"memoryLimit,omitempty"`
 	ReadinessPeriodSeconds  int      `json:"readinessPeriodSeconds,omitempty"`
 	ReadinessTimeoutSeconds int      `json:"readinessTimeoutSeconds,omitempty"`
+}
+
+type Registry struct {
+	Name     string `json:"name,omitempty"`
+	URL      string `json:"url,omitempty"`
+	User     string `json:"user,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type Ldap struct {
@@ -154,6 +158,8 @@ type Mpi struct {
 	KubectlDeliveryImage string            `json:"kubectlDeliveryImage,omitempty"`
 	ExtraArgs            map[string]string `json:"extraArgs,omitempty"`
 	Registry             Registry          `json:"registry,omitempty"`
+	Requests             Requests          `json:"requests,omitempty"`
+	Limits               Limits            `json:"limits,omitempty"`
 }
 
 var mpiDefault = Mpi{
@@ -161,6 +167,14 @@ var mpiDefault = Mpi{
 	Image:                "mpioperator/mpi-operator:v0.2.3",
 	KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
 	ExtraArgs:            nil,
+	Requests: Requests{
+		Cpu:    "100m",
+		Memory: "100Mi",
+	},
+	Limits: Limits{
+		Cpu:    "1000m",
+		Memory: "1Gi",
+	},
 	Registry: Registry{
 
 		Name:     "mpi-private-registry",
@@ -197,6 +211,10 @@ var controlPlaneDefault = ControlPlane{
 			Cpu:    "2000m",
 			Memory: "4Gi",
 		},
+		Limits: Limits{
+			Cpu:    "10000m",
+			Memory: "10000Gi",
+		},
 		SvcName:                 "app",
 		NodePort:                30080,
 		PassengerMaxPoolSize:    20,
@@ -225,6 +243,10 @@ var controlPlaneDefault = ControlPlane{
 			Cpu:    "1000m",
 			Memory: "3750Mi",
 		},
+		Limits: Limits{
+			Cpu:    "10000m",
+			Memory: "10000Gi",
+		},
 		Replicas: 2,
 	},
 
@@ -234,6 +256,10 @@ var controlPlaneDefault = ControlPlane{
 			Cpu:    "750m",
 			Memory: "750Mi",
 		},
+		Limits: Limits{
+			Cpu:    "10000m",
+			Memory: "10000Gi",
+		},
 		Replicas: 1,
 	},
 
@@ -242,6 +268,10 @@ var controlPlaneDefault = ControlPlane{
 		Requests: Requests{
 			Cpu:    "500m",
 			Memory: "500Mi",
+		},
+		Limits: Limits{
+			Cpu:    "10000m",
+			Memory: "10000Gi",
 		},
 		Replicas: 1,
 	},

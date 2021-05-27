@@ -47,6 +47,13 @@ spec:
       - name: mpi-operator
         imagePullPolicy: Always
         image: {{ .Spec.ControlPlane.Mpi.Image }}
+        resources:
+          requests:
+            cpu: {{.Spec.ControlPlane.Mpi.Requests.Cpu}}
+            memory: {{.Spec.ControlPlane.Mpi.Requests.Memory}}
+          limits:
+            cpu: {{.Spec.ControlPlane.Mpi.Limits.Cpu}}
+            memory: {{.Spec.ControlPlane.Mpi.Limits.Memory}}
         args:
         - -alsologtostderr
         - --kubectl-delivery-image

@@ -88,6 +88,9 @@ spec:
           requests:
             cpu: {{ .Spec.ControlPlane.Searchkiq.Requests.Cpu }}
             memory: {{ .Spec.ControlPlane.Searchkiq.Requests.Memory }}
+          limits:
+            cpu: {{ .Spec.ControlPlane.Searchkiq.Limits.Cpu }}
+            memory: {{ .Spec.ControlPlane.Searchkiq.Limits.Memory }}
         lifecycle:
           preStop:
             exec:
@@ -102,6 +105,13 @@ spec:
       - name: seeder
         image:  {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         command: ["/bin/bash", "-lc", "while true; do if [[ $(kubectl get cm cnvrg-db-init -oname --ignore-not-found | wc -l) == 0 ]]; then echo 'cnvrg seed not ready'; sleep 1; else echo 'cnvrg seed is done'; exit 0; fi; done"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
         env:
         - name: "CNVRG_NS"
           value: {{ ns . }}
