@@ -773,10 +773,11 @@ var _ = Describe("CnvrgApp controller", func() {
 				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
 				testApp.Spec.ControlPlane.Image = "app:1.2.3"
 
-				deployment := v1.Deployment{}
+				dep := v1.Deployment{}
 				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
 				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &dep)
 					if err != nil {
 						return false
 					}
@@ -784,7 +785,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				}, timeout, interval).Should(BeTrue())
 
 				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
-				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+				Expect(dep.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
 
 			})
 
@@ -801,6 +802,30 @@ var _ = Describe("CnvrgApp controller", func() {
 				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 				Eventually(func() bool {
 					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+
+				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
+				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+			})
+
+			It("ImageHub for Sidekiq - custom ImageHub", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				testApp := getDefaultTestAppSpec(ns)
+				testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+				testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+				testApp.Spec.ImageHub = "foo/bar"
+
+				deployment := v1.Deployment{}
+				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
 					if err != nil {
 						return false
 					}
