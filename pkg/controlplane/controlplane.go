@@ -70,6 +70,16 @@ func controlPlaneConfigState() []*desired.State {
 		},
 		{
 
+			TemplatePath:   path + "/conf/cm/config-labels.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
 			TemplatePath:   path + "/conf/cm/secret-base.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
