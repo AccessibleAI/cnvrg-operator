@@ -44,7 +44,7 @@ spec:
       {{- end }}
       containers:
         - name: config-reloader
-          image: {{.Spec.ImageHub}}/{{.Spec.ConfigReloader.Image}}
+          image: {{image .Spec.ImageHub .Spec.ConfigReloader.Image}}
           imagePullPolicy: Always
           command:
             - /opt/app-root/config-reloader

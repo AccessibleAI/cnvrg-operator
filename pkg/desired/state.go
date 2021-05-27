@@ -338,6 +338,14 @@ elasticsearch:
 			}
 			return fmt.Sprintf("%dGB", size-2)
 		},
+		"image": func(imageHub string, imageName string) string {
+			if strings.Contains(imageName, "/") {
+				return imageName
+			} else {
+				return fmt.Sprintf("%s/%s", imageHub, imageName)
+			}
+
+		},
 	}
 }
 

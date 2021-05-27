@@ -48,7 +48,7 @@ spec:
       {{- end }}
       serviceAccountName: cnvrg
       containers:
-        - image: {{.Spec.ImageHub }}/{{ .Spec.ControlPlane.Hyper.Image }}
+        - image: {{ image .Spec.ImageHub .Spec.ControlPlane.Hyper.Image }}
           name: {{ .Spec.ControlPlane.Hyper.SvcName }}
           envFrom:
             - configMapRef:

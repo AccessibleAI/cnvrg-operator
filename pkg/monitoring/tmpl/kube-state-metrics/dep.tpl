@@ -46,14 +46,14 @@ spec:
         - --port=8081
         - --telemetry-host=127.0.0.1
         - --telemetry-port=8082
-        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.KubeStateMetrics.Image }}
+        image: {{ image .Spec.ImageHub .Spec.Monitoring.KubeStateMetrics.Image }}
         name: kube-state-metrics
       - args:
         - --logtostderr
         - --secure-listen-address=:8443
         - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
         - --upstream=http://127.0.0.1:8081/
-        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
+        image: {{ image .Spec.ImageHub .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
         name: kube-rbac-proxy-main
         ports:
         - containerPort: 8443
@@ -67,7 +67,7 @@ spec:
         - --secure-listen-address=:9443
         - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
         - --upstream=http://127.0.0.1:8082/
-        image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
+        image: {{ image .Spec.ImageHub .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
         name: kube-rbac-proxy-self
         ports:
         - containerPort: 9443

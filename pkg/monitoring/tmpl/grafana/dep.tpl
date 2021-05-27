@@ -46,7 +46,7 @@ spec:
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"
-        image: {{.Spec.ImageHub }}/{{ .Spec.SSO.Image }}
+        image: {{image .Spec.ImageHub .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
         envFrom:
         - secretRef:
@@ -56,7 +56,7 @@ spec:
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
       {{- end }}
-      - image: {{.Spec.ImageHub }}/{{ .Spec.Monitoring.Grafana.Image }}
+      - image: {{image .Spec.ImageHub .Spec.Monitoring.Grafana.Image }}
         name: grafana
         env:
           - name: GF_AUTH_BASIC_ENABLED

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -761,6 +762,77 @@ var _ = Describe("CnvrgApp controller", func() {
 
 				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+			})
+
+			It("ImageHub for WebApp - default ImageHub", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				testApp := getDefaultTestAppSpec(ns)
+				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+				testApp.Spec.ControlPlane.Image = "app:1.2.3"
+
+				deployment := v1.Deployment{}
+				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+
+				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
+				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+			})
+
+			It("ImageHub for WebApp - custom ImageHub", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				testApp := getDefaultTestAppSpec(ns)
+				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+				testApp.Spec.ImageHub = "foo/bar"
+				testApp.Spec.ControlPlane.Image = "app:1.2.3"
+
+				deployment := v1.Deployment{}
+				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+
+				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
+				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+			})
+
+			It("Image for WebApp - disable  ImageHub", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				testApp := getDefaultTestAppSpec(ns)
+				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+				testApp.Spec.ImageHub = "foo/bar"
+				testApp.Spec.ControlPlane.Image = "foo/app:1.2.3"
+
+				deployment := v1.Deployment{}
+				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+
+				shouldBe := fmt.Sprintf("%s", testApp.Spec.ControlPlane.Image)
+				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
 
 			})
 

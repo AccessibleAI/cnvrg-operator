@@ -286,8 +286,6 @@ spec:
                         items:
                           type: string
                         type: array
-                      hub:
-                        type: string
                       ingressSvcAnnotations:
                         additionalProperties:
                           type: string
@@ -300,7 +298,11 @@ spec:
                         items:
                           type: string
                         type: array
-                      tag:
+                      operatorImage:
+                        type: string
+                      pilotImage:
+                        type: string
+                      proxyImage:
                         type: string
                     type: object
                 type: object

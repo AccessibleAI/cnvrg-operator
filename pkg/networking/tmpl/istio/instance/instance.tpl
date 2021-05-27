@@ -13,7 +13,7 @@ metadata:
     {{- end }}
 spec:
   profile: minimal
-  tag: {{.Spec.Networking.Istio.Tag}}
+  tag: 1.10.0 # have to be statically configured, currently cnvrg not support other versions
   hub: {{.Spec.ImageHub }}
   components:
     base:
