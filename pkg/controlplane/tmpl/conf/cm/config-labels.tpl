@@ -20,7 +20,3 @@ data:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-
-
-
-

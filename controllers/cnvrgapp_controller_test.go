@@ -861,6 +861,33 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			})
 
+			It("Labels/Annotations CCP ConfigMap", func() {
+				ns := createNs()
+				ctx := context.Background()
+
+				testApp := getDefaultTestAppSpec(ns)
+				testApp.Spec.Labels = map[string]string{"foo": "bar", "foo1": "bar1"}
+				testApp.Spec.Annotations = map[string]string{"foo1": "bar1"}
+				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+
+				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
+				cm := corev1.ConfigMap{}
+				Eventually(func() bool {
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-annotation-label", Namespace: ns}, &cm)
+					if err != nil {
+						return false
+					}
+					return true
+				}, timeout, interval).Should(BeTrue())
+
+				Expect(cm.Data["labels"]).Should(ContainSubstring("foo"))
+				Expect(cm.Data["labels"]).Should(ContainSubstring("bar"))
+				Expect(cm.Data["annotations"]).Should(ContainSubstring("foo1"))
+				Expect(cm.Data["annotations"]).Should(ContainSubstring("bar1"))
+
+			})
+
 		})
 	}
 
