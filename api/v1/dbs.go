@@ -97,12 +97,12 @@ var minioDefaults = Minio{
 	NodePort:       30090,
 	StorageClass:   "",
 	Requests: Requests{
-		Cpu:    "1000m",
+		Cpu:    "1",
 		Memory: "2Gi",
 	},
 	Limits: Limits{
-		Cpu:    "4000m",
-		Memory: "10Gi",
+		Cpu:    "8",
+		Memory: "20Gi",
 	},
 	PvcName: "minio-storage",
 	SharedStorage: SharedStorage{
