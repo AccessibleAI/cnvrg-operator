@@ -15,6 +15,10 @@ $(shell echo $$(git fetch --tags && git tag -l --sort -version:refname | head -n
 
 all: manager
 
+# Unfocus tests
+unfocus:
+	ginkgo unfocus controllers/
+
 # Run tests
 test: pack generate fmt vet manifests
 	go test ./controllers/ -v

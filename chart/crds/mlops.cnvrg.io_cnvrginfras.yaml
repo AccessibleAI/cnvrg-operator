@@ -122,6 +122,13 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       logsMounts:
                         additionalProperties:
                           type: string
@@ -129,6 +136,13 @@ spec:
                       nodeSelector:
                         additionalProperties:
                           type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
                         type: object
                     type: object
                 type: object
@@ -211,6 +225,13 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       nodePort:
                         type: integer
                       nodeSelector:

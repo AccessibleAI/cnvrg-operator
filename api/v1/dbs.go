@@ -123,11 +123,11 @@ var pgDefault = Pg{
 	SvcName:        "postgres",
 	StorageClass:   "",
 	Requests: Requests{
-		Cpu:    "4000m",
+		Cpu:    "4",
 		Memory: "4Gi",
 	},
 	Limits: Limits{
-		Cpu:    "8000m",
+		Cpu:    "8",
 		Memory: "20Gi",
 	},
 	MaxConnections:     500,

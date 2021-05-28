@@ -48,6 +48,13 @@ spec:
       - name: "cnvrg-oauth-proxy"
         image: {{image .Spec.ImageHub .Spec.SSO.Image }}
         command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100m
+          limits:
+            cpu: 500m
+            memory: 1Gi
         envFrom:
         - secretRef:
             name: {{ .Spec.Dbs.Redis.CredsRef }}

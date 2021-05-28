@@ -19,14 +19,6 @@ import (
 var defaultTrue = true
 
 // +kubebuilder:docs-gen:collapse=Imports
-var enabledAppTests = map[string]bool{
-	"pg":         true,
-	"redis":      true,
-	"minio":      true,
-	"es":         true,
-	"ccp":        true,
-	"monitoring": true,
-}
 
 var _ = Describe("CnvrgApp controller", func() {
 
@@ -35,861 +27,870 @@ var _ = Describe("CnvrgApp controller", func() {
 		duration = time.Second * 10
 		interval = time.Millisecond * 250
 	)
-	if enabledAppTests["pg"] {
-		Context("Test PG", func() {
-			It("PG Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("PG Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
+	Context("Test PG", func() {
+		It("PG Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("PG HugePages - defaults", func() {
-				ns := createNs()
-				ctx := context.Background()
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("PG Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
 
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("PG HugePages - defaults", func() {
+			ns := createNs()
+			ctx := context.Background()
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
 
-				v := corev1.Volume{
-					Name: "hugepage",
-					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{
-							Medium:    "HugePages",
-							SizeLimit: nil,
-						},
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			v := corev1.Volume{
+				Name: "hugepage",
+				VolumeSource: corev1.VolumeSource{
+					EmptyDir: &corev1.EmptyDirVolumeSource{
+						Medium:    "HugePages",
+						SizeLimit: nil,
 					},
+				},
+			}
+			Expect(deployment.Spec.Template.Spec.Volumes).Should(ContainElement(v))
+
+			vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
+			Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).Should(ContainElement(vm))
+
+			shouldLimits := map[corev1.ResourceName]resource.Quantity{
+				"hugepages-2Mi":       resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Memory),
+				corev1.ResourceCPU:    resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Cpu),
+				corev1.ResourceMemory: resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Memory),
+			}
+
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["hugepages-2Mi"]))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["cpu"]))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["memory"]))
+
+		})
+		It("PG HugePages - custom", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.HugePages.Size = "1Gi"
+			testApp.Spec.Dbs.Pg.HugePages.Memory = "2Gi"
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
 				}
-				Expect(deployment.Spec.Template.Spec.Volumes).Should(ContainElement(v))
+				return true
+			}, timeout, interval).Should(BeTrue())
 
-				vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
-				Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).Should(ContainElement(vm))
-
-				l := corev1.ResourceList{"hugepages-2Mi": resource.MustParse("4Gi")}
-				Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(BeEquivalentTo(l))
-
-			})
-			It("PG HugePages - custom", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.HugePages.Size = "1Gi"
-				testApp.Spec.Dbs.Pg.HugePages.Memory = "2Gi"
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				v := corev1.Volume{
-					Name: "hugepage",
-					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{
-							Medium:    "HugePages",
-							SizeLimit: nil,
-						},
+			v := corev1.Volume{
+				Name: "hugepage",
+				VolumeSource: corev1.VolumeSource{
+					EmptyDir: &corev1.EmptyDirVolumeSource{
+						Medium:    "HugePages",
+						SizeLimit: nil,
 					},
-				}
-				Expect(deployment.Spec.Template.Spec.Volumes).Should(ContainElement(v))
+				},
+			}
+			Expect(deployment.Spec.Template.Spec.Volumes).Should(ContainElement(v))
 
-				vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
-				Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).Should(ContainElement(vm))
+			vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
+			Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).Should(ContainElement(vm))
 
-				l := corev1.ResourceList{"hugepages-1Gi": resource.MustParse("2Gi")}
-				Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(BeEquivalentTo(l))
+			shouldLimits := map[corev1.ResourceName]resource.Quantity{
+				"hugepages-2Mi":       resource.MustParse("2Gi"),
+				corev1.ResourceCPU:    resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Cpu),
+				corev1.ResourceMemory: resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Memory),
+			}
 
-			})
-			It("PG NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.NodeSelector = map[string]string{"foo": "bar"}
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-
-			})
-			It("PG Tenancy & NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Pg.NodeSelector = map[string]string{"foo": "bar"}
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
-				}
-
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
-			})
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["hugepages-2Mi"]))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["cpu"]))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["memory"]))
 
 		})
-	}
-	if enabledAppTests["redis"] {
-		Context("Test Redis", func() {
-			It("Redis Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
+		It("PG NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("Redis Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.NodeSelector = map[string]string{"foo": "bar"}
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("Redis NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Redis.NodeSelector = map[string]string{"foo": "bar"}
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-
-			})
-			It("Redis Tenancy & NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Redis.NodeSelector = map[string]string{"foo": "bar"}
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
 				}
+				return true
+			}, timeout, interval).Should(BeTrue())
 
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
-			})
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 
 		})
-	}
-	if enabledAppTests["minio"] {
-		Context("Test Minio", func() {
-			It("Minio Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
+		It("PG Tenancy & NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("Minio Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.NodeSelector = map[string]string{"foo": "bar"}
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("Minio NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Minio.NodeSelector = map[string]string{"foo": "bar"}
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-
-			})
-			It("Minio Tenancy & NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Minio.NodeSelector = map[string]string{"foo": "bar"}
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
 				}
+				return true
+			}, timeout, interval).Should(BeTrue())
 
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
 
-			})
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 
 		})
-	}
-	if enabledAppTests["es"] {
-		Context("Test Es", func() {
-			It("Es Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
 
-				sts := v1.StatefulSet{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(sts.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("Es Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
+	})
 
-				sts := v1.StatefulSet{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(sts.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("Es NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
+	Context("Test Redis", func() {
+		It("Redis Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
 
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Es.NodeSelector = map[string]string{"foo": "bar"}
-
-				sts := v1.StatefulSet{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-
-			})
-			It("Es Tenancy & NodeSelector", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-				testApp.Spec.Dbs.Es.NodeSelector = map[string]string{"foo": "bar"}
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				sts := v1.StatefulSet{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
 				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("Redis Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
 
-				Expect(sts.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-				Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("Redis NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
 
-			})
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.NodeSelector = map[string]string{"foo": "bar"}
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 
 		})
-	}
-	if enabledAppTests["ccp"] {
-		Context("Test Cnvrg Control Plane", func() {
+		It("Redis Tenancy & NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
 
-			It("WebApp Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("WebApp Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.NodeSelector = map[string]string{"foo": "bar"}
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
 
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("WebApp Tenancy", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
 				}
+				return true
+			}, timeout, interval).Should(BeTrue())
 
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
 
-			})
-
-			It("Sidekiq Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-				testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("Sidekiq Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-				testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("Sidekiq Tenancy", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-				testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
-				}
-
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
-			})
-
-			It("Hyper Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("Hyper Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("Hyper Tenancy", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
-				}
-
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
-			})
-
-			It("Mpi Operator Labels", func() {
-				ns := createNs()
-				ctx := context.Background()
-				labels := map[string]string{"foo": "bar"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-				testApp.Spec.Labels = labels
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
-			})
-			It("Mpi Operator Annotations", func() {
-				ns := createNs()
-				ctx := context.Background()
-				annotations := map[string]string{"foo1": "bar1"}
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-				testApp.Spec.Annotations = annotations
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-				Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
-			})
-			It("Mpi Operator Tenancy", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-				testApp.Spec.Tenancy.Enabled = &defaultTrue
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				t := corev1.Toleration{
-					Key:      testApp.Spec.Tenancy.Key,
-					Operator: "Equal",
-					Value:    testApp.Spec.Tenancy.Value,
-					Effect:   "NoSchedule",
-				}
-
-				Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
-				Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
-			})
-
-			It("ImageHub for WebApp - default ImageHub", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-				testApp.Spec.ControlPlane.Image = "app:1.2.3"
-
-				dep := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &dep)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
-				Expect(dep.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
-			})
-
-			It("ImageHub for WebApp - custom ImageHub", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-				testApp.Spec.ImageHub = "foo/bar"
-				testApp.Spec.ControlPlane.Image = "app:1.2.3"
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
-				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
-			})
-
-			It("ImageHub for Sidekiq - custom ImageHub", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-				testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-				testApp.Spec.ImageHub = "foo/bar"
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
-				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
-			})
-
-			It("Image for WebApp - disable  ImageHub", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-				testApp.Spec.ImageHub = "foo/bar"
-				testApp.Spec.ControlPlane.Image = "foo/app:1.2.3"
-
-				deployment := v1.Deployment{}
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				shouldBe := fmt.Sprintf("%s", testApp.Spec.ControlPlane.Image)
-				Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
-			})
-
-			It("Labels/Annotations CCP ConfigMap", func() {
-				ns := createNs()
-				ctx := context.Background()
-
-				testApp := getDefaultTestAppSpec(ns)
-				testApp.Spec.Labels = map[string]string{"foo": "bar", "foo1": "bar1"}
-				testApp.Spec.Annotations = map[string]string{"foo1": "bar1"}
-				testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-
-				Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
-
-				cm := corev1.ConfigMap{}
-				Eventually(func() bool {
-					err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-annotation-label", Namespace: ns}, &cm)
-					if err != nil {
-						return false
-					}
-					return true
-				}, timeout, interval).Should(BeTrue())
-
-				Expect(cm.Data["labels"]).Should(ContainSubstring("foo"))
-				Expect(cm.Data["labels"]).Should(ContainSubstring("bar"))
-				Expect(cm.Data["annotations"]).Should(ContainSubstring("foo1"))
-				Expect(cm.Data["annotations"]).Should(ContainSubstring("bar1"))
-
-			})
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 
 		})
-	}
+
+	})
+
+	Context("Test Minio", func() {
+		It("Minio Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("Minio Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("Minio NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.NodeSelector = map[string]string{"foo": "bar"}
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+
+		})
+		It("Minio Tenancy & NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.NodeSelector = map[string]string{"foo": "bar"}
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Minio.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+		})
+
+	})
+
+	Context("Test Es", func() {
+		It("Es Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(sts.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("Es Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
+
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(sts.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("Es NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.NodeSelector = map[string]string{"foo": "bar"}
+
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+
+		})
+		It("Es Tenancy & NodeSelector", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.NodeSelector = map[string]string{"foo": "bar"}
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(sts.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+		})
+
+	})
+
+	Context("Test Cnvrg Control Plane", func() {
+
+		It("WebApp Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("WebApp Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("WebApp Tenancy", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+		})
+
+		It("Sidekiq Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("Sidekiq Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("Sidekiq Tenancy", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+		})
+
+		It("Hyper Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("Hyper Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("Hyper Tenancy", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+		})
+
+		It("Mpi Operator Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+		It("Mpi Operator Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			annotations := map[string]string{"foo1": "bar1"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.Annotations = annotations
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+		})
+		It("Mpi Operator Tenancy", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.Hyper.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+
+		})
+
+		It("ImageHub for WebApp - default ImageHub", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Image = "app:1.2.3"
+
+			dep := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
+			Expect(dep.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+		})
+
+		It("ImageHub for WebApp - custom ImageHub", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ImageHub = "foo/bar"
+			testApp.Spec.ControlPlane.Image = "app:1.2.3"
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
+			Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+		})
+
+		It("ImageHub for Sidekiq - custom ImageHub", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			testApp.Spec.ImageHub = "foo/bar"
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
+			Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+		})
+
+		It("Image for WebApp - disable  ImageHub", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ImageHub = "foo/bar"
+			testApp.Spec.ControlPlane.Image = "foo/app:1.2.3"
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			shouldBe := fmt.Sprintf("%s", testApp.Spec.ControlPlane.Image)
+			Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
+
+		})
+
+		It("Labels/Annotations CCP ConfigMap", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Labels = map[string]string{"foo": "bar", "foo1": "bar1"}
+			testApp.Spec.Annotations = map[string]string{"foo1": "bar1"}
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
+			cm := corev1.ConfigMap{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-annotation-label", Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(cm.Data["labels"]).Should(ContainSubstring("foo"))
+			Expect(cm.Data["labels"]).Should(ContainSubstring("bar"))
+			Expect(cm.Data["annotations"]).Should(ContainSubstring("foo1"))
+			Expect(cm.Data["annotations"]).Should(ContainSubstring("bar1"))
+
+		})
+
+	})
 
 })
 
