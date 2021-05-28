@@ -88,6 +88,7 @@ spec:
                   echo "[$(date)][cnvrg-init] kibana not ready yet.. "
                   sleep 1
                 done
+                echo "[$(date)][cnvrg-init] kibana is ready!"
                 cnvrgIndexPatternExists=$(curl -s http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern -o /dev/null -w '%{http_code}')
                 if [[ "$cnvrgIndexPatternExists" == "200" ]]; then
                   echo "[$(date)][cnvrg-init] cnvrg index pattern found, skip index creation!"

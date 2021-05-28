@@ -155,7 +155,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["memory"]))
 
 		})
-		FIt("PG HugePages - disabled", func() {
+		It("PG HugePages - disabled", func() {
 			ns := createNs()
 			ctx := context.Background()
 
@@ -190,7 +190,6 @@ var _ = Describe("CnvrgApp controller", func() {
 			vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
 			Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).ShouldNot(ContainElement(vm))
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(BeEquivalentTo(shouldLimits))
-
 
 		})
 		It("PG NodeSelector", func() {
