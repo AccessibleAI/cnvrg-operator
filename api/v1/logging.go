@@ -10,6 +10,8 @@ type AppInstance struct {
 type Fluentbit struct {
 	Enabled      *bool             `json:"enabled,omitempty"`
 	Image        string            `json:"image,omitempty"`
+	Requests     Requests          `json:"requests,omitempty"`
+	Limits       Limits            `json:"limits,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 	LogsMounts   map[string]string `json:"logsMounts,omitempty"`
 }
@@ -56,6 +58,14 @@ var fluentbitDefault = Fluentbit{
 	LogsMounts: map[string]string{
 		"varlog":                 "/var/log",
 		"varlibdockercontainers": "/var/lib/docker/containers",
+	},
+	Requests: Requests{
+		Cpu:    "200m",
+		Memory: "200Mi",
+	},
+	Limits: Limits{
+		Cpu:    "2000m",
+		Memory: "2Gi",
 	},
 }
 

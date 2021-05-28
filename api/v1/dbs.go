@@ -15,6 +15,7 @@ type Pg struct {
 	SvcName            string            `json:"svcName,omitempty"`
 	StorageClass       string            `json:"storageClass,omitempty"`
 	Requests           Requests          `json:"requests,omitempty"`
+	Limits             Limits            `json:"limits,omitempty"`
 	MaxConnections     int               `json:"maxConnections,omitempty"`
 	SharedBuffers      string            `json:"sharedBuffers,omitempty"`      // https://github.com/sclorg/postgresql-container/tree/generated/12
 	EffectiveCacheSize string            `json:"effectiveCacheSize,omitempty"` // https://github.com/sclorg/postgresql-container/tree/generated/12
@@ -35,6 +36,7 @@ type Minio struct {
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
 	Requests       Requests          `json:"requests,omitempty"`
+	Limits         Limits            `json:"limits,omitempty"`
 	SharedStorage  SharedStorage     `json:"sharedStorage,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
@@ -48,8 +50,8 @@ type Redis struct {
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
-	Limits         Limits            `json:"limits,omitempty"`
 	Requests       Requests          `json:"requests,omitempty"`
+	Limits         Limits            `json:"limits,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
@@ -98,6 +100,10 @@ var minioDefaults = Minio{
 		Cpu:    "1000m",
 		Memory: "2Gi",
 	},
+	Limits: Limits{
+		Cpu:    "4000m",
+		Memory: "10Gi",
+	},
 	PvcName: "minio-storage",
 	SharedStorage: SharedStorage{
 		Enabled: &defaultFalse,
@@ -119,6 +125,10 @@ var pgDefault = Pg{
 	Requests: Requests{
 		Cpu:    "4000m",
 		Memory: "4Gi",
+	},
+	Limits: Limits{
+		Cpu:    "8000m",
+		Memory: "20Gi",
 	},
 	MaxConnections:     500,
 	SharedBuffers:      "1024MB", // for the shared_buffers we use 1/4 of given memory

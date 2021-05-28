@@ -12,6 +12,7 @@ type Prometheus struct {
 	Image               string            `json:"image,omitempty"`
 	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
 	Requests            Requests          `json:"requests,omitempty"`
+	Limits              Limits            `json:"limits,omitempty"`
 	SvcName             string            `json:"svcName,omitempty"`
 	Port                int               `json:"port,omitempty"`
 	NodePort            int               `json:"nodePort,omitempty"`
@@ -58,11 +59,6 @@ type CnvrgIdleMetricsExporter struct {
 	Labels  map[string]string `json:"labels,omitempty"`
 }
 
-type MetricsServer struct {
-	Enabled *bool  `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-}
-
 type CnvrgInfraMonitoring struct {
 	PrometheusOperator       PrometheusOperator       `json:"prometheusOperator,omitempty"`
 	Prometheus               Prometheus               `json:"prometheus,omitempty"`
@@ -106,6 +102,10 @@ var prometheusInfraDefault = Prometheus{
 		Cpu:    "200m",
 		Memory: "500Mi",
 	},
+	Limits: Limits{
+		Cpu:    "2000m",
+		Memory: "4Gi",
+	},
 	SvcName:      "prometheus",
 	Port:         9091, // basic auth nginx proxy is enabled by default
 	NodePort:     30910,
@@ -123,6 +123,10 @@ var prometheusAppDefault = Prometheus{
 	Requests: Requests{
 		Cpu:    "200m",
 		Memory: "500Mi",
+	},
+	Limits: Limits{
+		Cpu:    "2000m",
+		Memory: "4Gi",
 	},
 	SvcName:      "prometheus",
 	Port:         9091, // basic auth nginx proxy is enabled by default

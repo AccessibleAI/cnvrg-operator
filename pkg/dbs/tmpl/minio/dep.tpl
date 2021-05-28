@@ -88,6 +88,9 @@ spec:
             requests:
               cpu: {{ .Spec.Dbs.Minio.Requests.Cpu }}
               memory: {{ .Spec.Dbs.Minio.Requests.Memory }}
+            limits:
+              cpu: {{ .Spec.Dbs.Minio.Limits.Cpu }}
+              memory: {{ .Spec.Dbs.Minio.Limits.Memory }}
       volumes:
         - name: minio-storage
           persistentVolumeClaim:

@@ -43,6 +43,9 @@ spec:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}
       memory: {{ .Spec.Monitoring.Prometheus.Requests.Memory }}
+    limits:
+      cpu: {{ .Spec.Monitoring.Prometheus.Limits.Cpu }}
+      memory: {{ .Spec.Monitoring.Prometheus.Limits.Memory }}
   ruleSelector:
     matchLabels:
       app: cnvrg-ccp-prometheus

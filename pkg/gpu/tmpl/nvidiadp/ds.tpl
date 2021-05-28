@@ -39,6 +39,13 @@ spec:
         - image: {{ image .Spec.ImageHub .Data.NvidiaDp.Image }}
           name: nvidia-device-plugin-ctr
           args: ["--fail-on-init-error=true"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 500Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

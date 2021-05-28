@@ -48,6 +48,13 @@ spec:
         - --telemetry-port=8082
         image: {{ image .Spec.ImageHub .Spec.Monitoring.KubeStateMetrics.Image }}
         name: kube-state-metrics
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200m
+          limits:
+            cpu: 1000m
+            memory: 1Gi
       - args:
         - --logtostderr
         - --secure-listen-address=:8443
@@ -55,6 +62,13 @@ spec:
         - --upstream=http://127.0.0.1:8081/
         image: {{ image .Spec.ImageHub .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
         name: kube-rbac-proxy-main
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200m
+          limits:
+            cpu: 1000m
+            memory: 1Gi
         ports:
         - containerPort: 8443
           name: https-main
@@ -69,6 +83,13 @@ spec:
         - --upstream=http://127.0.0.1:8082/
         image: {{ image .Spec.ImageHub .Spec.Monitoring.PrometheusOperator.KubeRbacProxyImage }}
         name: kube-rbac-proxy-self
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200m
+          limits:
+            cpu: 1000m
+            memory: 1Gi
         ports:
         - containerPort: 9443
           name: https-self

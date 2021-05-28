@@ -59,6 +59,13 @@ spec:
             {{- end }}
             - name: fluent-bit-config
               mountPath: /opt/app-root/etc/
+          resources:
+            requests:
+              cpu: {{.Spec.Logging.Fluentbit.Requests.Cpu }}
+              memory: {{.Spec.Logging.Fluentbit.Requests.Memory }}
+            limits:
+              cpu: {{.Spec.Logging.Fluentbit.Limits.Cpu }}
+              memory: {{.Spec.Logging.Fluentbit.Limits.Memory }}                              
           securityContext:
             privileged: true
             runAsUser: 0
