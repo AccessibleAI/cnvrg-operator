@@ -94,10 +94,12 @@ spec:
             limits:
               cpu: {{ .Spec.Dbs.Pg.Limits.Cpu }}
               memory: {{ .Spec.Dbs.Pg.Limits.Memory }}
+              {{- if isTrue .Spec.Dbs.Pg.HugePages.Enabled }}
               {{- if eq .Spec.Dbs.Pg.HugePages.Memory ""}}
               hugepages-{{ .Spec.Dbs.Pg.HugePages.Size }}: {{ .Spec.Dbs.Pg.Requests.Memory }}
               {{- else }}
               hugepages-{{ .Spec.Dbs.Pg.HugePages.Size }}: {{ .Spec.Dbs.Pg.HugePages.Memory }}
+              {{- end }}
               {{- end }}
             requests:
               cpu: {{ .Spec.Dbs.Pg.Requests.Cpu }}
