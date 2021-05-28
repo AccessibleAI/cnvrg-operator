@@ -155,6 +155,44 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["memory"]))
 
 		})
+		FIt("PG HugePages - disabled", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			shouldLimits := map[corev1.ResourceName]resource.Quantity{
+				corev1.ResourceCPU:    resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Cpu),
+				corev1.ResourceMemory: resource.MustParse(testApp.Spec.Dbs.Pg.Limits.Memory),
+			}
+
+			v := corev1.Volume{
+				Name: "hugepage",
+				VolumeSource: corev1.VolumeSource{
+					EmptyDir: &corev1.EmptyDirVolumeSource{
+						Medium:    "HugePages",
+						SizeLimit: nil,
+					},
+				},
+			}
+			Expect(deployment.Spec.Template.Spec.Volumes).ShouldNot(ContainElement(v))
+			vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
+			Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).ShouldNot(ContainElement(vm))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(BeEquivalentTo(shouldLimits))
+
+
+		})
 		It("PG NodeSelector", func() {
 			ns := createNs()
 			ctx := context.Background()
