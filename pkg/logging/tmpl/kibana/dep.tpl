@@ -75,6 +75,33 @@ spec:
         {{- end }}
         - name: {{ .Spec.Logging.Kibana.SvcName }}
           image: {{image .Spec.ImageHub .Spec.Logging.Kibana.Image }}
+          command:
+            - /bin/bash
+            - -lc
+            - |
+              #!/bin/bash
+              {
+                cnvrgIndexPattern=cnvrg
+                ready=notready
+                while [[ "$ready" != "200" ]]; do
+                  ready=$(curl -s http://localhost:$SERVER_PORT/api/status -o /dev/null -w '%{http_code}')
+                  echo "[$(date)][cnvrg-init] kibana not ready yet.. "
+                  sleep 1
+                done
+                cnvrgIndexPatternExists=$(curl -s http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern -o /dev/null -w '%{http_code}')
+                if [[ "$cnvrgIndexPatternExists" == "200" ]]; then
+                  echo "[$(date)][cnvrg-init] cnvrg index pattern found, skip index creation!"
+                fi
+                if [[ "$cnvrgIndexPatternExists" == "404" ]]; then
+                  echo "[$(date)][cnvrg-init] cnvrg index pattern not found, going to create one"
+                  curl -XPOST "http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern" \
+                     -H 'kbn-xsrf: true' \
+                     -H 'Content-Type: application/json' \
+                     -d '{"attributes":{"title": "cnvrg","timeFieldName": "@timestamp"}}'
+                  echo "[$(date)][cnvrg-init] Index created!"
+                fi
+              } &
+              /usr/local/bin/kibana-docker
           volumeMounts:
             - name: "kibana-config"
               mountPath: "/usr/share/kibana/config"
@@ -96,18 +123,3 @@ spec:
             requests:
               cpu: {{ .Spec.Logging.Kibana.Requests.Cpu }}
               memory: {{ .Spec.Logging.Kibana.Requests.Memory }}
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/bash
-                  - -c
-                  - |
-                    while [[ "$ready" != "200" ]]; do
-                      ready=$(curl -s http://localhost:$SERVER_PORT/api/status -o /dev/null -w '%{http_code}')
-                      echo "kibana not ready yet.. "
-                      sleep 1
-                    done
-                    curl -XPOST "http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/cnvrg" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d '{"attributes":{"title": "cnvrg","timeFieldName": "@timestamp"}}'
-
-
