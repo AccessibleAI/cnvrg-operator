@@ -17,16 +17,14 @@ data:
   CNVRG_STORAGE_ENDPOINT: {{ objectStorageUrl . | b64enc }}
   ################## minio/aws storage ObjectStorage  ###########################
   CNVRG_STORAGE_BUCKET: {{ .Spec.ControlPlane.ObjectStorage.Bucket | b64enc }}
-  {{- if eq .Spec.ControlPlane.ObjectStorage.AccessKey "" }}
+  {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") (eq .Spec.ControlPlane.ObjectStorage.AccessKey "") (eq .Spec.ControlPlane.ObjectStorage.SecretKey "") }}
   CNVRG_STORAGE_ACCESS_KEY:  {{ randAlpha 20 | b64enc }}
-  {{- else }}
-  CNVRG_STORAGE_ACCESS_KEY:  {{ .Spec.ControlPlane.ObjectStorage.AccessKey | b64enc }}
-  {{- end }}
-  {{- if eq .Spec.ControlPlane.ObjectStorage.SecretKey "" }}
   CNVRG_STORAGE_SECRET_KEY: {{ randAlpha 40 | b64enc }}
   {{- else }}
+  CNVRG_STORAGE_ACCESS_KEY:  {{ .Spec.ControlPlane.ObjectStorage.AccessKey | b64enc }}
   CNVRG_STORAGE_SECRET_KEY: {{ .Spec.ControlPlane.ObjectStorage.SecretKey | b64enc }}
   {{- end }}
+
   CNVRG_STORAGE_REGION: {{ .Spec.ControlPlane.ObjectStorage.Region | b64enc }}
   ################## azure #########################
   CNVRG_STORAGE_AZURE_ACCESS_KEY: {{ .Spec.ControlPlane.ObjectStorage.AccessKey | b64enc }}

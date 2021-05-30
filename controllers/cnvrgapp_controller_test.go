@@ -929,6 +929,117 @@ var _ = Describe("CnvrgApp controller", func() {
 
 	})
 
+	Context("Test Object Storage Secret", func() {
+		It("Object Storage Secret - Minio enabled - random keys", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.ObjectStorage.Type = "minio"
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			secret := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-object-storage", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).ShouldNot(BeEmpty())
+			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).ShouldNot(BeEmpty())
+		})
+
+		It("Object Storage Secret - Minio enabled - explicitly configured keys", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.ObjectStorage.Type = "minio"
+			testApp.Spec.ControlPlane.ObjectStorage.AccessKey = "access-key"
+			testApp.Spec.ControlPlane.ObjectStorage.SecretKey = "secret-key"
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			secret := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-object-storage", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(Equal([]byte("access-key")))
+			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(Equal([]byte("secret-key")))
+		})
+
+		It("Object Storage Secret - Minio external - explicitly configured keys", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.ObjectStorage.Type = "minio"
+			testApp.Spec.ControlPlane.ObjectStorage.AccessKey = "access-key"
+			testApp.Spec.ControlPlane.ObjectStorage.SecretKey = "secret-key"
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			secret := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-object-storage", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(Equal([]byte("access-key")))
+			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(Equal([]byte("secret-key")))
+		})
+
+		It("Object Storage Secret - AWS S3 - explicitly configured keys", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.ObjectStorage.Type = "aws"
+			testApp.Spec.ControlPlane.ObjectStorage.AccessKey = "access-key"
+			testApp.Spec.ControlPlane.ObjectStorage.SecretKey = "secret-key"
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			secret := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-object-storage", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(Equal([]byte("access-key")))
+			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(Equal([]byte("secret-key")))
+		})
+
+		It("Object Storage Secret - AWS S3 - IAM S3 access", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.ObjectStorage.Type = "aws"
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			secret := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-object-storage", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(BeEmpty())
+			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(BeEmpty())
+		})
+
+	})
+
 })
 
 func createNs() string {
