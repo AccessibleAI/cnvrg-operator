@@ -476,7 +476,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(ds.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-			Expect(ds.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(ds.Spec.Template.Spec.NodeSelector).ShouldNot(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 		})
 
 	})
