@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/go-logr/zapr"
 	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
@@ -10,10 +13,8 @@ import (
 	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
-	"strings"
 
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/controllers"
@@ -126,21 +127,30 @@ func runOperator() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.CnvrgAppReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("CnvrgApp"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "CnvrgApp")
-		os.Exit(1)
-	}
+	//if err = (&controllers.CnvrgAppReconciler{
+	//	Client: mgr.GetClient(),
+	//	Log:    ctrl.Log.WithName("controllers").WithName("CnvrgApp"),
+	//	Scheme: mgr.GetScheme(),
+	//}).SetupWithManager(mgr); err != nil {
+	//	setupLog.Error(err, "unable to create controller", "controller", "CnvrgApp")
+	//	os.Exit(1)
+	//}
+	//
+	//if err = (&controllers.CnvrgInfraReconciler{
+	//	Client: mgr.GetClient(),
+	//	Log:    ctrl.Log.WithName("controllers").WithName("CnvrgInfra"),
+	//	Scheme: mgr.GetScheme(),
+	//}).SetupWithManager(mgr); err != nil {
+	//	setupLog.Error(err, "unable to create controller", "controller", "CnvrgInfra")
+	//	os.Exit(1)
+	//}
 
-	if err = (&controllers.CnvrgInfraReconciler{
+	if err = (&controllers.OnPremExecutorReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("CnvrgInfra"),
+		Log:    ctrl.Log.WithName("controllers").WithName("OnPremExecutor"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "CnvrgInfra")
+		setupLog.Error(err, "unable to create controller", "controller", "OnPremExecutor")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
@@ -182,6 +192,7 @@ func informPkger() {
 	pkger.Include("/pkg/storage/tmpl")
 	pkger.Include("/pkg/gpu/tmpl")
 	pkger.Include("/pkg/reloader/tmpl")
+	pkger.Include("/pkg/executor/tmpl")
 }
 
 func main() {

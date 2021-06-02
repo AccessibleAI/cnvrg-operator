@@ -7,4 +7,7 @@ resources:
 - group: mlops
   kind: CnvrgInfra
   version: v1
+- group: mlops
+  kind: OnPremExecutor
+  version: v1
 version: "2"

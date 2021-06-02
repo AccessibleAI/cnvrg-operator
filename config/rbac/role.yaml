@@ -52,3 +52,23 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - onpremexecutors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - onpremexecutors/status
+  verbs:
+  - get
+  - patch
+  - update
