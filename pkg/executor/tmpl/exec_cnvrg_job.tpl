@@ -26,6 +26,7 @@ start_cnvrg_job(){
 
 . /root/envs
 
+dump_job_env_vars
 cleanup_working_dirs
 start_cnvrg_tiny_server
 start_cnvrg_job
