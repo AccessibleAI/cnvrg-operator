@@ -22,7 +22,6 @@ cleanup(){
 }
 
 start_cnvrg_tiny_server(){
-  cp /root/cnvrg-go-exec-main/tiny /conf/tiny
   cd /cnvrg && /conf/tiny &
 }
 
