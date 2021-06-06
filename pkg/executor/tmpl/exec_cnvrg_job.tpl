@@ -13,8 +13,12 @@ cleanup(){
   rm -fr /data && mkdir /data
   rm -fr /script && mkdir /script
   rm -fr /conf && mkdir /conf
-  2>&1 pgrep -f tiny | xargs kill -9
-  2>&1 pgrep -f metrics | xargs kill -9
+  if [[ $(pgrep -f tiny | wc -l) > 0 ]]; then
+    pgrep -f tiny | xargs kill -9
+  fi
+  if [[ $(pgrep -f metrics | wc -l) > 0 ]]; then
+    pgrep -f metrics | xargs kill -9
+  fi
 }
 
 start_cnvrg_tiny_server(){
