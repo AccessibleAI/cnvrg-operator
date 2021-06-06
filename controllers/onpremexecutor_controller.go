@@ -49,7 +49,7 @@ func (r *OnPremExecutorReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	_ = context.Background()
 	_ = r.Log.WithValues("onpremexecutor", req.NamespacedName)
 
-	r.Log.Info("This is Cnvrg OnPrem Executor ")
+	r.Log.Info("reconciling...")
 	ctx := context.Background()
 	var executor mlopsv1.OnPremExecutor
 	if err := r.Get(ctx, req.NamespacedName, &executor); err != nil {
