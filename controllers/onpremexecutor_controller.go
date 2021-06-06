@@ -62,7 +62,7 @@ func (r *OnPremExecutorReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		r.Log.Error(err, "error dumping on-prem-executor.sh script")
 		return ctrl.Result{}, err
 	}
-	if err := executeJob(); err != nil {
+	if err := r.executeJob(); err != nil {
 		r.Log.Error(err, "error executing onprem-executor.sh script!")
 	}
 	return ctrl.Result{}, nil
@@ -93,10 +93,12 @@ func generateExecutorScript(jobEnvVars []string) string {
 	return executorScript
 }
 
-func executeJob() error {
-	cmd := exec.Command("/bin/bash", fmt.Sprintf("-lc %s", ExecutorScript))
+func (r *OnPremExecutorReconciler) executeJob() error {
+
+	cmd := exec.Command("/bin/bash", strings.Split(fmt.Sprintf("-lc %s", ExecutorScript), " ")...)
 	stdout, _ := cmd.StdoutPipe()
 	if err := cmd.Start(); err != nil {
+		r.Log.Error(err, "unable to start StdoutPipe!")
 		return err
 	}
 	scanner := bufio.NewScanner(stdout)
@@ -106,6 +108,7 @@ func executeJob() error {
 		fmt.Println(m)
 	}
 	if err := cmd.Wait(); err != nil {
+		r.Log.Error(err, "unable to Wait()!")
 		return err
 	}
 	return nil
