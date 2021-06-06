@@ -139,6 +139,10 @@ vet:
 generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
+.PHONY: build-linux
+build-linux:
+	docker run --rm -v ${PWD}:/usr/src/cnvrg-operator -w /usr/src/cnvrg-operator golang:1.14 /bin/bash -c "go get github.com/markbates/pkger/cmd/pkger && pkger && GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/cnvrg-operator-x86_64 main.go pkged.go"
+
 # Build the docker image
 docker-build: pack generate manifests
 		docker build . -t docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
