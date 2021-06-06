@@ -22,6 +22,7 @@ cleanup(){
 }
 
 start_cnvrg_tiny_server(){
+  cp /usr/local/bin/tiny /conf/tiny
   cd /cnvrg && /conf/tiny &
 }
 
