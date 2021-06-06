@@ -23,16 +23,17 @@ cleanup(){
 
 start_cnvrg_tiny_server(){
   cp /usr/local/bin/tiny /conf/tiny
-  cd /cnvrg && /conf/tiny &
+  cd /cnvrg && /conf/tiny
 }
 
 start_cnvrg_job(){
-  cd /cnvrg && cnvrg job start
+  cd /cnvrg && cnvrg job start &
 }
 
 . /root/envs
+echo ". /root/envs" >> /root/.bashrc
 
 dump_job_env_vars
 cleanup
-start_cnvrg_tiny_server
 start_cnvrg_job
+start_cnvrg_tiny_server

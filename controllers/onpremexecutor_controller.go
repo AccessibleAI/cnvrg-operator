@@ -22,6 +22,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/markbates/pkger"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"k8s.io/apimachinery/pkg/runtime"
 	"os/exec"
@@ -62,9 +63,14 @@ func (r *OnPremExecutorReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		r.Log.Error(err, "error dumping on-prem-executor.sh script")
 		return ctrl.Result{}, err
 	}
-	if err := r.executeJob(); err != nil {
-		r.Log.Error(err, "error executing onprem-executor.sh script!")
+	if viper.GetBool("run-executor-script") {
+		if err := r.executeJob(); err != nil {
+			r.Log.Error(err, "error executing onprem-executor.sh script!")
+		}
+	} else{
+		r.Log.Info("skipping executor script execution...")
 	}
+
 	return ctrl.Result{}, nil
 }
 

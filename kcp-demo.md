@@ -3,14 +3,16 @@
 0. Install prerequisite
 ```shell
 sudo apt update -y \
- && sudo apt install dnsutils ubuntu-dev-tools ruby-full -y \
+ && sudo apt install dnsutils ubuntu-dev-tools ruby-full python3 python3-pip -y \
  && gem install cnvrg \
  && curl -# -L0 -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl \
  && chmod +x /usr/local/bin/kubectl \
  && wget https://cnvrg-public-data.s3-us-west-2.amazonaws.com/cnvrg-cli-kcp.gem \
  && gem install cnvrg-cli-kcp.gem \
  && curl -# -o /usr/local/bin/tiny https://cnvrg-public-data.s3-us-west-2.amazonaws.com/tiny \
- && chmod +x /usr/local/bin/tiny
+ && chmod +x /usr/local/bin/tiny \
+ && pip3 install watchdog prometheus_client \
+ && pip3 install --upgrade tensorflow 
 ```
 
 1. Download KCP linux binary from cnvrg public bucket

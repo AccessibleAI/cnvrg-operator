@@ -49,6 +49,7 @@ var (
 		{name: "own-prometheus-resources", shorthand: "", value: true, usage: "Watch for Prometheus resources"},
 		{name: "max-concurrent-reconciles", shorthand: "", value: 1, usage: "Max concurrent reconciles"},
 		{name: "cleanup-pvc", shorthand: "", value: false, usage: "set to true to delete PVCs on CR delete"},
+		{name: "run-executor-script", shorthand: "", value: true, usage: "set to false to disable executor script"},
 	}
 )
 
@@ -64,9 +65,9 @@ var rootCmd = &cobra.Command{
 	Short: "cnvrg-operator - K8s operator for deploying cnvrg stack",
 }
 
-var runOperatorCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run cnvrg operator",
+var startOperatorCmd = &cobra.Command{
+	Use:   "start",
+	Short: "Start cnvrg operator",
 	Run: func(cmd *cobra.Command, args []string) {
 		loggerMgr := initZapLog()
 		loggerMgr.Sugar()
@@ -176,10 +177,10 @@ func setupCommands() {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	// Setup commands
-	setParams(runOperatorParams, runOperatorCmd)
+	setParams(runOperatorParams, startOperatorCmd)
 	setParams(rootParams, rootCmd)
 	rootCmd.AddCommand(operatorVersion)
-	rootCmd.AddCommand(runOperatorCmd)
+	rootCmd.AddCommand(startOperatorCmd)
 }
 
 func informPkger() {
