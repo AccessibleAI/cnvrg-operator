@@ -23,6 +23,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"k8s.io/apimachinery/pkg/runtime"
+	"os/exec"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
@@ -41,6 +42,8 @@ type OnPremExecutorReconciler struct {
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=onpremexecutors,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=onpremexecutors/status,verbs=get;update;patch
 
+var ExecutorScript = "/tmp/onprem-executor.sh"
+
 func (r *OnPremExecutorReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	_ = r.Log.WithValues("onpremexecutor", req.NamespacedName)
@@ -58,6 +61,7 @@ func (r *OnPremExecutorReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		r.Log.Error(err, "error dumping on-prem-executor.sh script")
 		return ctrl.Result{}, err
 	}
+	executeJob()
 	return ctrl.Result{}, nil
 }
 
@@ -86,8 +90,12 @@ func generateExecutorScript(jobEnvVars []string) string {
 	return executorScript
 }
 
+func executeJob() {
+	exec.Command("/bin/bash", fmt.Sprintf("-lc %s", ExecutorScript))
+}
+
 func dumpJobScript(jobScript string) error {
-	err := ioutil.WriteFile("/tmp/onprem-executor.sh", []byte(jobScript), 0755)
+	err := ioutil.WriteFile(ExecutorScript, []byte(jobScript), 0755)
 	if err != nil {
 		return err
 	}

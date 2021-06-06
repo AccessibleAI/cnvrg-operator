@@ -1,3 +1,4 @@
+#!/bin/bash
 
 dump_job_env_vars(){
   rm -fr /root/envs
@@ -7,15 +8,16 @@ dump_job_env_vars(){
   {{- end }}
 }
 
-cleanup_working_dirs(){
+cleanup(){
   rm -fr /cnvrg && mkdir /cnvrg
   rm -fr /data && mkdir /data
   rm -fr /script && mkdir /script
   rm -fr /conf && mkdir /conf
+  pgrep -f tiny | xargs kill -9
+  pgrep -f metrics | xargs kill -9
 }
 
 start_cnvrg_tiny_server(){
-  pgrep -f tiny | xargs kill -9
   cp /root/cnvrg-go-exec-main/tiny /conf/tiny
   cd /cnvrg && /conf/tiny &
 }
@@ -27,6 +29,6 @@ start_cnvrg_job(){
 . /root/envs
 
 dump_job_env_vars
-cleanup_working_dirs
+cleanup
 start_cnvrg_tiny_server
 start_cnvrg_job
