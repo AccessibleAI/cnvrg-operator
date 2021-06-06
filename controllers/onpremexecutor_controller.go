@@ -15,6 +15,7 @@ limitations under the License.
 package controllers
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -61,7 +62,9 @@ func (r *OnPremExecutorReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		r.Log.Error(err, "error dumping on-prem-executor.sh script")
 		return ctrl.Result{}, err
 	}
-	executeJob()
+	if err := executeJob(); err != nil {
+		r.Log.Error(err, "error executing onprem-executor.sh script!")
+	}
 	return ctrl.Result{}, nil
 }
 
@@ -90,8 +93,22 @@ func generateExecutorScript(jobEnvVars []string) string {
 	return executorScript
 }
 
-func executeJob() {
-	exec.Command("/bin/bash", fmt.Sprintf("-lc %s", ExecutorScript))
+func executeJob() error {
+	cmd := exec.Command("/bin/bash", fmt.Sprintf("-lc %s", ExecutorScript))
+	stdout, _ := cmd.StdoutPipe()
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	scanner := bufio.NewScanner(stdout)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+		m := scanner.Text()
+		fmt.Println(m)
+	}
+	if err := cmd.Wait(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func dumpJobScript(jobScript string) error {
