@@ -73,7 +73,7 @@ func (r *OnPremExecutorReconciler) jobEnvVars(executor mlopsv1.OnPremExecutor) [
 	var envVars []string
 	envVar := executor.Spec.Template.Spec.Containers[0].Env
 	for i := 0; i < len(envVar); i++ {
-		envVars = append(envVars, fmt.Sprintf(`export %s=%s`, envVar[i].Name, envVar[i].Value))
+		envVars = append(envVars, fmt.Sprintf(`export %s='%s'`, envVar[i].Name, envVar[i].Value))
 	}
 	return envVars
 }
