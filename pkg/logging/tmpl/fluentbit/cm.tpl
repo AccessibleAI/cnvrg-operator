@@ -37,11 +37,13 @@ data:
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
         Parser            docker
-        DB                /var/log/flb_kube.db
+        DB                /var/log/cnvrg_flb_kube.db
         Mem_Buf_Limit     5MB
+        Buffer_Chunk_Size 1MB
+        Buffer_Max_Size   1MB
         Skip_Long_Lines   On
         Refresh_Interval  10
-
+        storage.type      filesystem
   {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf: |
     [FILTER]
         Name                kubernetes
@@ -63,8 +65,9 @@ data:
         Logstash_Format Off
         Replace_Dots    On
         Retry_Limit     False
+        Trace_Error     On
         Index           cnvrg
-        Logstash_Prefix cnvrg
+        Logstash_Prefix  cnvrg
         HTTP_User       {{ $app.EsUser }}
         HTTP_Passwd     {{ $app.EsPass }}
 
