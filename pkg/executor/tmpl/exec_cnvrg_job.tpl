@@ -1,12 +1,8 @@
 #!/bin/bash
 
-dump_job_env_vars(){
-  rm -fr /root/envs
-  touch /root/envs
-  {{- range $idx, $v := .Data.JobEnvVars }}
-  echo "{{$v}}" >> /root/envs
-  {{- end }}
-}
+{{- range $idx, $v := .Data.JobEnvVars }}
+{{$v}}
+{{- end }}
 
 cleanup(){
   rm -fr /cnvrg && mkdir /cnvrg
@@ -30,10 +26,6 @@ start_cnvrg_job(){
   cd /cnvrg && cnvrg job start &
 }
 
-. /root/envs
-echo ". /root/envs" >> /root/.bashrc
-
-dump_job_env_vars
 cleanup
 start_cnvrg_job
 start_cnvrg_tiny_server
