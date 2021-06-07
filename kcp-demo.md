@@ -48,5 +48,6 @@ mkdir -p ~/.kube \
 4. Download and start cnvrg OnPremExecutor
 ```shell
 sudo curl -# -o /usr/local/bin/cnvrg-operator https://cnvrg-public-data.s3-us-west-2.amazonaws.com/cnvrg-operator \
- && sudo chmod +x /usr/local/bin/cnvrg-operator
+ && sudo chmod +x /usr/local/bin/cnvrg-operator \
+ && cnvrg-operator start
 ``` 
