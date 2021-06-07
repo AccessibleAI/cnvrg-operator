@@ -3,7 +3,7 @@
 0. Install prerequisite
 ```shell
 sudo apt update -y \
- && sudo apt install dnsutils ubuntu-dev-tools ruby-full python3 python3-pip -y \
+ && sudo apt install dnsutils ubuntu-dev-tools ruby-full python3 python3-pip python3-testresources -y \
  && gem install cnvrg \
  && curl -# -L0 -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl \
  && chmod +x /usr/local/bin/kubectl \
