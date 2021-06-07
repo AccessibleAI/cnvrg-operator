@@ -174,11 +174,11 @@ var esDefault = Es{
 	NodePort:       32200,
 	StorageClass:   "",
 	Requests: Requests{
-		Cpu:    "1000m",
-		Memory: "1Gi",
+		Cpu:    "2",
+		Memory: "2Gi",
 	},
 	Limits: Limits{
-		Cpu:    "2000m",
+		Cpu:    "4",
 		Memory: "4Gi",
 	},
 	JavaOpts:     "",
