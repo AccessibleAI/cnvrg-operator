@@ -16,13 +16,17 @@ metadata:
 data:
   fluent-bit.conf: |
     [SERVICE]
-        Flush         1
-        Log_Level     info
-        Daemon        off
-        Parsers_File  parsers.conf
-        HTTP_Server   On
-        HTTP_Listen   0.0.0.0
-        HTTP_Port     2020
+        Flush                     1
+        Log_Level                 info
+        Daemon                    off
+        Parsers_File              parsers.conf
+        HTTP_Server               On
+        HTTP_Listen               0.0.0.0
+        HTTP_Port                 2020
+        storage.path              /var/log/cnvrg-flb-storage/
+        storage.sync              normal
+        storage.checksum          off
+        storage.backlog.mem_limit 5M
     {{- range $_, $app := .Data.AppInstance }}
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf
