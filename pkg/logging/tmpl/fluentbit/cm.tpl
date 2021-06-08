@@ -26,7 +26,7 @@ data:
         storage.path              /var/log/cnvrg-flb-storage/
         storage.sync              normal
         storage.checksum          off
-        storage.backlog.mem_limit 8M
+        storage.backlog.mem_limit 512M
     {{- range $_, $app := .Data.AppInstance }}
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf
