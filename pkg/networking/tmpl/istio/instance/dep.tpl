@@ -31,6 +31,15 @@ spec:
       imagePullSecrets:
         - name: {{ .Spec.Registry.Name }}
       serviceAccountName: istio-operator
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- end }}
       containers:
         - name: istio-operator
           image: "{{.Spec.ImageHub }}/operator:1.10.0"
