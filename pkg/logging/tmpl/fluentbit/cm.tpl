@@ -26,7 +26,7 @@ data:
         storage.path              /var/log/cnvrg-flb-storage/
         storage.sync              normal
         storage.checksum          off
-        storage.backlog.mem_limit 512M
+        storage.backlog.mem_limit 256M
     {{- range $_, $app := .Data.AppInstance }}
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf
@@ -41,10 +41,10 @@ data:
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
         Parser            docker
-        DB                /var/log/cnvrg_flb_kube.db
-        Mem_Buf_Limit     8MB
-        Buffer_Chunk_Size 1MB
-        Buffer_Max_Size   1MB
+        DB                /var/log/cnvrg-flb-storage/flb_kube.db
+        Mem_Buf_Limit     128MB
+        Buffer_Chunk_Size 2MB
+        Buffer_Max_Size   4MB
         Skip_Long_Lines   On
         Refresh_Interval  10
         storage.type      filesystem

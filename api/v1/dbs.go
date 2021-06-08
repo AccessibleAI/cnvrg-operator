@@ -128,7 +128,7 @@ var pgDefault = Pg{
 	},
 	Limits: Limits{
 		Cpu:    "8",
-		Memory: "20Gi",
+		Memory: "32Gi",
 	},
 	MaxConnections:     500,
 	SharedBuffers:      "1024MB", // for the shared_buffers we use 1/4 of given memory
@@ -175,13 +175,13 @@ var esDefault = Es{
 	StorageClass:   "",
 	Requests: Requests{
 		Cpu:    "2",
-		Memory: "2Gi",
+		Memory: "4Gi",
 	},
 	Limits: Limits{
 		Cpu:    "4",
-		Memory: "4Gi",
+		Memory: "8Gi",
 	},
-	JavaOpts:     "",
+	JavaOpts:     "-Xms2g -Xmx2g",
 	PatchEsNodes: &defaultTrue,
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
