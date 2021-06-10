@@ -30,6 +30,9 @@ controlPlane:
   sidekiq:
     enabled: true
     split: true
+  cnvrgRouter:
+    enabled: true
+    image: nginx:1.21.0
   smtp:
     server: ""
     port: 587

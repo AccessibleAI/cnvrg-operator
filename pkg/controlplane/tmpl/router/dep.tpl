@@ -32,9 +32,6 @@ spec:
           effect: "NoSchedule"
       {{- end }}
       serviceAccountName: cnvrg
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
       containers:
         - name: nginx
           image: {{ .Spec.ControlPlane.CnvrgRouter.Image }}
