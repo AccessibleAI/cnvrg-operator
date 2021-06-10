@@ -754,8 +754,8 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 
 func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
 	ctx := context.Background()
-	var cnvrgApp mlopsv1.CnvrgApp
-	if err := r.Get(ctx, namespacedName, &cnvrgApp); err != nil {
+	var app mlopsv1.CnvrgApp
+	if err := r.Get(ctx, namespacedName, &app); err != nil {
 		if errors.IsNotFound(err) {
 			appLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
 			return nil, nil
@@ -763,7 +763,15 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 		appLog.Error(err, "unable to fetch CnvrgApp")
 		return nil, err
 	}
-	return &cnvrgApp, nil
+	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
+		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
+		mem, err := strconv.Atoi(requestMem)
+		if err == nil {
+			heapMem := mem / 2
+			app.Spec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
+		}
+	}
+	return &app, nil
 }
 
 func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {

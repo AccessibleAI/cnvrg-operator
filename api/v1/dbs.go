@@ -181,7 +181,7 @@ var esDefault = Es{
 		Cpu:    "4",
 		Memory: "8Gi",
 	},
-	JavaOpts:     "-Xms2g -Xmx2g",
+	JavaOpts:     "",
 	PatchEsNodes: &defaultTrue,
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
