@@ -192,11 +192,12 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 		},
 		"cnvrgRoutingService": func(cnvrgApp mlopsv1.CnvrgApp) string {
-
-			if *cnvrgApp.Spec.Networking.HTTPS.Enabled {
-				return fmt.Sprintf("https://routing-servce.%s", cnvrgApp.Spec.ClusterDomain)
+			if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NodePortIngress {
+				return fmt.Sprintf("http://%s:%d", cnvrgApp.Spec.ClusterDomain, cnvrgApp.Spec.ControlPlane.CnvrgRouter.NodePort)
+			} else if *cnvrgApp.Spec.Networking.HTTPS.Enabled {
+				return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.ControlPlane.CnvrgRouter.SvcName, cnvrgApp.Spec.ClusterDomain)
 			} else {
-				return fmt.Sprintf("http://routing-servce.%s", cnvrgApp.Spec.ClusterDomain)
+				return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.ControlPlane.CnvrgRouter.SvcName, cnvrgApp.Spec.ClusterDomain)
 			}
 
 		},

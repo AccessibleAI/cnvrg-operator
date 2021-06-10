@@ -68,6 +68,13 @@ type Systemkiq struct {
 	Replicas int      `json:"replicas,omitempty"`
 }
 
+type CnvrgRouter struct {
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Image    string `json:"image,omitempty"`
+	SvcName  string `json:"svcName,omitempty"`
+	NodePort int    `json:"nodePort,omitempty"`
+}
+
 type Hyper struct {
 	Enabled                 *bool    `json:"enabled,omitempty"`
 	Image                   string   `json:"image,omitempty"`
@@ -140,16 +147,12 @@ type ControlPlane struct {
 	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
 	Systemkiq     Systemkiq     `json:"systemkiq,omitempty"`
 	Hyper         Hyper         `json:"hyper,omitempty"`
+	CnvrgRouter   CnvrgRouter   `json:"cnvrgRouter"`
 	BaseConfig    BaseConfig    `json:"baseConfig,omitempty"`
 	Ldap          Ldap          `json:"ldap,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
 	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
 	Mpi           Mpi           `json:"mpi,omitempty"`
-}
-
-type Cnvrg struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
 }
 
 type Mpi struct {
@@ -294,6 +297,13 @@ var controlPlaneDefault = ControlPlane{
 		},
 		ReadinessPeriodSeconds:  100,
 		ReadinessTimeoutSeconds: 60,
+	},
+
+	CnvrgRouter: CnvrgRouter{
+		Enabled:  &defaultFalse,
+		Image:    "nginx:1.21.0",
+		SvcName:  "cnvrg-router",
+		NodePort: 30081,
 	},
 
 	Mpi: mpiDefault,
