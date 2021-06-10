@@ -528,7 +528,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 
 		})
-		FIt("Es default xms xmx", func() {
+		It("Es default xms xmx", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
@@ -546,7 +546,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms2g -Xmx2g"}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
 		})
-		FIt("Es 5Gi requests  -  xms xmx", func() {
+		It("Es 5Gi requests  -  xms xmx", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
@@ -564,7 +564,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms2g -Xmx2g"}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
 		})
-		FIt("Es 6Gi requests -  xms xmx", func() {
+		It("Es 6Gi requests -  xms xmx", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
@@ -582,7 +582,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms3g -Xmx3g"}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
 		})
-		FIt("Es 6000Mi requests - xms xmx", func() {
+		It("Es 6000Mi requests - xms xmx", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
