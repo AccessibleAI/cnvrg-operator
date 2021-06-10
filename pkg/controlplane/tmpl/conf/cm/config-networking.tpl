@@ -24,5 +24,8 @@ data:
   ROUTE_BY_NGINX_INGRESS: "{{ routeBy . "NGINX_INGRESS" }}"
   ROUTE_BY_NODE_PORT: "{{ routeBy . "NODE_PORT" }}"
   CNVRG_ISTIO_GATEWAY: "{{ istioGwName .}}"
+  DEPLOY_URL: "{{ cnvrgRoutingService . }}"
+  NOTEBOOK_URL: "{{ cnvrgRoutingService . }}"
+  TENSORBOARD_URL: "{{ cnvrgRoutingService . }}"
 
 

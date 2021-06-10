@@ -190,6 +190,14 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 					return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
 				}
 			}
+		},
+		"cnvrgRoutingService": func(cnvrgApp mlopsv1.CnvrgApp) string {
+
+			if *cnvrgApp.Spec.Networking.HTTPS.Enabled {
+				return fmt.Sprintf("https://routing-servce.%s", cnvrgApp.Spec.ClusterDomain)
+			} else {
+				return fmt.Sprintf("http://routing-servce.%s", cnvrgApp.Spec.ClusterDomain)
+			}
 
 		},
 		"routeBy": func(cnvrgApp mlopsv1.CnvrgApp, routeBy string) string {
