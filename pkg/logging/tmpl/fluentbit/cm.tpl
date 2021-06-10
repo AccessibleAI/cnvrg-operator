@@ -43,7 +43,7 @@ data:
         Parser            docker
         DB                /var/log/cnvrg-flb-storage/flb_kube.db
         Mem_Buf_Limit     128MB
-        Buffer_Chunk_Size 2MB
+        Buffer_Chunk_Size 8MB
         Buffer_Max_Size   32MB
         Skip_Long_Lines   On
         Refresh_Interval  10
