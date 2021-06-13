@@ -147,7 +147,7 @@ type ControlPlane struct {
 	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
 	Systemkiq     Systemkiq     `json:"systemkiq,omitempty"`
 	Hyper         Hyper         `json:"hyper,omitempty"`
-	CnvrgRouter   CnvrgRouter   `json:"cnvrgRouter"`
+	CnvrgRouter   CnvrgRouter   `json:"cnvrgRouter,omitempty"`
 	BaseConfig    BaseConfig    `json:"baseConfig,omitempty"`
 	Ldap          Ldap          `json:"ldap,omitempty"`
 	SMTP          SMTP          `json:"smtp,omitempty"`
