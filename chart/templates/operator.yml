@@ -89,6 +89,15 @@ spec:
       labels:
         control-plane: cnvrg-operator
     spec:
+      {{- if .Values.tenancy.enabled }}
+      nodeSelector:
+        {{ .Values.tenancy.key }}: "{{ .Values.tenancy.value }}"
+      tolerations:
+        - key: "{{ .Values.tenancy.key }}"
+          operator: "Equal"
+          value: "{{ .Values.tenancy.value }}"
+          effect: "NoSchedule"
+      {{- end }}
       containers:
         - command:
             - /opt/app-root/cnvrg-operator
