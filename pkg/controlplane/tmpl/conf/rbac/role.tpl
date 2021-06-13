@@ -239,3 +239,9 @@ rules:
   -  "*"
   verbs:
   -  "*"
+- apiGroups:
+  - kubeflow.org
+  resources:
+  -  "*"
+  verbs:
+  -  "*"
