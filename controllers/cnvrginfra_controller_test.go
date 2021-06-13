@@ -411,6 +411,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeTrue())
+
 			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement("foo-bar"))
 
 			Eventually(func() bool {
@@ -439,6 +440,37 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
+		})
+		It("Istio Operator Deployment Tenancy", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Tenancy.Enabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.InfraNamespace = ns
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			istio := &unstructured.Unstructured{}
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "istio-operator", Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      infra.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    infra.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 		})
 
 	})
