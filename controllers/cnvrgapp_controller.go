@@ -397,39 +397,6 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	return nil
 }
 
-func (r *CnvrgAppReconciler) istioIngressState(app *mlopsv1.CnvrgApp) error {
-	infra, err := r.getCnvrgInfra()
-	if err != nil {
-		appLog.Error(err, "error retrieving cnvrg infra object")
-		return err
-	}
-	if *infra.Spec.Networking.Istio.Enabled {
-		_, err := r.getAppIstioGw(app)
-		if errors.IsNotFound(err) {
-			if err := desired.Apply(networking.CnvrgAppNetworkingState(app), app, r.Client, r.Scheme, appLog); err != nil {
-				r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func (r *CnvrgAppReconciler) getAppIstioGw(app *mlopsv1.CnvrgApp) (*unstructured.Unstructured, error) {
-	name := types.NamespacedName{Name: app.Spec.Networking.Ingress.IstioGwName, Namespace: app.Namespace}
-	istioGw := &unstructured.Unstructured{}
-	istioGw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
-	if err := r.Get(context.Background(), name, istioGw); err != nil {
-		if errors.IsNotFound(err) {
-			appLog.Info("istio GW not not found")
-		} else {
-			appLog.Error(err, "error retrieving istio gw")
-		}
-		return nil, err
-	}
-	return istioGw, nil
-}
-
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 	appLog.Info("applying logging")
 	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
@@ -756,7 +723,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	// Get default cnvrgApp spec
 	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
 
-	calculateAndApplyDefaults(cnvrgApp, &desiredSpec)
+	calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec)
 
 	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride); err != nil {
@@ -785,18 +752,6 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 
 	appLog.Info("states are equals, no need to sync")
 	return equal, nil
-}
-
-func calculateAndApplyDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec) {
-	// set default heap size for ES if not set by user
-	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
-		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
-		mem, err := strconv.Atoi(requestMem)
-		if err == nil {
-			heapMem := mem / 2
-			desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
-		}
-	}
 }
 
 func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName) (*mlopsv1.CnvrgApp, error) {
@@ -983,4 +938,21 @@ func removeString(slice []string, s string) (result []string) {
 		result = append(result, item)
 	}
 	return
+}
+
+func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec) {
+	// set default heap size for ES if not set by user
+	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
+		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
+		mem, err := strconv.Atoi(requestMem)
+		if err == nil {
+			heapMem := mem / 2
+			desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
+		}
+	}
+
+	if app.Spec.Networking.Ingress.IstioGwName == "" {
+		desiredAppSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, app.Namespace)
+	}
+
 }

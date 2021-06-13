@@ -23,7 +23,7 @@ data:
   ROUTE_BY_OPENSHIFT: "{{ routeBy . "OPENSHIFT" }}"
   ROUTE_BY_NGINX_INGRESS: "{{ routeBy . "NGINX_INGRESS" }}"
   ROUTE_BY_NODE_PORT: "{{ routeBy . "NODE_PORT" }}"
-  CNVRG_ISTIO_GATEWAY: "{{ istioGwName . }}"
+  CNVRG_ISTIO_GATEWAY: "{{ .Spec.Networking.Ingress.IstioGwName }}"
   {{- if isTrue .Spec.ControlPlane.CnvrgRouter.Enabled }}
   DEPLOY_URL: "{{ cnvrgRoutingService . }}"
   NOTEBOOK_URL: "{{ cnvrgRoutingService . }}"

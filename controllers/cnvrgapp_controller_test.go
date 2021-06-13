@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	"github.com/cnvrg-operator/pkg/desired"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/teris-io/shortid"
@@ -11,6 +12,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"strings"
 	"time"
@@ -1180,6 +1182,280 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+		})
+
+	})
+
+	Context("Control Plane - Default Istio Ingress", func() {
+
+		It("Default Istio Ingress", func() {
+			ns := createNs()
+			gwName := fmt.Sprintf(mlopsv1.IstioGwName, ns)
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.Logging.Kibana.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+
+			namespacedName := types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: testApp.Namespace}
+			upstreamSecret := corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+			Expect(k8sClient.Create(ctx, &upstreamSecret)).Should(Succeed())
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			gw := &unstructured.Unstructured{}
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			vs := &unstructured.Unstructured{}
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Logging.Kibana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Monitoring.Grafana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.CnvrgRouter.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+		})
+
+		It("Custom Istio Ingress Name", func() {
+			ns := createNs()
+			gwName := "foo-bar"
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			testApp.Spec.Networking.Ingress.IstioGwName = gwName
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.Logging.Kibana.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+
+			namespacedName := types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: testApp.Namespace}
+			upstreamSecret := corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+			Expect(k8sClient.Create(ctx, &upstreamSecret)).Should(Succeed())
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
+			gw := &unstructured.Unstructured{}
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			time.Sleep(time.Second * 3)
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			vs := &unstructured.Unstructured{}
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Logging.Kibana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Monitoring.Grafana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.CnvrgRouter.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+		})
+
+		It("Istio Disabled - Custom Istio Ingress Name", func() {
+			ns := createNs()
+
+			gwName := "foo-bar"
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Networking.Ingress.IstioGwName = gwName
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.Logging.Kibana.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+
+			namespacedName := types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: testApp.Namespace}
+			upstreamSecret := corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+			Expect(k8sClient.Create(ctx, &upstreamSecret)).Should(Succeed())
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
+			vs := &unstructured.Unstructured{}
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Logging.Kibana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Monitoring.Grafana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.CnvrgRouter.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+
+			gw := &unstructured.Unstructured{}
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			time.Sleep(time.Second * 3)
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeFalse())
 		})
 
 	})

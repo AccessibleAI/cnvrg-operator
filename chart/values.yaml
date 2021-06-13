@@ -123,6 +123,7 @@ networking:
     certSecret: ""
   ingress:
     type: "istio"
+    istioGwEnabled: true
   istio:
     enabled: true
     externalIp: [ ]

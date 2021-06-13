@@ -7,6 +7,7 @@ networking:
     certSecret: "{{ .Values.networking.https.certSecret }}"
   ingress:
     type: "{{ .Values.networking.ingress.type }}"
+    istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
   istio:
     enabled: {{ .Values.networking.istio.enabled }}
     {{- if .Values.networking.istio.externalIp }}

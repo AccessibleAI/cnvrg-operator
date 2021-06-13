@@ -695,6 +695,8 @@ spec:
                     type: object
                   ingress:
                     properties:
+                      istioGwEnabled:
+                        type: boolean
                       istioGwName:
                         type: string
                       perTryTimeout:

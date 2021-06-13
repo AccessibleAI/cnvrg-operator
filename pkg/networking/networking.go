@@ -95,6 +95,9 @@ func IstioInstanceState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if *cnvrgInfra.Spec.Networking.Istio.Enabled {
 		state = append(state, istioInstanceState()...)
+	}
+
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && *cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {
 		state = append(state, ingressState()...)
 	}
 
@@ -103,7 +106,8 @@ func IstioInstanceState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
-	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && *cnvrgApp.Spec.Networking.Ingress.IstioGwEnabled {
 		state = append(state, ingressState()...)
 	}
 

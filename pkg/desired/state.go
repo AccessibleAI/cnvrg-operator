@@ -75,26 +75,6 @@ func getNs(obj interface{}) string {
 	return "cnvrg-infra"
 }
 
-func getIstioGwName(obj interface{}) string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-		if cnvrgInfra.Spec.Networking.Ingress.IstioGwName == "" {
-			return fmt.Sprintf("isito-gw-%v", getNs(obj))
-		} else {
-			return cnvrgInfra.Spec.Networking.Ingress.IstioGwName
-		}
-	}
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
-		if cnvrgApp.Spec.Networking.Ingress.IstioGwName == "" || cnvrgApp.Spec.Networking.Ingress.IstioGwName == mlopsv1.DoNotDeployIstioGwFlag {
-			return fmt.Sprintf("isito-gw-%v", getNs(obj))
-		} else {
-			return cnvrgApp.Spec.Networking.Ingress.IstioGwName
-		}
-	}
-	return "" // what can go wrong?
-}
-
 func getGrafanaDashboards(obj interface{}) []string {
 	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
 		return GrafanaInfraDashboards
@@ -319,9 +299,6 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return true
 		},
-		"istioGwName": func(obj interface{}) string {
-			return getIstioGwName(obj)
-		},
 		"kibanaSecret": func(host, port, esHost, esUser, esPass, esBasicAuth string) string {
 			return fmt.Sprintf(`
 server:
@@ -498,7 +475,7 @@ func GetPromCredsSecret(secretName string, secretNs string, client client.Client
 	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
 	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		log.Error(err, "Prometheus creds secret not found", "name", secretName)
+		log.Error(err, "Prometheus creds secret not found (either not created yet or you are using external prometheus: https://install.cnvrg.io/deployments/openshift.html)", "name", secretName)
 		return "", "", "", err
 	} else if err != nil {
 		log.Error(err, "can't get prometheus creds secret", "name", secretName)

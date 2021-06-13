@@ -6,6 +6,8 @@ networking:
   ingress:
     type: {{ .Values.networking.ingress.type }}
     {{- if and (eq .Values.networking.ingress.type "istio") (eq .Values.spec "allinone") }}
-    istioGwName: "do-not-deploy"
+    istioGwEnabled: false
+    {{- else }}
+    istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     {{- end }}
 {{- end }}

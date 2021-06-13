@@ -50,7 +50,7 @@ spec:
       {{- if isTrue .Spec.Dbs.Es.PatchEsNodes }}
       initContainers:
       - name: "maxmap"
-        image: "docker.io/cnvrg/cnvrg-tools:v0.3"
+        image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}
         imagePullPolicy: "Always"
         command: [ "/bin/bash","-c","sysctl -w vm.max_map_count=262144"]
         securityContext:

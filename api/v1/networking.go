@@ -3,7 +3,7 @@ package v1
 // +kubebuilder:validation:Enum=istio;ingress;openshift;nodeport
 type IngressType string
 
-var DoNotDeployIstioGwFlag string = "do-not-deploy"
+var IstioGwName string = "istio-gw-%s"
 
 const (
 	IstioIngress     IngressType = "istio"
@@ -28,6 +28,7 @@ type Ingress struct {
 	Timeout         string      `json:"timeout,omitempty"`
 	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
+	IstioGwEnabled  *bool       `json:"istioGwEnabled,omitempty"`
 	IstioGwName     string      `json:"istioGwName,omitempty"`
 }
 
@@ -72,6 +73,7 @@ var ingressAppDefault = Ingress{
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
+	IstioGwEnabled:  &defaultFalse,
 	IstioGwName:     "",
 }
 
@@ -80,6 +82,7 @@ var ingressInfraDefault = Ingress{
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
+	IstioGwEnabled:  &defaultFalse,
 	IstioGwName:     "",
 }
 

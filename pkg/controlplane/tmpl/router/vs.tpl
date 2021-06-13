@@ -15,7 +15,7 @@ spec:
   hosts:
     - "{{.Spec.ControlPlane.CnvrgRouter.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
-    - {{ istioGwName .}}
+    - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:
     - retries:
         attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}

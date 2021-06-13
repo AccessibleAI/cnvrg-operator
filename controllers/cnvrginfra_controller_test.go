@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
 	. "github.com/onsi/ginkgo"
@@ -335,6 +336,111 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(port2222).Should(HaveKeyWithValue("name", "port2222"))
 			Expect(port2222).Should(HaveKeyWithValue("port", port2222int64))
 		})
+		It("Istio Default Gateway Name", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			infra.Spec.InfraNamespace = ns
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			gw := &unstructured.Unstructured{}
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: fmt.Sprintf(mlopsv1.IstioGwName, ns), Namespace: ns}, gw)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+		})
+		It("Istio Custom Gateway Name", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			infra.Spec.Networking.Ingress.IstioGwName = "foo-bar"
+			infra.Spec.InfraNamespace = ns
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			gw := &unstructured.Unstructured{}
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "foo-bar", Namespace: ns}, gw)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+		})
+		It("Istio Disabled ", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+
+			infra.Spec.InfraNamespace = ns
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			istio := &unstructured.Unstructured{}
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			time.Sleep(time.Second * 3)
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeFalse())
+		})
+		It("Istio Disabled - Custom GW name for Prometheus and Grafana VS", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Networking.Ingress.IstioGwName = "foo-bar"
+			infra.Spec.InfraNamespace = ns
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+
+			vs := &unstructured.Unstructured{}
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Monitoring.Grafana.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement("foo-bar"))
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Monitoring.Prometheus.SvcName, Namespace: ns}, vs)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement("foo-bar"))
+
+		})
+		It("Istio Disabled - No Istio GW are created", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.InfraNamespace = ns
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			gw := &unstructured.Unstructured{}
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			time.Sleep(time.Second * 3)
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: fmt.Sprintf(mlopsv1.IstioGwName, ns), Namespace: ns}, gw)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeFalse())
+		})
+
 	})
 
 	Context("Test Config Reloader", func() {

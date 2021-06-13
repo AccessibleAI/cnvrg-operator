@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: {{ istioGwName .}}
+  name: {{ .Spec.Networking.Ingress.IstioGwName }}
   namespace: {{ ns . }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
