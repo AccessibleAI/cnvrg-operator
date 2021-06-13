@@ -4,6 +4,7 @@ dbs:
     enabled: {{ .Values.dbs.es.enabled }}
     storageSize: {{ .Values.dbs.es.storageSize }}
     storageClass: "{{ .Values.dbs.es.storageClass }}"
+    patchEsNodes: {{ .Values.dbs.es.patchEsNodes }}
     {{- if .Values.dbs.es.nodeSelector }}
     nodeSelector:
     {{- range $key, $value := .Values.dbs.es.nodeSelector }}

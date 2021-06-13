@@ -8,6 +8,7 @@ networking:
   ingress:
     type: "{{ .Values.networking.ingress.type }}"
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
+    istioGwName: "{{.Values.networking.ingress.istioGwName}}"
   istio:
     enabled: {{ .Values.networking.istio.enabled }}
     {{- if .Values.networking.istio.externalIp }}

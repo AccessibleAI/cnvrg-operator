@@ -182,7 +182,7 @@ var esDefault = Es{
 		Memory: "8Gi",
 	},
 	JavaOpts:     "",
-	PatchEsNodes: &defaultTrue,
+	PatchEsNodes: &defaultFalse,
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
 }

@@ -55,6 +55,7 @@ dbs:
     enabled: true
     storageSize: 80Gi
     storageClass: ""
+    patchEsNodes: true
     nodeSelector: { }
   minio:
     enabled: true
@@ -124,6 +125,7 @@ networking:
   ingress:
     type: "istio"
     istioGwEnabled: true
+    istioGwName: ""
   istio:
     enabled: true
     externalIp: [ ]

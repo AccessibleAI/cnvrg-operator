@@ -23,10 +23,6 @@ data:
         HTTP_Server               On
         HTTP_Listen               0.0.0.0
         HTTP_Port                 2020
-        storage.path              /var/log/cnvrg-flb-storage/
-        storage.sync              normal
-        storage.checksum          off
-        storage.backlog.mem_limit 256M
     {{- range $_, $app := .Data.AppInstance }}
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf
@@ -41,39 +37,35 @@ data:
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
         Parser            docker
-        DB                /var/log/cnvrg-flb-storage/flb_kube.db
-        Mem_Buf_Limit     128MB
-        Buffer_Chunk_Size 8MB
-        Buffer_Max_Size   32MB
+        DB                /var/log/cnvrg_flb_kube.db
         Skip_Long_Lines   On
         Refresh_Interval  10
-        storage.type      filesystem
   {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf: |
     [FILTER]
-        Name                kubernetes
-        Match               kube.{{ $app.SpecNs }}.*
-        Kube_URL            https://kubernetes.default.svc:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Kube_Tag_Prefix     kube.{{ $app.SpecNs }}.var.log.containers.
-        Merge_Log           On
-        K8S-Logging.Parser  On
-        K8S-Logging.Exclude Off
+        Name                  kubernetes
+        Match                 kube.{{ $app.SpecNs }}.*
+        Kube_URL              https://kubernetes.default.svc:443
+        Kube_CA_File          /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File       /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix        kube.{{ $app.SpecNs }}.var.log.containers.
+        Merge_Log             On
+        K8S-Logging.Parser    On
+        K8S-Logging.Exclude   Off
 
   {{ $app.SpecName }}-{{ $app.SpecNs }}-output.conf: |
     [OUTPUT]
-        Name            es
-        Match           kube.{{ $app.SpecNs }}.*
-        Host            elasticsearch.{{ $app.SpecNs }}.svc.cluster.local
-        Port            9200
-        Logstash_Format Off
-        Replace_Dots    On
-        Retry_Limit     False
-        Trace_Error     On
-        Index           cnvrg
-        Logstash_Prefix  cnvrg
-        HTTP_User       {{ $app.EsUser }}
-        HTTP_Passwd     {{ $app.EsPass }}
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.cluster.local
+        Port                      9200
+        Logstash_Format           Off
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg
+        Logstash_Prefix            cnvrg
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
 
     {{- end }}
 
