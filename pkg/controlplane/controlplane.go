@@ -226,6 +226,81 @@ func sidekiqState() []*desired.State {
 	}
 }
 
+func cnvrgRouter() []*desired.State {
+	return []*desired.State{
+		{
+
+			TemplatePath:   path + "/router/cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/router/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.DeploymentGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/router/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SvcGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func cnvrgRouterIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/router/vs.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func cnvrgRouterOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/router/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func cnvrgRouterIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/router/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func searchkiqState() []*desired.State {
 	return []*desired.State{
 		{
@@ -409,6 +484,19 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.Hyper.Enabled {
 		state = append(state, hyperState()...)
+	}
+
+	if *cnvrgApp.Spec.ControlPlane.CnvrgRouter.Enabled {
+		state = append(state, cnvrgRouter()...)
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+			state = append(state, cnvrgRouterIstioVs()...)
+		}
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+			state = append(state, cnvrgRouterOcpRoute()...)
+		}
+		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
+			state = append(state, cnvrgRouterIngress()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.ControlPlane.Mpi.Enabled {

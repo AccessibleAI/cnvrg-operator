@@ -14,6 +14,9 @@ controlPlane:
     {{- end }}
   hyper:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
+  cnvrgRouter:
+    enabled: {{ .Values.controlPlane.cnvrgRouter.enabled }}
+    image: {{ .Values.controlPlane.cnvrgRouter.image }}
   objectStorage:
     accessKey: "{{ .Values.controlPlane.objectStorage.accessKey }}"
     bucket: "{{ .Values.controlPlane.objectStorage.bucket }}"

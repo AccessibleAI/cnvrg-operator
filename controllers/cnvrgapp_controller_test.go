@@ -1040,6 +1040,78 @@ var _ = Describe("CnvrgApp controller", func() {
 
 	})
 
+	Context("CnvrgRouter", func() {
+		It("Cnvrg Router Labels", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.Labels = labels
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.CnvrgRouter.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+		})
+
+		It("Cnvrg Router Annotations", func() {
+			ns := createNs()
+			ctx := context.Background()
+			labels := map[string]string{"foo": "bar"}
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.Annotations = labels
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.CnvrgRouter.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo", "bar"))
+		})
+
+		It("Cnvrg Router Tenancy", func() {
+			ns := createNs()
+			ctx := context.Background()
+
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = &defaultTrue
+
+			deployment := v1.Deployment{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.CnvrgRouter.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			t := corev1.Toleration{
+				Key:      testApp.Spec.Tenancy.Key,
+				Operator: "Equal",
+				Value:    testApp.Spec.Tenancy.Value,
+				Effect:   "NoSchedule",
+			}
+
+			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
+			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+		})
+
+	})
+
 })
 
 func createNs() string {

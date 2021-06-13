@@ -71,6 +71,17 @@ spec:
                       sentryUrl:
                         type: string
                     type: object
+                  cnvrgRouter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
                   hyper:
                     properties:
                       cpuLimit:
@@ -319,6 +330,8 @@ spec:
                       svcName:
                         type: string
                     type: object
+                required:
+                - cnvrgRouter
                 type: object
               dbs:
                 properties:
