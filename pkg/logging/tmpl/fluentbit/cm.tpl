@@ -16,13 +16,17 @@ metadata:
 data:
   fluent-bit.conf: |
     [SERVICE]
-        Flush         1
-        Log_Level     info
-        Daemon        off
-        Parsers_File  parsers.conf
-        HTTP_Server   On
-        HTTP_Listen   0.0.0.0
-        HTTP_Port     2020
+        Flush                     1
+        Log_Level                 info
+        Daemon                    off
+        Parsers_File              parsers.conf
+        HTTP_Server               On
+        HTTP_Listen               0.0.0.0
+        HTTP_Port                 2020
+        storage.path              /var/log/cnvrg-flb-storage/
+        storage.sync              normal
+        storage.checksum          off
+        storage.backlog.mem_limit 256M
     {{- range $_, $app := .Data.AppInstance }}
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf
@@ -37,11 +41,13 @@ data:
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
         Parser            docker
-        DB                /var/log/flb_kube.db
-        Mem_Buf_Limit     5MB
+        DB                /var/log/cnvrg-flb-storage/flb_kube.db
+        Mem_Buf_Limit     128MB
+        Buffer_Chunk_Size 8MB
+        Buffer_Max_Size   32MB
         Skip_Long_Lines   On
         Refresh_Interval  10
-
+        storage.type      filesystem
   {{ $app.SpecName }}-{{ $app.SpecNs }}-filter.conf: |
     [FILTER]
         Name                kubernetes
@@ -63,8 +69,9 @@ data:
         Logstash_Format Off
         Replace_Dots    On
         Retry_Limit     False
+        Trace_Error     On
         Index           cnvrg
-        Logstash_Prefix cnvrg
+        Logstash_Prefix  cnvrg
         HTTP_User       {{ $app.EsUser }}
         HTTP_Passwd     {{ $app.EsPass }}
 

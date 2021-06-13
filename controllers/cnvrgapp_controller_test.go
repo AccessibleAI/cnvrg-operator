@@ -528,6 +528,78 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 
 		})
+		It("Es default xms xmx", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Requests.Memory = "4Gi"
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms2g -Xmx2g"}
+			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+		})
+		It("Es 5Gi requests  -  xms xmx", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Requests.Memory = "5Gi"
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms2g -Xmx2g"}
+			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+		})
+		It("Es 6Gi requests -  xms xmx", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Requests.Memory = "6Gi"
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms3g -Xmx3g"}
+			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+		})
+		It("Es 6000Mi requests - xms xmx", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Requests.Memory = "6000Mi"
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			sts := v1.StatefulSet{}
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: ""}
+			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+		})
 
 	})
 

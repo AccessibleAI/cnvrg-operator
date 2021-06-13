@@ -47,7 +47,7 @@ spec:
             {{- range $name, $path := .Spec.Logging.Fluentbit.LogsMounts }}
             - name: {{ $name }}
               mountPath: {{ $path }}
-              readOnly: true
+              readOnly: false
             {{- end }}
             - name: fluent-bit-config
               mountPath: /opt/app-root/etc/
