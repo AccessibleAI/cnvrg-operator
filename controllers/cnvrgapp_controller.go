@@ -397,6 +397,39 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	return nil
 }
 
+func (r *CnvrgAppReconciler) istioIngressState(app *mlopsv1.CnvrgApp) error {
+	infra, err := r.getCnvrgInfra()
+	if err != nil {
+		appLog.Error(err, "error retrieving cnvrg infra object")
+		return err
+	}
+	if *infra.Spec.Networking.Istio.Enabled {
+		_, err := r.getAppIstioGw(app)
+		if errors.IsNotFound(err) {
+			if err := desired.Apply(networking.CnvrgAppNetworkingState(app), app, r.Client, r.Scheme, appLog); err != nil {
+				r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) getAppIstioGw(app *mlopsv1.CnvrgApp) (*unstructured.Unstructured, error) {
+	name := types.NamespacedName{Name: app.Spec.Networking.Ingress.IstioGwName, Namespace: app.Namespace}
+	istioGw := &unstructured.Unstructured{}
+	istioGw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+	if err := r.Get(context.Background(), name, istioGw); err != nil {
+		if errors.IsNotFound(err) {
+			appLog.Info("istio GW not not found")
+		} else {
+			appLog.Error(err, "error retrieving istio gw")
+		}
+		return nil, err
+	}
+	return istioGw, nil
+}
+
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 	appLog.Info("applying logging")
 	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)

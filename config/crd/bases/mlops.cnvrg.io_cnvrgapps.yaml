@@ -330,8 +330,6 @@ spec:
                       svcName:
                         type: string
                     type: object
-                required:
-                - cnvrgRouter
                 type: object
               dbs:
                 properties:
