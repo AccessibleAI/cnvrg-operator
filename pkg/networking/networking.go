@@ -21,7 +21,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.ClusterRoleGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 		},
 		{
 
@@ -41,7 +41,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.DeploymentGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 		},
 		{
 
@@ -51,7 +51,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SaGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 		},
 		{
 
@@ -61,7 +61,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 		},
 		{
 
@@ -71,7 +71,7 @@ func istioInstanceState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.IstioGVR],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 		},
 	}
 }
