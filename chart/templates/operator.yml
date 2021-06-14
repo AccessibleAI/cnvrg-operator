@@ -116,5 +116,7 @@ spec:
               memory: 200Mi
       serviceAccountName: cnvrg-operator
       terminationGracePeriodSeconds: 10
+      imagePullSecrets:
+        - name: operator-pull-secret
 ---
 {{- end }}
