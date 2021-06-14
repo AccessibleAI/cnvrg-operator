@@ -4,11 +4,11 @@ metadata:
   name: nvidia-device-plugin-daemonset
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Spec.Annotations }}
+    {{- range $k, $v := .Data.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    {{- range $k, $v := .Spec.Labels }}
+    {{- range $k, $v := .Data.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
@@ -18,12 +18,12 @@ spec:
   template:
     metadata:
       annotations:
-        {{- range $k, $v := .Spec.Annotations }}
+        {{- range $k, $v := .Data.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
         name: nvidia-device-plugin-ds
-        {{- range $k, $v := .Spec.Labels }}
+        {{- range $k, $v := .Data.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
@@ -36,7 +36,7 @@ spec:
       nodeSelector:
         accelerator: nvidia
       containers:
-        - image: {{ image .Spec.ImageHub .Data.NvidiaDp.Image }}
+        - image: {{ image .Data.ImageHub .Data.NvidiaDp.Image }}
           name: nvidia-device-plugin-ctr
           args: ["--fail-on-init-error=true"]
           resources:

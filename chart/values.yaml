@@ -6,6 +6,10 @@ labels: {}
 
 annotations: {}
 
+gpu:
+  nvidiaDp:
+    enabled: true
+
 controlPlane:
   image: core:3.6.99
   baseConfig:

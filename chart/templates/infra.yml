@@ -10,6 +10,9 @@ spec:
   imageHub: {{ .Values.imageHub }}
   configReloader:
     enabled: {{.Values.configReloader.enabled}}
+  gpu:
+    nvidiaDp:
+      enabled: {{.Values.gpu.nvidiaDp.enabled}}
   {{- include "spec.labelsAndAnnotations" . | indent 2 }}
   {{- include "spec.registry" . | indent 2 }}
   {{- include "spec.storage" . | indent 2 }}

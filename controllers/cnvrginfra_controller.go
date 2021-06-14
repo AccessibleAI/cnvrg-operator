@@ -228,8 +228,11 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		nvidiaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
 			Data: map[string]interface{}{
-				"NvidiaDp": cnvrgInfra.Spec.Gpu.NvidiaDp,
-				"Registry": cnvrgInfra.Spec.Registry,
+				"NvidiaDp":    cnvrgInfra.Spec.Gpu.NvidiaDp,
+				"Registry":    cnvrgInfra.Spec.Registry,
+				"ImageHub":    cnvrgInfra.Spec.ImageHub,
+				"Annotations": cnvrgInfra.Spec.Annotations,
+				"Labels":      cnvrgInfra.Spec.Labels,
 			},
 		}
 		if err := desired.Apply(gpu.NvidiaDpState(nvidiaDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
