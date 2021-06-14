@@ -72,6 +72,15 @@ subjects:
     name: cnvrg-operator
     namespace: {{ template "spec.cnvrgNs" . }}
 ---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/dockerconfigjson
+metadata:
+  name: operator-pull-secret
+  namespace: {{ template "spec.cnvrgNs" . }}
+data:
+  .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .Values.registry.url .Values.registry.user .Values.registry.password (printf "%s:%s" .Values.registry.user .Values.registry.password | b64enc) | b64enc }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -98,6 +107,8 @@ spec:
           value: "{{ .Values.tenancy.value }}"
           effect: "NoSchedule"
       {{- end }}
+      imagePullSecrets:
+        - name: operator-pull-secret
       containers:
         - command:
             - /opt/app-root/cnvrg-operator
@@ -116,7 +127,6 @@ spec:
               memory: 200Mi
       serviceAccountName: cnvrg-operator
       terminationGracePeriodSeconds: 10
-      imagePullSecrets:
-        - name: operator-pull-secret
+
 ---
 {{- end }}
