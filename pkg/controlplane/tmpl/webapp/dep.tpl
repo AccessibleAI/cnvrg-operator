@@ -152,6 +152,10 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
+        {{- if isTrue .Spec.Proxy.Enabled }}
+        - configMapRef:
+            name: {{ .Spec.Proxy.ConfigRef }}
+        {{- end }}
         resources:
           requests:
             cpu: "100m"
@@ -243,5 +247,9 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
+        {{- if isTrue .Spec.Proxy.Enabled }}
+        - configMapRef:
+            name: {{ .Spec.Proxy.ConfigRef }}
+        {{- end }}
 
 
