@@ -5,7 +5,6 @@ import (
 )
 
 var defaultFalse = false
-var defaultTrue = true
 
 type CnvrgAppSpec struct {
 	ClusterDomain string             `json:"clusterDomain,omitempty"`
@@ -20,7 +19,6 @@ type CnvrgAppSpec struct {
 	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
 	SSO           SSO                `json:"sso,omitempty"`
 	Tenancy       Tenancy            `json:"tenancy,omitempty"`
-	Proxy         Proxy              `json:"proxy,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -61,6 +59,5 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Tenancy:       tenancyDefault,
 		Labels:        map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations:   nil,
-		Proxy:         defaultProxy,
 	}
 }

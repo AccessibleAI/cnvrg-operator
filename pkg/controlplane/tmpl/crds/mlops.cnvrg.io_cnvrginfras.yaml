@@ -328,25 +328,25 @@ spec:
                       proxyImage:
                         type: string
                     type: object
-                type: object
-              proxy:
-                properties:
-                  configRef:
-                    type: string
-                  enabled:
-                    type: boolean
-                  httpProxy:
-                    items:
-                      type: string
-                    type: array
-                  httpsProxy:
-                    items:
-                      type: string
-                    type: array
-                  noProxy:
-                    items:
-                      type: string
-                    type: array
+                  proxy:
+                    properties:
+                      configRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                      httpProxy:
+                        items:
+                          type: string
+                        type: array
+                      httpsProxy:
+                        items:
+                          type: string
+                        type: array
+                      noProxy:
+                        items:
+                          type: string
+                        type: array
+                    type: object
                 type: object
               registry:
                 properties:

@@ -97,9 +97,9 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
-        {{- if isTrue .Spec.Proxy.Enabled }}
+        {{- if isTrue .Spec.Networking.Proxy.Enabled }}
         - configMapRef:
-            name: {{ .Spec.Proxy.ConfigRef }}
+            name: {{ .Spec.Networking.Proxy.ConfigRef }}
         {{- end }}
         name: cnvrg-app
         ports:
@@ -152,9 +152,9 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
-        {{- if isTrue .Spec.Proxy.Enabled }}
+        {{- if isTrue .Spec.Networking.Proxy.Enabled }}
         - configMapRef:
-            name: {{ .Spec.Proxy.ConfigRef }}
+            name: {{ .Spec.Networking.Proxy.ConfigRef }}
         {{- end }}
         resources:
           requests:
@@ -247,9 +247,9 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
-        {{- if isTrue .Spec.Proxy.Enabled }}
+        {{- if isTrue .Spec.Networking.Proxy.Enabled }}
         - configMapRef:
-            name: {{ .Spec.Proxy.ConfigRef }}
+            name: {{ .Spec.Networking.Proxy.ConfigRef }}
         {{- end }}
 
 

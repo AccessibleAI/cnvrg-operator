@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/networking"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/apps/v1"
@@ -12,6 +13,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
+	"reflect"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -624,12 +628,12 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Proxy.Enabled = &defaultTrue
-			infra.Spec.Proxy.HttpProxy = []string{
+			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
+			infra.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
 			}
-			infra.Spec.Proxy.HttpsProxy = []string{
+			infra.Spec.Networking.Proxy.HttpsProxy = []string{
 				"https://proxy1.org.local",
 				"https://proxy2.org.local",
 			}
@@ -637,7 +641,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
 					return false
 				}
@@ -656,17 +660,17 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Proxy.Enabled = &defaultTrue
-			infra.Spec.Proxy.HttpProxy = []string{
+			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
+			infra.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
 			}
-			infra.Spec.Proxy.HttpsProxy = []string{
+			infra.Spec.Networking.Proxy.HttpsProxy = []string{
 				"https://proxy1.org.local",
 				"https://proxy2.org.local",
 			}
 
-			infra.Spec.Proxy.NoProxy = []string{
+			infra.Spec.Networking.Proxy.NoProxy = []string{
 				".svc.cluster.local",
 				".foo.bar",
 			}
@@ -674,7 +678,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
 					return false
 				}
@@ -688,6 +692,53 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local,.foo.bar"))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local,.foo.bar"))
 		})
+		FIt("Proxy configmap test creation - k8s api server", func() {
+			noProxy := []string{".foo.bar"}
+			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
+			ctx := context.Background()
+			ns := createNs()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
+			infra.Spec.Networking.Proxy.HttpProxy = []string{
+				"http://proxy1.org.local",
+				"http://proxy2.org.local",
+			}
+			infra.Spec.Networking.Proxy.HttpsProxy = []string{
+				"https://proxy1.org.local",
+				"https://proxy2.org.local",
+			}
+
+			infra.Spec.Networking.Proxy.NoProxy = noProxy
+
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			Eventually(func() bool {
+				infraRes := mlopsv1.CnvrgInfra{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				sort.Strings(infraRes.Spec.Networking.Proxy.NoProxy)
+				sort.Strings(expectedNoProxy)
+				return reflect.DeepEqual(infraRes.Spec.Networking.Proxy.NoProxy, expectedNoProxy)
+			}, timeout, interval).Should(BeTrue())
+
+			cm := corev1.ConfigMap{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(cm.Data).Should(HaveKeyWithValue("HTTP_PROXY", "http://proxy1.org.local,http://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
+
+		})
 		It("Proxy configmap test creation - proxy disabled", func() {
 
 			ctx := context.Background()
@@ -698,7 +749,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			cm := corev1.ConfigMap{}
 			time.Sleep(3)
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
 					return false
 				}

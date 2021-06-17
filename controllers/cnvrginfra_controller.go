@@ -12,7 +12,6 @@ import (
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
-	"github.com/cnvrg-operator/pkg/proxy"
 	"github.com/cnvrg-operator/pkg/registry"
 	"github.com/cnvrg-operator/pkg/reloader"
 	"github.com/cnvrg-operator/pkg/storage"
@@ -203,8 +202,8 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// istio
-	infraLog.Info("applying istio")
-	if err := desired.Apply(networking.IstioInstanceState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+	infraLog.Info("applying infra networking")
+	if err := desired.Apply(networking.InfraNetworkingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -240,17 +239,6 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
-	}
-
-	// proxy
-	if *cnvrgInfra.Spec.Proxy.Enabled {
-		infraLog.Info("applying proxy configuration")
-		if err := desired.Apply(proxy.State(), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-			reconcileResult = err
-		}
-	} else {
-		infraLog.Info("proxy disabled, skipping proxy configuration")
 	}
 
 	return reconcileResult
@@ -494,7 +482,7 @@ func (r *CnvrgInfraReconciler) cleanupPVCs(infra *mlopsv1.CnvrgInfra) error {
 func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 	infraLog.Info("running istio cleanup")
 	ctx := context.Background()
-	istioManifests := networking.IstioInstanceState(cnvrgInfra)
+	istioManifests := networking.InfraNetworkingState(cnvrgInfra)
 	for _, m := range istioManifests {
 		// Make sure IstioOperator was deployed
 		if m.GVR == desired.Kinds[desired.IstioGVR] {
@@ -662,4 +650,17 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 		desiredInfraSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, infra.Spec.InfraNamespace)
 	}
 
+	if *infra.Spec.Networking.Proxy.Enabled {
+		desiredInfraSpec.Networking.Proxy.NoProxy = infra.Spec.Networking.Proxy.NoProxy
+		for _, defaultNoProxy := range networking.DefaultNoProxy() {
+			if !containsString(desiredInfraSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
+				desiredInfraSpec.Networking.Proxy.NoProxy = append(desiredInfraSpec.Networking.Proxy.NoProxy, defaultNoProxy)
+			}
+		}
+		sort.Strings(desiredInfraSpec.Networking.Proxy.NoProxy)
+		sort.Strings(infra.Spec.Networking.Proxy.NoProxy)
+		if !reflect.DeepEqual(desiredInfraSpec.Networking.Proxy.NoProxy, infra.Spec.Networking.Proxy.NoProxy) {
+			infra.Spec.Networking.Proxy.NoProxy = nil
+		}
+	}
 }

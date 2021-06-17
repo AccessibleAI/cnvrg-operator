@@ -1000,11 +1000,11 @@ var _ = Describe("CnvrgApp controller", func() {
 
 		})
 
-		FIt("Proxy enabled - webapp", func() {
+		It("Proxy enabled - webapp", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
 			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			dep := v1.Deployment{}
@@ -1017,17 +1017,17 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			env := corev1.EnvFromSource{
 				ConfigMapRef: &corev1.ConfigMapEnvSource{
-					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Networking.Proxy.ConfigRef},
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
 		})
 
-		FIt("Proxy enabled - sidekiq", func() {
+		It("Proxy enabled - sidekiq", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
 			app.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
 			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
@@ -1041,17 +1041,17 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			env := corev1.EnvFromSource{
 				ConfigMapRef: &corev1.ConfigMapEnvSource{
-					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Networking.Proxy.ConfigRef},
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
 		})
 
-		FIt("Proxy enabled - searchkiq", func() {
+		It("Proxy enabled - searchkiq", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
 			app.Spec.ControlPlane.Searchkiq.Enabled = &defaultTrue
 			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
@@ -1065,17 +1065,17 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			env := corev1.EnvFromSource{
 				ConfigMapRef: &corev1.ConfigMapEnvSource{
-					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Networking.Proxy.ConfigRef},
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
 		})
 
-		FIt("Proxy enabled - systemkiq", func() {
+		It("Proxy enabled - systemkiq", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
 			app.Spec.ControlPlane.Systemkiq.Enabled = &defaultTrue
 			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
@@ -1089,7 +1089,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			env := corev1.EnvFromSource{
 				ConfigMapRef: &corev1.ConfigMapEnvSource{
-					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Networking.Proxy.ConfigRef},
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
@@ -1560,12 +1560,12 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Proxy.Enabled = &defaultTrue
-			app.Spec.Proxy.HttpProxy = []string{
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
 			}
-			app.Spec.Proxy.HttpsProxy = []string{
+			app.Spec.Networking.Proxy.HttpsProxy = []string{
 				"https://proxy1.org.local",
 				"https://proxy2.org.local",
 			}
@@ -1573,7 +1573,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
 					return false
 				}
@@ -1592,17 +1592,17 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Proxy.Enabled = &defaultTrue
-			app.Spec.Proxy.HttpProxy = []string{
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
 			}
-			app.Spec.Proxy.HttpsProxy = []string{
+			app.Spec.Networking.Proxy.HttpsProxy = []string{
 				"https://proxy1.org.local",
 				"https://proxy2.org.local",
 			}
 
-			app.Spec.Proxy.NoProxy = []string{
+			app.Spec.Networking.Proxy.NoProxy = []string{
 				".svc.cluster.local",
 				".foo.bar",
 			}
@@ -1610,7 +1610,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
 					return false
 				}
@@ -1634,7 +1634,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			cm := corev1.ConfigMap{}
 			time.Sleep(3)
 			Eventually(func() bool {
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
 					return false
 				}

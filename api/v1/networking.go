@@ -42,12 +42,30 @@ type HTTPS struct {
 type CnvrgAppNetworking struct {
 	Ingress Ingress `json:"ingress,omitempty"`
 	HTTPS   HTTPS   `json:"https,omitempty"`
+	Proxy   Proxy   `json:"proxy,omitempty"`
 }
 
 type CnvrgInfraNetworking struct {
 	Ingress Ingress `json:"ingress,omitempty"`
 	HTTPS   HTTPS   `json:"https,omitempty"`
 	Istio   Istio   `json:"istio,omitempty"`
+	Proxy   Proxy   `json:"proxy,omitempty"`
+}
+
+type Proxy struct {
+	Enabled    *bool    `json:"enabled,omitempty"`
+	ConfigRef  string   `json:"configRef,omitempty"`
+	HttpProxy  []string `json:"httpProxy,omitempty"`
+	HttpsProxy []string `json:"httpsProxy,omitempty"`
+	NoProxy    []string `json:"noProxy,omitempty"`
+}
+
+var defaultProxy = Proxy{
+	Enabled:    &defaultFalse,
+	ConfigRef:  "cp-proxy",
+	HttpProxy:  nil,
+	HttpsProxy: nil,
+	NoProxy:    nil,
 }
 
 var istioDefault = Istio{
@@ -89,10 +107,12 @@ var ingressInfraDefault = Ingress{
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
 	Ingress: ingressAppDefault,
 	HTTPS:   httpsDefault,
+	Proxy:   defaultProxy,
 }
 
 var cnvrgInfraNetworkingDefault = CnvrgInfraNetworking{
 	Ingress: ingressInfraDefault,
 	Istio:   istioDefault,
 	HTTPS:   httpsDefault,
+	Proxy:   defaultProxy,
 }
