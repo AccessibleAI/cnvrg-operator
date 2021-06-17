@@ -11,6 +11,7 @@ import (
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
+	"github.com/cnvrg-operator/pkg/proxy"
 	"github.com/cnvrg-operator/pkg/registry"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -360,6 +361,17 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
 		return err
+	}
+
+	// proxy
+	if *cnvrgApp.Spec.Proxy.Enabled {
+		infraLog.Info("applying proxy configuration")
+		if err := desired.Apply(proxy.State(), cnvrgApp, r.Client, r.Scheme, infraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+			return err
+		}
+	} else {
+		infraLog.Info("proxy disabled, skipping proxy configuration")
 	}
 
 	// dbs

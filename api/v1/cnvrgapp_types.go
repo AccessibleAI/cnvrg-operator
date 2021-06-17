@@ -9,6 +9,9 @@ var defaultTrue = true
 
 type CnvrgAppSpec struct {
 	ClusterDomain string             `json:"clusterDomain,omitempty"`
+	ImageHub      string             `json:"imageHub,omitempty"`
+	Labels        map[string]string  `json:"labels,omitempty"`
+	Annotations   map[string]string  `json:"annotations,omitempty"`
 	ControlPlane  ControlPlane       `json:"controlPlane,omitempty"`
 	Registry      Registry           `json:"registry,omitempty"`
 	Dbs           AppDbs             `json:"dbs,omitempty"`
@@ -17,9 +20,7 @@ type CnvrgAppSpec struct {
 	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
 	SSO           SSO                `json:"sso,omitempty"`
 	Tenancy       Tenancy            `json:"tenancy,omitempty"`
-	Labels        map[string]string  `json:"labels,omitempty"`
-	Annotations   map[string]string  `json:"annotations,omitempty"`
-	ImageHub      string             `json:"imageHub,omitempty"`
+	Proxy         Proxy              `json:"proxy,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -60,5 +61,6 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Tenancy:       tenancyDefault,
 		Labels:        map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations:   nil,
+		Proxy:         defaultProxy,
 	}
 }

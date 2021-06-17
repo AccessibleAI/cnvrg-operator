@@ -12,6 +12,7 @@ import (
 	"github.com/cnvrg-operator/pkg/logging"
 	"github.com/cnvrg-operator/pkg/monitoring"
 	"github.com/cnvrg-operator/pkg/networking"
+	"github.com/cnvrg-operator/pkg/proxy"
 	"github.com/cnvrg-operator/pkg/registry"
 	"github.com/cnvrg-operator/pkg/reloader"
 	"github.com/cnvrg-operator/pkg/storage"
@@ -239,6 +240,17 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
+	}
+
+	// proxy
+	if *cnvrgInfra.Spec.Proxy.Enabled {
+		infraLog.Info("applying proxy configuration")
+		if err := desired.Apply(proxy.State(), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			reconcileResult = err
+		}
+	} else {
+		infraLog.Info("proxy disabled, skipping proxy configuration")
 	}
 
 	return reconcileResult

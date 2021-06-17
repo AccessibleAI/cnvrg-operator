@@ -97,6 +97,10 @@ spec:
             name: {{ .Spec.Dbs.Redis.CredsRef }}
         - secretRef:
             name: {{ .Spec.Monitoring.Prometheus.CredsRef }}
+        {{- if isTrue .Spec.Proxy.Enabled }}
+        - configMapRef:
+            name: {{ .Spec.Proxy.ConfigRef }}
+        {{- end }}
         name: cnvrg-app
         ports:
           - containerPort: {{ .Spec.ControlPlane.WebApp.Port }}

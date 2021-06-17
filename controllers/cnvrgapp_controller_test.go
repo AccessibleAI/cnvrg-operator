@@ -1000,6 +1000,101 @@ var _ = Describe("CnvrgApp controller", func() {
 
 		})
 
+		FIt("Proxy enabled - webapp", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			env := corev1.EnvFromSource{
+				ConfigMapRef: &corev1.ConfigMapEnvSource{
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+				},
+			}
+			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+		})
+
+		FIt("Proxy enabled - sidekiq", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			env := corev1.EnvFromSource{
+				ConfigMapRef: &corev1.ConfigMapEnvSource{
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+				},
+			}
+			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+		})
+
+		FIt("Proxy enabled - searchkiq", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Searchkiq.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "searchkiq", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			env := corev1.EnvFromSource{
+				ConfigMapRef: &corev1.ConfigMapEnvSource{
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+				},
+			}
+			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+		})
+
+		FIt("Proxy enabled - systemkiq", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Systemkiq.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "systemkiq", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			env := corev1.EnvFromSource{
+				ConfigMapRef: &corev1.ConfigMapEnvSource{
+					LocalObjectReference: corev1.LocalObjectReference{Name: app.Spec.Proxy.ConfigRef},
+				},
+			}
+			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+		})
+
 	})
 
 	Context("Test Object Storage Secret", func() {
@@ -1457,6 +1552,96 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeFalse())
 		})
 
+	})
+
+	Context("Test Proxy ConfigMap creation", func() {
+		It("Proxy configmap test creation - default no_proxy", func() {
+
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.Proxy.HttpProxy = []string{
+				"http://proxy1.org.local",
+				"http://proxy2.org.local",
+			}
+			app.Spec.Proxy.HttpsProxy = []string{
+				"https://proxy1.org.local",
+				"https://proxy2.org.local",
+			}
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			cm := corev1.ConfigMap{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(cm.Data).Should(HaveKeyWithValue("HTTP_PROXY", "http://proxy1.org.local,http://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local"))
+		})
+		It("Proxy configmap test creation - custom no_proxy", func() {
+
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Proxy.Enabled = &defaultTrue
+			app.Spec.Proxy.HttpProxy = []string{
+				"http://proxy1.org.local",
+				"http://proxy2.org.local",
+			}
+			app.Spec.Proxy.HttpsProxy = []string{
+				"https://proxy1.org.local",
+				"https://proxy2.org.local",
+			}
+
+			app.Spec.Proxy.NoProxy = []string{
+				".svc.cluster.local",
+				".foo.bar",
+			}
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			cm := corev1.ConfigMap{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(cm.Data).Should(HaveKeyWithValue("HTTP_PROXY", "http://proxy1.org.local,http://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local,.foo.bar"))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local,.foo.bar"))
+		})
+		It("Proxy configmap test creation - proxy disabled", func() {
+
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			cm := corev1.ConfigMap{}
+			time.Sleep(3)
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Proxy.ConfigRef, Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeFalse())
+
+		})
 	})
 
 })
