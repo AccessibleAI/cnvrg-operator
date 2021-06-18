@@ -1652,7 +1652,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
 
-		FIt("Proxy configmap test creation - proxy disabled", func() {
+		It("Proxy configmap test creation - proxy disabled", func() {
 
 			ctx := context.Background()
 			ns := createNs()
