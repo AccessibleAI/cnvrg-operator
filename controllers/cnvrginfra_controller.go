@@ -650,6 +650,11 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 		desiredInfraSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, infra.Spec.InfraNamespace)
 	}
 
+	// if proxy.enabled wasn't set in spec, make sure explicitly set it before initiating noProxy values
+	if infra.Spec.Networking.Proxy.Enabled == nil {
+		infra.Spec.Networking.Proxy.Enabled = desiredInfraSpec.Networking.Proxy.Enabled
+	}
+
 	if *infra.Spec.Networking.Proxy.Enabled {
 		desiredInfraSpec.Networking.Proxy.NoProxy = infra.Spec.Networking.Proxy.NoProxy
 		for _, defaultNoProxy := range networking.DefaultNoProxy() {

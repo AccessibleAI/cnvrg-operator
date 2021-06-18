@@ -764,10 +764,20 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			ctx := context.Background()
 			ns := createNs()
-			infra := getDefaultTestInfraSpec(ns)
+			infra := getEmptyTestInfraSpec(ns)
 
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			cm := corev1.ConfigMap{}
+
+			Eventually(func() bool {
+				infraRes := mlopsv1.CnvrgInfra{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				return infraRes.Spec.Networking.Proxy.Enabled != nil && *infraRes.Spec.Networking.Proxy.Enabled == false
+			}, timeout, interval).Should(BeTrue())
+
 			time.Sleep(3)
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
@@ -781,6 +791,20 @@ var _ = Describe("CnvrgInfra controller", func() {
 	})
 
 })
+
+func getEmptyTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {
+
+	infraEmptySpec := mlopsv1.CnvrgInfraSpec{}
+	infraEmptySpec.InfraNamespace = ns
+	return &mlopsv1.CnvrgInfra{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "CnvrgInfra",
+			APIVersion: "mlops.cnvrg.io/v1"},
+
+		ObjectMeta: metav1.ObjectMeta{Name: ns},
+		Spec:       infraEmptySpec,
+	}
+}
 
 func getDefaultTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {
 	testSpec := mlopsv1.DefaultCnvrgInfraSpec()

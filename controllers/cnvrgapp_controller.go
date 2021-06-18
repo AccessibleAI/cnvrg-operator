@@ -956,6 +956,11 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, app.Namespace)
 	}
 
+	// if proxy.enabled wasn't set in spec, make sure explicitly set it before initiating noProxy values
+	if app.Spec.Networking.Proxy.Enabled == nil {
+		app.Spec.Networking.Proxy.Enabled = desiredAppSpec.Networking.Proxy.Enabled
+	}
+
 	if *app.Spec.Networking.Proxy.Enabled {
 		desiredAppSpec.Networking.Proxy.NoProxy = app.Spec.Networking.Proxy.NoProxy
 		// make sure no_proxy includes all default values

@@ -1651,15 +1651,28 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
-		It("Proxy configmap test creation - proxy disabled", func() {
+
+		FIt("Proxy configmap test creation - proxy disabled", func() {
 
 			ctx := context.Background()
 			ns := createNs()
-			app := getDefaultTestAppSpec(ns)
+			app := getEmptyTestAppSpec(ns)
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+
+			Eventually(func() bool {
+				appRes := mlopsv1.CnvrgApp{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Name, Namespace: app.Namespace}, &appRes)
+				if err != nil {
+					return false
+				}
+				return appRes.Spec.Networking.Proxy.Enabled != nil && *appRes.Spec.Networking.Proxy.Enabled == false
+			}, timeout, interval).Should(BeTrue())
+
 			cm := corev1.ConfigMap{}
+
 			time.Sleep(3)
+
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
@@ -1683,6 +1696,20 @@ func createNs() string {
 		panic(err)
 	}
 	return ns
+}
+
+func getEmptyTestAppSpec(ns string) *mlopsv1.CnvrgApp {
+
+	return &mlopsv1.CnvrgApp{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "CnvrgApp",
+			APIVersion: "mlops.cnvrg.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "cnvrgapp",
+			Namespace: ns,
+		},
+	}
 }
 
 func getDefaultTestAppSpec(ns string) *mlopsv1.CnvrgApp {
