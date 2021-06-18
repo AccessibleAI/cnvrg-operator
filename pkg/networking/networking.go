@@ -180,7 +180,7 @@ func getK8sApiIP() string {
 		zap.S().Errorf("%s: getting K8s api IP", err)
 		return "unable-to-detect-k8s-api-ip"
 	}
-	if len(ips) > 1 {
+	if len(ips) < 1 {
 		zap.S().Errorf("%s: getting K8s api IP", err)
 		return "unable-to-detect-k8s-api-ip"
 	}
