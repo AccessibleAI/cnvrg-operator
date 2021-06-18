@@ -60,7 +60,15 @@ type Proxy struct {
 	NoProxy    []string `json:"noProxy,omitempty"`
 }
 
-var defaultProxy = Proxy{
+var defaultInfraProxy = Proxy{
+	Enabled:    &defaultFalse,
+	ConfigRef:  "infra-proxy",
+	HttpProxy:  nil,
+	HttpsProxy: nil,
+	NoProxy:    nil,
+}
+
+var defaultAppProxy = Proxy{
 	Enabled:    &defaultFalse,
 	ConfigRef:  "cp-proxy",
 	HttpProxy:  nil,
@@ -107,12 +115,12 @@ var ingressInfraDefault = Ingress{
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
 	Ingress: ingressAppDefault,
 	HTTPS:   httpsDefault,
-	Proxy:   defaultProxy,
+	Proxy:   defaultAppProxy,
 }
 
 var cnvrgInfraNetworkingDefault = CnvrgInfraNetworking{
 	Ingress: ingressInfraDefault,
 	Istio:   istioDefault,
 	HTTPS:   httpsDefault,
-	Proxy:   defaultProxy,
+	Proxy:   defaultInfraProxy,
 }
