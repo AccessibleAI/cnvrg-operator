@@ -126,6 +126,11 @@ networking:
   https:
     enabled: false
     certSecret: ""
+  proxy:
+    enabled: false
+    httpProxy: [ ]
+    httpsProxy: [ ]
+    noProxy: [ ]
   ingress:
     type: "istio"
     istioGwEnabled: true

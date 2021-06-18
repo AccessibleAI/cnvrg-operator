@@ -163,6 +163,8 @@ func IstioCrds() (crds []*desired.State) {
 
 func DefaultNoProxy() []string {
 	return append([]string{
+		"localhost",
+		"127.0.0.1",
 		".svc",
 		".svc.cluster.local",
 		"kubernetes.default.svc",
