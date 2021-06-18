@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -956,7 +957,20 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	}
 
 	if *app.Spec.Networking.Proxy.Enabled {
-		desiredAppSpec.Networking.Proxy.NoProxy = append(networking.DefaultNoProxy(), app.Spec.Networking.Proxy.NoProxy...)
+		desiredAppSpec.Networking.Proxy.NoProxy = app.Spec.Networking.Proxy.NoProxy
+		// make sure no_proxy includes all default values
+		for _, defaultNoProxy := range networking.DefaultNoProxy() {
+			if !containsString(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
+				desiredAppSpec.Networking.Proxy.NoProxy = append(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy)
+			}
+		}
+		// sort slices before compare
+		sort.Strings(desiredAppSpec.Networking.Proxy.NoProxy)
+		sort.Strings(app.Spec.Networking.Proxy.NoProxy)
+		// if slice are not equal, use desiredAppSpec no_proxy
+		if !reflect.DeepEqual(desiredAppSpec.Networking.Proxy.NoProxy, app.Spec.Networking.Proxy.NoProxy) {
+			app.Spec.Networking.Proxy.NoProxy = nil
+		}
 	}
 
 }

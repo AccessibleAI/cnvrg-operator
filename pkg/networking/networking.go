@@ -130,6 +130,10 @@ func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, ingressState()...)
 	}
 
+	if *cnvrgApp.Spec.Networking.Proxy.Enabled {
+		state = append(state, proxyState()...)
+	}
+
 	return state
 }
 

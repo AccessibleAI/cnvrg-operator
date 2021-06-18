@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/cnvrg-operator/pkg/networking"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/teris-io/shortid"
@@ -14,6 +15,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
+	"reflect"
+	"sort"
 	"strings"
 	"time"
 )
@@ -1559,6 +1562,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			ctx := context.Background()
 			ns := createNs()
+			expectedNoProxy := networking.DefaultNoProxy()
 			app := getDefaultTestAppSpec(ns)
 			app.Spec.Networking.Proxy.Enabled = &defaultTrue
 			app.Spec.Networking.Proxy.HttpProxy = []string{
@@ -1571,6 +1575,18 @@ var _ = Describe("CnvrgApp controller", func() {
 			}
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+
+			Eventually(func() bool {
+				appRes := mlopsv1.CnvrgApp{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Name, Namespace: app.Namespace}, &appRes)
+				if err != nil {
+					return false
+				}
+				sort.Strings(appRes.Spec.Networking.Proxy.NoProxy)
+				sort.Strings(expectedNoProxy)
+				return reflect.DeepEqual(appRes.Spec.Networking.Proxy.NoProxy, expectedNoProxy)
+			}, timeout, interval).Should(BeTrue())
+
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
@@ -1584,14 +1600,18 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
-			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local"))
-			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
 		It("Proxy configmap test creation - custom no_proxy", func() {
 
 			ctx := context.Background()
 			ns := createNs()
+			noProxy := []string{".foo.bar"}
+			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
 			app := getDefaultTestAppSpec(ns)
+			cm := corev1.ConfigMap{}
+
 			app.Spec.Networking.Proxy.Enabled = &defaultTrue
 			app.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
@@ -1602,13 +1622,20 @@ var _ = Describe("CnvrgApp controller", func() {
 				"https://proxy2.org.local",
 			}
 
-			app.Spec.Networking.Proxy.NoProxy = []string{
-				".svc.cluster.local",
-				".foo.bar",
-			}
-
+			app.Spec.Networking.Proxy.NoProxy = noProxy
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
-			cm := corev1.ConfigMap{}
+
+			Eventually(func() bool {
+				appRes := mlopsv1.CnvrgApp{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Name, Namespace: app.Namespace}, &appRes)
+				if err != nil {
+					return false
+				}
+				sort.Strings(appRes.Spec.Networking.Proxy.NoProxy)
+				sort.Strings(expectedNoProxy)
+				return reflect.DeepEqual(appRes.Spec.Networking.Proxy.NoProxy, expectedNoProxy)
+			}, timeout, interval).Should(BeTrue())
+
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
 				if err != nil {
@@ -1621,8 +1648,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
-			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local,.foo.bar"))
-			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local,.foo.bar"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
 		It("Proxy configmap test creation - proxy disabled", func() {
 

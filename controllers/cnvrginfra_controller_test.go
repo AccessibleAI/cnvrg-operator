@@ -627,6 +627,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			ctx := context.Background()
 			ns := createNs()
+			expectedNoProxy := networking.DefaultNoProxy()
 			infra := getDefaultTestInfraSpec(ns)
 			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
@@ -639,6 +640,18 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}
 
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+
+			Eventually(func() bool {
+				infraRes := mlopsv1.CnvrgInfra{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				sort.Strings(infraRes.Spec.Networking.Proxy.NoProxy)
+				sort.Strings(expectedNoProxy)
+				return reflect.DeepEqual(infraRes.Spec.Networking.Proxy.NoProxy, expectedNoProxy)
+			}, timeout, interval).Should(BeTrue())
+
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
@@ -652,13 +665,15 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
-			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local"))
-			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
 		It("Proxy configmap test creation - custom no_proxy", func() {
 
 			ctx := context.Background()
 			ns := createNs()
+			noProxy := []string{".foo.bar"}
+			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
 			infra := getDefaultTestInfraSpec(ns)
 			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
@@ -669,13 +684,19 @@ var _ = Describe("CnvrgInfra controller", func() {
 				"https://proxy1.org.local",
 				"https://proxy2.org.local",
 			}
-
-			infra.Spec.Networking.Proxy.NoProxy = []string{
-				".svc.cluster.local",
-				".foo.bar",
-			}
+			infra.Spec.Networking.Proxy.NoProxy = noProxy
 
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			Eventually(func() bool {
+				infraRes := mlopsv1.CnvrgInfra{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				sort.Strings(infraRes.Spec.Networking.Proxy.NoProxy)
+				sort.Strings(expectedNoProxy)
+				return reflect.DeepEqual(infraRes.Spec.Networking.Proxy.NoProxy, expectedNoProxy)
+			}, timeout, interval).Should(BeTrue())
 			cm := corev1.ConfigMap{}
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Networking.Proxy.ConfigRef, Namespace: ns}, &cm)
@@ -689,10 +710,10 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("http_proxy", "http://proxy1.org.local,http://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("https_proxy", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
-			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", ".svc.cluster.local,.foo.bar"))
-			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", ".svc.cluster.local,.foo.bar"))
+			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
+			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
-		FIt("Proxy configmap test creation - k8s api server", func() {
+		It("Proxy configmap test creation - k8s api server", func() {
 			noProxy := []string{".foo.bar"}
 			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
 			ctx := context.Background()
