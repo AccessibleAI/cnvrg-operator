@@ -160,17 +160,21 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// redis
 	if *cnvrgInfra.Spec.Dbs.Redis.Enabled || *cnvrgInfra.Spec.SSO.Enabled {
-		infraLog.Info("applying redis")
-		if err := desired.CreateRedisCredsSecret(cnvrgInfra,
-			cnvrgInfra.Spec.Dbs.Redis.CredsRef,
-			cnvrgInfra.Spec.InfraNamespace,
-			fmt.Sprintf("%s:%d", cnvrgInfra.Spec.Dbs.Redis.SvcName, cnvrgInfra.Spec.Dbs.Redis.Port),
-			r,
-			r.Scheme,
-			infraLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
-			reconcileResult = err
+		redisSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   cnvrgInfra.Spec.InfraNamespace,
+				"Annotations": cnvrgInfra.Spec.Annotations,
+				"Labels":      cnvrgInfra.Spec.Labels,
+				"CredsRef":    cnvrgInfra.Spec.Dbs.Redis.CredsRef,
+				"SvcName":     cnvrgInfra.Spec.Dbs.Redis.SvcName,
+			},
 		}
+		appLog.Info("trying to generate redis creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.RedisCreds(redisSecretData), cnvrgInfra, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			return err
+		}
+		infraLog.Info("applying redis")
 		if err := desired.Apply(dbs.InfraDbsState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err

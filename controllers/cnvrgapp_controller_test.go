@@ -250,6 +250,56 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 
 		})
+		It("Pg creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			// create app
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			// get pg creds
+			pgCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.CredsRef, Namespace: ns}, &pgCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable ES and make sure it was deployed
+			appRes := mlopsv1.CnvrgApp{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrgapp", Namespace: ns}, &appRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := appRes.ObjectMeta.ResourceVersion
+			appRes.Spec.Dbs.Es.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &appRes)).Should(Succeed())
+			sts := v1.StatefulSet{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(appRes.ObjectMeta.ResourceVersion)))
+			// get pg creds after reconcile
+			pgCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.CredsRef, Namespace: ns}, &pgCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure es creds wasn't mutated between reconciliation loops
+			Expect(pgCreds.Data["POSTGRESQL_PASSWORD"]).Should(Equal(pgCredsAfterReconcile.Data["POSTGRESQL_PASSWORD"]))
+		})
 
 	})
 
@@ -343,6 +393,56 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
 
+		})
+		It("Redis creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			// create app
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			// get pg creds
+			redisCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.CredsRef, Namespace: ns}, &redisCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable ES and make sure it was deployed
+			appRes := mlopsv1.CnvrgApp{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrgapp", Namespace: ns}, &appRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := appRes.ObjectMeta.ResourceVersion
+			appRes.Spec.Dbs.Es.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &appRes)).Should(Succeed())
+			sts := v1.StatefulSet{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.SvcName, Namespace: ns}, &sts)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(appRes.ObjectMeta.ResourceVersion)))
+			// get pg creds after reconcile
+			redisCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Redis.CredsRef, Namespace: ns}, &redisCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure es creds wasn't mutated between reconciliation loops
+			Expect(redisCreds.Data["redis.conf"]).Should(Equal(redisCredsAfterReconcile.Data["redis.conf"]))
 		})
 
 	})
@@ -603,6 +703,56 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: ""}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+		})
+		It("Es creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			// create app
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+			// get es creds
+			esCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.CredsRef, Namespace: ns}, &esCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable PG and make sure it was deployed
+			appRes := mlopsv1.CnvrgApp{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrgapp", Namespace: ns}, &appRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := appRes.ObjectMeta.ResourceVersion
+			appRes.Spec.Dbs.Pg.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &appRes)).Should(Succeed())
+			deployment := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(appRes.ObjectMeta.ResourceVersion)))
+			// get es creds after reconcile
+			esCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Es.CredsRef, Namespace: ns}, &esCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure es creds wasn't mutated between reconciliation loops
+			Expect(esCreds.Data["CNVRG_ES_PASS"]).Should(Equal(esCredsAfterReconcile.Data["CNVRG_ES_PASS"]))
 		})
 
 	})

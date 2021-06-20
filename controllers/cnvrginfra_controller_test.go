@@ -790,6 +790,59 @@ var _ = Describe("CnvrgInfra controller", func() {
 		})
 	})
 
+	Context("Test Redis", func() {
+		FIt("Redis creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Dbs.Redis.Enabled = &defaultTrue
+			// create app
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			// get redis creds
+			redisCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Dbs.Redis.CredsRef, Namespace: ns}, &redisCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable Prometheus Operator and make sure it was deployed
+			infraRes := mlopsv1.CnvrgInfra{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-prometheus-operator", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(infraRes.ObjectMeta.ResourceVersion)))
+			// get redis creds after reconcile
+			redisCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Dbs.Redis.CredsRef, Namespace: ns}, &redisCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure redis creds wasn't mutated between reconciliation loops
+			Expect(redisCreds.Data["redis.conf"]).Should(Equal(redisCredsAfterReconcile.Data["redis.conf"]))
+		})
+	})
+
 })
 
 func getEmptyTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {

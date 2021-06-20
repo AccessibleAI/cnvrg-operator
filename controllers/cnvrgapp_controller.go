@@ -143,33 +143,13 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 }
 
-func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
+func (r *CnvrgAppReconciler) getEsCredsSecret(app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
 	user = "cnvrg"
 	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Es.CredsRef, Namespace: app.Namespace}
 	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
-			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
-			return "", "", err
-		}
-
-		pass = desired.RandomString()
-		esUrl := fmt.Sprintf("http://%s:%s@%s.%s.svc:%d", user, pass, app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port)
-		creds.Data = map[string][]byte{
-			"CNVRG_ES_USER":          []byte(user),  // envs for webapp/kiqs
-			"CNVRG_ES_PASS":          []byte(pass),  // envs for webapp/kiqs
-			"ELASTICSEARCH_URL":      []byte(esUrl), // envs for webapp/kiqs
-			"ES_USERNAME":            []byte(user),  // envs for elastalerts
-			"ES_PASSWORD":            []byte(pass),  // envs for elastalerts
-			"ELASTICSEARCH_USERNAME": []byte(user),  // envs for kibana
-			"ELASTICSEARCH_PASSWORD": []byte(pass),  // envs for kibana
-
-		}
-		if err := r.Create(context.Background(), &creds); err != nil {
-			appLog.Error(err, "error creating es creds", "name", namespacedName.Name)
-			return "", "", err
-		}
-		return user, pass, nil
+		appLog.Error(err, "es-creds secret not found!")
+		return "", "", err
 	} else if err != nil {
 		appLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
 		return "", "", err
@@ -188,44 +168,6 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 	}
 
 	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
-}
-
-func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
-
-	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Pg.CredsRef, Namespace: app.Namespace}
-	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
-			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
-			return err
-		}
-		user := "cnvrg"
-		pass := desired.RandomString()
-		database := "cnvrg_production"
-		creds.Data = map[string][]byte{
-			"POSTGRESQL_USER":                 []byte(user),
-			"POSTGRESQL_PASSWORD":             []byte(pass),
-			"POSTGRESQL_ADMIN_PASSWORD":       []byte(pass),
-			"POSTGRESQL_DATABASE":             []byte(database),
-			"POSTGRESQL_MAX_CONNECTIONS":      []byte(strconv.Itoa(app.Spec.Dbs.Pg.MaxConnections)),
-			"POSTGRESQL_SHARED_BUFFERS":       []byte(app.Spec.Dbs.Pg.SharedBuffers),
-			"POSTGRESQL_EFFECTIVE_CACHE_SIZE": []byte(app.Spec.Dbs.Pg.EffectiveCacheSize),
-			// required vars for the app
-			"POSTGRES_DB":       []byte(database),
-			"POSTGRES_PASSWORD": []byte(pass),
-			"POSTGRES_USER":     []byte(user),
-			"POSTGRES_HOST":     []byte(app.Spec.Dbs.Pg.SvcName),
-		}
-		if err := r.Create(context.Background(), &creds); err != nil {
-			appLog.Error(err, "error creating pg creds", "name", namespacedName.Name)
-			return err
-		}
-		return nil
-	} else if err != nil {
-		appLog.Error(err, "can't check if pg creds secret exists", "name", namespacedName.Name)
-		return err
-	}
-	return nil
 }
 
 func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
@@ -418,30 +360,64 @@ func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
+
 	// dbs
 	appLog.Info("applying dbs")
-	// creds for es
-	if _, _, err := r.esCredsSecret(app); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Dbs.Es.Enabled {
+		esSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   app.Namespace,
+				"CredsRef":    app.Spec.Dbs.Es.CredsRef,
+				"EsUrl":       fmt.Sprintf("%s.%s.svc:%d", app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port),
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+			},
+		}
+		appLog.Info("trying to generate es creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.EsCreds(esSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
-	// creds for pg
-	if err := r.pgCredsSecret(app); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Dbs.Pg.Enabled {
+		pgSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":          app.Namespace,
+				"CredsRef":           app.Spec.Dbs.Pg.CredsRef,
+				"Annotations":        app.Spec.Annotations,
+				"Labels":             app.Spec.Labels,
+				"MaxConnections":     app.Spec.Dbs.Pg.MaxConnections,
+				"SharedBuffers":      app.Spec.Dbs.Pg.SharedBuffers,
+				"EffectiveCacheSize": app.Spec.Dbs.Pg.EffectiveCacheSize,
+				"SvcName":            app.Spec.Dbs.Pg.SvcName,
+			},
+		}
+		appLog.Info("trying to generate pg creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.PgCreds(pgSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
-	// creds for redis
-	if err := desired.CreateRedisCredsSecret(
-		app,
-		app.Spec.Dbs.Redis.CredsRef,
-		app.Namespace,
-		fmt.Sprintf("%s:%d", app.Spec.Dbs.Redis.SvcName, app.Spec.Dbs.Redis.Port),
-		r,
-		r.Scheme,
-		appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Dbs.Redis.Enabled {
+		redisSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   app.Namespace,
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+				"CredsRef":    app.Spec.Dbs.Redis.CredsRef,
+				"SvcName":     app.Spec.Dbs.Redis.SvcName,
+			},
+		}
+		appLog.Info("trying to generate redis creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.RedisCreds(redisSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
+
 	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
@@ -557,7 +533,7 @@ func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) err
 func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*desired.TemplateData, error) {
 	kibanaHost := "0.0.0.0"
 	kibanaPort := strconv.Itoa(app.Spec.Logging.Kibana.Port)
-	esUser, esPass, err := r.esCredsSecret(app)
+	esUser, esPass, err := r.getEsCredsSecret(app)
 	if err != nil {
 		appLog.Error(err, "can't fetch es creds")
 		return nil, err
@@ -646,7 +622,7 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		},
 	}
 
-	esUser, esPass, err := r.esCredsSecret(cnvrgApp)
+	esUser, esPass, err := r.getEsCredsSecret(cnvrgApp)
 	if err != nil {
 		appLog.Error(err, "failed to fetch es creds ")
 		return err
@@ -948,7 +924,9 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		mem, err := strconv.Atoi(requestMem)
 		if err == nil {
 			heapMem := mem / 2
-			desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
+			if heapMem > 0 {
+				desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
+			}
 		}
 	}
 
