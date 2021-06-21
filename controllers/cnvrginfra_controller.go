@@ -279,7 +279,16 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
-	infraLog.Info("applying monitoring")
+	if err := r.generateMonitoringSecrets(infra); err != nil {
+		return err
+	}
+	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInfra) error {
 
 	if *infra.Spec.Monitoring.Prometheus.Enabled {
 		pass := desired.RandomString()
@@ -303,9 +312,6 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 		infraLog.Info("trying to generate prometheus creds (if still doesn't exists...)")
 		if err := desired.Apply(monitoring.PromCreds(promSecretData), infra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), infra)
-			return err
-		}
-		if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
 			return err
 		}
 	}

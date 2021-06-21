@@ -25,3 +25,4 @@ bin
 vendor
 config/samples/private
 *.code-workspace
+controllers/junit.xml

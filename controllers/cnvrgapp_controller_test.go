@@ -28,7 +28,7 @@ var defaultTrue = true
 var _ = Describe("CnvrgApp controller", func() {
 
 	const (
-		timeout  = time.Second * 30
+		timeout  = time.Second * 20
 		interval = time.Millisecond * 250
 	)
 
@@ -1448,10 +1448,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
 			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
 
-			namespacedName := types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: testApp.Namespace}
-			upstreamSecret := corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-			Expect(k8sClient.Create(ctx, &upstreamSecret)).Should(Succeed())
-
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
 			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
@@ -1538,15 +1537,16 @@ var _ = Describe("CnvrgApp controller", func() {
 			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
 			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
 
-			namespacedName := types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: testApp.Namespace}
-			upstreamSecret := corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-			Expect(k8sClient.Create(ctx, &upstreamSecret)).Should(Succeed())
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Networking.Ingress.Type = mlopsv1.NginxIngress
+
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 
 			gw := &unstructured.Unstructured{}
 			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
-			time.Sleep(time.Second * 3)
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)
 				if err != nil {
@@ -1629,9 +1629,10 @@ var _ = Describe("CnvrgApp controller", func() {
 			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
 			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
 
-			namespacedName := types.NamespacedName{Name: testApp.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: testApp.Namespace}
-			upstreamSecret := corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-			Expect(k8sClient.Create(ctx, &upstreamSecret)).Should(Succeed())
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Networking.Ingress.Type = mlopsv1.NginxIngress
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 

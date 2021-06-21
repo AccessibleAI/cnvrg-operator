@@ -24,7 +24,7 @@ import (
 var _ = Describe("CnvrgInfra controller", func() {
 
 	const (
-		timeout  = time.Second * 30
+		timeout  = time.Second * 20
 		interval = time.Millisecond * 250
 	)
 

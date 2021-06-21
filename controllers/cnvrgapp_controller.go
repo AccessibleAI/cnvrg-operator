@@ -431,6 +431,21 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
+	// generate monitoring secrets (prometheus, prometheus upstream, and grafana data sources
+	if err := r.generateMonitoringSecrets(app); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	// apply app monitoring state
+	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, appLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) error {
 	if *app.Spec.Monitoring.Prometheus.Enabled {
 		appLog.Info("applying monitoring")
 		pass := desired.RandomString()
@@ -451,26 +466,14 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
 			},
 		}
+
 		appLog.Info("trying to generate prometheus creds (if still doesn't exists...)")
 		if err := desired.Apply(monitoring.PromCreds(promSecretData), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
-		//if err := desired.CreatePromCredsSecret(app,
-		//	app.Spec.Monitoring.Prometheus.CredsRef,
-		//	app.Namespace, fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
-		//	r,
-		//	r.Scheme,
-		//	appLog); err != nil {
-		//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		//	return err
-		//}
-		if err := r.upstreamPrometheusConfig(app); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-			return err
-		}
 
-		if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, appLog); err != nil {
+		if err := r.createUpstreamPrometheusConfig(app); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
@@ -525,17 +528,10 @@ func (r *CnvrgAppReconciler) getCnvrgInfra() (*mlopsv1.CnvrgInfra, error) {
 	return &cnvrgAppInfra.Items[0], nil
 }
 
-func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) error {
-	//namespacedName := types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: app.Namespace}
-	//upstreamSecret := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	//if err := r.Get(context.Background(), namespacedName, &upstreamSecret); err != nil && errors.IsNotFound(err) {
-	//	if err := ctrl.SetControllerReference(app, &upstreamSecret, r.Scheme); err != nil {
-	//		appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
-	//		return err
-	//	}
+func (r *CnvrgAppReconciler) createUpstreamPrometheusConfig(app *mlopsv1.CnvrgApp) error {
 	infra, err := r.getCnvrgInfra()
 	if err != nil {
-		appLog.Error(err, "can't get cnvrgInfra object")
+		appLog.Error(err, "can't get cnvrgInfra object ")
 		return err
 	}
 
@@ -561,15 +557,6 @@ func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) err
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
 	}
-
-	//upstreamPrometheus := fmt.Sprintf("prometheus-operated.%s.svc:%d", infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port)
-	//promUpstreamConfig := desired.PrometheusUpstreamConfig(user, pass, app.Namespace, upstreamPrometheus)
-	//appLog.V(1).Info(promUpstreamConfig)
-	//upstreamSecret.Data = map[string][]byte{"prometheus-additional.yaml": []byte(promUpstreamConfig)}
-	//if err := r.Create(context.Background(), &upstreamSecret); err != nil {
-	//	appLog.Error(err, "error crating upstream prometheus static configs")
-	//	return err
-	//}
 
 	return nil
 }
