@@ -1801,7 +1801,6 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
 		})
-
 		It("Proxy configmap test creation - proxy disabled", func() {
 
 			ctx := context.Background()
@@ -1832,6 +1831,119 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeFalse())
 
 		})
+	})
+
+	Context("Test AppMonitoring", func() {
+		It("Prom creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			// create infra
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			// create app
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			// get prom creds
+			promCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.CredsRef, Namespace: ns}, &promCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable Prometheus Operator and make sure it was deployed
+			infraRes := mlopsv1.CnvrgInfra{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-prometheus-operator", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(infraRes.ObjectMeta.ResourceVersion)))
+			// get prometheus creds after reconcile
+			promCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.CredsRef, Namespace: ns}, &promCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure redis creds wasn't mutated between reconciliation loops
+			Expect(promCreds.Data["CNVRG_PROMETHEUS_PASS"]).Should(Equal(promCredsAfterReconcile.Data["CNVRG_PROMETHEUS_PASS"]))
+		})
+
+		It("Prom upstream creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			// create infra
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			// create app
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			// get prom creds
+			promUpstreamCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: ns}, &promUpstreamCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable Prometheus Operator and make sure it was deployed
+			infraRes := mlopsv1.CnvrgInfra{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-prometheus-operator", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(infraRes.ObjectMeta.ResourceVersion)))
+			// get prometheus creds after reconcile
+			promUpstreamCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: ns}, &promUpstreamCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure redis creds wasn't mutated between reconciliation loops
+			Expect(promUpstreamCreds.Data).Should(Equal(promUpstreamCredsAfterReconcile.Data))
+		})
+
 	})
 
 })

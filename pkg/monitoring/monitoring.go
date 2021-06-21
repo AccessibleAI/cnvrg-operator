@@ -11,6 +11,36 @@ import (
 
 const path = "/pkg/monitoring/tmpl"
 
+func PromCreds(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prometheus/instance/credsec.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			TemplateData:   data,
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
+func PromUpstreamCreds(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prometheus/instance/ccp/upstream.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			TemplateData:   data,
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
 func prometheusOperatorState() []*desired.State {
 	return []*desired.State{
 		{

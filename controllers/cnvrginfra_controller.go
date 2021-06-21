@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Dimss/crypt/apr1_crypt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplane"
 	"github.com/cnvrg-operator/pkg/dbs"
@@ -169,8 +170,8 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 				"SvcName":     cnvrgInfra.Spec.Dbs.Redis.SvcName,
 			},
 		}
-		appLog.Info("trying to generate redis creds (if still doesn't exists...)")
-		if err := desired.Apply(dbs.RedisCreds(redisSecretData), cnvrgInfra, r.Client, r.Scheme, appLog); err != nil {
+		infraLog.Info("trying to generate redis creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.RedisCreds(redisSecretData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			return err
 		}
@@ -278,16 +279,33 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
-	if *infra.Spec.Monitoring.Prometheus.Enabled {
-		err := desired.CreatePromCredsSecret(infra,
-			infra.Spec.Monitoring.Prometheus.CredsRef,
-			infra.Spec.InfraNamespace,
-			fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
-			r,
-			r.Scheme,
-			infraLog)
-		if err != nil {
+	infraLog.Info("applying monitoring")
 
+	if *infra.Spec.Monitoring.Prometheus.Enabled {
+		pass := desired.RandomString()
+		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
+		if err != nil {
+			infraLog.Error(err, "error generating prometheus hash")
+			return err
+		}
+		promSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   infra.Spec.InfraNamespace,
+				"Annotations": infra.Spec.Annotations,
+				"Labels":      infra.Spec.Labels,
+				"CredsRef":    infra.Spec.Monitoring.Prometheus.CredsRef,
+				"User":        "cnvrg",
+				"Pass":        pass,
+				"PassHash":    passHash,
+				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
+			},
+		}
+		infraLog.Info("trying to generate prometheus creds (if still doesn't exists...)")
+		if err := desired.Apply(monitoring.PromCreds(promSecretData), infra, r.Client, r.Scheme, infraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), infra)
+			return err
+		}
+		if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
 			return err
 		}
 	}
@@ -318,11 +336,6 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), infra, r.Client, r.Scheme, infraLog); err != nil {
 			return err
 		}
-	}
-	// monitoring
-	infraLog.Info("applying monitoring")
-	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
-		return err
 	}
 
 	return nil

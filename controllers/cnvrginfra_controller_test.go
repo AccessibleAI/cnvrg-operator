@@ -163,6 +163,56 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
 		})
+		It("Prom creds secret generator", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			// create infra
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			// get prom creds
+			promCreds := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Monitoring.Prometheus.CredsRef, Namespace: ns}, &promCreds)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// enforce reconcile loop - enable Prometheus Operator and make sure it was deployed
+			infraRes := mlopsv1.CnvrgInfra{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: ns}, &infraRes)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-prometheus-operator", Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure resource version has been updated
+			Expect(rvBeforeUpdate).Should(Not(Equal(infraRes.ObjectMeta.ResourceVersion)))
+			// get redis creds after reconcile
+			promCredsAfterReconcile := corev1.Secret{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Monitoring.Prometheus.CredsRef, Namespace: ns}, &promCredsAfterReconcile)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			// Make sure redis creds wasn't mutated between reconciliation loops
+			Expect(promCreds.Data["CNVRG_PROMETHEUS_PASS"]).Should(Equal(promCredsAfterReconcile.Data["CNVRG_PROMETHEUS_PASS"]))
+		})
 	})
 
 	Context("Test Storage", func() {
@@ -791,7 +841,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 	})
 
 	Context("Test Redis", func() {
-		FIt("Redis creds secret generator", func() {
+		It("Redis creds secret generator", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)

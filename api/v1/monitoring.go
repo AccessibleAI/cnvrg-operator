@@ -111,7 +111,7 @@ var prometheusInfraDefault = Prometheus{
 	NodePort:     30910,
 	StorageSize:  "50Gi",
 	StorageClass: "",
-	CredsRef:     "prom-creds",
+	CredsRef:     "infra-prom-creds",
 	UpstreamRef:  "upstream-prom-static-config",
 	NodeSelector: nil,
 }
