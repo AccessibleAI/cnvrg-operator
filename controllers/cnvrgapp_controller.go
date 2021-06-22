@@ -60,14 +60,16 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	appLog = r.Log.WithValues("name", req.NamespacedName)
 	appLog.Info("starting cnvrgapp reconciliation")
 
+	// sync specs between actual and defaults
 	equal, err := r.syncCnvrgAppSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 	if !equal {
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{Requeue: true}, nil // specs are not equals -> reconcile
 	}
 
+	// specs are synced, proceed reconcile
 	cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -107,15 +109,19 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
+	// check if enabled control plane workloads are all in ready status
 	ready, percentageReady, err := r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	// even if all control plane workloads are ready, let operator finish the full reconcile loop
 	if percentageReady == 100 {
 		percentageReady = 99
 	}
 	r.updateStatusMessage(mlopsv1.StatusReconciling, fmt.Sprintf("reconciling... (%d%%)", percentageReady), cnvrgApp)
 
+	// apply spec manifests
 	if err := r.applyManifests(cnvrgApp); err != nil {
 		return ctrl.Result{}, err
 	}
@@ -125,15 +131,14 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-
 	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", percentageReady)
 	appLog.Info(statusMsg)
 
-	if ready {
+	if ready { // ura, done
 		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
 		appLog.Info("stack is ready!")
 		return ctrl.Result{}, nil
-	} else {
+	} else { // reconcile again
 		requeueAfter, err := time.ParseDuration("30s")
 		if err != nil {
 			appLog.Error(err, "wrong duration for requeueAfter")

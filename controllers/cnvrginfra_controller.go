@@ -61,6 +61,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	infraLog = r.Log.WithValues("name", req.NamespacedName)
 	infraLog.Info("starting cnvrginfra reconciliation")
 
+	// sync specs between actual and defaults
 	equal, err := r.syncCnvrgInfraSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -70,6 +71,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
 
+	// specs are synced, proceed reconcile
 	cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
