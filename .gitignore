@@ -26,3 +26,4 @@ vendor
 config/samples/private
 *.code-workspace
 controllers/junit.xml
+controllers/test-report.html
