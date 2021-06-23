@@ -11,7 +11,7 @@ gpu:
     enabled: true
 
 controlPlane:
-  image: core:3.6.99
+  image: core:3.9.13
   baseConfig:
     agentCustomTag: latest
     intercom: "true"
