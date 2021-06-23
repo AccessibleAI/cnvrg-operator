@@ -1248,6 +1248,45 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
 		})
 
+		It("Proxy enabled - ccp networking configmap", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Networking.Proxy.Enabled = &defaultTrue
+			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			cm := corev1.ConfigMap{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-networking-config", Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(cm.Data["CNVRG_PROXY_CONFIG_REF"]).Should(BeEquivalentTo(app.Spec.Networking.Proxy.ConfigRef))
+		})
+
+		It("Proxy disabled - ccp networking configmap", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			cm := corev1.ConfigMap{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-networking-config", Namespace: ns}, &cm)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			_, found := cm.Data["CNVRG_PROXY_CONFIG_REF"]
+			Expect(found).Should(BeFalse())
+		})
+
 	})
 
 	Context("Test Object Storage Secret", func() {
