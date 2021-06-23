@@ -29,4 +29,7 @@ data:
   NOTEBOOK_URL: "{{ cnvrgRoutingService . }}"
   TENSORBOARD_URL: "{{ cnvrgRoutingService . }}"
   {{- end }}
+  {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+  CNVRG_PROXY_CONFIG_REF: {{ .Spec.Networking.Proxy.ConfigRef }}
+  {{- end }}
 
