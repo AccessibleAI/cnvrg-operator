@@ -2016,7 +2016,7 @@ func getEmptyTestAppSpec(ns string) *mlopsv1.CnvrgApp {
 
 func getDefaultTestAppSpec(ns string) *mlopsv1.CnvrgApp {
 	testSpec := mlopsv1.DefaultCnvrgAppSpec()
-
+	testSpec.ClusterDomain = "test.local"
 	return &mlopsv1.CnvrgApp{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "CnvrgApp",

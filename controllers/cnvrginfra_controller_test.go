@@ -912,6 +912,7 @@ func getEmptyTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {
 func getDefaultTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {
 	testSpec := mlopsv1.DefaultCnvrgInfraSpec()
 	testSpec.InfraNamespace = ns
+	testSpec.ClusterDomain = "test.local"
 	return &mlopsv1.CnvrgInfra{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "CnvrgInfra",
