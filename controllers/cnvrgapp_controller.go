@@ -260,7 +260,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		// if es is ready, trigger fluentbit reconfiguration
 		if ready {
 			appLog.Info("es is ready, triggering fluentbit reconfiguration")
-			if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
+			if err := r.addFluentbitConfiguration(cnvrgApp); err != nil {
 				return false, 0, err
 			}
 		}
@@ -578,7 +578,6 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 		kibanaHost = "127.0.0.1"
 		kibanaPort = "3000"
 	}
-
 	return &desired.TemplateData{
 		Namespace: app.Namespace,
 		Data: map[string]interface{}{
@@ -636,31 +635,20 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 
 }
 
-func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, op string) error {
-
+func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
 	infra, err := r.getCnvrgInfra()
-
 	if err != nil && errors.IsNotFound(err) {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	name := types.NamespacedName{
-		Name:      mlopsv1.InfraReconcilerCm,
-		Namespace: infra.Spec.InfraNamespace,
-	}
-
-	cm := &v1core.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name.Name,
-			Namespace: name.Namespace,
-		},
-	}
+	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
+	cm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: name.Name, Namespace: name.Namespace}}
 
 	esUser, esPass, err := r.getEsCredsSecret(cnvrgApp)
 	if err != nil {
-		appLog.Error(err, "failed to fetch es creds ")
+		appLog.Error(err, "failed to fetch es creds")
 		return err
 	}
 
@@ -670,29 +658,38 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		appLog.Error(err, "failed to marshal app instance ")
 		return err
 	}
-	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
-		appLog.Info("infra reconciler cm does not exists, skipping", "name", name)
-		return nil
-	} else if err != nil {
-		appLog.Error(err, "can't get cm", "name", name)
+	if err := r.Get(context.Background(), name, cm); err != nil {
+		appLog.Error(err, "can't get reconciler cm", "name", name)
 		return err
 	}
-
-	if op == "add" {
-		if cm.Data == nil {
-			cm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
-		} else {
-			cm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
-		}
-	}
-	if op == "remove" {
-		delete(cm.Data, cnvrgApp.Namespace)
+	if cm.Data == nil {
+		cm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
+	} else {
+		cm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
 	}
 	if err := r.Update(context.Background(), cm); err != nil {
 		appLog.Error(err, "can't update cm", "cm", name)
 		return err
 	}
+	return nil
+}
 
+func (r *CnvrgAppReconciler) removeFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
+	infra, err := r.getCnvrgInfra()
+	if err != nil && errors.IsNotFound(err) {
+		appLog.Info("cnvrg infra not found, skipping fluentbit cleanup")
+		return nil
+	} else if err != nil {
+		appLog.Info("error getting cnvrg infra, trying reconcile again...")
+		return err
+	}
+	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
+	cm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: name.Name, Namespace: name.Namespace}}
+	delete(cm.Data, cnvrgApp.Namespace)
+	if err := r.Update(context.Background(), cm); err != nil {
+		appLog.Error(err, "can't update cm", "cm", name)
+		return err
+	}
 	return nil
 }
 
@@ -792,7 +789,7 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// update infra reconciler cm
-	if err := r.triggerInfraReconciler(cnvrgApp, "remove"); err != nil {
+	if err := r.removeFluentbitConfiguration(cnvrgApp); err != nil {
 		if err.Error() == "no CnvrgInfra objects was deployed, skipping infra reconciler" {
 			appLog.Info("cnvrgInfra object not found, no need to trigger infra reconciler")
 		} else {
