@@ -330,7 +330,17 @@ elasticsearch:
 			} else {
 				return fmt.Sprintf("%s/%s", imageHub, imageName)
 			}
-
+		},
+		"redisConf": func(password string) string {
+			return fmt.Sprintf(`
+dir /data/
+appendonly "yes"
+appendfilename "appendonly.aof"
+appendfsync everysec
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 128mb
+requirepass %s
+`, password)
 		},
 	}
 }
@@ -503,54 +513,6 @@ func GetPromCredsSecret(secretName string, secretNs string, client client.Client
 	return string(creds.Data["CNVRG_PROMETHEUS_URL"]), string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_PASS"]), nil
 }
 
-func GetRedisCredsSecret(secretName string, secretNs string, client client.Client, log logr.Logger) (pass string, err error) {
-	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
-	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		log.Error(err, "redis creds secret not found", "name", secretName)
-		return "", err
-	} else if err != nil {
-		log.Error(err, "can't get prometheus creds secret", "name", secretName)
-		return "", err
-	}
-
-	if _, ok := creds.Data["CNVRG_REDIS_PASSWORD"]; !ok {
-		err := fmt.Errorf("redis creds secret %s missing require field CNVRG_REDIS_PASSWORD", namespacedName.Name)
-		log.Error(err, "missing required field")
-		return "", err
-	}
-
-	return string(creds.Data["CNVRG_REDIS_PASSWORD"]), nil
-}
-
-func CreateRedisCredsSecret(obj v1.Object, secretName, secretNs, redisUrl string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
-	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
-	creds := v1core.Secret{ObjectMeta: v1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	if err := client.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		if err := ctrl.SetControllerReference(obj, &creds, schema); err != nil {
-			log.Error(err, "error set controller reference", "name", namespacedName.Name)
-			return err
-		}
-
-		pass := RandomString()
-		creds.Data = map[string][]byte{
-			"CNVRG_REDIS_PASSWORD":              []byte(pass),
-			"REDIS_URL":                         []byte(fmt.Sprintf("redis://:%s@%s", pass, redisUrl)), // for cnvrg webapp/sidekiq
-			"OAUTH2_PROXY_REDIS_CONNECTION_URL": []byte(fmt.Sprintf("redis://:%s@%s", pass, redisUrl)), // for oauth2 proxy
-			"redis.conf":                        []byte(redisConf(pass)),
-		}
-		if err := client.Create(context.Background(), &creds); err != nil {
-			log.Error(err, "error creating redis creds", "name", namespacedName.Name)
-			return err
-		}
-		return nil
-	} else if err != nil {
-		log.Error(err, "can't check if redis creds secret exists", "name", namespacedName.Name)
-		return err
-	}
-	return nil
-}
-
 func CreatePromCredsSecret(obj v1.Object, secretName, secretNs, promUrl string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
 	user := "cnvrg"
 	namespacedName := types.NamespacedName{Name: secretName, Namespace: secretNs}
@@ -584,25 +546,6 @@ func CreatePromCredsSecret(obj v1.Object, secretName, secretNs, promUrl string, 
 		return err
 	}
 	return nil
-
-}
-
-func GetNodeIp(client client.Client, log logr.Logger) (string, error) {
-	nodeList := v1core.NodeList{}
-	if err := client.List(context.Background(), &nodeList); err != nil {
-		log.Error(err, "can't list nodes")
-		return "", fmt.Errorf("can't list nodes")
-	}
-	if len(nodeList.Items) == 0 {
-		return "", fmt.Errorf("nodes list is 0, wtf?!")
-	}
-	// take ip of the first node (doesn't really matter)
-	for _, address := range nodeList.Items[0].Status.Addresses {
-		if address.Type == v1core.NodeInternalIP {
-			return address.Address, nil
-		}
-	}
-	return "", fmt.Errorf("can't detect node's internal IP")
 }
 
 func PrometheusUpstreamConfig(user, pass, ns, upstream string) string {
@@ -622,18 +565,6 @@ func PrometheusUpstreamConfig(user, pass, ns, upstream string) string {
     - targets:
       - '%s'
 `, user, pass, ns, upstream)
-}
-
-func redisConf(password string) string {
-	return fmt.Sprintf(`
-dir /data/
-appendonly "yes"
-appendfilename "appendonly.aof"
-appendfsync everysec
-auto-aof-rewrite-percentage 100
-auto-aof-rewrite-min-size 128mb
-requirepass %s
-`, password)
 }
 
 func RandomString() string {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Dimss/crypt/apr1_crypt"
 	mlopsv1 "github.com/cnvrg-operator/api/v1"
 	"github.com/cnvrg-operator/pkg/controlplane"
 	"github.com/cnvrg-operator/pkg/dbs"
@@ -59,14 +60,16 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	appLog = r.Log.WithValues("name", req.NamespacedName)
 	appLog.Info("starting cnvrgapp reconciliation")
 
+	// sync specs between actual and defaults
 	equal, err := r.syncCnvrgAppSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 	if !equal {
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{Requeue: true}, nil // specs are not equals -> reconcile
 	}
 
+	// specs are synced, proceed reconcile
 	cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -106,15 +109,19 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
+	// check if enabled control plane workloads are all in ready status
 	ready, percentageReady, err := r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	// even if all control plane workloads are ready, let operator finish the full reconcile loop
 	if percentageReady == 100 {
 		percentageReady = 99
 	}
 	r.updateStatusMessage(mlopsv1.StatusReconciling, fmt.Sprintf("reconciling... (%d%%)", percentageReady), cnvrgApp)
 
+	// apply spec manifests
 	if err := r.applyManifests(cnvrgApp); err != nil {
 		return ctrl.Result{}, err
 	}
@@ -124,15 +131,14 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-
 	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", percentageReady)
 	appLog.Info(statusMsg)
 
-	if ready {
+	if ready { // ura, done
 		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
 		appLog.Info("stack is ready!")
 		return ctrl.Result{}, nil
-	} else {
+	} else { // reconcile again
 		requeueAfter, err := time.ParseDuration("30s")
 		if err != nil {
 			appLog.Error(err, "wrong duration for requeueAfter")
@@ -143,33 +149,13 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 }
 
-func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
+func (r *CnvrgAppReconciler) getEsCredsSecret(app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
 	user = "cnvrg"
 	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Es.CredsRef, Namespace: app.Namespace}
 	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
 	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
-			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
-			return "", "", err
-		}
-
-		pass = desired.RandomString()
-		esUrl := fmt.Sprintf("http://%s:%s@%s.%s.svc:%d", user, pass, app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port)
-		creds.Data = map[string][]byte{
-			"CNVRG_ES_USER":          []byte(user),  // envs for webapp/kiqs
-			"CNVRG_ES_PASS":          []byte(pass),  // envs for webapp/kiqs
-			"ELASTICSEARCH_URL":      []byte(esUrl), // envs for webapp/kiqs
-			"ES_USERNAME":            []byte(user),  // envs for elastalerts
-			"ES_PASSWORD":            []byte(pass),  // envs for elastalerts
-			"ELASTICSEARCH_USERNAME": []byte(user),  // envs for kibana
-			"ELASTICSEARCH_PASSWORD": []byte(pass),  // envs for kibana
-
-		}
-		if err := r.Create(context.Background(), &creds); err != nil {
-			appLog.Error(err, "error creating es creds", "name", namespacedName.Name)
-			return "", "", err
-		}
-		return user, pass, nil
+		appLog.Error(err, "es-creds secret not found!")
+		return "", "", err
 	} else if err != nil {
 		appLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
 		return "", "", err
@@ -188,44 +174,6 @@ func (r *CnvrgAppReconciler) esCredsSecret(app *mlopsv1.CnvrgApp) (user string, 
 	}
 
 	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
-}
-
-func (r *CnvrgAppReconciler) pgCredsSecret(app *mlopsv1.CnvrgApp) error {
-
-	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Pg.CredsRef, Namespace: app.Namespace}
-	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		if err := ctrl.SetControllerReference(app, &creds, r.Scheme); err != nil {
-			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
-			return err
-		}
-		user := "cnvrg"
-		pass := desired.RandomString()
-		database := "cnvrg_production"
-		creds.Data = map[string][]byte{
-			"POSTGRESQL_USER":                 []byte(user),
-			"POSTGRESQL_PASSWORD":             []byte(pass),
-			"POSTGRESQL_ADMIN_PASSWORD":       []byte(pass),
-			"POSTGRESQL_DATABASE":             []byte(database),
-			"POSTGRESQL_MAX_CONNECTIONS":      []byte(strconv.Itoa(app.Spec.Dbs.Pg.MaxConnections)),
-			"POSTGRESQL_SHARED_BUFFERS":       []byte(app.Spec.Dbs.Pg.SharedBuffers),
-			"POSTGRESQL_EFFECTIVE_CACHE_SIZE": []byte(app.Spec.Dbs.Pg.EffectiveCacheSize),
-			// required vars for the app
-			"POSTGRES_DB":       []byte(database),
-			"POSTGRES_PASSWORD": []byte(pass),
-			"POSTGRES_USER":     []byte(user),
-			"POSTGRES_HOST":     []byte(app.Spec.Dbs.Pg.SvcName),
-		}
-		if err := r.Create(context.Background(), &creds); err != nil {
-			appLog.Error(err, "error creating pg creds", "name", namespacedName.Name)
-			return err
-		}
-		return nil
-	} else if err != nil {
-		appLog.Error(err, "can't check if pg creds secret exists", "name", namespacedName.Name)
-		return err
-	}
-	return nil
 }
 
 func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
@@ -312,7 +260,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		// if es is ready, trigger fluentbit reconfiguration
 		if ready {
 			appLog.Info("es is ready, triggering fluentbit reconfiguration")
-			if err := r.triggerInfraReconciler(cnvrgApp, "add"); err != nil {
+			if err := r.addFluentbitConfiguration(cnvrgApp); err != nil {
 				return false, 0, err
 			}
 		}
@@ -399,49 +347,86 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
-	appLog.Info("applying logging")
-	kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
-	if err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
-	}
-	if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), app, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Logging.Kibana.Enabled {
+		appLog.Info("applying logging")
+		kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
+		if err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
+		if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
+		if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
 
-	if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
-	}
 	return nil
 }
 
 func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
+
 	// dbs
 	appLog.Info("applying dbs")
-	// creds for es
-	if _, _, err := r.esCredsSecret(app); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Dbs.Es.Enabled {
+		esSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   app.Namespace,
+				"CredsRef":    app.Spec.Dbs.Es.CredsRef,
+				"EsUrl":       fmt.Sprintf("%s.%s.svc:%d", app.Spec.Dbs.Es.SvcName, app.Namespace, app.Spec.Dbs.Es.Port),
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+			},
+		}
+		appLog.Info("trying to generate es creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.EsCreds(esSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
-	// creds for pg
-	if err := r.pgCredsSecret(app); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Dbs.Pg.Enabled {
+		pgSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":          app.Namespace,
+				"CredsRef":           app.Spec.Dbs.Pg.CredsRef,
+				"Annotations":        app.Spec.Annotations,
+				"Labels":             app.Spec.Labels,
+				"MaxConnections":     app.Spec.Dbs.Pg.MaxConnections,
+				"SharedBuffers":      app.Spec.Dbs.Pg.SharedBuffers,
+				"EffectiveCacheSize": app.Spec.Dbs.Pg.EffectiveCacheSize,
+				"SvcName":            app.Spec.Dbs.Pg.SvcName,
+			},
+		}
+		appLog.Info("trying to generate pg creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.PgCreds(pgSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
-	// creds for redis
-	if err := desired.CreateRedisCredsSecret(
-		app,
-		app.Spec.Dbs.Redis.CredsRef,
-		app.Namespace,
-		fmt.Sprintf("%s:%d", app.Spec.Dbs.Redis.SvcName, app.Spec.Dbs.Redis.Port),
-		r,
-		r.Scheme,
-		appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
+
+	if *app.Spec.Dbs.Redis.Enabled {
+		redisSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   app.Namespace,
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+				"CredsRef":    app.Spec.Dbs.Redis.CredsRef,
+				"SvcName":     app.Spec.Dbs.Redis.SvcName,
+			},
+		}
+		appLog.Info("trying to generate redis creds (if still doesn't exists...)")
+		if err := desired.Apply(dbs.RedisCreds(redisSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
+
 	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
@@ -451,18 +436,49 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
+	// generate monitoring secrets (prometheus, prometheus upstream, and grafana data sources
+	if err := r.generateMonitoringSecrets(app); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+	// apply app monitoring state
+	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, appLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+
+	return nil
+}
+
+func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) error {
 	if *app.Spec.Monitoring.Prometheus.Enabled {
 		appLog.Info("applying monitoring")
-		if err := desired.CreatePromCredsSecret(app,
-			app.Spec.Monitoring.Prometheus.CredsRef,
-			app.Namespace, fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
-			r,
-			r.Scheme,
-			appLog); err != nil {
+		pass := desired.RandomString()
+		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
+		if err != nil {
+			appLog.Error(err, "error generating prometheus hash")
+			return err
+		}
+		promSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   app.Namespace,
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+				"CredsRef":    app.Spec.Monitoring.Prometheus.CredsRef,
+				"User":        "cnvrg",
+				"Pass":        pass,
+				"PassHash":    passHash,
+				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
+			},
+		}
+
+		appLog.Info("trying to generate prometheus creds (if still doesn't exists...)")
+		if err := desired.Apply(monitoring.PromCreds(promSecretData), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
-		if err := r.upstreamPrometheusConfig(app); err != nil {
+
+		if err := r.createUpstreamPrometheusConfig(app); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
@@ -497,11 +513,6 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 		}
 	}
 
-	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-		return err
-	}
-
 	return nil
 }
 
@@ -522,42 +533,43 @@ func (r *CnvrgAppReconciler) getCnvrgInfra() (*mlopsv1.CnvrgInfra, error) {
 	return &cnvrgAppInfra.Items[0], nil
 }
 
-func (r *CnvrgAppReconciler) upstreamPrometheusConfig(app *mlopsv1.CnvrgApp) error {
-	namespacedName := types.NamespacedName{Name: app.Spec.Monitoring.Prometheus.UpstreamRef, Namespace: app.Namespace}
-	upstreamSecret := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	if err := r.Get(context.Background(), namespacedName, &upstreamSecret); err != nil && errors.IsNotFound(err) {
-		if err := ctrl.SetControllerReference(app, &upstreamSecret, r.Scheme); err != nil {
-			appLog.Error(err, "error set controller reference", "name", namespacedName.Name)
-			return err
-		}
-
-		infra, err := r.getCnvrgInfra()
-		if err != nil {
-			appLog.Error(err, "can't get cnvrgInfra object", "name", namespacedName.Name)
-			return err
-		}
-
-		_, user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, appLog)
-		if err != nil {
-			appLog.Error(err, "can't get cnvrgInfra prometheus creds", "name", namespacedName.Name)
-			return err
-		}
-		upstreamPrometheus := fmt.Sprintf("prometheus-operated.%s.svc:%d", infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port)
-		promUpstreamConfig := desired.PrometheusUpstreamConfig(user, pass, app.Namespace, upstreamPrometheus)
-		appLog.V(1).Info(promUpstreamConfig)
-		upstreamSecret.Data = map[string][]byte{"prometheus-additional.yaml": []byte(promUpstreamConfig)}
-		if err := r.Create(context.Background(), &upstreamSecret); err != nil {
-			appLog.Error(err, "error crating upstream prometheus static configs")
-			return err
-		}
+func (r *CnvrgAppReconciler) createUpstreamPrometheusConfig(app *mlopsv1.CnvrgApp) error {
+	infra, err := r.getCnvrgInfra()
+	if err != nil {
+		appLog.Error(err, "can't get cnvrgInfra object ")
+		return err
 	}
+
+	_, user, pass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, appLog)
+	if err != nil {
+		appLog.Error(err, "can't get cnvrgInfra prometheus creds")
+		return err
+	}
+
+	promUpstreamData := desired.TemplateData{
+		Data: map[string]interface{}{
+			"Namespace":   app.Namespace,
+			"Annotations": app.Spec.Annotations,
+			"Labels":      app.Spec.Labels,
+			"CredsRef":    app.Spec.Monitoring.Prometheus.UpstreamRef,
+			"User":        user,
+			"Pass":        pass,
+			"Upstream":    fmt.Sprintf("prometheus-operated.%s.svc:%d", infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
+		},
+	}
+
+	if err := desired.Apply(monitoring.PromUpstreamCreds(promUpstreamData), app, r.Client, r.Scheme, appLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		return err
+	}
+
 	return nil
 }
 
 func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*desired.TemplateData, error) {
 	kibanaHost := "0.0.0.0"
 	kibanaPort := strconv.Itoa(app.Spec.Logging.Kibana.Port)
-	esUser, esPass, err := r.esCredsSecret(app)
+	esUser, esPass, err := r.getEsCredsSecret(app)
 	if err != nil {
 		appLog.Error(err, "can't fetch es creds")
 		return nil, err
@@ -566,7 +578,6 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 		kibanaHost = "127.0.0.1"
 		kibanaPort = "3000"
 	}
-
 	return &desired.TemplateData{
 		Namespace: app.Namespace,
 		Data: map[string]interface{}{
@@ -624,31 +635,20 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 
 }
 
-func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, op string) error {
-
+func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
 	infra, err := r.getCnvrgInfra()
-
 	if err != nil && errors.IsNotFound(err) {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	name := types.NamespacedName{
-		Name:      mlopsv1.InfraReconcilerCm,
-		Namespace: infra.Spec.InfraNamespace,
-	}
+	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
+	cm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: name.Name, Namespace: name.Namespace}}
 
-	cm := &v1core.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name.Name,
-			Namespace: name.Namespace,
-		},
-	}
-
-	esUser, esPass, err := r.esCredsSecret(cnvrgApp)
+	esUser, esPass, err := r.getEsCredsSecret(cnvrgApp)
 	if err != nil {
-		appLog.Error(err, "failed to fetch es creds ")
+		appLog.Error(err, "failed to fetch es creds")
 		return err
 	}
 
@@ -658,29 +658,38 @@ func (r *CnvrgAppReconciler) triggerInfraReconciler(cnvrgApp *mlopsv1.CnvrgApp, 
 		appLog.Error(err, "failed to marshal app instance ")
 		return err
 	}
-	if err := r.Get(context.Background(), name, cm); err != nil && errors.IsNotFound(err) {
-		appLog.Info("infra reconciler cm does not exists, skipping", "name", name)
-		return nil
-	} else if err != nil {
-		appLog.Error(err, "can't get cm", "name", name)
+	if err := r.Get(context.Background(), name, cm); err != nil {
+		appLog.Error(err, "can't get reconciler cm", "name", name)
 		return err
 	}
-
-	if op == "add" {
-		if cm.Data == nil {
-			cm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
-		} else {
-			cm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
-		}
-	}
-	if op == "remove" {
-		delete(cm.Data, cnvrgApp.Namespace)
+	if cm.Data == nil {
+		cm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
+	} else {
+		cm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
 	}
 	if err := r.Update(context.Background(), cm); err != nil {
 		appLog.Error(err, "can't update cm", "cm", name)
 		return err
 	}
+	return nil
+}
 
+func (r *CnvrgAppReconciler) removeFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
+	infra, err := r.getCnvrgInfra()
+	if err != nil && errors.IsNotFound(err) {
+		appLog.Info("cnvrg infra not found, skipping fluentbit cleanup")
+		return nil
+	} else if err != nil {
+		appLog.Info("error getting cnvrg infra, trying reconcile again...")
+		return err
+	}
+	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
+	cm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: name.Name, Namespace: name.Namespace}}
+	delete(cm.Data, cnvrgApp.Namespace)
+	if err := r.Update(context.Background(), cm); err != nil {
+		appLog.Error(err, "can't update cm", "cm", name)
+		return err
+	}
 	return nil
 }
 
@@ -780,7 +789,7 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// update infra reconciler cm
-	if err := r.triggerInfraReconciler(cnvrgApp, "remove"); err != nil {
+	if err := r.removeFluentbitConfiguration(cnvrgApp); err != nil {
 		if err.Error() == "no CnvrgInfra objects was deployed, skipping infra reconciler" {
 			appLog.Info("cnvrgInfra object not found, no need to trigger infra reconciler")
 		} else {
@@ -948,7 +957,9 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		mem, err := strconv.Atoi(requestMem)
 		if err == nil {
 			heapMem := mem / 2
-			desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
+			if heapMem > 0 {
+				desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
+			}
 		}
 	}
 

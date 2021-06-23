@@ -8,6 +8,21 @@ import (
 
 const path = "/pkg/dbs/tmpl"
 
+func EsCreds(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/secret.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			TemplateData:   data,
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
 func esState() []*desired.State {
 	return []*desired.State{
 		{
@@ -54,6 +69,21 @@ func esState() []*desired.State {
 			GVR:            desired.Kinds[desired.SvcGVR],
 			Own:            true,
 			Updatable:      true,
+		},
+	}
+}
+
+func PgCreds(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/pg/secret.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			TemplateData:   data,
+			Own:            true,
+			Updatable:      false,
 		},
 	}
 }
@@ -125,6 +155,21 @@ func pgState() []*desired.State {
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
 			Own:            true,
 			Updatable:      true,
+		},
+	}
+}
+
+func RedisCreds(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/redis/secret.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			TemplateData:   data,
+			Own:            true,
+			Updatable:      false,
 		},
 	}
 }
