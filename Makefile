@@ -21,7 +21,11 @@ unfocus:
 
 # Run tests
 test: pack generate fmt vet manifests
-	go test ./controllers/ -v
+	rm -f ./controllers/test-report.html ./controllers/junit.xml
+	CNVRG_OPERATOR_MAX_CONCURRENT_RECONCILES=1 go test ./controllers/ -v
+
+test-report:
+	docker run -v $$(pwd)/controllers:/tmp cnvrg/xunit-viewer xunit-viewer -r /tmp/junit.xml -o /tmp/test-report.html
 
 pack:
 	pkger

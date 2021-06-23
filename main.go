@@ -164,6 +164,7 @@ func runOperator() {
 
 func setupCommands() {
 	viper.AutomaticEnv()
+	viper.SetEnvPrefix("CNVRG_OPERATOR")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	// Setup commands
 	setParams(runOperatorParams, runOperatorCmd)

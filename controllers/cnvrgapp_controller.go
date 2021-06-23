@@ -492,7 +492,6 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 		}
 		// grafana datasource
 		appLog.Info("applying grafana datasource")
-
 		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, appLog)
 		if err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
@@ -795,7 +794,6 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 		} else {
 			return err
 		}
-
 	}
 
 	// cleanup pvc

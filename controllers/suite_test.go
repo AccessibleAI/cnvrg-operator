@@ -21,6 +21,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"path/filepath"
@@ -29,6 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"strings"
 	"testing"
 	// +kubebuilder:scaffold:imports
 )
@@ -45,10 +47,6 @@ func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 	junitReporter := reporters.NewJUnitReporter("junit.xml")
 	RunSpecsWithDefaultAndCustomReporters(t, "Cnvrg Controller Suite", []Reporter{junitReporter})
-
-	//RunSpecsWithDefaultAndCustomReporters(t,
-	//	"Controller Suite",
-	//	[]Reporter{printer.NewlineReporter{}})
 }
 
 var _ = BeforeSuite(func(done Done) {
@@ -62,6 +60,10 @@ var _ = BeforeSuite(func(done Done) {
 			filepath.Join("..", "pkg", "monitoring", "tmpl", "crds")},
 		UseExistingCluster: &useExistingCluster,
 	}
+
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("CNVRG_OPERATOR")
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
 	var err error
 	cfg, err = testEnv.Start()

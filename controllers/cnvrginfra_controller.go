@@ -461,12 +461,6 @@ func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
 	infraLog.Info("running finalizer cleanup")
 
-	// todo: completely remove istio cleanup when you are emotional ready
-	// remove istio
-	//if err := r.cleanupIstio(cnvrgInfra); err != nil {
-	//	return err
-	//}
-
 	// cleanup pvc
 	if err := r.cleanupPVCs(cnvrgInfra); err != nil {
 		return err
