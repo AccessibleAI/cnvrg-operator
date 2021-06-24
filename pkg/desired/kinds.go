@@ -29,6 +29,7 @@ const (
 	IstioGwGVR              GVRName = "IstioGwGVR"
 	StorageClassGVR         GVRName = "StorageClassGVR"
 	PodDisruptionBudgetGVR  GVRName = "PodDisruptionBudget"
+	HpaGVR                  GVRName = "HpaGVR"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -166,5 +167,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "policy",
 		Version: "v1beta1",
 		Kind:    "PodDisruptionBudget",
+	},
+	HpaGVR: schema.GroupVersionKind{
+		Group:   "autoscaling",
+		Version: "v2beta2",
+		Kind:    "HorizontalPodAutoscaler",
 	},
 }

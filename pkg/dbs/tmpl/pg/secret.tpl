@@ -28,4 +28,4 @@ data:
   POSTGRES_DB:                      {{ $db }}
   POSTGRES_PASSWORD:                {{ $pass }}
   POSTGRES_USER:                    {{ $user }}
-  POSTGRES_HOST:                    {{ .Data.SvcName }}
+  POSTGRES_HOST:                    {{ .Data.SvcName | b64enc }}

@@ -211,12 +211,12 @@ var controlPlaneDefault = ControlPlane{
 		Replicas: 1,
 		Port:     8080,
 		Requests: Requests{
-			Cpu:    "2000m",
+			Cpu:    "2",
 			Memory: "4Gi",
 		},
 		Limits: Limits{
-			Cpu:    "10000m",
-			Memory: "10000Gi",
+			Cpu:    "4",
+			Memory: "8Gi",
 		},
 		SvcName:                 "app",
 		NodePort:                30080,
@@ -247,8 +247,8 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "3750Mi",
 		},
 		Limits: Limits{
-			Cpu:    "10000m",
-			Memory: "10000Gi",
+			Cpu:    "2",
+			Memory: "8Gi",
 		},
 		Replicas: 2,
 	},
@@ -260,8 +260,8 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "750Mi",
 		},
 		Limits: Limits{
-			Cpu:    "10000m",
-			Memory: "10000Gi",
+			Cpu:    "2",
+			Memory: "8Gi",
 		},
 		Replicas: 1,
 	},
@@ -273,8 +273,8 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "500Mi",
 		},
 		Limits: Limits{
-			Cpu:    "10000m",
-			Memory: "10000Gi",
+			Cpu:    "2",
+			Memory: "8Gi",
 		},
 		Replicas: 1,
 	},
@@ -292,7 +292,7 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "200Mi",
 		},
 		Limits: Limits{
-			Cpu:    "2000m",
+			Cpu:    "2",
 			Memory: "4Gi",
 		},
 		ReadinessPeriodSeconds:  100,

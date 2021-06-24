@@ -157,6 +157,15 @@ func webAppState() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+		{
+			TemplatePath:   path + "/webapp/hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 
