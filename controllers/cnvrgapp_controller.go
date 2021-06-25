@@ -636,14 +636,12 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 
 func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
 	infra, err := r.getCnvrgInfra()
-	if err != nil && errors.IsNotFound(err) {
-		return nil
-	} else if err != nil {
+	if err != nil {
 		return err
 	}
 
 	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
-	cm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: name.Name, Namespace: name.Namespace}}
+	infraReconcilerCm := &v1core.ConfigMap{}
 
 	esUser, esPass, err := r.getEsCredsSecret(cnvrgApp)
 	if err != nil {
@@ -657,16 +655,16 @@ func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgAp
 		appLog.Error(err, "failed to marshal app instance ")
 		return err
 	}
-	if err := r.Get(context.Background(), name, cm); err != nil {
+	if err := r.Get(context.Background(), name, infraReconcilerCm); err != nil {
 		appLog.Error(err, "can't get reconciler cm", "name", name)
 		return err
 	}
-	if cm.Data == nil {
-		cm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
+	if infraReconcilerCm.Data == nil {
+		infraReconcilerCm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
 	} else {
-		cm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
+		infraReconcilerCm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
 	}
-	if err := r.Update(context.Background(), cm); err != nil {
+	if err := r.Update(context.Background(), infraReconcilerCm); err != nil {
 		appLog.Error(err, "can't update cm", "cm", name)
 		return err
 	}
@@ -683,9 +681,16 @@ func (r *CnvrgAppReconciler) removeFluentbitConfiguration(cnvrgApp *mlopsv1.Cnvr
 		return err
 	}
 	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
-	cm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: name.Name, Namespace: name.Namespace}}
-	delete(cm.Data, cnvrgApp.Namespace)
-	if err := r.Update(context.Background(), cm); err != nil {
+	infraReconcilerCm := &v1core.ConfigMap{}
+	if err := r.Get(context.Background(), name, infraReconcilerCm); err != nil && errors.IsNotFound(err) {
+		appLog.Info("infra reconciler configmap not found, skipping fluentbit cleanup")
+		return nil
+	} else if err != nil {
+		appLog.Error(err, "can't get reconciler cm", "name", name)
+		return err
+	}
+	delete(infraReconcilerCm.Data, cnvrgApp.Namespace)
+	if err := r.Update(context.Background(), infraReconcilerCm); err != nil {
 		appLog.Error(err, "can't update cm", "cm", name)
 		return err
 	}

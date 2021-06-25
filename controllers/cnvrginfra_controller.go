@@ -118,11 +118,6 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, err
 	}
 
-	// infra reconciler trigger configmap
-	if err := r.createInfraReconcilerTriggerCm(cnvrgInfra); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	r.updateStatusMessage(mlopsv1.StatusHealthy, "successfully reconciled", cnvrgInfra)
 	infraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
@@ -143,6 +138,12 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
+	// infra reconciler trigger configmap
+	if err := r.createInfraReconcilerTriggerCm(cnvrgInfra); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -293,6 +294,7 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInfra) error {
 
 	if *infra.Spec.Monitoring.Prometheus.Enabled {
+		user := "cnvrg"
 		pass := desired.RandomString()
 		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
 		if err != nil {
@@ -305,9 +307,9 @@ func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInf
 				"Annotations": infra.Spec.Annotations,
 				"Labels":      infra.Spec.Labels,
 				"CredsRef":    infra.Spec.Monitoring.Prometheus.CredsRef,
-				"User":        "cnvrg",
+				"User":        user,
 				"Pass":        pass,
-				"PassHash":    passHash,
+				"PassHash":    fmt.Sprintf("%s:%s", user, passHash),
 				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
 			},
 		}

@@ -13,13 +13,13 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  {{- $esUser := "cnvrg" | b64enc}}
-  {{- $esPass := randAlphaNum 20 | b64enc}}
-  {{- $esUrl  := printf ("http://%s:%s@%s") $esUser $esPass .Data.EsUrl | b64enc }} # env for webapp/kiqs
-  CNVRG_ES_USER:          {{ $esUser }}     # env for webapp/kiqs
-  CNVRG_ES_PASS:          {{ $esPass }}     # env for webapp/kiqs
-  ELASTICSEARCH_URL:      {{ $esUrl  }}     # env for webapp/kiqs
-  ES_USERNAME:            {{ $esUser }}     # env for elastalerts
-  ES_PASSWORD:            {{ $esPass }}     # env for elastalerts
-  ELASTICSEARCH_USERNAME: {{ $esUser }}     # env for kibana
-  ELASTICSEARCH_PASSWORD: {{ $esPass }}     # env for kibana
+  {{- $esUser := "cnvrg" }}
+  {{- $esPass := randAlphaNum 20 }}
+  {{- $esUrl  := printf ("http://%s:%s@%s") $esUser $esPass .Data.EsUrl }} # env for webapp/kiqs
+  CNVRG_ES_USER:          {{ $esUser | b64enc }}     # env for webapp/kiqs
+  CNVRG_ES_PASS:          {{ $esPass | b64enc }}     # env for webapp/kiqs
+  ELASTICSEARCH_URL:      {{ $esUrl  | b64enc }}     # env for webapp/kiqs
+  ES_USERNAME:            {{ $esUser | b64enc }}     # env for elastalerts
+  ES_PASSWORD:            {{ $esPass | b64enc }}     # env for elastalerts
+  ELASTICSEARCH_USERNAME: {{ $esUser | b64enc }}     # env for kibana
+  ELASTICSEARCH_PASSWORD: {{ $esPass | b64enc }}     # env for kibana
