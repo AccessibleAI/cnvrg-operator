@@ -16,7 +16,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  replicas: {{ .Spec.ControlPlane.Systemkiq.Replicas }}
   selector:
     matchLabels:
       app: systemkiq

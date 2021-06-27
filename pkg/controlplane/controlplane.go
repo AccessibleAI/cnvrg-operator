@@ -232,6 +232,15 @@ func sidekiqState() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+		{
+			TemplatePath:   path + "/sidekiqs/sidekiq-hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 
@@ -331,6 +340,15 @@ func searchkiqState() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+		{
+			TemplatePath:   path + "/sidekiqs/searchkiq-hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 
@@ -351,6 +369,15 @@ func systemkiqState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/sidekiqs/systemkiq-hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
 			Own:            true,
 			Updatable:      true,
 		},

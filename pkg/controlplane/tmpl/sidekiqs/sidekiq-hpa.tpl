@@ -1,15 +1,15 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Spec.ControlPlane.WebApp.SvcName }}
+  name: sidekiq
   namespace: {{ ns . }}
 spec:
-  minReplicas: {{ .Spec.ControlPlane.WebApp.Replicas }}
+  minReplicas: {{ .Spec.ControlPlane.Sidekiq.Replicas }}
   maxReplicas: 5
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Spec.ControlPlane.WebApp.SvcName }}
+    name: sidekiq
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300

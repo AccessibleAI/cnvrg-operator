@@ -16,7 +16,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  replicas: {{ .Spec.ControlPlane.Sidekiq.Replicas }}
   selector:
     matchLabels:
       app: sidekiq
