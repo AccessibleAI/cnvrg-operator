@@ -16,7 +16,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  replicas: {{ .Spec.ControlPlane.WebApp.Replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
