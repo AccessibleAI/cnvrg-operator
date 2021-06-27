@@ -119,6 +119,62 @@ func controlPlaneConfigState() []*desired.State {
 	}
 }
 
+func webAppHpaState() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/webapp/hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func sidekiqHpaState() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/sidekiqs/sidekiq-hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func searchkiqHpaState() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/sidekiqs/searchkiq-hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func systemkiqHpaState() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/sidekiqs/systemkiq-hpa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.HpaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func webAppState() []*desired.State {
 	return []*desired.State{
 		{
@@ -154,15 +210,6 @@ func webAppState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/webapp/hpa.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.HpaGVR],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -229,15 +276,6 @@ func sidekiqState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/sidekiqs/sidekiq-hpa.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.HpaGVR],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -340,15 +378,6 @@ func searchkiqState() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
-		{
-			TemplatePath:   path + "/sidekiqs/searchkiq-hpa.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.HpaGVR],
-			Own:            true,
-			Updatable:      true,
-		},
 	}
 }
 
@@ -369,15 +398,6 @@ func systemkiqState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PodDisruptionBudgetGVR],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/sidekiqs/systemkiq-hpa.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.HpaGVR],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -486,13 +506,15 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		state = append(state, webAppState()...)
+		if *cnvrgApp.Spec.ControlPlane.WebApp.Hpa.Enabled {
+			state = append(state, webAppHpaState()...)
+		}
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 			state = append(state, webAppIstioVs()...)
 		}
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
 			state = append(state, webAppOcpRoute()...)
 		}
-
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
 			state = append(state, webAppIngress()...)
 		}
@@ -504,18 +526,32 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, sidekiqState()...)
+
+		if *cnvrgApp.Spec.ControlPlane.Sidekiq.Hpa.Enabled {
+			state = append(state, sidekiqHpaState()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, searchkiqState()...)
+		if *cnvrgApp.Spec.ControlPlane.Searchkiq.Hpa.Enabled {
+			state = append(state, searchkiqHpaState()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, systemkiqState()...)
+		if *cnvrgApp.Spec.ControlPlane.Systemkiq.Hpa.Enabled {
+			state = append(state, systemkiqHpaState()...)
+		}
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
+	// if split stet to false -> all queues executed by sidekiq instance
+	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && !*cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, sidekiqState()...)
+		if *cnvrgApp.Spec.ControlPlane.Sidekiq.Hpa.Enabled {
+			state = append(state, systemkiqHpaState()...)
+		}
 	}
 
 	if *cnvrgApp.Spec.ControlPlane.Hyper.Enabled {

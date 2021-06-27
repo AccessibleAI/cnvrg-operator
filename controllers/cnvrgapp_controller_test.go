@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/teris-io/shortid"
 	v1 "k8s.io/api/apps/v1"
+	"k8s.io/api/autoscaling/v2beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -707,10 +708,14 @@ var _ = Describe("CnvrgApp controller", func() {
 		It("Es creds secret generator", func() {
 			ns := createNs()
 			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			// create infra
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// create app
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
 			// get es creds
 			esCreds := corev1.Secret{}
 			Eventually(func() bool {
@@ -1285,6 +1290,109 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			_, found := cm.Data["CNVRG_PROXY_CONFIG_REF"]
 			Expect(found).Should(BeFalse())
+		})
+
+		It("HPA disabled", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			hpa := v2beta1.HorizontalPodAutoscaler{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &hpa)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeFalse())
+		})
+
+		It("WebApp HPA Enabled", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			app.Spec.ControlPlane.WebApp.Hpa.Enabled = &defaultTrue
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			hpa := v2beta1.HorizontalPodAutoscaler{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, &hpa)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.WebApp.Replicas)))
+			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.WebApp.Hpa.MaxReplicas)))
+		})
+
+		It("Sidekiq HPA Enabled", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Hpa.Enabled = &defaultTrue
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			hpa := v2beta1.HorizontalPodAutoscaler{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "sidekiq", Namespace: ns}, &hpa)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Sidekiq.Replicas)))
+			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Sidekiq.Hpa.MaxReplicas)))
+		})
+
+		It("Searchkiq HPA Enabled", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.Searchkiq.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			app.Spec.ControlPlane.Searchkiq.Hpa.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Searchkiq.Hpa.MaxReplicas = 10
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			hpa := v2beta1.HorizontalPodAutoscaler{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "searchkiq", Namespace: ns}, &hpa)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Searchkiq.Replicas)))
+			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Searchkiq.Hpa.MaxReplicas)))
+		})
+
+		It("Systemkiq HPA Enabled", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.Systemkiq.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			app.Spec.ControlPlane.Systemkiq.Hpa.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Systemkiq.Hpa.Utilization = 90
+
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			hpa := v2beta1.HorizontalPodAutoscaler{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "systemkiq", Namespace: ns}, &hpa)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Replicas)))
+			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Hpa.MaxReplicas)))
+			Expect(*hpa.Spec.Metrics[0].Resource.TargetAverageUtilization).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Hpa.Utilization)))
 		})
 
 	})

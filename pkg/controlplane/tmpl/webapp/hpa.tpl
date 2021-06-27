@@ -5,7 +5,7 @@ metadata:
   namespace: {{ ns . }}
 spec:
   minReplicas: {{ .Spec.ControlPlane.WebApp.Replicas }}
-  maxReplicas: 5
+  maxReplicas: {{ .Spec.ControlPlane.WebApp.Hpa.MaxReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
@@ -29,10 +29,10 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 70
+        averageUtilization: {{ .Spec.ControlPlane.WebApp.Hpa.Utilization }}
   - type: Resource
     resource:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 70
+        averageUtilization: {{ .Spec.ControlPlane.WebApp.Hpa.Utilization }}

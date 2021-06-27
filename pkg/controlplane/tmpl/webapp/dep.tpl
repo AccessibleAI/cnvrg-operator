@@ -16,6 +16,9 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  {{- if eq false (isTrue .Spec.ControlPlane.WebApp.Hpa.Enabled) }}
+  replicas: {{ .Spec.ControlPlane.WebApp.Replicas }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:

@@ -25,6 +25,12 @@ type Limits struct {
 	Memory string `json:"memory,omitempty"`
 }
 
+type Hpa struct {
+	Enabled     *bool `json:"enabled,omitempty"`
+	Utilization int   `json:"utilization,omitempty"`
+	MaxReplicas int   `json:"maxReplicas,omitempty"`
+}
+
 type Requests struct {
 	Cpu    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
@@ -44,6 +50,7 @@ type WebApp struct {
 	ReadinessTimeoutSeconds int                   `json:"readinessTimeoutSeconds,omitempty"`
 	FailureThreshold        int                   `json:"failureThreshold,omitempty"`
 	OauthProxy              OauthProxyServiceConf `json:"oauthProxy,omitempty"`
+	Hpa                     Hpa                   `json:"hpa"`
 }
 
 type Sidekiq struct {
@@ -52,6 +59,7 @@ type Sidekiq struct {
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
+	Hpa      Hpa      `json:"hpa"`
 }
 
 type Searchkiq struct {
@@ -59,6 +67,7 @@ type Searchkiq struct {
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
+	Hpa      Hpa      `json:"hpa"`
 }
 
 type Systemkiq struct {
@@ -66,6 +75,7 @@ type Systemkiq struct {
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
+	Hpa      Hpa      `json:"hpa"`
 }
 
 type CnvrgRouter struct {
@@ -187,6 +197,12 @@ var mpiDefault = Mpi{
 	},
 }
 
+var hpa = Hpa{
+	Enabled:     &defaultFalse,
+	Utilization: 85,
+	MaxReplicas: 5,
+}
+
 var appRegistryDefault = Registry{
 
 	Name:     "cnvrg-app-registry",
@@ -237,6 +253,7 @@ var controlPlaneDefault = ControlPlane{
 				`\/ms-python-release.vsix`,
 			},
 		},
+		Hpa: hpa,
 	},
 
 	Sidekiq: Sidekiq{
@@ -251,6 +268,7 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "8Gi",
 		},
 		Replicas: 2,
+		Hpa:      hpa,
 	},
 
 	Searchkiq: Searchkiq{
@@ -264,6 +282,7 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "8Gi",
 		},
 		Replicas: 1,
+		Hpa:      hpa,
 	},
 
 	Systemkiq: Systemkiq{
@@ -277,6 +296,7 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "8Gi",
 		},
 		Replicas: 1,
+		Hpa:      hpa,
 	},
 
 	Hyper: Hyper{

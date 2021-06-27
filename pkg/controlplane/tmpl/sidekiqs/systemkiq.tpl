@@ -16,6 +16,9 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  {{- if eq false (isTrue .Spec.ControlPlane.Systemkiq.Hpa.Enabled) }}
+  replicas: {{ .Spec.ControlPlane.Systemkiq.Replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: systemkiq

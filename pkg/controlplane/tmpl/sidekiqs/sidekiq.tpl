@@ -16,6 +16,9 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  {{- if eq false (isTrue .Spec.ControlPlane.Sidekiq.Hpa.Enabled) }}
+  replicas: {{ .Spec.ControlPlane.Sidekiq.Replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: sidekiq

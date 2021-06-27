@@ -212,6 +212,15 @@ spec:
                     properties:
                       enabled:
                         type: boolean
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
                       limits:
                         properties:
                           cpu:
@@ -228,11 +237,22 @@ spec:
                           memory:
                             type: string
                         type: object
+                    required:
+                    - hpa
                     type: object
                   sidekiq:
                     properties:
                       enabled:
                         type: boolean
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
                       limits:
                         properties:
                           cpu:
@@ -251,6 +271,8 @@ spec:
                         type: object
                       split:
                         type: boolean
+                    required:
+                    - hpa
                     type: object
                   smtp:
                     properties:
@@ -269,6 +291,15 @@ spec:
                     properties:
                       enabled:
                         type: boolean
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
                       limits:
                         properties:
                           cpu:
@@ -285,6 +316,8 @@ spec:
                           memory:
                             type: string
                         type: object
+                    required:
+                    - hpa
                     type: object
                   webapp:
                     properties:
@@ -292,6 +325,15 @@ spec:
                         type: boolean
                       failureThreshold:
                         type: integer
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
                       initialDelaySeconds:
                         type: integer
                       limits:
@@ -329,6 +371,8 @@ spec:
                         type: object
                       svcName:
                         type: string
+                    required:
+                    - hpa
                     type: object
                 type: object
               dbs:

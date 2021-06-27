@@ -30,9 +30,15 @@ controlPlane:
     gcpProject: "{{ .Values.controlPlane.objectStorage.gcpProject }}"
   searchkiq:
     enabled: {{ .Values.controlPlane.searchkiq.enabled }}
+    hpa:
+      enabled: {{ .Values.controlPlane.searchkiq.hpa.enabled }}
+      maxReplicas: {{ .Values.controlPlane.searchkiq.hpa.maxReplicas }}
   sidekiq:
     enabled: {{ .Values.controlPlane.sidekiq.enabled }}
     split: {{ .Values.controlPlane.sidekiq.split }}
+    hpa:
+      enabled: {{ .Values.controlPlane.sidekiq.hpa.enabled }}
+      maxReplicas: {{ .Values.controlPlane.sidekiq.hpa.maxReplicas }}
   smtp:
     server: "{{ .Values.controlPlane.smtp.server }}"
     port: {{ .Values.controlPlane.smtp.port }}
@@ -41,9 +47,15 @@ controlPlane:
     domain: "{{ .Values.controlPlane.smtp.domain }}"
   systemkiq:
     enabled: {{ .Values.controlPlane.systemkiq.enabled }}
+    hpa:
+      enabled: {{ .Values.controlPlane.systemkiq.hpa.enabled }}
+      maxReplicas: {{ .Values.controlPlane.systemkiq.hpa.maxReplicas }}
   webapp:
     enabled: {{ .Values.controlPlane.webapp.enabled }}
     replicas: {{ .Values.controlPlane.webapp.replicas }}
+    hpa:
+      enabled: {{ .Values.controlPlane.webapp.hpa.enabled }}
+      maxReplicas: {{ .Values.controlPlane.webapp.hpa.maxReplicas }}
   mpi:
     enabled: {{ .Values.controlPlane.mpi.enabled }}
     image: {{ .Values.controlPlane.mpi.image }}
