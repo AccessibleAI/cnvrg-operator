@@ -506,6 +506,7 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		state = append(state, webAppState()...)
+
 		if *cnvrgApp.Spec.ControlPlane.WebApp.Hpa.Enabled {
 			state = append(state, webAppHpaState()...)
 		}
@@ -534,6 +535,7 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, searchkiqState()...)
+
 		if *cnvrgApp.Spec.ControlPlane.Searchkiq.Hpa.Enabled {
 			state = append(state, searchkiqHpaState()...)
 		}
@@ -541,6 +543,7 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if *cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, systemkiqState()...)
+
 		if *cnvrgApp.Spec.ControlPlane.Systemkiq.Hpa.Enabled {
 			state = append(state, systemkiqHpaState()...)
 		}
