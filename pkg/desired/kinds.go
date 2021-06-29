@@ -17,6 +17,7 @@ const (
 	PrometheusGVR           GVRName = "PrometheusGVR"
 	ServiceMonitorGVR       GVRName = "ServiceMonitorGVR"
 	PrometheusRuleGVR       GVRName = "PrometheusRuleGVR"
+	AlertmanagerGVR         GVRName = "AlertmanagerGVR"
 	ClusterRoleGVR          GVRName = "ClusterRoleGVR"
 	ClusterRoleBindingGVR   GVRName = "ClusterRoleBindingGVR"
 	RoleGVR                 GVRName = "RoleGVR"
@@ -172,5 +173,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "autoscaling",
 		Version: "v2beta2",
 		Kind:    "HorizontalPodAutoscaler",
+	},
+	AlertmanagerGVR: schema.GroupVersionKind{
+		Group:   "monitoring.coreos.com",
+		Version: "v1",
+		Kind:    "Alertmanager",
 	},
 }

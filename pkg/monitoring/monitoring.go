@@ -44,7 +44,7 @@ func PromUpstreamCreds(data interface{}) []*desired.State {
 func prometheusOperatorState() []*desired.State {
 	return []*desired.State{
 		{
-			TemplatePath:   path + "/prometheus/operator/clusterrole.tpl",
+			TemplatePath:   path + "/prom-operator/clusterrole.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -53,7 +53,7 @@ func prometheusOperatorState() []*desired.State {
 			Updatable:      true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/operator/clusterrolebinding.tpl",
+			TemplatePath:   path + "/prom-operator/clusterrolebinding.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -62,7 +62,7 @@ func prometheusOperatorState() []*desired.State {
 			Updatable:      true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/operator/sa.tpl",
+			TemplatePath:   path + "/prom-operator/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -71,7 +71,7 @@ func prometheusOperatorState() []*desired.State {
 			Updatable:      false,
 		},
 		{
-			TemplatePath:   path + "/prometheus/operator/dep.tpl",
+			TemplatePath:   path + "/prom-operator/dep.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -80,7 +80,7 @@ func prometheusOperatorState() []*desired.State {
 			Updatable:      true,
 		},
 		{
-			TemplatePath:   path + "/prometheus/operator/svc.tpl",
+			TemplatePath:   path + "/prom-operator/svc.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -90,6 +90,119 @@ func prometheusOperatorState() []*desired.State {
 		},
 	}
 }
+
+// ----------------- Alertmanager -----------------
+func alertmanagerState() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/alertmanager/infra/clusterrole.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ClusterRoleGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/alertmanager/infra/clusterrolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ClusterRoleBindingGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/alertmanager/infra/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/alertmanager/infra/alertmanager.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.AlertmanagerGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/alertmanager/auth-proxy-cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/alertmanager/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SvcGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/alertmanager/credsec.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SecretGVR],
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
+func alertmanagerIstioVs() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/alertmanager/vs.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IstioVsGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func alertmanagerIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/alertmanager/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.IngressGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func alertmanagerOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/alertmanager/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.OcpRouteGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+// ----------------- Alertmanager -----------------
 
 func infraPrometheusInstanceState() []*desired.State {
 	return []*desired.State{
@@ -144,6 +257,15 @@ func infraPrometheusInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVR:            desired.Kinds[desired.PrometheusRuleGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/prometheus/instance/infra/alertmanager.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.AlertmanagerGVR],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -399,7 +521,7 @@ func ccpPrometheusInstance() []*desired.State {
 	}
 }
 
-func promOauthProxy() []*desired.State {
+func promAuthProxy() []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/prometheus/instance/prom-auth-proxy-cm.tpl",
@@ -623,7 +745,7 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
 	if *cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
-		state = append(state, promOauthProxy()...)
+		state = append(state, promAuthProxy()...)
 		state = append(state, ccpPrometheusInstance()...)
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
@@ -665,7 +787,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	}
 
 	if *infra.Spec.Monitoring.Prometheus.Enabled {
-		state = append(state, promOauthProxy()...)
+		state = append(state, promAuthProxy()...)
 		state = append(state, infraPrometheusInstanceState()...)
 
 		switch infra.Spec.Networking.Ingress.Type {
@@ -678,6 +800,7 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		}
 
 	}
+
 	if *infra.Spec.Monitoring.KubeStateMetrics.Enabled {
 		state = append(state, kubeStateMetricsState()...)
 	}

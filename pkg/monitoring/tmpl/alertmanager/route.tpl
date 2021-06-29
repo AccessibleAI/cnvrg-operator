@@ -6,7 +6,7 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: {{ .Spec.Monitoring.Prometheus.SvcName }}
+  name: {{ .Spec.Monitoring.Alertmanager.SvcName }}
   namespace: {{ ns . }}
   labels:
     app: {{ ns . }}
@@ -14,12 +14,12 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"
+  host: "{{ .Spec.Monitoring.Alertmanager.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:
-    targetPort: {{ .Spec.Monitoring.Prometheus.Port }}
+    targetPort: {{ .Spec.Monitoring.Alertmanager.Port }}
   to:
     kind: Service
-    name: {{ .Spec.Monitoring.Prometheus.SvcName }}
+    name: {{ .Spec.Monitoring.Alertmanager.SvcName }}
     weight: 100
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:

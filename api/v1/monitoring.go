@@ -23,6 +23,21 @@ type Prometheus struct {
 	NodeSelector        map[string]string `json:"nodeSelector,omitempty"`
 }
 
+type Alertmanager struct {
+	Enabled             *bool             `json:"enabled,omitempty"`
+	Image               string            `json:"image,omitempty"`
+	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
+	Requests            Requests          `json:"requests,omitempty"`
+	Limits              Limits            `json:"limits,omitempty"`
+	SvcName             string            `json:"svcName,omitempty"`
+	Port                int               `json:"port,omitempty"`
+	NodePort            int               `json:"nodePort,omitempty"`
+	StorageSize         string            `json:"storageSize,omitempty"`
+	StorageClass        string            `json:"storageClass,omitempty"`
+	NodeSelector        map[string]string `json:"nodeSelector,omitempty"`
+	CredsRef            string            `json:"credsRef,omitempty"`
+}
+
 type NodeExporter struct {
 	Enabled *bool             `json:"enabled,omitempty"`
 	Image   string            `json:"image,omitempty"`
@@ -62,6 +77,7 @@ type CnvrgIdleMetricsExporter struct {
 type CnvrgInfraMonitoring struct {
 	PrometheusOperator       PrometheusOperator       `json:"prometheusOperator,omitempty"`
 	Prometheus               Prometheus               `json:"prometheus,omitempty"`
+	Alertmanager             Alertmanager             `json:"alertmanager,omitempty"`
 	NodeExporter             NodeExporter             `json:"nodeExporter,omitempty"`
 	KubeStateMetrics         KubeStateMetrics         `json:"kubeStateMetrics,omitempty"`
 	Grafana                  Grafana                  `json:"grafana,omitempty"`
@@ -116,6 +132,27 @@ var prometheusInfraDefault = Prometheus{
 	NodeSelector: nil,
 }
 
+var alertmanagerInfraDefault = Alertmanager{
+	Enabled:             &defaultFalse,
+	Image:               "alertmanager:v0.22.2",
+	BasicAuthProxyImage: "nginx:1.20",
+	Requests: Requests{
+		Cpu:    "200m",
+		Memory: "500Mi",
+	},
+	Limits: Limits{
+		Cpu:    "2000m",
+		Memory: "4Gi",
+	},
+	SvcName:      "alertmanager",
+	Port:         9093, // basic auth nginx proxy is enabled by default
+	NodePort:     30913,
+	StorageSize:  "50Gi",
+	StorageClass: "",
+	CredsRef:     "infra-alertmanager-creds",
+	NodeSelector: nil,
+}
+
 var prometheusAppDefault = Prometheus{
 	Enabled:             &defaultFalse,
 	Image:               "prometheus:v2.22.1",
@@ -147,8 +184,9 @@ var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 }
 
 var infraMonitoringDefault = CnvrgInfraMonitoring{
-	Prometheus: prometheusInfraDefault,
-	Grafana:    grafanaInfraDefault,
+	Prometheus:   prometheusInfraDefault,
+	Alertmanager: alertmanagerInfraDefault,
+	Grafana:      grafanaInfraDefault,
 	PrometheusOperator: PrometheusOperator{
 		Enabled:                       &defaultFalse,
 		OperatorImage:                 "prometheus-operator:v0.44.1",
