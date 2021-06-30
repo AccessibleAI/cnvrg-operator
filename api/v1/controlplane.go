@@ -189,7 +189,6 @@ var mpiDefault = Mpi{
 		Memory: "1Gi",
 	},
 	Registry: Registry{
-
 		Name:     "mpi-private-registry",
 		URL:      "docker.io",
 		User:     "",
