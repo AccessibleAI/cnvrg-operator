@@ -42,7 +42,7 @@ spec:
       {{- end }}
       containers:
         - name: istio-operator
-          image: "{{.Spec.ImageHub }}/operator:1.10.0"
+          image: {{ image .Spec.ImageHub .Spec.Networking.Istio.OperatorImage }}
           command:
             - operator
             - server
