@@ -13,8 +13,8 @@ metadata:
     {{- end }}
 spec:
   profile: minimal
-  tag: 1.10.0 # have to be statically configured, currently cnvrg not support other versions
-  hub: {{.Spec.ImageHub }}
+  tag: {{ trimPrefix "pilot:" .Spec.Networking.Istio.PilotImage }}
+  hub: {{ .Spec.ImageHub }}
   components:
     base:
       enabled: true
@@ -97,6 +97,20 @@ spec:
       enabled: false
     pilot:
       enabled: true
+      k8s:
+        podAnnotations:
+          {{- range $k, $v := .Spec.Annotations }}
+          {{$k}}: "{{$v}}"
+          {{- end }}
+        {{- if isTrue .Spec.Tenancy.Enabled }}
+        nodeSelector:
+          {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
+        tolerations:
+          - key: "{{ .Spec.Tenancy.Key }}"
+            operator: "Equal"
+            value: "{{ .Spec.Tenancy.Value }}"
+            effect: "NoSchedule"
+        {{- end }}
   values:
     global:
       istioNamespace:  {{ ns . }}

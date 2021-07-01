@@ -189,7 +189,6 @@ var mpiDefault = Mpi{
 		Memory: "1Gi",
 	},
 	Registry: Registry{
-
 		Name:     "mpi-private-registry",
 		URL:      "docker.io",
 		User:     "",
@@ -240,7 +239,7 @@ var controlPlaneDefault = ControlPlane{
 		InitialDelaySeconds:     10,
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
-		FailureThreshold:        4,
+		FailureThreshold:        5,
 		OauthProxy: OauthProxyServiceConf{
 			SkipAuthRegex: []string{
 				`^\/api`,

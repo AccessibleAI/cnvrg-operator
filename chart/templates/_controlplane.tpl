@@ -61,10 +61,9 @@ controlPlane:
     image: {{ .Values.controlPlane.mpi.image }}
     kubectlDeliveryImage: {{ .Values.controlPlane.mpi.kubectlDeliveryImage }}
     registry:
-        name: {{ .Values.controlPlane.mpi.registry.name }}
-        url: {{ .Values.controlPlane.mpi.registry.url }}
-        user: "{{ .Values.controlPlane.mpi.registry.user }}"
-        password: "{{ .Values.controlPlane.mpi.registry.password }}"
+      url: "{{ .Values.controlPlane.mpi.registry.url }}"
+      user: "{{ .Values.controlPlane.mpi.registry.user }}"
+      password: "{{ .Values.controlPlane.mpi.registry.password }}"
     {{- if .Values.controlPlane.mpi.extraArgs }}
     extraArgs:
     {{- range $key, $value := .Values.controlPlane.mpi.extraArgs }}

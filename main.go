@@ -64,8 +64,8 @@ var rootCmd = &cobra.Command{
 }
 
 var runOperatorCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run cnvrg operator",
+	Use:   "start",
+	Short: "Start cnvrg operator",
 	Run: func(cmd *cobra.Command, args []string) {
 		loggerMgr := initZapLog()
 		loggerMgr.Sugar()

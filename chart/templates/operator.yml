@@ -112,7 +112,7 @@ spec:
       containers:
         - command:
             - /opt/app-root/cnvrg-operator
-            - run
+            - start
             - --max-concurrent-reconciles
             - "3"
           image: "docker.io/cnvrg/cnvrg-operator:{{ .Chart.Version }}"

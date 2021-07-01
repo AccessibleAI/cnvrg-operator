@@ -71,6 +71,10 @@ controlPlane:
       user: ""
       password: ""
     extraArgs: { }
+    registry:
+      url: "docker.io"
+      user: ""
+      password: ""
 
 dbs:
   es:
