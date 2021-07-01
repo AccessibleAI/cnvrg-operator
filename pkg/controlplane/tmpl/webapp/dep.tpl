@@ -116,6 +116,22 @@ spec:
           initialDelaySeconds: {{ .Spec.ControlPlane.WebApp.InitialDelaySeconds }}
           periodSeconds: {{ .Spec.ControlPlane.WebApp.ReadinessPeriodSeconds }}
           timeoutSeconds: {{ .Spec.ControlPlane.WebApp.ReadinessTimeoutSeconds }}
+        livenessProbe:
+          successThreshold: 1
+          failureThreshold: {{ .Spec.ControlPlane.WebApp.FailureThreshold }}
+          initialDelaySeconds: {{ .Spec.ControlPlane.WebApp.InitialDelaySeconds }}
+          periodSeconds: {{ .Spec.ControlPlane.WebApp.ReadinessPeriodSeconds }}
+          timeoutSeconds: {{ .Spec.ControlPlane.WebApp.ReadinessTimeoutSeconds }}
+          exec:
+             command:
+             - /bin/bash
+             - -c
+             - |
+               threshold=50
+               requests=$(passenger-status | grep '(app)' -A 2 | grep Requests | awk '{print $NF}')
+               if (( $requests > $threshold )); then
+                   exit 1
+               fi
         resources:
           requests:
             cpu: "{{.Spec.ControlPlane.WebApp.Requests.Cpu}}"

@@ -239,7 +239,7 @@ var controlPlaneDefault = ControlPlane{
 		InitialDelaySeconds:     10,
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
-		FailureThreshold:        4,
+		FailureThreshold:        5,
 		OauthProxy: OauthProxyServiceConf{
 			SkipAuthRegex: []string{
 				`^\/api`,
