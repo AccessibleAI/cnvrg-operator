@@ -237,8 +237,6 @@ spec:
                           memory:
                             type: string
                         type: object
-                    required:
-                    - hpa
                     type: object
                   sidekiq:
                     properties:
@@ -271,8 +269,6 @@ spec:
                         type: object
                       split:
                         type: boolean
-                    required:
-                    - hpa
                     type: object
                   smtp:
                     properties:
@@ -316,8 +312,6 @@ spec:
                           memory:
                             type: string
                         type: object
-                    required:
-                    - hpa
                     type: object
                   webapp:
                     properties:
@@ -371,8 +365,6 @@ spec:
                         type: object
                       svcName:
                         type: string
-                    required:
-                    - hpa
                     type: object
                 type: object
               dbs:
