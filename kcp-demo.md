@@ -31,6 +31,7 @@ mkdir -p ~/kcp \
 
 3. add new K8s cluster to cnvrg control plane (copy/paste kubeconfig) 
 ```shell
+# export KUBECONFIG=~/kcp/.kcp/data/admin.kubeconfig
 cat ~/kcp/.kcp/data/admin.kubeconfig
 ```
 
