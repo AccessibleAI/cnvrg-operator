@@ -101,10 +101,9 @@ helm template cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 1500s \
   --set monitoring.prometheus.enabled=false \
   --no-hooks | oc apply -f -
 ```
-::: tip
+
 #### Use these containers for testing the CCP deployment on OCP
 
 CPU runtime: docker.io/cnvrg/cnvrg-cpu-runtime:1.5
 
 GPU runtime: docker.io/cnvrg/cnvrg-gpu-runtime:tf-2.3.2.c1
-:::

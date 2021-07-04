@@ -22,25 +22,28 @@ On-premises distros
 
 ### K8s storage provisioner
 Any K8s SCI compatible storage [provisioner](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner).
-::: tip
+
+
+
 CCP K8s Operator might deploy out-of-the-box two storage provisioners (**mainly useful for on-prem deployments**)
 * [Hostpath SCI provisioner](https://github.com/kubevirt/hostpath-provisioner)
 * [NFS client SCI provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner)
 
-For more details click [here](/storage.md) 
-:::
+For more details click [here](/docs/deployments/storage.md) 
+
 
 ### K8s ingress controller and DNS wildcard record 
 Any [K8s ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
 
 DNS wildcard record which will resolve the ingress IP to the CCP cluster domain. e.g `*.cnvrg.my-org.com -> 1.2.3.4`
-::: tip
+
+
 CCP K8s Operator might deploy out-of-the-box 
 [Istio](https://istio.io/) and configure [Istio Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/) to allow ingress traffic into the cluster.
 
 If you don't have any DNS name for the CCP deployment, you might use [nip.io](https://nip.io) 
 (**mainly useful for PoC or dev environments**)
-:::
+
 
 ### Minimal default compute/memory/storage requirements for production CCP deployment
 |**Workload**|**Replicas**|**CPU Request**|**Memory Request**|**Storage**
@@ -59,13 +62,14 @@ If you don't have any DNS name for the CCP deployment, you might use [nip.io](ht
 |`prometheus`       | 1 | 200m  | 500Mi     | 50Gi
 |`sys-compenents`   | n | 2000m| 4Gi     | -
 |**TOTAL**| **15** | **~14** | **~22Gi** | ~250Gi | - | - 
-::: warning
+
+
 Please note, this is the minimal defaults, e.i K8s resources requests. 
 The real resources values will be highly depends on the actual load and usage of CCP
 
 Also, please note these compute resources are for CCP only. 
 The actual compute power for ML workloads have to be calculated independently 
 and include totals of CPU/GPU, Memory and storage expected to be consumed by the ML workloads.    
-:::
+
 
 

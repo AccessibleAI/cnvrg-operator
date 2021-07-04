@@ -10,7 +10,6 @@ helm install cnvrg cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 150
   --set networking.istio.enabled=false
 ```
 
-::: tip
 Nodeport not suitable for production cluster. The node port should be used only for devs/poc clusters. 
 
 The `<node-ip>` value will depend on your cluster and network setup. 
@@ -22,4 +21,3 @@ or, if you behind firewall, router, VPN or nat gateway, you've to make sure all
 are open between your local machine and remote K8s cluster (same is true even for simple Minikube/Kind/K3s devs clusters)   
 
 Please consult with your network administrator before deploying CCP with node port.
-:::

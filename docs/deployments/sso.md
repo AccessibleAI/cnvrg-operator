@@ -47,11 +47,9 @@ helm install cnvrg cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 150
   --set sso.azureTenant="<azure-tenant-id>"
 ```
 
-::: tip
 Some Auth Providers require explicitly set redirect URIs for each service (e.g. Azure), 
 while others allow you to use wildcard (e.g. Keycloak).
 If your Auth Provider doesn't allow `*` as redirect URIs, please configure the following 
 1. Redirect URI for WebApp: `http<s>://app.<cluster.domain.for.cnvrg>/oauth2/callback`
 2. Redirect URI for Kibana: `http<s>://kibana.<cluster.domain.for.cnvrg>/oauth2/callback`
 3. Redirect URI for Grafana: `http<s>://grafana.<cluster.domain.for.cnvrg>/oauth2/callback`
-:::

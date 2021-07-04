@@ -23,7 +23,6 @@ helm install cnvrg cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 150
   --set dbs.minio.enabled=false
 ```
 
-::: warning
 Cluster domain for worker cluster have to be a subdomain of the CCP cluster.
 For example: if CCP domain is `ccp.domain.com`, the worker 
 cluster domain must be `workers.ccp.domain.com`
@@ -33,4 +32,3 @@ while `workers.ccp.domain.com` should resolve to ingress IP for the workers clus
 
 When running in hybrid setup, make user both sites are using same http scheme, 
 either both sites should be HTTP or both should be HTTPS.
-:::
