@@ -214,7 +214,7 @@ spec:
             echo "[$(date)] elasticsearch is ready!"
 
             {{- if and ( isTrue .Spec.Dbs.Minio.Enabled ) (eq .Spec.ControlPlane.ObjectStorage.Type "minio") }}
-            if [[ $(curl -s $CNVRG_STORAGE_ENDPOINT/minio/health/ready -o /dev/null -w '%{http_code}') != 200 ]]; then
+            if [[ $(curl -sk $CNVRG_STORAGE_ENDPOINT/minio/health/ready -o /dev/null -w '%{http_code}') != 200 ]]; then
               echo "[$(date)] minio [$CNVRG_STORAGE_ENDPOINT/minio/health/ready] not ready"
               sleep 1
               continue

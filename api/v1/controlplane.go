@@ -50,7 +50,7 @@ type WebApp struct {
 	ReadinessTimeoutSeconds int                   `json:"readinessTimeoutSeconds,omitempty"`
 	FailureThreshold        int                   `json:"failureThreshold,omitempty"`
 	OauthProxy              OauthProxyServiceConf `json:"oauthProxy,omitempty"`
-	Hpa                     Hpa                   `json:"hpa"`
+	Hpa                     Hpa                   `json:"hpa,omitempty"`
 }
 
 type Sidekiq struct {
@@ -59,7 +59,7 @@ type Sidekiq struct {
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
-	Hpa      Hpa      `json:"hpa"`
+	Hpa      Hpa      `json:"hpa,omitempty"`
 }
 
 type Searchkiq struct {
@@ -67,7 +67,7 @@ type Searchkiq struct {
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
-	Hpa      Hpa      `json:"hpa"`
+	Hpa      Hpa      `json:"hpa,omitempty"`
 }
 
 type Systemkiq struct {
@@ -75,7 +75,7 @@ type Systemkiq struct {
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
-	Hpa      Hpa      `json:"hpa"`
+	Hpa      Hpa      `json:"hpa,omitempty"`
 }
 
 type CnvrgRouter struct {
