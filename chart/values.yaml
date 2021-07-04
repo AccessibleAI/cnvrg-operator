@@ -41,7 +41,7 @@ controlPlane:
       enabled: true
       maxReplicas: 5
   cnvrgRouter:
-    enabled: true
+    enabled: false
     image: nginx:1.21.0
   smtp:
     server: ""
