@@ -56,6 +56,13 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
       {{- end }}
       securityContext:
         runAsUser: 1000
