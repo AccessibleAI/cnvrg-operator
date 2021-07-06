@@ -46,6 +46,14 @@ Helm chart command line options
 `controlPlane.sidekiq.enabled` |  true | set to false to disable sidekiq
 `controlPlane.sidekiq.split` |  true | set to false to disable sidekiq split
 `controlPlane.systemkiq.enabled` |  true | set to false to disable systemkiq split
+`controlPlane.webapp.hap.enabled` |  true | set to false to disable hpa
+`controlPlane.webapp.hap.maxReplicas` |  5 | set max replicas for HPA
+`controlPlane.sidekiq.hap.enabled` |  true | set to false to disable hpa
+`controlPlane.sidekiq.hap.maxReplicas` |  5 | set max replicas for HPA
+`controlPlane.searchkiq.hap.enabled` |  true | set to false to disable hpa
+`controlPlane.searchkiq.hap.maxReplicas` |  5 | set max replicas for HPA
+`controlPlane.systemkiq.hap.enabled` |  true | set to false to disable hpa
+`controlPlane.systemkiq.hap.maxReplicas` |  5 | set max replicas for HPA
 `controlPlane.smtp.server` |  - | smtp server
 `controlPlane.smtp.port` |  587 | smtp port
 `controlPlane.smtp.username` |  - | smtp username
