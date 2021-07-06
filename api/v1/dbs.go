@@ -127,7 +127,7 @@ var pgDefault = Pg{
 		Memory: "4Gi",
 	},
 	Limits: Limits{
-		Cpu:    "8",
+		Cpu:    "12",
 		Memory: "32Gi",
 	},
 	MaxConnections:     500,
