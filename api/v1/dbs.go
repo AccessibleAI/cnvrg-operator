@@ -23,6 +23,7 @@ type Pg struct {
 	NodeSelector       map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef           string            `json:"credsRef,omitempty"`
 	PvcName            string            `json:"pvcName,omitempty"`
+	Backup             Backup            `json:"backup,omitempty"`
 }
 
 type Minio struct {
@@ -55,6 +56,7 @@ type Redis struct {
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
+	Backup         Backup            `json:"backup,omitempty"`
 }
 
 type Es struct {
@@ -141,6 +143,13 @@ var pgDefault = Pg{
 		Memory:  "",
 	},
 	CredsRef: "pg-creds",
+	Backup: Backup{
+		Enabled:   &defaultFalse,
+		BucketRef: "cp-object-storage",
+		CredsRef:  "pg-creds",
+		Rotation:  5,
+		Period:    1440,
+	},
 }
 
 var redisDefault = Redis{
