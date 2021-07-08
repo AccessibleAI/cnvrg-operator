@@ -1,5 +1,5 @@
 domain: cnvrg.io
-repo: github.com/cnvrg-operator
+repo: github.com/AccessibleAI/cnvrg-operator
 resources:
 - group: mlops
   kind: CnvrgApp

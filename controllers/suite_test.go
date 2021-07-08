@@ -17,7 +17,7 @@ limitations under the License.
 package controllers
 
 import (
-	mlopsv1 "github.com/cnvrg-operator/api/v1"
+	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"

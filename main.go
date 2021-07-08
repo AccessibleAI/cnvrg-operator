@@ -15,8 +15,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"strings"
 
-	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/controllers"
+	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/controllers"
 )
 
 type param struct {

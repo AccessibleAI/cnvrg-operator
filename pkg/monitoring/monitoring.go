@@ -1,8 +1,8 @@
 package monitoring
 
 import (
-	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/pkg/desired"
+	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/markbates/pkger"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

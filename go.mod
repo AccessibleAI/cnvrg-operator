@@ -1,4 +1,4 @@
-module github.com/cnvrg-operator
+module github.com/AccessibleAI/cnvrg-operator
 
 go 1.16
 

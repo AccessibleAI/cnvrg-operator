@@ -3,9 +3,9 @@ package controllers
 import (
 	"context"
 	"fmt"
-	mlopsv1 "github.com/cnvrg-operator/api/v1"
-	"github.com/cnvrg-operator/pkg/desired"
-	"github.com/cnvrg-operator/pkg/networking"
+	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/teris-io/shortid"

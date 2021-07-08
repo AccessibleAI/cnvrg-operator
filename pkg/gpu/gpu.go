@@ -1,7 +1,7 @@
 package gpu
 
 import (
-	"github.com/cnvrg-operator/pkg/desired"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
