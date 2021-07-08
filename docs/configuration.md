@@ -116,7 +116,7 @@ Helm chart command line options
 | ------------------|---|-------
 `networking.https.enabled` |  false | set to false to disable https
 `networking.https.certSecret` |  - | K8s tls secret 
-`networking.ingress.type` |  istio | ingress type: (`istio|ingress|openshift|nodeport`)
+`networking.ingress.type` |  istio | ingress type: (`istio\|ingress\|openshift\|nodeport`)
 `networking.ingress.istioGwEnabled` |  true | either deploy or not Istio GW
 `networking.ingress.istioGwName` |  istio-gw-[namespace] | name of the istio GW (either to use or create and use if istioGwEnabled is true)
 `networking.istio.enabled` |  true | set to false to disable istio deployment 
