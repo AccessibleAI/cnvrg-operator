@@ -22,4 +22,4 @@ spec:
           - path: /
             backend:
               serviceName: {{ .Spec.Logging.Kibana.SvcName }}
-              servicePort: {{ .Spec.Logging.Kibana.SvcName }}
+              servicePort: {{ .Spec.Logging.Kibana.Port }}
