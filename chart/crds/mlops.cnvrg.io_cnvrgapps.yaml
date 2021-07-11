@@ -469,6 +469,19 @@ spec:
                     type: object
                   pg:
                     properties:
+                      backup:
+                        properties:
+                          bucketRef:
+                            type: string
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          period:
+                            type: integer
+                          rotation:
+                            type: integer
+                        type: object
                       credsRef:
                         type: string
                       effectiveCacheSize:
@@ -523,6 +536,19 @@ spec:
                     type: object
                   redis:
                     properties:
+                      backup:
+                        properties:
+                          bucketRef:
+                            type: string
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          period:
+                            type: integer
+                          rotation:
+                            type: integer
+                        type: object
                       credsRef:
                         type: string
                       enabled:
