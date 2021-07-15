@@ -235,7 +235,7 @@ var controlPlaneDefault = ControlPlane{
 		},
 		SvcName:                 "app",
 		NodePort:                30080,
-		PassengerMaxPoolSize:    40,
+		PassengerMaxPoolSize:    50,
 		InitialDelaySeconds:     10,
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
