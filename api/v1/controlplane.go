@@ -274,7 +274,7 @@ var controlPlaneDefault = ControlPlane{
 		Enabled: &defaultFalse,
 		Requests: Requests{
 			Cpu:    "750m",
-			Memory: "750Mi",
+			Memory: "1Gi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
@@ -288,7 +288,7 @@ var controlPlaneDefault = ControlPlane{
 		Enabled: &defaultFalse,
 		Requests: Requests{
 			Cpu:    "500m",
-			Memory: "500Mi",
+			Memory: "1Gi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
