@@ -61,6 +61,7 @@ var GrafanaInfraDashboards = append([]string{
 	"grafana-scheduler.json",
 	"grafana-node-exporter.json",
 	"grafana-fluentbit.json",
+	"grafana-dcgm-exporter.json",
 }, GrafanaAppDashboards...)
 
 func getNs(obj interface{}) string {

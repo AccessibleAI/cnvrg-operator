@@ -55,6 +55,8 @@ spec:
               value: "true"
             - name: "DCGM_EXPORTER_LISTEN"
               value: ":9400"
+            - name: "DCGM_EXPORTER_INTERVAL"
+              value: "5000"
           ports:
             - name: "metrics"
               containerPort: 9400
@@ -73,10 +75,10 @@ spec:
             httpGet:
               path: /health
               port: 9400
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /health
               port: 9400
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
