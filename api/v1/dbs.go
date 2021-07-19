@@ -148,7 +148,7 @@ var pgDefault = Pg{
 		BucketRef: "cp-object-storage",
 		CredsRef:  "pg-creds",
 		Rotation:  5,
-		Period:    1440,
+		Period:    "24h",
 	},
 }
 

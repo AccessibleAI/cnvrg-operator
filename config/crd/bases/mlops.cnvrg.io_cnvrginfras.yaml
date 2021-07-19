@@ -67,7 +67,7 @@ spec:
                           enabled:
                             type: boolean
                           period:
-                            type: integer
+                            type: string
                           rotation:
                             type: integer
                         type: object
