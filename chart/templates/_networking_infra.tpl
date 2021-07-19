@@ -5,8 +5,10 @@ networking:
     certSecret: "{{ .Values.networking.https.certSecret }}"
   ingress:
     type: "{{ .Values.networking.ingress.type }}"
+    {{- if eq .Values.networking.ingress.type "istio" }}
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     istioGwName: "{{.Values.networking.ingress.istioGwName}}"
+    {{- end }}
   proxy:
     enabled: {{ .Values.networking.proxy.enabled }}
     {{- if .Values.networking.proxy.httpProxy }}
@@ -27,6 +29,7 @@ networking:
       - {{$value}}
     {{- end }}
     {{- end }}
+  {{- if eq .Values.networking.ingress.type "istio" }}
   istio:
     enabled: {{ .Values.networking.istio.enabled }}
     {{- if .Values.networking.istio.externalIp }}
@@ -51,6 +54,7 @@ networking:
     lbSourceRanges:
     {{- range $_, $value := .Values.networking.istio.lbSourceRanges }}
       - {{$value}}
+    {{- end }}
     {{- end }}
     {{- end }}
 {{- end }}
