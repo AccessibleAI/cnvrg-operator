@@ -25,10 +25,12 @@ networking:
     {{- end }}
   ingress:
     type: {{ .Values.networking.ingress.type }}
+    {{- if eq .Values.networking.ingress.type "istio" }}
     istioGwName: "{{.Values.networking.ingress.istioGwName}}"
     {{- if and (eq .Values.networking.ingress.type "istio") (eq .Values.spec "allinone") }}
     istioGwEnabled: false
     {{- else }}
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
+    {{- end }}
     {{- end }}
 {{- end }}

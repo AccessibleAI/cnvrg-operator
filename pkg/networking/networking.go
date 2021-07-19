@@ -108,7 +108,7 @@ func proxyState() []*desired.State {
 func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
 
-	if *cnvrgInfra.Spec.Networking.Istio.Enabled {
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && *cnvrgInfra.Spec.Networking.Istio.Enabled {
 		state = append(state, istioInstanceState()...)
 	}
 
