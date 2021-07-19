@@ -5,5 +5,5 @@ type Backup struct {
 	BucketRef string `json:"bucketRef,omitempty"`
 	CredsRef  string `json:"credsRef,omitempty"`
 	Rotation  int    `json:"rotation,omitempty"`
-	Period    int    `json:"period,omitempty"`
+	Period    string `json:"period,omitempty"` // on of [Xs, Xm, Xh]
 }
