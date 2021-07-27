@@ -269,5 +269,11 @@ spec:
         - configMapRef:
             name: {{ .Spec.Networking.Proxy.ConfigRef }}
         {{- end }}
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
+        volumeMounts:
+        - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
+          mountPath: /opt/app-root/conf/gcp-keyfile
+          readOnly: true
+        {{- end }}
 
 

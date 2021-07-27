@@ -31,7 +31,7 @@ Helm chart command line options
 `controlPlane.baseConfig.featureFlags` | {} | map of strings, usage example: `--set controlPlane.baseConfig.featureFlags.FOO="BAR"` 
 `controlPlane.baseConfig.intercom` |  true | set to false to disable intercom
 `controlPlane.hyper.enabled` |  true | set to false to disable hyper
-`controlPlane.objectStorage.type` |  minio | supported values: `minio|aws|azure|gcp`
+`controlPlane.objectStorage.type` |  minio | supported values: `minio,aws,azure,gcp`
 `controlPlane.objectStorage.bucket` |  cnvrg-storage | S3 bucket name
 `controlPlane.objectStorage.region` |  eastus | bucket region
 `controlPlane.objectStorage.accessKey` |  - | bucket access key (if blank - auto generated) 
