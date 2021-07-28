@@ -414,7 +414,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
-		if err := r.ApplyCapsuleAnnotations(app.Spec.Dbs.Pg.Backup, &pgPvc); err != nil {
+		if err := r.ApplyCapsuleAnnotations(app.Spec.Dbs.Pg.Backup, &pgPvc, "postgresql"); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
@@ -944,15 +944,17 @@ func (r *CnvrgAppReconciler) CheckStatefulSetReadiness(name types.NamespacedName
 	return false, nil
 }
 
-func (r *CnvrgAppReconciler) ApplyCapsuleAnnotations(b mlopsv1.Backup, pvc *v1core.PersistentVolumeClaim) error {
+func (r *CnvrgAppReconciler) ApplyCapsuleAnnotations(b mlopsv1.Backup, pvc *v1core.PersistentVolumeClaim, serviceType string) error {
 	pvc.Annotations["capsule.mlops.cnvrg.io/backup"] = "false"
 	if *b.Enabled {
 		pvc.Annotations["capsule.mlops.cnvrg.io/backup"] = "true"
 	}
+	pvc.Annotations["capsule.mlops.cnvrg.io/serviceType"] = serviceType
 	pvc.Annotations["capsule.mlops.cnvrg.io/bucketRef"] = b.BucketRef
 	pvc.Annotations["capsule.mlops.cnvrg.io/credsRef"] = b.CredsRef
 	pvc.Annotations["capsule.mlops.cnvrg.io/rotation"] = strconv.Itoa(b.Rotation)
 	pvc.Annotations["capsule.mlops.cnvrg.io/period"] = b.Period
+
 	if err := r.Update(context.Background(), pvc); err != nil {
 		return err
 	}
