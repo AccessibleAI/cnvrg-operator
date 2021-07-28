@@ -317,6 +317,12 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// backups
+	if err := r.backupsState(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		return err
+	}
+
 	// networking
 	appLog.Info("applying networking")
 	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
@@ -408,16 +414,6 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 			return err
 		}
-		pgPvc := v1core.PersistentVolumeClaim{}
-		pgPvcName := types.NamespacedName{Namespace: app.Namespace, Name: app.Spec.Dbs.Pg.PvcName}
-		if err := r.Get(context.Background(), pgPvcName, &pgPvc); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-			return err
-		}
-		if err := r.ApplyCapsuleAnnotations(app.Spec.Dbs.Pg.Backup, &pgPvc, "postgresql"); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
-			return err
-		}
 	}
 
 	if *app.Spec.Dbs.Redis.Enabled {
@@ -440,6 +436,23 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
 		return err
+	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
+
+	if *app.Spec.Dbs.Pg.Enabled { // pg backups
+		pgPvc := v1core.PersistentVolumeClaim{}
+		pgPvcName := types.NamespacedName{Namespace: app.Namespace, Name: app.Spec.Dbs.Pg.PvcName}
+		if err := r.Get(context.Background(), pgPvcName, &pgPvc); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
+		if err := r.ApplyCapsuleAnnotations(app.Spec.Dbs.Pg.Backup, &pgPvc, "postgresql"); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			return err
+		}
 	}
 	return nil
 }
