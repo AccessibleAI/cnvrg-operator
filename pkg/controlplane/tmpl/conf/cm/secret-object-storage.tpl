@@ -33,3 +33,4 @@ data:
   ################## gcp ###########################
   CNVRG_STORAGE_KEYFILE: {{ "/opt/app-root/conf/gcp-keyfile/key.json"  | b64enc }}
   CNVRG_STORAGE_PROJECT: {{ .Spec.ControlPlane.ObjectStorage.GcpProject | b64enc }}
+  CNVRG_STORAGE_GCP_SECRET_REF: {{ .Spec.ControlePlane.ObjectStorage.GcpSecretRef | b64enc }}
