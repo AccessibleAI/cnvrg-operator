@@ -893,6 +893,88 @@ var _ = Describe("CnvrgInfra controller", func() {
 		})
 	})
 
+	Context("Test Capsule", func() {
+
+		It("Capsule deployment", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Capsule.Enabled = &defaultTrue
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			dep := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Capsule.SvcName, Namespace: ns}, &dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(dep.Spec.Template.Spec.ServiceAccountName).To(Equal("cnvrg-capsule"))
+
+		})
+
+		It("Capsule PVC - default storage size", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Capsule.Enabled = &defaultTrue
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+
+			pvc := corev1.PersistentVolumeClaim{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Capsule.SvcName, Namespace: ns}, &pvc)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			storageSize := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
+			Expect(storageSize.String()).To(Equal(infra.Spec.Capsule.StorageSize))
+		})
+
+		It("Capsule PVC - custom storage size", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Capsule.Enabled = &defaultTrue
+			infra.Spec.Capsule.StorageSize = "20Gi"
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+
+			pvc := corev1.PersistentVolumeClaim{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Capsule.SvcName, Namespace: ns}, &pvc)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			storageSize := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
+			Expect(storageSize.String()).To(Equal(infra.Spec.Capsule.StorageSize))
+		})
+
+		FIt("Capsule PVC - custom storage class", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Capsule.Enabled = &defaultTrue
+			infra.Spec.Capsule.StorageClass = "foo-bar"
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+
+			pvc := corev1.PersistentVolumeClaim{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Capsule.SvcName, Namespace: ns}, &pvc)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(*pvc.Spec.StorageClassName).To(Equal(infra.Spec.Capsule.StorageClass))
+		})
+	})
+
 })
 
 func getEmptyTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {

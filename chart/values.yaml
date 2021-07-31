@@ -2,9 +2,9 @@ clusterDomain: ""
 spec: allinone # allinone|infra|ccp
 imageHub: docker.io/cnvrg
 
-labels: {}
+labels: { }
 
-annotations: {}
+annotations: { }
 
 gpu:
   nvidiaDp:
@@ -15,7 +15,7 @@ controlPlane:
   baseConfig:
     agentCustomTag: latest
     intercom: "true"
-    featureFlags: {}
+    featureFlags: { }
   hyper:
     enabled: true
   objectStorage:
@@ -195,3 +195,7 @@ registry:
 
 configReloader:
   enabled: true
+
+capsule:
+  enabled: true
+  image: "cnvrg-capsule:1.0.2"

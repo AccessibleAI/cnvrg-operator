@@ -22,6 +22,7 @@ type CnvrgInfraSpec struct {
 	Annotations    map[string]string    `json:"annotations,omitempty"`
 	ImageHub       string               `json:"imageHub,omitempty"`
 	ConfigReloader ConfigReloader       `json:"configReloader,omitempty"`
+	Capsule        Capsule              `json:"capsule"`
 }
 
 // +kubebuilder:object:root=true
@@ -65,6 +66,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Labels:         map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations:    nil,
 		ConfigReloader: defaultConfigReloader,
+		Capsule:        capsuleDefault,
 	}
 	return infraDefault
 }

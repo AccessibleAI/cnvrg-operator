@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/capsule"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/controlplane"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
@@ -247,6 +248,13 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
+	}
+
+	// capsule backup service
+	infraLog.Info("applying capsule")
+	if err := desired.Apply(capsule.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
 	}
 
 	return reconcileResult

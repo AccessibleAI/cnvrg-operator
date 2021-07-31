@@ -45,6 +45,33 @@ spec:
                 additionalProperties:
                   type: string
                 type: object
+              capsule:
+                properties:
+                  enabled:
+                    type: boolean
+                  image:
+                    type: string
+                  limits:
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                    type: object
+                  requests:
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                    type: object
+                  storageClass:
+                    type: string
+                  storageSize:
+                    type: string
+                  svcName:
+                    type: string
+                type: object
               clusterDomain:
                 type: string
               configReloader:
@@ -475,6 +502,8 @@ spec:
                   value:
                     type: string
                 type: object
+            required:
+            - capsule
             type: object
           status:
             properties:
