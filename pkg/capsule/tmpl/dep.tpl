@@ -29,7 +29,7 @@ spec:
       containers:
         - name: capsule
           command:
-            - /workspace/capsule
+            - /opt/app-root/capsule
             - start
           env:
             - name: CNVRG_CAPSULE_DUMPDIR
