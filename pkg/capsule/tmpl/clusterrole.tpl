@@ -13,8 +13,10 @@ metadata:
     {{- end }}
 rules:
   - apiGroups:
-      - ""
+    - ""
     resources:
-      - ""
+    - persistentvolumeclaims
+    - secrets
     verbs:
-      - ""
+    - list
+    - get
