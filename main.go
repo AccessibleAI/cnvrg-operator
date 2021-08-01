@@ -183,6 +183,7 @@ func informPkger() {
 	pkger.Include("/pkg/storage/tmpl")
 	pkger.Include("/pkg/gpu/tmpl")
 	pkger.Include("/pkg/reloader/tmpl")
+	pkger.Include("/pkg/capsule/tmpl")
 }
 
 func main() {

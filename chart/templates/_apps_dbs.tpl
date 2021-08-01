@@ -37,6 +37,10 @@ dbs:
       enabled: {{ .Values.dbs.pg.hugePages.enabled }}
       size: {{ .Values.dbs.pg.hugePages.size }}
       memory: "{{ .Values.dbs.pg.hugePages.memory }}"
+    backup:
+      enabled: {{.Values.backup.enabled}}
+      rotation: {{.Values.backup.rotation}}
+      period: {{.Values.backup.period}}
   {{- if eq .Values.spec "ccp"  }}
   redis:
     enabled: {{ .Values.dbs.redis.enabled }}

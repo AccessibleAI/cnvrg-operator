@@ -893,7 +893,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 		})
 	})
 
-	Context("Test Capsule", func() {
+	FContext("Test Capsule", func() {
 
 		It("Capsule deployment", func() {
 			ns := createNs()
@@ -954,7 +954,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(storageSize.String()).To(Equal(infra.Spec.Capsule.StorageSize))
 		})
 
-		FIt("Capsule PVC - custom storage class", func() {
+		It("Capsule PVC - custom storage class", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)

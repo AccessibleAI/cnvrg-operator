@@ -199,3 +199,9 @@ configReloader:
 capsule:
   enabled: true
   image: "cnvrg-capsule:1.0.2"
+
+backup:
+  enabled: true
+  rotation: 5
+  period: 24h
+
