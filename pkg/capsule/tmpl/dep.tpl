@@ -32,8 +32,6 @@ spec:
             - /opt/app-root/capsule
             - start
           env:
-            - name: CNVRG_CAPSULE_DUMPDIR
-              value: /capsule-data
             - name: GIN_MODE
               value: release
           image: {{ image .Spec.ImageHub .Spec.Capsule.Image }}
@@ -46,7 +44,7 @@ spec:
               cpu: "{{.Spec.Capsule.Limits.Cpu}}"
               memory: "{{.Spec.Capsule.Limits.Memory}}"
           volumeMounts:
-            - mountPath: /capsule-data
+            - mountPath: /tmp/capsule-data
               name: capsule-data
       volumes:
         - name: capsule-data
