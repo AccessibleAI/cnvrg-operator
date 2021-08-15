@@ -893,7 +893,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 		})
 	})
 
-	FContext("Test Capsule", func() {
+	Context("Test Capsule", func() {
 
 		It("Capsule deployment", func() {
 			ns := createNs()

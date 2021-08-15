@@ -958,6 +958,9 @@ func (r *CnvrgAppReconciler) CheckStatefulSetReadiness(name types.NamespacedName
 }
 
 func (r *CnvrgAppReconciler) ApplyCapsuleAnnotations(b mlopsv1.Backup, pvc *v1core.PersistentVolumeClaim, serviceType string) error {
+	if pvc.Annotations == nil {
+		pvc.Annotations = map[string]string{}
+	}
 	pvc.Annotations["capsule.mlops.cnvrg.io/backup"] = "false"
 	if *b.Enabled {
 		pvc.Annotations["capsule.mlops.cnvrg.io/backup"] = "true"

@@ -30,6 +30,6 @@ var capsuleDefault = Capsule{
 		Memory: "1Gi",
 	},
 	SvcName:      "capsule",
-	StorageSize:  "10Gi",
+	StorageSize:  "100Gi",
 	StorageClass: "",
 }
