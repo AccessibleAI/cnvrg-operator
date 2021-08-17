@@ -39,9 +39,8 @@ Helm chart command line options
 `controlPlane.objectStorage.endpoint` |  - | bucket endpoint (if blank - auto generated )
 `controlPlane.objectStorage.azureAccountName` |  - | azure storage account name
 `controlPlane.objectStorage.azureContainer` |  - | azure storage container name
-`controlPlane.objectStorage.gcpKeyfileMountPath` |  /tmp/gcp_keyfile | -
-`controlPlane.objectStorage.gcpKeyfileName` |  key.json | -
-`controlPlane.objectStorage.gcpStorageSecret` |  gcp-storage-secret | gcp storage secret 
+`controlPlane.objectStorage.gcpProject` |  - | gcp project 
+`controlPlane.objectStorage.gcpSecretRef` |  gcp-storage-secret | gcp storage secret 
 `controlPlane.searchkiq.enabled` |  true | set to false to disable searchkiq
 `controlPlane.sidekiq.enabled` |  true | set to false to disable sidekiq
 `controlPlane.sidekiq.split` |  true | set to false to disable sidekiq split
