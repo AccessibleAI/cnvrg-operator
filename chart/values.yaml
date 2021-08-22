@@ -71,6 +71,16 @@ controlPlane:
       user: ""
       password: ""
 
+  ldap:
+    enabled: false
+    host: ""
+    port: ""
+    account: "userPrincipalName"
+    base: ""
+    adminUser: ""
+    adminPassword: ""
+    ssl: "false"
+
 dbs:
   es:
     enabled: true

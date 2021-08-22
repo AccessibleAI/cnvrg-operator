@@ -72,4 +72,13 @@ controlPlane:
     {{- else }}
     extraArgs: { }
     {{- end }}
+  ldap:
+    enabled: {{ .Values.controlPlane.ldap.enabled }}
+    host: "{{ .Values.controlPlane.ldap.host }}"
+    port: "{{ .Values.controlPlane.ldap.port }}"
+    account: "{{ .Values.controlPlane.ldap.account }}"
+    base: "{{ .Values.controlPlane.ldap.base }}"
+    adminUser: "{{ .Values.controlPlane.ldap.adminUser }}"
+    adminPassword: "{{ .Values.controlPlane.ldap.adminPassword }}"
+    ssl: "{{ .Values.controlPlane.ldap.ssl }}"
 {{- end }}
