@@ -1395,6 +1395,25 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(*hpa.Spec.Metrics[0].Resource.TargetAverageUtilization).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Hpa.Utilization)))
 		})
 
+		It("SMTP OpensslVerifyMode", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.SMTP.OpensslVerifyMode = "foo"
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			secret := corev1.Secret{}
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-smtp", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(string(secret.Data["OPENSSL_VERIFY_MODE"])).To(Equal("foo"))
+
+		})
+
 	})
 
 	Context("Test Object Storage Secret", func() {

@@ -45,6 +45,7 @@ controlPlane:
     username: "{{ .Values.controlPlane.smtp.username }}"
     password: "{{ .Values.controlPlane.smtp.password }}"
     domain: "{{ .Values.controlPlane.smtp.domain }}"
+    opensslVerifyMode: "{{ .Values.controlPlane.smtp.opensslVerifyMode }}"
   systemkiq:
     enabled: {{ .Values.controlPlane.systemkiq.enabled }}
     hpa:

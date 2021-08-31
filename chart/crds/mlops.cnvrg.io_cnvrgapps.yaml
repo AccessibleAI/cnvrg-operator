@@ -274,6 +274,8 @@ spec:
                     properties:
                       domain:
                         type: string
+                      opensslVerifyMode:
+                        type: string
                       password:
                         type: string
                       port:

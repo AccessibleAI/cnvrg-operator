@@ -120,11 +120,12 @@ type Ldap struct {
 }
 
 type SMTP struct {
-	Server   string `json:"server,omitempty"`
-	Port     int    `json:"port,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
-	Domain   string `json:"domain,omitempty"`
+	Server            string `json:"server,omitempty"`
+	Port              int    `json:"port,omitempty"`
+	Username          string `json:"username,omitempty"`
+	Password          string `json:"password,omitempty"`
+	Domain            string `json:"domain,omitempty"`
+	OpensslVerifyMode string `json:"opensslVerifyMode,omitempty"`
 }
 
 type ObjectStorage struct {
@@ -362,10 +363,11 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	SMTP: SMTP{
-		Server:   "",
-		Port:     587,
-		Username: "",
-		Password: "",
-		Domain:   "",
+		Server:            "",
+		Port:              587,
+		Username:          "",
+		Password:          "",
+		Domain:            "",
+		OpensslVerifyMode: "none",
 	},
 }
