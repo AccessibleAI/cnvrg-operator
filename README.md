@@ -115,7 +115,7 @@ Helm chart command line options
 `controlPlane.smtp.username` |  - | smtp username
 `controlPlane.smtp.password` |  - | smtp password
 `controlPlane.smtp.domain` |  - | smtp domain
-`opensslVerifyMode` | none | 
+`controlPlane.smtp.opensslVerifyMode` | none | openssl verify mode for cnvrg smtp client 
 `controlPlane.webapp.enabled` |  true | set to false to disable webapp
 `controlPlane.webapp.replicas` |  1 | webapp replicas number
 `controlPlane.mpi.enabled` |  true | set to false to disable mpi
