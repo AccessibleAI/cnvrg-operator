@@ -368,6 +368,6 @@ var controlPlaneDefault = ControlPlane{
 		Username:          "",
 		Password:          "",
 		Domain:            "",
-		OpensslVerifyMode: "none",
+		OpensslVerifyMode: "",
 	},
 }

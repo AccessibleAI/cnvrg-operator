@@ -49,7 +49,7 @@ controlPlane:
     username: ""
     password: ""
     domain: ""
-    opensslVerifyMode: none
+    opensslVerifyMode: ""
   systemkiq:
     enabled: true
     hpa:
