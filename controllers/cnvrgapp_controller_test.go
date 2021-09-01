@@ -1395,7 +1395,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(*hpa.Spec.Metrics[0].Resource.TargetAverageUtilization).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Hpa.Utilization)))
 		})
 
-		It("SMTP OpensslVerifyMode", func() {
+		FIt("SMTP OpensslVerifyMode", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
@@ -1410,7 +1410,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeTrue())
-			Expect(string(secret.Data["OPENSSL_VERIFY_MODE"])).To(Equal("foo"))
+			Expect(string(secret.Data["SMTP_OPENSSL_VERIFY_MODE"])).To(Equal("foo"))
 
 		})
 

@@ -18,4 +18,4 @@ data:
   SMTP_USERNAME: {{ .Spec.ControlPlane.SMTP.Username | b64enc }}
   SMTP_PASSWORD: {{ .Spec.ControlPlane.SMTP.Password | b64enc }}
   SMTP_DOMAIN: {{ .Spec.ControlPlane.SMTP.Domain | b64enc }}
-  OPENSSL_VERIFY_MODE: {{ .Spec.ControlPlane.SMTP.OpensslVerifyMode | b64enc }}
+  SMTP_OPENSSL_VERIFY_MODE: {{ .Spec.ControlPlane.SMTP.OpensslVerifyMode | b64enc }}
