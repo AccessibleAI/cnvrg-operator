@@ -14,18 +14,18 @@ metadata:
 data:
 {{- $upstreamConfig := `
     - job_name: 'federate'
-          scrape_interval: 10s
-          honor_labels: true
-          honor_timestamps: false
-          metrics_path: '/federate'
-          basic_auth:
-            username: '%s'
-            password: '%s'
-          params:
-            'match[]':
-              - '{namespace="%s"}'
-          static_configs:
-            - targets:
-              - '%s'`
+      scrape_interval: 10s
+      honor_labels: true
+      honor_timestamps: false
+      metrics_path: '/federate'
+      basic_auth:
+        username: '%s'
+        password: '%s'
+      params:
+        'match[]':
+          - '{namespace="%s"}'
+      static_configs:
+        - targets:
+          - '%s'`
 }}
   prometheus-additional.yaml: {{ printf $upstreamConfig .Data.User .Data.Pass .Data.Namespace .Data.Upstream | b64enc }}
