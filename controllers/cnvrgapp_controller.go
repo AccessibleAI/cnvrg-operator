@@ -474,8 +474,10 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) error {
+
 	if *app.Spec.Monitoring.Prometheus.Enabled {
 		appLog.Info("applying monitoring")
+		user := "cnvrg"
 		pass := desired.RandomString()
 		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
 		if err != nil {
@@ -488,9 +490,9 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 				"Annotations": app.Spec.Annotations,
 				"Labels":      app.Spec.Labels,
 				"CredsRef":    app.Spec.Monitoring.Prometheus.CredsRef,
-				"User":        "cnvrg",
+				"User":        user,
 				"Pass":        pass,
-				"PassHash":    passHash,
+				"PassHash":    fmt.Sprintf("%s:%s", user, passHash),
 				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", app.Spec.Monitoring.Prometheus.SvcName, app.Namespace, app.Spec.Monitoring.Prometheus.Port),
 			},
 		}
