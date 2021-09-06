@@ -13,5 +13,5 @@ const (
 type Status struct {
 	Status   OperatorStatus `json:"status,omitempty"`
 	Message  string         `json:"message,omitempty"`
-	Progress string         `json:"progress,omitempty"`
+	Progress int            `json:"progress,omitempty"`
 }

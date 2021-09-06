@@ -89,7 +89,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	} else {
 		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			r.updateStatusMessage(mlopsv1.StatusRemoving, "removing cnvrg spec", cnvrgApp)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusRemoving, Message: "removing cnvrg spec"}, cnvrgApp)
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
@@ -119,7 +119,11 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if percentageReady == 100 {
 		percentageReady = 99
 	}
-	r.updateStatusMessage(mlopsv1.StatusReconciling, fmt.Sprintf("reconciling... (%d%%)", percentageReady), cnvrgApp)
+	s := mlopsv1.Status{
+		Status:   mlopsv1.StatusReconciling,
+		Message:  fmt.Sprintf("reconciling... (%d%%)", percentageReady),
+		Progress: percentageReady}
+	r.updateStatusMessage(s, cnvrgApp)
 
 	// apply spec manifests
 	if err := r.applyManifests(cnvrgApp); err != nil {
@@ -135,7 +139,11 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	appLog.Info(statusMsg)
 
 	if ready { // ura, done
-		r.updateStatusMessage(mlopsv1.StatusReady, statusMsg, cnvrgApp)
+		s := mlopsv1.Status{
+			Status:   mlopsv1.StatusReady,
+			Message:  statusMsg,
+			Progress: percentageReady}
+		r.updateStatusMessage(s, cnvrgApp)
 		appLog.Info("stack is ready!")
 		return ctrl.Result{}, nil
 	} else { // reconcile again
@@ -307,45 +315,45 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		},
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
 	// dbs
 	if err := r.dbsState(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
 	// backups
 	if err := r.backupsState(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
 	// networking
 	appLog.Info("applying networking")
 	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
 	// logging
 	if err := r.loggingState(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
 	// controlplane
 	appLog.Info("applying controlplane")
 	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
 	// monitoring
 	if err := r.monitoringState(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgApp)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
 
@@ -358,15 +366,15 @@ func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 		appLog.Info("applying logging")
 		kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
 		if err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 		if err := desired.Apply(logging.KibanaConfSecret(*kibanaConfigSecretData), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 		if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
@@ -391,7 +399,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		}
 		appLog.Info("trying to generate es creds (if still doesn't exists...)")
 		if err := desired.Apply(dbs.EsCreds(esSecretData), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
@@ -411,7 +419,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		}
 		appLog.Info("trying to generate pg creds (if still doesn't exists...)")
 		if err := desired.Apply(dbs.PgCreds(pgSecretData), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
@@ -428,13 +436,13 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		}
 		appLog.Info("trying to generate redis creds (if still doesn't exists...)")
 		if err := desired.Apply(dbs.RedisCreds(redisSecretData), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
 
 	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
 	}
 	return nil
@@ -446,11 +454,11 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 		pgPvc := v1core.PersistentVolumeClaim{}
 		pgPvcName := types.NamespacedName{Namespace: app.Namespace, Name: app.Spec.Dbs.Pg.PvcName}
 		if err := r.Get(context.Background(), pgPvcName, &pgPvc); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 		if err := r.ApplyCapsuleAnnotations(app.Spec.Dbs.Pg.Backup, &pgPvc, "postgresql"); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
@@ -461,12 +469,12 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
 	// generate monitoring secrets (prometheus, prometheus upstream, and grafana data sources
 	if err := r.generateMonitoringSecrets(app); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
 	}
 	// apply app monitoring state
 	if err := desired.Apply(monitoring.AppMonitoringState(app), app, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
 	}
 
@@ -499,12 +507,12 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 
 		appLog.Info("trying to generate prometheus creds (if still doesn't exists...)")
 		if err := desired.Apply(monitoring.PromCreds(promSecretData), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 
 		if err := r.createUpstreamPrometheusConfig(app); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
@@ -519,7 +527,7 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 		appLog.Info("applying grafana datasource")
 		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, appLog)
 		if err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 		grafanaDatasourceData := desired.TemplateData{
@@ -532,7 +540,7 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 		}
 
 		if err := desired.Apply(monitoring.GrafanaDSState(grafanaDatasourceData), app, r.Client, r.Scheme, appLog); err != nil {
-			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
@@ -583,7 +591,7 @@ func (r *CnvrgAppReconciler) createUpstreamPrometheusConfig(app *mlopsv1.CnvrgAp
 	}
 
 	if err := desired.Apply(monitoring.PromUpstreamCreds(promUpstreamData), app, r.Client, r.Scheme, appLog); err != nil {
-		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), app)
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
 	}
 
@@ -722,20 +730,23 @@ func (r *CnvrgAppReconciler) removeFluentbitConfiguration(cnvrgApp *mlopsv1.Cnvr
 	return nil
 }
 
-func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgApp *mlopsv1.CnvrgApp) {
-	if cnvrgApp.Status.Status == mlopsv1.StatusRemoving {
+func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlopsv1.CnvrgApp) {
+	if app.Status.Status == mlopsv1.StatusRemoving {
 		appLog.Info("skipping status update, current cnvrg spec under removing status...")
 		return
 	}
 	ctx := context.Background()
 	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		name := types.NamespacedName{Namespace: cnvrgApp.Namespace, Name: cnvrgApp.Name}
+		name := types.NamespacedName{Namespace: app.Namespace, Name: app.Name}
 		app, err := r.getCnvrgAppSpec(name)
 		if err != nil {
 			return err
 		}
-		app.Status.Status = status
-		app.Status.Message = message
+		app.Status.Status = status.Status
+		app.Status.Message = status.Message
+		if status.Progress >= 0 {
+			app.Status.Progress = status.Progress
+		}
 		err = r.Status().Update(ctx, app)
 		return err
 	})
