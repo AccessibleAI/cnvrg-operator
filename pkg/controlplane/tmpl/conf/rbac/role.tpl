@@ -242,6 +242,15 @@ rules:
 - apiGroups:
   - kubeflow.org
   resources:
-  -  "*"
+  - "*"
   verbs:
-  -  "*"
+  - "*"
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - cnvrgclusterprovisioners
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
