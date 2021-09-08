@@ -238,7 +238,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
 		})
-		It("Nfs provisioner Labels/Annotations", func() {
+		FIt("Nfs provisioner Labels/Annotations", func() {
 			ns := createNs()
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
