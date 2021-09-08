@@ -31,7 +31,7 @@ spec:
           value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      serviceAccountName: cnvrg
+      serviceAccountName: cnvrg-control-plane
       containers:
         - name: nginx
           image: {{ .Spec.ControlPlane.CnvrgRouter.Image }}

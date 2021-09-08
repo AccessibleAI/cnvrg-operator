@@ -51,6 +51,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			l := prom.Object["spec"].(map[string]interface{})["podMetadata"].(map[string]interface{})["labels"]
 			Expect(a).Should(BeNil())
 			Expect(l).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Prometheus Operator Labels/Annotations", func() {
 			ns := createNs()
@@ -73,6 +74,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Prometheus NodeExporter Labels/Annotations", func() {
 			ns := createNs()
@@ -95,6 +97,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Kube State Metrics Labels/Annotations", func() {
 			ns := createNs()
@@ -117,6 +120,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Grafana Labels/Annotations", func() {
 			ns := createNs()
@@ -140,6 +144,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Dcgm exporter Labels/Annotations", func() {
 			ns := createNs()
@@ -162,6 +167,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Prom creds secret generator", func() {
 			ns := createNs()
@@ -212,6 +218,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure redis creds wasn't mutated between reconciliation loops
 			Expect(promCreds.Data["CNVRG_PROMETHEUS_PASS"]).Should(Equal(promCredsAfterReconcile.Data["CNVRG_PROMETHEUS_PASS"]))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 	})
 
@@ -237,6 +244,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Nfs provisioner Labels/Annotations", func() {
 			ns := createNs()
@@ -261,6 +269,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(d.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(d.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})
@@ -286,6 +295,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(istio.GetAnnotations()).Should(BeNil())
 			Expect(istio.GetLabels()).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio Service Annotations", func() {
 			ns := createNs()
@@ -308,6 +318,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			serviceAnnotations := istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["serviceAnnotations"]
 			Expect(serviceAnnotations).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio LoadBalancer Source Ranges", func() {
 			ns := createNs()
@@ -333,6 +344,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["service"].(map[string]interface{})["loadBalancerSourceRanges"].([]interface{})[1].(string),
 			}
 			Expect(lbSources).Should(Equal([]string{"1.1.1.1/32", "2.2.2.2/24"}))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio ExternalIps", func() {
 			ns := createNs()
@@ -359,6 +371,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				istio.Object["spec"].(map[string]interface{})["components"].(map[string]interface{})["ingressGateways"].([]interface{})[0].(map[string]interface{})["k8s"].(map[string]interface{})["service"].(map[string]interface{})["externalIPs"].([]interface{})[1].(string),
 			}
 			Expect(externalIps).Should(Equal(exIps))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio ExtraPorts", func() {
 			ns := createNs()
@@ -388,6 +401,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(port1111).Should(HaveKeyWithValue("port", port1111int64))
 			Expect(port2222).Should(HaveKeyWithValue("name", "port2222"))
 			Expect(port2222).Should(HaveKeyWithValue("port", port2222int64))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio Default Gateway Name", func() {
 			ns := createNs()
@@ -406,6 +420,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeTrue())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio Custom Gateway Name", func() {
 			ns := createNs()
@@ -425,6 +440,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeTrue())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio Disabled ", func() {
 			ns := createNs()
@@ -443,6 +459,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio Disabled - Custom GW name for Prometheus and Grafana VS", func() {
 			ns := createNs()
@@ -475,6 +492,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement("foo-bar"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 
 		})
 		It("Istio Disabled - No Istio GW are created", func() {
@@ -493,6 +511,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Istio Operator Deployment Tenancy", func() {
 			ns := createNs()
@@ -524,6 +543,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})
@@ -550,6 +570,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(d.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(d.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})
@@ -576,6 +597,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Fluentbit Default Logs Volumes", func() {
 			ns := createNs()
@@ -614,6 +636,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}
 			Expect(ds.Spec.Template.Spec.Volumes).Should(ContainElement(v))
 			Expect(ds.Spec.Template.Spec.Volumes).Should(ContainElement(v1))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 
 		})
 
@@ -645,6 +668,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				},
 			}
 			Expect(ds.Spec.Template.Spec.Volumes).Should(ContainElement(v))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 		It("Fluentbit Tolerations", func() {
@@ -668,6 +692,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			Expect(ds.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Spec.Template.Spec.NodeSelector).ShouldNot(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})
@@ -717,6 +742,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Proxy configmap test creation - custom no_proxy", func() {
 
@@ -762,6 +788,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 		It("Proxy configmap test creation - k8s api server", func() {
 			noProxy := []string{".foo.bar"}
@@ -808,6 +835,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 
 		})
 		It("Proxy configmap test creation - proxy disabled", func() {
@@ -836,7 +864,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
-
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 	})
 
@@ -846,7 +874,6 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
 			infra.Spec.Dbs.Redis.Enabled = true
-			// create app
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// get redis creds
 			redisCreds := corev1.Secret{}
@@ -890,6 +917,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure redis creds wasn't mutated between reconciliation loops
 			Expect(redisCreds.Data["redis.conf"]).Should(Equal(redisCredsAfterReconcile.Data["redis.conf"]))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 	})
 
@@ -910,7 +938,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(dep.Spec.Template.Spec.ServiceAccountName).To(Equal("cnvrg-capsule"))
-
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 		It("Capsule PVC - default storage size", func() {
@@ -931,6 +959,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			storageSize := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
 			Expect(storageSize.String()).To(Equal(infra.Spec.Capsule.StorageSize))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 		It("Capsule PVC - custom storage size", func() {
@@ -952,6 +981,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			storageSize := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
 			Expect(storageSize.String()).To(Equal(infra.Spec.Capsule.StorageSize))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 		It("Capsule PVC - custom storage class", func() {
@@ -972,6 +1002,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(*pvc.Spec.StorageClassName).To(Equal(infra.Spec.Capsule.StorageClass))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 	})
 

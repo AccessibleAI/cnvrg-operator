@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cnvrg
+  name: cnvrg-job
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}

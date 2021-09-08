@@ -50,6 +50,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("PG Annotations", func() {
 			ns := createNs()
@@ -69,6 +70,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("PG HugePages - defaults", func() {
 			ns := createNs()
@@ -111,6 +113,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["hugepages-2Mi"]))
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["cpu"]))
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["memory"]))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("PG HugePages - custom", func() {
@@ -156,6 +159,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["hugepages-2Mi"]))
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["cpu"]))
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(ContainElement(shouldLimits["memory"]))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("PG HugePages - disabled", func() {
@@ -193,6 +197,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			vm := corev1.VolumeMount{Name: "hugepage", MountPath: "/hugepages"}
 			Expect(deployment.Spec.Template.Spec.Containers[0].VolumeMounts).ShouldNot(ContainElement(vm))
 			Expect(deployment.Spec.Template.Spec.Containers[0].Resources.Limits).Should(BeEquivalentTo(shouldLimits))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("PG NodeSelector", func() {
@@ -215,6 +220,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("PG Tenancy & NodeSelector", func() {
@@ -247,6 +253,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("Pg creds secret generator", func() {
@@ -298,6 +305,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure es creds wasn't mutated between reconciliation loops
 			Expect(pgCreds.Data["POSTGRESQL_PASSWORD"]).Should(Equal(pgCredsAfterReconcile.Data["POSTGRESQL_PASSWORD"]))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 	})
@@ -321,6 +329,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Redis Annotations", func() {
 			ns := createNs()
@@ -340,6 +349,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Redis NodeSelector", func() {
 			ns := createNs()
@@ -360,6 +370,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("Redis Tenancy & NodeSelector", func() {
@@ -391,6 +402,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("Redis creds secret generator", func() {
@@ -442,6 +454,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure es creds wasn't mutated between reconciliation loops
 			Expect(redisCreds.Data["redis.conf"]).Should(Equal(redisCredsAfterReconcile.Data["redis.conf"]))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 	})
@@ -465,6 +478,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Minio Annotations", func() {
 			ns := createNs()
@@ -484,6 +498,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Minio NodeSelector", func() {
 			ns := createNs()
@@ -504,7 +519,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Minio Tenancy & NodeSelector", func() {
 			ns := createNs()
@@ -535,7 +550,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 	})
@@ -559,6 +574,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(sts.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Es Annotations", func() {
 			ns := createNs()
@@ -578,6 +594,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(sts.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Es NodeSelector", func() {
 			ns := createNs()
@@ -598,6 +615,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("Es Tenancy & NodeSelector", func() {
@@ -629,6 +647,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(sts.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(sts.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 
 		})
 		It("Es default xms xmx", func() {
@@ -648,6 +667,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms2g -Xmx2g"}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Es 5Gi requests  -  xms xmx", func() {
 			ns := createNs()
@@ -666,6 +686,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms2g -Xmx2g"}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Es 6Gi requests -  xms xmx", func() {
 			ns := createNs()
@@ -684,6 +705,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: "-Xms3g -Xmx3g"}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Es 6000Mi requests - xms xmx", func() {
 			ns := createNs()
@@ -702,6 +724,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			javaOpts := corev1.EnvVar{Name: "ES_JAVA_OPTS", Value: ""}
 			Expect(sts.Spec.Template.Spec.Containers[0].Env).Should(ContainElement(javaOpts))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Es creds secret generator", func() {
 			ns := createNs()
@@ -756,6 +779,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure es creds wasn't mutated between reconciliation loops
 			Expect(esCreds.Data["CNVRG_ES_PASS"]).Should(Equal(esCredsAfterReconcile.Data["CNVRG_ES_PASS"]))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})
@@ -779,6 +804,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("WebApp Annotations", func() {
 			ns := createNs()
@@ -798,6 +824,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("WebApp Tenancy", func() {
 			ns := createNs()
@@ -826,7 +853,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Sidekiq Labels", func() {
@@ -847,6 +874,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Sidekiq Annotations", func() {
 			ns := createNs()
@@ -867,6 +895,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Sidekiq Tenancy", func() {
 			ns := createNs()
@@ -896,7 +925,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Hyper Labels", func() {
@@ -916,6 +945,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Hyper Annotations", func() {
 			ns := createNs()
@@ -935,6 +965,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Hyper Tenancy", func() {
 			ns := createNs()
@@ -963,7 +994,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Mpi Operator Labels", func() {
@@ -983,6 +1014,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Mpi Operator Annotations", func() {
 			ns := createNs()
@@ -1002,6 +1034,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 		It("Mpi Operator Tenancy", func() {
 			ns := createNs()
@@ -1030,7 +1063,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("ImageHub for WebApp - default ImageHub", func() {
@@ -1054,7 +1087,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
 			Expect(dep.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("ImageHub for WebApp - custom ImageHub", func() {
@@ -1078,7 +1111,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
 			Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("ImageHub for Sidekiq - custom ImageHub", func() {
@@ -1102,7 +1135,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			shouldBe := fmt.Sprintf("%s/%s", testApp.Spec.ImageHub, testApp.Spec.ControlPlane.Image)
 			Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Image for WebApp - disable  ImageHub", func() {
@@ -1126,7 +1159,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			shouldBe := fmt.Sprintf("%s", testApp.Spec.ControlPlane.Image)
 			Expect(deployment.Spec.Template.Spec.Containers[0].Image).Should(Equal(shouldBe))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Labels/Annotations CCP ConfigMap", func() {
@@ -1153,7 +1186,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data["labels"]).Should(ContainSubstring("bar"))
 			Expect(cm.Data["annotations"]).Should(ContainSubstring("foo1"))
 			Expect(cm.Data["annotations"]).Should(ContainSubstring("bar1"))
-
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Proxy enabled - webapp", func() {
@@ -1177,6 +1210,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Proxy enabled - sidekiq", func() {
@@ -1201,6 +1235,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Proxy enabled - searchkiq", func() {
@@ -1225,6 +1260,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Proxy enabled - systemkiq", func() {
@@ -1249,6 +1285,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				},
 			}
 			Expect(dep.Spec.Template.Spec.Containers[0].EnvFrom).Should(ContainElement(env))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Proxy enabled - ccp networking configmap", func() {
@@ -1269,6 +1306,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(cm.Data["CNVRG_PROXY_CONFIG_REF"]).Should(BeEquivalentTo(app.Spec.Networking.Proxy.ConfigRef))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Proxy disabled - ccp networking configmap", func() {
@@ -1288,6 +1326,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			_, found := cm.Data["CNVRG_PROXY_CONFIG_REF"]
 			Expect(found).Should(BeFalse())
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("HPA disabled", func() {
@@ -1305,6 +1344,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("WebApp HPA Enabled", func() {
@@ -1325,6 +1365,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.WebApp.Replicas)))
 			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.WebApp.Hpa.MaxReplicas)))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Sidekiq HPA Enabled", func() {
@@ -1346,6 +1387,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Sidekiq.Replicas)))
 			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Sidekiq.Hpa.MaxReplicas)))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Searchkiq HPA Enabled", func() {
@@ -1368,6 +1410,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Searchkiq.Replicas)))
 			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Searchkiq.Hpa.MaxReplicas)))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("Systemkiq HPA Enabled", func() {
@@ -1391,6 +1434,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(*hpa.Spec.MinReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Replicas)))
 			Expect(hpa.Spec.MaxReplicas).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Hpa.MaxReplicas)))
 			Expect(*hpa.Spec.Metrics[0].Resource.TargetAverageUtilization).Should(BeEquivalentTo(int32(app.Spec.ControlPlane.Systemkiq.Hpa.Utilization)))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 		It("SMTP OpensslVerifyMode", func() {
@@ -1409,6 +1453,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(string(secret.Data["SMTP_OPENSSL_VERIFY_MODE"])).To(Equal("foo"))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 
 		})
 
@@ -1434,6 +1479,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).ShouldNot(BeEmpty())
 			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).ShouldNot(BeEmpty())
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Object Storage Secret - Minio enabled - explicitly configured keys", func() {
@@ -1457,6 +1503,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(Equal([]byte("access-key")))
 			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(Equal([]byte("secret-key")))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Object Storage Secret - Minio external - explicitly configured keys", func() {
@@ -1479,6 +1526,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(Equal([]byte("access-key")))
 			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(Equal([]byte("secret-key")))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Object Storage Secret - AWS S3 - explicitly configured keys", func() {
@@ -1501,6 +1549,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(Equal([]byte("access-key")))
 			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(Equal([]byte("secret-key")))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Object Storage Secret - AWS S3 - IAM S3 access", func() {
@@ -1521,6 +1570,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(secret.Data["CNVRG_STORAGE_ACCESS_KEY"]).Should(BeEmpty())
 			Expect(secret.Data["CNVRG_STORAGE_SECRET_KEY"]).Should(BeEmpty())
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 	})
@@ -1544,6 +1594,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Cnvrg Router Annotations", func() {
@@ -1564,6 +1615,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo", "bar"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 		It("Cnvrg Router Tenancy", func() {
@@ -1593,6 +1645,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			Expect(deployment.Spec.Template.Spec.Tolerations).Should(ContainElement(t))
 			Expect(deployment.Spec.Template.Spec.NodeSelector).Should(HaveKeyWithValue("purpose", "cnvrg-control-plane"))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
 	})
@@ -1683,6 +1736,8 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 
 		})
 
@@ -1776,6 +1831,8 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 
 		})
 
@@ -1868,6 +1925,8 @@ var _ = Describe("CnvrgApp controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
+			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})
@@ -1917,6 +1976,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 		It("Proxy configmap test creation - custom no_proxy", func() {
 
@@ -1965,6 +2025,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(cm.Data).Should(HaveKeyWithValue("HTTPS_PROXY", "https://proxy1.org.local,https://proxy2.org.local"))
 			Expect(cm.Data).Should(HaveKeyWithValue("NO_PROXY", strings.Join(expectedNoProxy, ",")))
 			Expect(cm.Data).Should(HaveKeyWithValue("no_proxy", strings.Join(expectedNoProxy, ",")))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 		It("Proxy configmap test creation - proxy disabled", func() {
 
@@ -1994,7 +2055,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				}
 				return true
 			}, timeout, interval).Should(BeFalse())
-
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 	})
 
@@ -2052,6 +2113,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure redis creds wasn't mutated between reconciliation loops
 			Expect(promCreds.Data["CNVRG_PROMETHEUS_PASS"]).Should(Equal(promCredsAfterReconcile.Data["CNVRG_PROMETHEUS_PASS"]))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 		It("Prom upstream creds secret generator", func() {
@@ -2107,6 +2170,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			// Make sure redis creds wasn't mutated between reconciliation loops
 			Expect(promUpstreamCreds.Data).Should(Equal(promUpstreamCredsAfterReconcile.Data))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 
 	})

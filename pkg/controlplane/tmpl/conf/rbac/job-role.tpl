@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: cnvrg-control-plane
+  name: cnvrg-job
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -245,11 +245,3 @@ rules:
   -  "*"
   verbs:
   -  "*"
-- apiGroups:
-  - mlops.cnvrg.io
-  resources:
-  - "cnvrgclusterprovisioners"
-  verbs:
-  - get
-  - list
-  - watch

@@ -17,4 +17,4 @@ roleRef:
   name: cnvrg-control-plane
 subjects:
   - kind: ServiceAccount
-    name: cnvrg
+    name: cnvrg-control-plane

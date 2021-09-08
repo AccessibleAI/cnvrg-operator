@@ -30,6 +30,7 @@ data:
   CNVRG_PASSENGER_BIND_ADDRESS: "{{ cnvrgPassengerBindAddress . }}"
   CNVRG_PASSENGER_BIND_PORT: "{{ cnvrgPassengerBindPort . }}"
   CNVRG_JOB_UID: "{{ .Spec.ControlPlane.BaseConfig.CnvrgJobUID }}"
+  CNVRG_JOBS_SERVICE_ACCOUNT: "cnvrg-job"
   {{- if ne .Spec.ControlPlane.BaseConfig.JobsStorageClass "" }}
   CNVRG_JOBS_STORAGECLASS: "{{ .Spec.ControlPlane.BaseConfig.JobsStorageClass }}" # if is set, app's job will use this storageClass for notebooks/experiments
   {{- end }}

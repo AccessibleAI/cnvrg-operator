@@ -15,7 +15,7 @@ func rbacState() []*desired.State {
 	return []*desired.State{
 		{
 
-			TemplatePath:   path + "/conf/rbac/role.tpl",
+			TemplatePath:   path + "/conf/rbac/ccp-role.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -25,7 +25,7 @@ func rbacState() []*desired.State {
 		},
 		{
 
-			TemplatePath:   path + "/conf/rbac/rolebinding.tpl",
+			TemplatePath:   path + "/conf/rbac/ccp-rolebinding.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -35,7 +35,37 @@ func rbacState() []*desired.State {
 		},
 		{
 
-			TemplatePath:   path + "/conf/rbac/sa.tpl",
+			TemplatePath:   path + "/conf/rbac/ccp-sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/job-role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/job-rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/job-sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
