@@ -108,15 +108,15 @@ func proxyState() []*desired.State {
 func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && *cnvrgInfra.Spec.Networking.Istio.Enabled {
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Istio.Enabled {
 		state = append(state, istioInstanceState()...)
 	}
 
-	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && *cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {
 		state = append(state, ingressState()...)
 	}
 
-	if *cnvrgInfra.Spec.Networking.Proxy.Enabled {
+	if cnvrgInfra.Spec.Networking.Proxy.Enabled {
 		state = append(state, proxyState()...)
 	}
 
@@ -126,11 +126,11 @@ func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && *cnvrgApp.Spec.Networking.Ingress.IstioGwEnabled {
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgApp.Spec.Networking.Ingress.IstioGwEnabled {
 		state = append(state, ingressState()...)
 	}
 
-	if *cnvrgApp.Spec.Networking.Proxy.Enabled {
+	if cnvrgApp.Spec.Networking.Proxy.Enabled {
 		state = append(state, proxyState()...)
 	}
 

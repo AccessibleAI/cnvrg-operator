@@ -1,14 +1,14 @@
 package v1
 
 type PrometheusOperator struct {
-	Enabled                       *bool  `json:"enabled,omitempty"`
+	Enabled                       bool   `json:"enabled,omitempty"`
 	OperatorImage                 string `json:"operatorImage,omitempty"`
 	PrometheusConfigReloaderImage string `json:"prometheusConfigReloaderImage,omitempty"`
 	KubeRbacProxyImage            string `json:"kubeRbacProxyImage,omitempty"`
 }
 
 type Prometheus struct {
-	Enabled             *bool             `json:"enabled,omitempty"`
+	Enabled             bool              `json:"enabled,omitempty"`
 	Image               string            `json:"image,omitempty"`
 	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
 	Requests            Requests          `json:"requests,omitempty"`
@@ -24,19 +24,19 @@ type Prometheus struct {
 }
 
 type NodeExporter struct {
-	Enabled *bool             `json:"enabled,omitempty"`
+	Enabled bool              `json:"enabled,omitempty"`
 	Image   string            `json:"image,omitempty"`
 	Labels  map[string]string `json:"labels,omitempty"`
 }
 
 type KubeStateMetrics struct {
-	Enabled *bool             `json:"enabled,omitempty"`
+	Enabled bool              `json:"enabled,omitempty"`
 	Image   string            `json:"image,omitempty"`
 	Labels  map[string]string `json:"labels,omitempty"`
 }
 
 type Grafana struct {
-	Enabled    *bool                 `json:"enabled,omitempty"`
+	Enabled    bool                  `json:"enabled,omitempty"`
 	Image      string                `json:"image,omitempty"`
 	SvcName    string                `json:"svcName,omitempty"`
 	Port       int                   `json:"port,omitempty"`
@@ -45,17 +45,17 @@ type Grafana struct {
 }
 
 type DefaultServiceMonitors struct {
-	Enabled *bool             `json:"enabled,omitempty"`
+	Enabled bool              `json:"enabled,omitempty"`
 	Labels  map[string]string `json:"labels,omitempty"`
 }
 
 type DcgmExporter struct {
-	Enabled *bool  `json:"enabled,omitempty"`
+	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 
 type CnvrgIdleMetricsExporter struct {
-	Enabled *bool             `json:"enabled,omitempty"`
+	Enabled bool              `json:"enabled,omitempty"`
 	Labels  map[string]string `json:"labels,omitempty"`
 }
 
@@ -77,7 +77,7 @@ type CnvrgAppMonitoring struct {
 }
 
 var grafanaInfraDefault = Grafana{
-	Enabled:    &defaultFalse,
+	Enabled:    false,
 	Image:      "grafana:7.3.4",
 	SvcName:    "grafana",
 	Port:       8080,
@@ -86,7 +86,7 @@ var grafanaInfraDefault = Grafana{
 }
 
 var grafanaAppDefault = Grafana{
-	Enabled:    &defaultFalse,
+	Enabled:    false,
 	Image:      "grafana:7.3.4",
 	SvcName:    "grafana",
 	Port:       8080,
@@ -95,7 +95,7 @@ var grafanaAppDefault = Grafana{
 }
 
 var prometheusInfraDefault = Prometheus{
-	Enabled:             &defaultFalse,
+	Enabled:             false,
 	Image:               "prometheus:v2.22.1",
 	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
@@ -117,7 +117,7 @@ var prometheusInfraDefault = Prometheus{
 }
 
 var prometheusAppDefault = Prometheus{
-	Enabled:             &defaultFalse,
+	Enabled:             false,
 	Image:               "prometheus:v2.22.1",
 	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
@@ -142,7 +142,7 @@ var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 	Prometheus: prometheusAppDefault,
 	Grafana:    grafanaAppDefault,
 	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
-		Enabled: &defaultFalse,
+		Enabled: false,
 	},
 }
 
@@ -150,27 +150,27 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	Prometheus: prometheusInfraDefault,
 	Grafana:    grafanaInfraDefault,
 	PrometheusOperator: PrometheusOperator{
-		Enabled:                       &defaultFalse,
+		Enabled:                       false,
 		OperatorImage:                 "prometheus-operator:v0.44.1",
 		PrometheusConfigReloaderImage: "prometheus-config-reloader:v0.44.1",
 		KubeRbacProxyImage:            "kube-rbac-proxy:v0.8.0",
 	},
 	KubeStateMetrics: KubeStateMetrics{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		Image:   "kube-state-metrics:v1.9.7",
 	},
 	NodeExporter: NodeExporter{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		Image:   "node-exporter:v1.0.1",
 	},
 	DcgmExporter: DcgmExporter{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		Image:   "dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
-		Enabled: &defaultFalse,
+		Enabled: false,
 	},
 	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
-		Enabled: &defaultFalse,
+		Enabled: false,
 	},
 }

@@ -281,13 +281,13 @@ func kibanaOauthProxy() []*desired.State {
 func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if *cnvrgApp.Spec.Logging.Elastalert.Enabled {
+	if cnvrgApp.Spec.Logging.Elastalert.Enabled {
 		state = append(state, elastAlert()...)
 	}
-	if *cnvrgApp.Spec.Logging.Kibana.Enabled {
+	if cnvrgApp.Spec.Logging.Kibana.Enabled {
 		state = append(state, kibana()...)
 
-		if *cnvrgApp.Spec.SSO.Enabled {
+		if cnvrgApp.Spec.SSO.Enabled {
 			state = append(state, kibanaOauthProxy()...)
 		}
 
@@ -308,7 +308,7 @@ func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 func InfraLoggingState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
 
-	if *infra.Spec.Logging.Fluentbit.Enabled {
+	if infra.Spec.Logging.Fluentbit.Enabled {
 		state = append(state, fluentbitState()...)
 	}
 

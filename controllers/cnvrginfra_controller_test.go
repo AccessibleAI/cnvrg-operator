@@ -24,7 +24,7 @@ import (
 var _ = Describe("CnvrgInfra controller", func() {
 
 	const (
-		timeout  = time.Second * 60
+		timeout  = time.Second * 30
 		interval = time.Millisecond * 250
 	)
 
@@ -34,7 +34,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -58,7 +58,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			infra.Spec.Monitoring.PrometheusOperator.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -80,7 +80,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.NodeExporter.Enabled = &defaultTrue
+			infra.Spec.Monitoring.NodeExporter.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -102,7 +102,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.KubeStateMetrics.Enabled = &defaultTrue
+			infra.Spec.Monitoring.KubeStateMetrics.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -124,8 +124,8 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Grafana.Enabled = &defaultTrue
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Grafana.Enabled = true
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -147,7 +147,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.DcgmExporter.Enabled = &defaultTrue
+			infra.Spec.Monitoring.DcgmExporter.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -167,7 +167,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			// create infra
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// get prom creds
@@ -189,7 +189,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
-			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = true
 			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -222,7 +222,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Storage.Hostpath.Enabled = &defaultTrue
+			infra.Spec.Storage.Hostpath.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -238,13 +238,13 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(ds.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(ds.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
 		})
-		FIt("Nfs provisioner Labels/Annotations", func() {
+		It("Nfs provisioner Labels/Annotations", func() {
 			ns := createNs()
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Storage.Nfs.Enabled = &defaultTrue
+			infra.Spec.Storage.Nfs.Enabled = true
 			infra.Spec.Storage.Nfs.Path = "/nfs-path"
 			infra.Spec.Storage.Nfs.Server = "nfs-server"
 			infra.Spec.InfraNamespace = ns
@@ -271,7 +271,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -292,7 +292,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
 			infra.Spec.Networking.Istio.IngressSvcAnnotations = map[string]string{"foo": "bar"}
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
@@ -314,7 +314,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
 			infra.Spec.Networking.Istio.LBSourceRanges = []string{"1.1.1.1/32", "2.2.2.2/24"}
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
@@ -340,7 +340,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			exIps := []string{"1.1.1.1", "2.2.2.2"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
 			infra.Spec.Networking.Istio.ExternalIP = exIps
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
@@ -366,7 +366,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			exPorts := []int{1111, 2222}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
 			infra.Spec.Networking.Istio.IngressSvcExtraPorts = exPorts
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
@@ -393,8 +393,8 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
-			infra.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
+			infra.Spec.Networking.Ingress.IstioGwEnabled = true
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
@@ -411,8 +411,8 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
-			infra.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			infra.Spec.Networking.Istio.Enabled = true
+			infra.Spec.Networking.Ingress.IstioGwEnabled = true
 			infra.Spec.Networking.Ingress.IstioGwName = "foo-bar"
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -448,8 +448,8 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Grafana.Enabled = &defaultTrue
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Grafana.Enabled = true
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			infra.Spec.Networking.Ingress.IstioGwName = "foo-bar"
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -499,8 +499,8 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Tenancy.Enabled = &defaultTrue
-			infra.Spec.Networking.Istio.Enabled = &defaultTrue
+			infra.Spec.Tenancy.Enabled = true
+			infra.Spec.Networking.Istio.Enabled = true
 			infra.Spec.InfraNamespace = ns
 
 			deployment := v1.Deployment{}
@@ -535,7 +535,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.ConfigReloader.Enabled = &defaultTrue
+			infra.Spec.ConfigReloader.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -561,7 +561,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			labels := map[string]string{"foo": "bar"}
 			annotations := map[string]string{"foo1": "bar1"}
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+			infra.Spec.Logging.Fluentbit.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			infra.Spec.Labels = labels
 			infra.Spec.Annotations = annotations
@@ -582,7 +582,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+			infra.Spec.Logging.Fluentbit.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			ds := v1.DaemonSet{}
@@ -622,7 +622,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+			infra.Spec.Logging.Fluentbit.Enabled = true
 			infra.Spec.Logging.Fluentbit.LogsMounts = map[string]string{"foobar": "/foo/bar"}
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -652,9 +652,9 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Logging.Fluentbit.Enabled = &defaultTrue
+			infra.Spec.Logging.Fluentbit.Enabled = true
 			infra.Spec.Logging.Fluentbit.NodeSelector = map[string]string{"foo": "bar"}
-			infra.Spec.Tenancy.Enabled = &defaultTrue
+			infra.Spec.Tenancy.Enabled = true
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			ds := v1.DaemonSet{}
@@ -679,7 +679,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			expectedNoProxy := networking.DefaultNoProxy()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
+			infra.Spec.Networking.Proxy.Enabled = true
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
@@ -725,7 +725,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			noProxy := []string{".foo.bar"}
 			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
+			infra.Spec.Networking.Proxy.Enabled = true
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
@@ -769,7 +769,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Networking.Proxy.Enabled = &defaultTrue
+			infra.Spec.Networking.Proxy.Enabled = true
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
@@ -825,7 +825,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				if err != nil {
 					return false
 				}
-				return infraRes.Spec.Networking.Proxy.Enabled != nil && *infraRes.Spec.Networking.Proxy.Enabled == false
+				return infraRes.Spec.Networking.Proxy.Enabled == false
 			}, timeout, interval).Should(BeTrue())
 
 			time.Sleep(3)
@@ -845,7 +845,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Dbs.Redis.Enabled = &defaultTrue
+			infra.Spec.Dbs.Redis.Enabled = true
 			// create app
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// get redis creds
@@ -867,7 +867,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
-			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = true
 			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -899,7 +899,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Capsule.Enabled = &defaultTrue
+			infra.Spec.Capsule.Enabled = true
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -917,7 +917,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Capsule.Enabled = &defaultTrue
+			infra.Spec.Capsule.Enabled = true
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 
 			pvc := corev1.PersistentVolumeClaim{}
@@ -937,7 +937,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Capsule.Enabled = &defaultTrue
+			infra.Spec.Capsule.Enabled = true
 			infra.Spec.Capsule.StorageSize = "20Gi"
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 
@@ -958,7 +958,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Capsule.Enabled = &defaultTrue
+			infra.Spec.Capsule.Enabled = true
 			infra.Spec.Capsule.StorageClass = "foo-bar"
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 

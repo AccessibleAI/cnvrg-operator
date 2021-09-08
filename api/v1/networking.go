@@ -13,7 +13,7 @@ const (
 )
 
 type Istio struct {
-	Enabled               *bool             `json:"enabled,omitempty"`
+	Enabled               bool              `json:"enabled,omitempty"`
 	OperatorImage         string            `json:"operatorImage,omitempty"`
 	PilotImage            string            `json:"pilotImage,omitempty"`
 	ProxyImage            string            `json:"proxyImage,omitempty"`
@@ -28,12 +28,12 @@ type Ingress struct {
 	Timeout         string      `json:"timeout,omitempty"`
 	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
-	IstioGwEnabled  *bool       `json:"istioGwEnabled,omitempty"`
+	IstioGwEnabled  bool        `json:"istioGwEnabled,omitempty"`
 	IstioGwName     string      `json:"istioGwName,omitempty"`
 }
 
 type HTTPS struct {
-	Enabled    *bool  `json:"enabled,omitempty"`
+	Enabled    bool   `json:"enabled,omitempty"`
 	Cert       string `json:"cert,omitempty"`
 	Key        string `json:"key,omitempty"`
 	CertSecret string `json:"certSecret,omitempty"`
@@ -53,7 +53,7 @@ type CnvrgInfraNetworking struct {
 }
 
 type Proxy struct {
-	Enabled    *bool    `json:"enabled,omitempty"`
+	Enabled    bool     `json:"enabled,omitempty"`
 	ConfigRef  string   `json:"configRef,omitempty"`
 	HttpProxy  []string `json:"httpProxy,omitempty"`
 	HttpsProxy []string `json:"httpsProxy,omitempty"`
@@ -61,7 +61,7 @@ type Proxy struct {
 }
 
 var defaultInfraProxy = Proxy{
-	Enabled:    &defaultFalse,
+	Enabled:    false,
 	ConfigRef:  "infra-proxy",
 	HttpProxy:  nil,
 	HttpsProxy: nil,
@@ -69,7 +69,7 @@ var defaultInfraProxy = Proxy{
 }
 
 var defaultAppProxy = Proxy{
-	Enabled:    &defaultFalse,
+	Enabled:    false,
 	ConfigRef:  "cp-proxy",
 	HttpProxy:  nil,
 	HttpsProxy: nil,
@@ -77,7 +77,7 @@ var defaultAppProxy = Proxy{
 }
 
 var istioDefault = Istio{
-	Enabled:               &defaultFalse,
+	Enabled:               false,
 	OperatorImage:         "istio-operator:1.10.2",
 	PilotImage:            "pilot:1.10.2",
 	ProxyImage:            "proxyv2:1.10.2",
@@ -88,7 +88,7 @@ var istioDefault = Istio{
 }
 
 var httpsDefault = HTTPS{
-	Enabled:    &defaultFalse,
+	Enabled:    false,
 	Cert:       "",
 	Key:        "",
 	CertSecret: "",
@@ -99,7 +99,7 @@ var ingressAppDefault = Ingress{
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
-	IstioGwEnabled:  &defaultFalse,
+	IstioGwEnabled:  false,
 	IstioGwName:     "",
 }
 
@@ -108,7 +108,7 @@ var ingressInfraDefault = Ingress{
 	Timeout:         "18000s",
 	RetriesAttempts: 5,
 	PerTryTimeout:   "3600s",
-	IstioGwEnabled:  &defaultFalse,
+	IstioGwEnabled:  false,
 	IstioGwName:     "",
 }
 

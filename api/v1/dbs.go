@@ -1,13 +1,13 @@
 package v1
 
 type HugePages struct {
-	Enabled *bool  `json:"enabled,omitempty"`
+	Enabled bool   `json:"enabled,omitempty"`
 	Size    string `json:"size,omitempty"`
 	Memory  string `json:"memory,omitempty"`
 }
 
 type Pg struct {
-	Enabled            *bool             `json:"enabled,omitempty"`
+	Enabled            bool              `json:"enabled,omitempty"`
 	ServiceAccount     string            `json:"serviceAccount,omitempty"`
 	Image              string            `json:"image,omitempty"`
 	Port               int               `json:"port,omitempty"`
@@ -27,7 +27,7 @@ type Pg struct {
 }
 
 type Minio struct {
-	Enabled        *bool             `json:"enabled,omitempty"`
+	Enabled        bool              `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Replicas       int               `json:"replicas,omitempty"`
 	Image          string            `json:"image,omitempty"`
@@ -44,7 +44,7 @@ type Minio struct {
 }
 
 type Redis struct {
-	Enabled        *bool             `json:"enabled,omitempty"`
+	Enabled        bool              `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	SvcName        string            `json:"svcName,omitempty"`
@@ -60,7 +60,7 @@ type Redis struct {
 }
 
 type Es struct {
-	Enabled        *bool             `json:"enabled,omitempty"`
+	Enabled        bool              `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
@@ -71,7 +71,7 @@ type Es struct {
 	Requests       Requests          `json:"requests,omitempty"`
 	Limits         Limits            `json:"limits,omitempty"`
 	JavaOpts       string            `json:"javaOpts,omitempty"`
-	PatchEsNodes   *bool             `json:"patchEsNodes,omitempty"`
+	PatchEsNodes   bool              `json:"patchEsNodes,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
@@ -89,7 +89,7 @@ type InfraDbs struct {
 }
 
 var minioDefaults = Minio{
-	Enabled:        &defaultFalse,
+	Enabled:        false,
 	ServiceAccount: "minio",
 	Replicas:       1,
 	Image:          "minio:RELEASE.2021-05-22T02-34-39Z",
@@ -108,7 +108,7 @@ var minioDefaults = Minio{
 	},
 	PvcName: "minio-storage",
 	SharedStorage: SharedStorage{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		ConsistentHash: ConsistentHash{
 			Key:   "httpQueryParameterName",
 			Value: "uploadId",
@@ -117,7 +117,7 @@ var minioDefaults = Minio{
 }
 
 var pgDefault = Pg{
-	Enabled:        &defaultFalse,
+	Enabled:        false,
 	ServiceAccount: "pg",
 	Image:          "postgresql-12-centos7:latest",
 	Port:           5432,
@@ -138,13 +138,13 @@ var pgDefault = Pg{
 	NodeSelector:       nil,
 	PvcName:            "pg-storage",
 	HugePages: HugePages{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		Size:    "2Mi", // 2Mi/1Gi https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-hugepages/ ,  https://wiki.debian.org/Hugepages#Huge_pages_sizes
 		Memory:  "",
 	},
 	CredsRef: "pg-creds",
 	Backup: Backup{
-		Enabled:   &defaultFalse,
+		Enabled:   false,
 		BucketRef: "cp-object-storage",
 		CredsRef:  "pg-creds",
 		Rotation:  5,
@@ -153,7 +153,7 @@ var pgDefault = Pg{
 }
 
 var redisDefault = Redis{
-	Enabled:        &defaultFalse,
+	Enabled:        false,
 	ServiceAccount: "redis",
 	Image:          "cnvrg-redis:v3.0.5.c2",
 	SvcName:        "redis",
@@ -174,7 +174,7 @@ var redisDefault = Redis{
 }
 
 var esDefault = Es{
-	Enabled:        &defaultFalse,
+	Enabled:        false,
 	ServiceAccount: "es",
 	Image:          "cnvrg-es:v7.8.1.a1",
 	Port:           9200,
@@ -191,7 +191,7 @@ var esDefault = Es{
 		Memory: "8Gi",
 	},
 	JavaOpts:     "",
-	PatchEsNodes: &defaultFalse,
+	PatchEsNodes: false,
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
 }

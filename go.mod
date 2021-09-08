@@ -16,8 +16,8 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/copystructure v1.1.1 // indirect
-	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.14.0
+	github.com/onsi/ginkgo v1.14.1
+	github.com/onsi/gomega v1.10.2
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.0
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125

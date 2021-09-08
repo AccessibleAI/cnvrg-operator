@@ -164,7 +164,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// redis
-	if *cnvrgInfra.Spec.Dbs.Redis.Enabled || *cnvrgInfra.Spec.SSO.Enabled {
+	if cnvrgInfra.Spec.Dbs.Redis.Enabled || cnvrgInfra.Spec.SSO.Enabled {
 		redisSecretData := desired.TemplateData{
 			Data: map[string]interface{}{
 				"Namespace":   cnvrgInfra.Spec.InfraNamespace,
@@ -232,7 +232,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// nvidia device plugin
-	if *cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled {
+	if cnvrgInfra.Spec.Gpu.NvidiaDp.Enabled {
 		infraLog.Info("nvidia device plugin")
 		nvidiaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
@@ -301,7 +301,7 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 
 func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInfra) error {
 
-	if *infra.Spec.Monitoring.Prometheus.Enabled {
+	if infra.Spec.Monitoring.Prometheus.Enabled {
 		user := "cnvrg"
 		pass := desired.RandomString()
 		passHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
@@ -328,7 +328,7 @@ func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInf
 		}
 	}
 
-	if *infra.Spec.Monitoring.Grafana.Enabled {
+	if infra.Spec.Monitoring.Grafana.Enabled {
 		// grafana dashboards
 		infraLog.Info("applying grafana dashboards")
 		if err := r.createGrafanaDashboards(infra); err != nil {
@@ -361,7 +361,7 @@ func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInf
 
 func (r *CnvrgInfraReconciler) createGrafanaDashboards(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
-	if !*cnvrgInfra.Spec.Monitoring.Grafana.Enabled {
+	if !cnvrgInfra.Spec.Monitoring.Grafana.Enabled {
 		infraLog.Info("grafana disabled, skipping grafana deployment")
 		return nil
 	}
@@ -422,7 +422,7 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	calculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec)
 
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
-	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride); err != nil {
+	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride, mergo.WithTransformers(cnvrgSpecBoolTransformer{})); err != nil {
 		infraLog.Error(err, "can't merge")
 		return false, err
 	}
@@ -671,30 +671,4 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return cnvrgInfraController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
 		Complete(r)
-}
-
-func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec) {
-
-	if infra.Spec.Networking.Ingress.IstioGwName == "" {
-		desiredInfraSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, infra.Spec.InfraNamespace)
-	}
-
-	// if proxy.enabled wasn't set in spec, make sure explicitly set it before initiating noProxy values
-	if infra.Spec.Networking.Proxy.Enabled == nil {
-		infra.Spec.Networking.Proxy.Enabled = desiredInfraSpec.Networking.Proxy.Enabled
-	}
-
-	if *infra.Spec.Networking.Proxy.Enabled {
-		desiredInfraSpec.Networking.Proxy.NoProxy = infra.Spec.Networking.Proxy.NoProxy
-		for _, defaultNoProxy := range networking.DefaultNoProxy() {
-			if !containsString(desiredInfraSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
-				desiredInfraSpec.Networking.Proxy.NoProxy = append(desiredInfraSpec.Networking.Proxy.NoProxy, defaultNoProxy)
-			}
-		}
-		sort.Strings(desiredInfraSpec.Networking.Proxy.NoProxy)
-		sort.Strings(infra.Spec.Networking.Proxy.NoProxy)
-		if !reflect.DeepEqual(desiredInfraSpec.Networking.Proxy.NoProxy, infra.Spec.Networking.Proxy.NoProxy) {
-			infra.Spec.Networking.Proxy.NoProxy = nil
-		}
-	}
 }

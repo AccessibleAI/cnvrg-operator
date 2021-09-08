@@ -22,8 +22,6 @@ import (
 	"time"
 )
 
-var defaultTrue = true
-
 // +kubebuilder:docs-gen:collapse=Imports
 
 var _ = Describe("CnvrgApp controller", func() {
@@ -39,7 +37,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
 			testApp.Spec.Labels = labels
 
 			deployment := v1.Deployment{}
@@ -58,7 +56,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -77,8 +75,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -120,8 +118,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = true
 			testApp.Spec.Dbs.Pg.HugePages.Size = "1Gi"
 			testApp.Spec.Dbs.Pg.HugePages.Memory = "2Gi"
 
@@ -165,7 +163,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -202,8 +200,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = true
 			testApp.Spec.Dbs.Pg.NodeSelector = map[string]string{"foo": "bar"}
 
 			deployment := v1.Deployment{}
@@ -224,10 +222,10 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Pg.HugePages.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
+			testApp.Spec.Dbs.Pg.HugePages.Enabled = true
 			testApp.Spec.Dbs.Pg.NodeSelector = map[string]string{"foo": "bar"}
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -255,7 +253,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Pg.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Pg.Enabled = true
 			// create app
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			// get pg creds
@@ -277,7 +275,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := appRes.ObjectMeta.ResourceVersion
-			appRes.Spec.Dbs.Es.Enabled = &defaultTrue
+			appRes.Spec.Dbs.Es.Enabled = true
 			Expect(k8sClient.Update(ctx, &appRes)).Should(Succeed())
 			sts := v1.StatefulSet{}
 			Eventually(func() bool {
@@ -310,7 +308,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.Enabled = true
 			testApp.Spec.Labels = labels
 
 			deployment := v1.Deployment{}
@@ -329,7 +327,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -348,7 +346,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.Enabled = true
 			testApp.Spec.Dbs.Redis.NodeSelector = map[string]string{"foo": "bar"}
 
 			deployment := v1.Deployment{}
@@ -369,9 +367,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.Enabled = true
 			testApp.Spec.Dbs.Redis.NodeSelector = map[string]string{"foo": "bar"}
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -399,7 +397,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Redis.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Redis.Enabled = true
 			// create app
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			// get pg creds
@@ -421,7 +419,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := appRes.ObjectMeta.ResourceVersion
-			appRes.Spec.Dbs.Es.Enabled = &defaultTrue
+			appRes.Spec.Dbs.Es.Enabled = true
 			Expect(k8sClient.Update(ctx, &appRes)).Should(Succeed())
 			sts := v1.StatefulSet{}
 			Eventually(func() bool {
@@ -454,7 +452,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.Enabled = true
 			testApp.Spec.Labels = labels
 
 			deployment := v1.Deployment{}
@@ -473,7 +471,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -492,7 +490,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.Enabled = true
 			testApp.Spec.Dbs.Minio.NodeSelector = map[string]string{"foo": "bar"}
 
 			deployment := v1.Deployment{}
@@ -513,9 +511,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.Enabled = true
 			testApp.Spec.Dbs.Minio.NodeSelector = map[string]string{"foo": "bar"}
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -548,7 +546,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			testApp.Spec.Labels = labels
 
 			sts := v1.StatefulSet{}
@@ -567,7 +565,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			sts := v1.StatefulSet{}
@@ -586,7 +584,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			testApp.Spec.Dbs.Es.NodeSelector = map[string]string{"foo": "bar"}
 
 			sts := v1.StatefulSet{}
@@ -607,9 +605,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			testApp.Spec.Dbs.Es.NodeSelector = map[string]string{"foo": "bar"}
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.Tenancy.Enabled = true
 
 			sts := v1.StatefulSet{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -638,7 +636,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Dbs.Es.Requests.Memory = "4Gi"
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			sts := v1.StatefulSet{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			Eventually(func() bool {
@@ -656,7 +654,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Dbs.Es.Requests.Memory = "5Gi"
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			sts := v1.StatefulSet{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			Eventually(func() bool {
@@ -674,7 +672,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Dbs.Es.Requests.Memory = "6Gi"
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			sts := v1.StatefulSet{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			Eventually(func() bool {
@@ -692,7 +690,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Dbs.Es.Requests.Memory = "6000Mi"
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			sts := v1.StatefulSet{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			Eventually(func() bool {
@@ -710,7 +708,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Es.Enabled = true
 			// create infra
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// create app
@@ -735,7 +733,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := appRes.ObjectMeta.ResourceVersion
-			appRes.Spec.Dbs.Pg.Enabled = &defaultTrue
+			appRes.Spec.Dbs.Pg.Enabled = true
 			Expect(k8sClient.Update(ctx, &appRes)).Should(Succeed())
 			deployment := v1.Deployment{}
 			Eventually(func() bool {
@@ -769,7 +767,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
 			testApp.Spec.Labels = labels
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -787,7 +785,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -806,8 +804,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -836,8 +834,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Split = true
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = true
 			testApp.Spec.Labels = labels
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -855,8 +853,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Split = true
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -875,9 +873,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Split = true
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = true
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -906,7 +904,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Hyper.Enabled = true
 			testApp.Spec.Labels = labels
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -924,7 +922,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Hyper.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -943,8 +941,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Hyper.Enabled = true
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -973,7 +971,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Hyper.Enabled = true
 			testApp.Spec.Labels = labels
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -991,7 +989,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			annotations := map[string]string{"foo1": "bar1"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Hyper.Enabled = true
 			testApp.Spec.Annotations = annotations
 
 			deployment := v1.Deployment{}
@@ -1010,8 +1008,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Hyper.Enabled = &defaultTrue
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.Hyper.Enabled = true
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -1040,7 +1038,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
 			testApp.Spec.ControlPlane.Image = "app:1.2.3"
 
 			dep := v1.Deployment{}
@@ -1064,7 +1062,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
 			testApp.Spec.ImageHub = "foo/bar"
 			testApp.Spec.ControlPlane.Image = "app:1.2.3"
 
@@ -1088,8 +1086,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-			testApp.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			testApp.Spec.ControlPlane.Sidekiq.Enabled = true
+			testApp.Spec.ControlPlane.Sidekiq.Split = true
 			testApp.Spec.ImageHub = "foo/bar"
 
 			deployment := v1.Deployment{}
@@ -1112,7 +1110,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
 			testApp.Spec.ImageHub = "foo/bar"
 			testApp.Spec.ControlPlane.Image = "foo/app:1.2.3"
 
@@ -1138,7 +1136,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Labels = map[string]string{"foo": "bar", "foo1": "bar1"}
 			testApp.Spec.Annotations = map[string]string{"foo1": "bar1"}
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
 
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 
@@ -1162,8 +1160,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
-			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
+			app.Spec.ControlPlane.WebApp.Enabled = true
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -1185,9 +1183,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Split = true
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -1209,9 +1207,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Searchkiq.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
+			app.Spec.ControlPlane.Searchkiq.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Split = true
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -1233,9 +1231,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Systemkiq.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
+			app.Spec.ControlPlane.Systemkiq.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Split = true
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -1257,8 +1255,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
-			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
+			app.Spec.ControlPlane.WebApp.Enabled = true
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			cm := corev1.ConfigMap{}
@@ -1277,7 +1275,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			app.Spec.ControlPlane.WebApp.Enabled = true
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			cm := corev1.ConfigMap{}
@@ -1296,7 +1294,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
+			app.Spec.ControlPlane.WebApp.Enabled = true
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			hpa := v2beta1.HorizontalPodAutoscaler{}
@@ -1313,8 +1311,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-			app.Spec.ControlPlane.WebApp.Hpa.Enabled = &defaultTrue
+			app.Spec.ControlPlane.WebApp.Enabled = true
+			app.Spec.ControlPlane.WebApp.Hpa.Enabled = true
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			hpa := v2beta1.HorizontalPodAutoscaler{}
@@ -1333,9 +1331,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.ControlPlane.Sidekiq.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Hpa.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Sidekiq.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Split = true
+			app.Spec.ControlPlane.Sidekiq.Hpa.Enabled = true
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
 			hpa := v2beta1.HorizontalPodAutoscaler{}
@@ -1354,9 +1352,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.ControlPlane.Searchkiq.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-			app.Spec.ControlPlane.Searchkiq.Hpa.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Searchkiq.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Split = true
+			app.Spec.ControlPlane.Searchkiq.Hpa.Enabled = true
 			app.Spec.ControlPlane.Searchkiq.Hpa.MaxReplicas = 10
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
@@ -1376,9 +1374,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.ControlPlane.Systemkiq.Enabled = &defaultTrue
-			app.Spec.ControlPlane.Sidekiq.Split = &defaultTrue
-			app.Spec.ControlPlane.Systemkiq.Hpa.Enabled = &defaultTrue
+			app.Spec.ControlPlane.Systemkiq.Enabled = true
+			app.Spec.ControlPlane.Sidekiq.Split = true
+			app.Spec.ControlPlane.Systemkiq.Hpa.Enabled = true
 			app.Spec.ControlPlane.Systemkiq.Hpa.Utilization = 90
 
 			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
@@ -1421,7 +1419,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.Enabled = true
 			testApp.Spec.ControlPlane.ObjectStorage.Type = "minio"
 
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -1442,7 +1440,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Dbs.Minio.Enabled = &defaultTrue
+			testApp.Spec.Dbs.Minio.Enabled = true
 			testApp.Spec.ControlPlane.ObjectStorage.Type = "minio"
 			testApp.Spec.ControlPlane.ObjectStorage.AccessKey = "access-key"
 			testApp.Spec.ControlPlane.ObjectStorage.SecretKey = "secret-key"
@@ -1533,7 +1531,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = true
 			testApp.Spec.Labels = labels
 
 			deployment := v1.Deployment{}
@@ -1553,7 +1551,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			labels := map[string]string{"foo": "bar"}
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = true
 			testApp.Spec.Annotations = labels
 
 			deployment := v1.Deployment{}
@@ -1573,8 +1571,8 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
-			testApp.Spec.Tenancy.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = true
+			testApp.Spec.Tenancy.Enabled = true
 
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
@@ -1606,16 +1604,16 @@ var _ = Describe("CnvrgApp controller", func() {
 			gwName := fmt.Sprintf(mlopsv1.IstioGwName, ns)
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
-			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-			testApp.Spec.Logging.Kibana.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
-			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+			testApp.Spec.Networking.Ingress.IstioGwEnabled = true
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = true
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
+			testApp.Spec.Logging.Kibana.Enabled = true
+			testApp.Spec.Dbs.Es.Enabled = true
+			testApp.Spec.Monitoring.Prometheus.Enabled = true
+			testApp.Spec.Monitoring.Grafana.Enabled = true
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
@@ -1694,17 +1692,17 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 
 			testApp := getDefaultTestAppSpec(ns)
-			testApp.Spec.Networking.Ingress.IstioGwEnabled = &defaultTrue
+			testApp.Spec.Networking.Ingress.IstioGwEnabled = true
 			testApp.Spec.Networking.Ingress.IstioGwName = gwName
-			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-			testApp.Spec.Logging.Kibana.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
-			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = true
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
+			testApp.Spec.Logging.Kibana.Enabled = true
+			testApp.Spec.Dbs.Es.Enabled = true
+			testApp.Spec.Monitoring.Prometheus.Enabled = true
+			testApp.Spec.Monitoring.Grafana.Enabled = true
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			infra.Spec.Networking.Ingress.Type = mlopsv1.NginxIngress
 
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -1788,15 +1786,15 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			testApp := getDefaultTestAppSpec(ns)
 			testApp.Spec.Networking.Ingress.IstioGwName = gwName
-			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = &defaultTrue
-			testApp.Spec.ControlPlane.WebApp.Enabled = &defaultTrue
-			testApp.Spec.Logging.Kibana.Enabled = &defaultTrue
-			testApp.Spec.Dbs.Es.Enabled = &defaultTrue
-			testApp.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
-			testApp.Spec.Monitoring.Grafana.Enabled = &defaultTrue
+			testApp.Spec.ControlPlane.CnvrgRouter.Enabled = true
+			testApp.Spec.ControlPlane.WebApp.Enabled = true
+			testApp.Spec.Logging.Kibana.Enabled = true
+			testApp.Spec.Dbs.Es.Enabled = true
+			testApp.Spec.Monitoring.Prometheus.Enabled = true
+			testApp.Spec.Monitoring.Grafana.Enabled = true
 
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			infra.Spec.Networking.Ingress.Type = mlopsv1.NginxIngress
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 
@@ -1881,7 +1879,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			expectedNoProxy := networking.DefaultNoProxy()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
 			app.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
@@ -1929,7 +1927,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			app := getDefaultTestAppSpec(ns)
 			cm := corev1.ConfigMap{}
 
-			app.Spec.Networking.Proxy.Enabled = &defaultTrue
+			app.Spec.Networking.Proxy.Enabled = true
 			app.Spec.Networking.Proxy.HttpProxy = []string{
 				"http://proxy1.org.local",
 				"http://proxy2.org.local",
@@ -1982,7 +1980,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				if err != nil {
 					return false
 				}
-				return appRes.Spec.Networking.Proxy.Enabled != nil && *appRes.Spec.Networking.Proxy.Enabled == false
+				return appRes.Spec.Networking.Proxy.Enabled == false
 			}, timeout, interval).Should(BeTrue())
 
 			cm := corev1.ConfigMap{}
@@ -2005,9 +2003,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			app.Spec.Monitoring.Prometheus.Enabled = true
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			// create infra
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// create app
@@ -2031,7 +2029,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
-			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = true
 			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {
@@ -2060,9 +2058,9 @@ var _ = Describe("CnvrgApp controller", func() {
 			ns := createNs()
 			ctx := context.Background()
 			app := getDefaultTestAppSpec(ns)
-			app.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			app.Spec.Monitoring.Prometheus.Enabled = true
 			infra := getDefaultTestInfraSpec(ns)
-			infra.Spec.Monitoring.Prometheus.Enabled = &defaultTrue
+			infra.Spec.Monitoring.Prometheus.Enabled = true
 			// create infra
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			// create app
@@ -2086,7 +2084,7 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 			rvBeforeUpdate := infraRes.ObjectMeta.ResourceVersion
-			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = &defaultTrue
+			infraRes.Spec.Monitoring.PrometheusOperator.Enabled = true
 			Expect(k8sClient.Update(ctx, &infraRes)).Should(Succeed())
 			dep := v1.Deployment{}
 			Eventually(func() bool {

@@ -35,7 +35,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -189,7 +188,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	readyState := make(map[string]bool)
 
 	// check webapp status
-	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
+	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -199,7 +198,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check sidekiq status
-	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled {
 		name := types.NamespacedName{Name: "sidekiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -209,7 +208,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check searchkiq status
-	if *cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled {
+	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled {
 		name := types.NamespacedName{Name: "searchkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -219,7 +218,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check systemkiq status
-	if *cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled {
+	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled {
 		name := types.NamespacedName{Name: "systemkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -229,7 +228,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check postgres status
-	if *cnvrgApp.Spec.Dbs.Pg.Enabled {
+	if cnvrgApp.Spec.Dbs.Pg.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Pg.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -239,7 +238,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check minio status
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled {
+	if cnvrgApp.Spec.Dbs.Minio.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Minio.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -249,7 +248,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check redis status
-	if *cnvrgApp.Spec.Dbs.Redis.Enabled {
+	if cnvrgApp.Spec.Dbs.Redis.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Redis.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -259,7 +258,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check es status
-	if *cnvrgApp.Spec.Dbs.Es.Enabled {
+	if cnvrgApp.Spec.Dbs.Es.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Es.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckStatefulSetReadiness(name)
 		if err != nil {
@@ -276,7 +275,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	}
 
 	// check kibana status
-	if *cnvrgApp.Spec.Logging.Kibana.Enabled {
+	if cnvrgApp.Spec.Logging.Kibana.Enabled {
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Kibana.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
@@ -362,7 +361,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 
-	if *app.Spec.Logging.Kibana.Enabled {
+	if app.Spec.Logging.Kibana.Enabled {
 		appLog.Info("applying logging")
 		kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
 		if err != nil {
@@ -387,7 +386,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 	// dbs
 	appLog.Info("applying dbs")
 
-	if *app.Spec.Dbs.Es.Enabled {
+	if app.Spec.Dbs.Es.Enabled {
 		esSecretData := desired.TemplateData{
 			Data: map[string]interface{}{
 				"Namespace":   app.Namespace,
@@ -404,7 +403,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		}
 	}
 
-	if *app.Spec.Dbs.Pg.Enabled {
+	if app.Spec.Dbs.Pg.Enabled {
 		pgSecretData := desired.TemplateData{
 			Data: map[string]interface{}{
 				"Namespace":          app.Namespace,
@@ -424,7 +423,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		}
 	}
 
-	if *app.Spec.Dbs.Redis.Enabled {
+	if app.Spec.Dbs.Redis.Enabled {
 		redisSecretData := desired.TemplateData{
 			Data: map[string]interface{}{
 				"Namespace":   app.Namespace,
@@ -450,7 +449,7 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 
-	if *app.Spec.Dbs.Pg.Enabled { // pg backups
+	if app.Spec.Dbs.Pg.Enabled { // pg backups
 		pgPvc := v1core.PersistentVolumeClaim{}
 		pgPvcName := types.NamespacedName{Namespace: app.Namespace, Name: app.Spec.Dbs.Pg.PvcName}
 		if err := r.Get(context.Background(), pgPvcName, &pgPvc); err != nil {
@@ -483,7 +482,7 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 
 func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) error {
 
-	if *app.Spec.Monitoring.Prometheus.Enabled {
+	if app.Spec.Monitoring.Prometheus.Enabled {
 		appLog.Info("applying monitoring")
 		user := "cnvrg"
 		pass := desired.RandomString()
@@ -517,7 +516,7 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 		}
 	}
 
-	if *app.Spec.Monitoring.Grafana.Enabled {
+	if app.Spec.Monitoring.Grafana.Enabled {
 		// grafana dashboards
 		appLog.Info("applying grafana dashboards ")
 		if err := r.createGrafanaDashboards(app); err != nil {
@@ -606,7 +605,7 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 		appLog.Error(err, "can't fetch es creds")
 		return nil, err
 	}
-	if *app.Spec.SSO.Enabled {
+	if app.Spec.SSO.Enabled {
 		kibanaHost = "127.0.0.1"
 		kibanaPort = "3000"
 	}
@@ -627,7 +626,7 @@ func (r *CnvrgAppReconciler) getKibanaConfigSecretData(app *mlopsv1.CnvrgApp) (*
 
 func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp) error {
 
-	if !*cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+	if !cnvrgApp.Spec.Monitoring.Grafana.Enabled {
 		appLog.Info("grafana disabled, skipping grafana deployment")
 		return nil
 	}
@@ -975,7 +974,7 @@ func (r *CnvrgAppReconciler) ApplyCapsuleAnnotations(b mlopsv1.Backup, pvc *v1co
 		pvc.Annotations = map[string]string{}
 	}
 	pvc.Annotations["capsule.mlops.cnvrg.io/backup"] = "false"
-	if *b.Enabled {
+	if b.Enabled {
 		pvc.Annotations["capsule.mlops.cnvrg.io/backup"] = "true"
 	}
 	pvc.Annotations["capsule.mlops.cnvrg.io/serviceType"] = serviceType
@@ -988,64 +987,4 @@ func (r *CnvrgAppReconciler) ApplyCapsuleAnnotations(b mlopsv1.Backup, pvc *v1co
 		return err
 	}
 	return nil
-}
-
-func containsString(slice []string, s string) bool {
-	for _, item := range slice {
-		if item == s {
-			return true
-		}
-	}
-	return false
-}
-
-func removeString(slice []string, s string) (result []string) {
-	for _, item := range slice {
-		if item == s {
-			continue
-		}
-		result = append(result, item)
-	}
-	return
-}
-
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec) {
-	// set default heap size for ES if not set by user
-	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
-		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
-		mem, err := strconv.Atoi(requestMem)
-		if err == nil {
-			heapMem := mem / 2
-			if heapMem > 0 {
-				desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
-			}
-		}
-	}
-
-	if app.Spec.Networking.Ingress.IstioGwName == "" {
-		desiredAppSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, app.Namespace)
-	}
-
-	// if proxy.enabled wasn't set in spec, make sure explicitly set it before initiating noProxy values
-	if app.Spec.Networking.Proxy.Enabled == nil {
-		app.Spec.Networking.Proxy.Enabled = desiredAppSpec.Networking.Proxy.Enabled
-	}
-
-	if *app.Spec.Networking.Proxy.Enabled {
-		desiredAppSpec.Networking.Proxy.NoProxy = app.Spec.Networking.Proxy.NoProxy
-		// make sure no_proxy includes all default values
-		for _, defaultNoProxy := range networking.DefaultNoProxy() {
-			if !containsString(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
-				desiredAppSpec.Networking.Proxy.NoProxy = append(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy)
-			}
-		}
-		// sort slices before compare
-		sort.Strings(desiredAppSpec.Networking.Proxy.NoProxy)
-		sort.Strings(app.Spec.Networking.Proxy.NoProxy)
-		// if slice are not equal, use desiredAppSpec no_proxy
-		if !reflect.DeepEqual(desiredAppSpec.Networking.Proxy.NoProxy, app.Spec.Networking.Proxy.NoProxy) {
-			app.Spec.Networking.Proxy.NoProxy = nil
-		}
-	}
-
 }

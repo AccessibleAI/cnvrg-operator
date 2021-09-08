@@ -24,7 +24,7 @@ func reloaderState() []*desired.State {
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if *cnvrgInfra.Spec.ConfigReloader.Enabled {
+	if cnvrgInfra.Spec.ConfigReloader.Enabled {
 		state = append(state, reloaderState()...)
 	}
 	return state

@@ -504,10 +504,10 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	state = append(state, rbacState()...)
 	state = append(state, controlPlaneConfigState()...)
 
-	if *cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
+	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
 		state = append(state, webAppState()...)
 
-		if *cnvrgApp.Spec.ControlPlane.WebApp.Hpa.Enabled {
+		if cnvrgApp.Spec.ControlPlane.WebApp.Hpa.Enabled {
 			state = append(state, webAppHpaState()...)
 		}
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
@@ -521,47 +521,47 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		}
 	}
 
-	if *cnvrgApp.Spec.SSO.Enabled {
+	if cnvrgApp.Spec.SSO.Enabled {
 		state = append(state, ssoState()...)
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, sidekiqState()...)
 
-		if *cnvrgApp.Spec.ControlPlane.Sidekiq.Hpa.Enabled {
+		if cnvrgApp.Spec.ControlPlane.Sidekiq.Hpa.Enabled {
 			state = append(state, sidekiqHpaState()...)
 		}
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
+	if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled && cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, searchkiqState()...)
 
-		if *cnvrgApp.Spec.ControlPlane.Searchkiq.Hpa.Enabled {
+		if cnvrgApp.Spec.ControlPlane.Searchkiq.Hpa.Enabled {
 			state = append(state, searchkiqHpaState()...)
 		}
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled && *cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
+	if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled && cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, systemkiqState()...)
 
-		if *cnvrgApp.Spec.ControlPlane.Systemkiq.Hpa.Enabled {
+		if cnvrgApp.Spec.ControlPlane.Systemkiq.Hpa.Enabled {
 			state = append(state, systemkiqHpaState()...)
 		}
 	}
 
 	// if split stet to false -> all queues executed by sidekiq instance
-	if *cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && !*cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
+	if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled && !cnvrgApp.Spec.ControlPlane.Sidekiq.Split {
 		state = append(state, sidekiqState()...)
-		if *cnvrgApp.Spec.ControlPlane.Sidekiq.Hpa.Enabled {
+		if cnvrgApp.Spec.ControlPlane.Sidekiq.Hpa.Enabled {
 			state = append(state, systemkiqHpaState()...)
 		}
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.Hyper.Enabled {
+	if cnvrgApp.Spec.ControlPlane.Hyper.Enabled {
 		state = append(state, hyperState()...)
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.CnvrgRouter.Enabled {
+	if cnvrgApp.Spec.ControlPlane.CnvrgRouter.Enabled {
 		state = append(state, cnvrgRouter()...)
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
 			state = append(state, cnvrgRouterIstioVs()...)
@@ -574,7 +574,7 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		}
 	}
 
-	if *cnvrgApp.Spec.ControlPlane.Mpi.Enabled {
+	if cnvrgApp.Spec.ControlPlane.Mpi.Enabled {
 		state = append(state, mpiAppState()...)
 	}
 	return state

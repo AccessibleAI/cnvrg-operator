@@ -19,6 +19,7 @@ package controllers
 import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -27,7 +28,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"strings"
@@ -45,8 +45,8 @@ var useExistingCluster = false
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
-	//junitReporter := reporters.NewJUnitReporter("junit.xml")
-	RunSpecsWithDefaultAndCustomReporters(t, "Cnvrg Controller Suite", []Reporter{printer.NewlineReporter{}})
+	junitReporter := reporters.NewJUnitReporter("junit.xml")
+	RunSpecsWithDefaultAndCustomReporters(t, "Cnvrg Controller Suite", []Reporter{junitReporter})
 }
 
 var _ = BeforeSuite(func(done Done) {

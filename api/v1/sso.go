@@ -1,7 +1,7 @@
 package v1
 
 type SSO struct {
-	Enabled       *bool    `json:"enabled,omitempty"`
+	Enabled       bool     `json:"enabled,omitempty"`
 	Image         string   `json:"image,omitempty"`
 	AdminUser     string   `json:"adminUser,omitempty"`
 	Provider      string   `json:"provider,omitempty"`
@@ -18,7 +18,7 @@ type OauthProxyServiceConf struct {
 }
 
 var ssoDefault = SSO{
-	Enabled:       &defaultFalse,
+	Enabled:       false,
 	Image:         "cnvrg-oauth-proxy:v7.0.1.c8",
 	AdminUser:     "",
 	Provider:      "",

@@ -60,7 +60,7 @@ func capsuleState() []*desired.State {
 
 func State(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if *infra.Spec.Capsule.Enabled {
+	if infra.Spec.Capsule.Enabled {
 		state = append(state, capsuleState()...)
 	}
 	return state

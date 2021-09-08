@@ -461,22 +461,22 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
 	// pg
-	if *cnvrgApp.Spec.Dbs.Pg.Enabled {
+	if cnvrgApp.Spec.Dbs.Pg.Enabled {
 		state = append(state, pgState()...)
 	}
 
 	// redis
-	if *cnvrgApp.Spec.Dbs.Redis.Enabled {
+	if cnvrgApp.Spec.Dbs.Redis.Enabled {
 		state = append(state, redisState()...)
 	}
 
 	// minio
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled && *cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled {
+	if cnvrgApp.Spec.Dbs.Minio.Enabled && cnvrgApp.Spec.Dbs.Minio.SharedStorage.Enabled {
 		state = append(state, sharedBackendMinio()...)
-	} else if *cnvrgApp.Spec.Dbs.Minio.Enabled {
+	} else if cnvrgApp.Spec.Dbs.Minio.Enabled {
 		state = append(state, singleBackendMinio()...)
 	}
-	if *cnvrgApp.Spec.Dbs.Minio.Enabled {
+	if cnvrgApp.Spec.Dbs.Minio.Enabled {
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
 			state = append(state, minioIstioVs()...)
@@ -488,7 +488,7 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	}
 
 	// elasticsearch
-	if *cnvrgApp.Spec.Dbs.Es.Enabled {
+	if cnvrgApp.Spec.Dbs.Es.Enabled {
 		state = append(state, esState()...)
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
@@ -505,7 +505,7 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 func InfraDbsState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if *infra.Spec.Dbs.Redis.Enabled {
+	if infra.Spec.Dbs.Redis.Enabled {
 		state = append(state, redisState()...)
 	}
 	return state

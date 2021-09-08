@@ -139,10 +139,10 @@ func nfsClientState() []*desired.State {
 
 func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
-	if *cnvrgInfra.Spec.Storage.Hostpath.Enabled {
+	if cnvrgInfra.Spec.Storage.Hostpath.Enabled {
 		state = append(state, hostPathState()...)
 	}
-	if *cnvrgInfra.Spec.Storage.Nfs.Enabled {
+	if cnvrgInfra.Spec.Storage.Nfs.Enabled {
 		state = append(state, nfsClientState()...)
 	}
 	return state

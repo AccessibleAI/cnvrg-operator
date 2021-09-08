@@ -8,7 +8,7 @@ type AppInstance struct {
 }
 
 type Fluentbit struct {
-	Enabled      *bool             `json:"enabled,omitempty"`
+	Enabled      bool              `json:"enabled,omitempty"`
 	Image        string            `json:"image,omitempty"`
 	Requests     Requests          `json:"requests,omitempty"`
 	Limits       Limits            `json:"limits,omitempty"`
@@ -17,7 +17,7 @@ type Fluentbit struct {
 }
 
 type Elastalert struct {
-	Enabled      *bool             `json:"enabled,omitempty"`
+	Enabled      bool              `json:"enabled,omitempty"`
 	Image        string            `json:"image,omitempty"`
 	Port         int               `json:"port,omitempty"`
 	NodePort     int               `json:"nodePort,omitempty"`
@@ -31,7 +31,7 @@ type Elastalert struct {
 }
 
 type Kibana struct {
-	Enabled        *bool                 `json:"enabled,omitempty"`
+	Enabled        bool                  `json:"enabled,omitempty"`
 	ServiceAccount string                `json:"serviceAccount,omitempty"`
 	SvcName        string                `json:"svcName,omitempty"`
 	Port           int                   `json:"port,omitempty"`
@@ -52,7 +52,7 @@ type CnvrgInfraLogging struct {
 }
 
 var fluentbitDefault = Fluentbit{
-	Enabled:      &defaultFalse,
+	Enabled:      false,
 	Image:        "cnvrg-fluentbit:v1.7.3",
 	NodeSelector: nil,
 	LogsMounts: map[string]string{
@@ -71,7 +71,7 @@ var fluentbitDefault = Fluentbit{
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{
 	Elastalert: Elastalert{
-		Enabled:      &defaultFalse,
+		Enabled:      false,
 		Image:        "elastalert:3.0.0-beta.1",
 		Port:         80,
 		NodePort:     32030,
@@ -90,7 +90,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 		PvcName:      "elastalert-storage",
 	},
 	Kibana: Kibana{
-		Enabled:        &defaultFalse,
+		Enabled:        false,
 		ServiceAccount: "kibana",
 		SvcName:        "kibana",
 		Port:           8080,

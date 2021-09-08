@@ -16,7 +16,7 @@ type ConsistentHash struct {
 }
 
 type SharedStorage struct {
-	Enabled        *bool          `json:"enabled,omitempty"`
+	Enabled        bool           `json:"enabled,omitempty"`
 	ConsistentHash ConsistentHash `json:"consistentHash,omitempty"`
 }
 
@@ -26,9 +26,9 @@ type Limits struct {
 }
 
 type Hpa struct {
-	Enabled     *bool `json:"enabled,omitempty"`
-	Utilization int   `json:"utilization,omitempty"`
-	MaxReplicas int   `json:"maxReplicas,omitempty"`
+	Enabled     bool `json:"enabled,omitempty"`
+	Utilization int  `json:"utilization,omitempty"`
+	MaxReplicas int  `json:"maxReplicas,omitempty"`
 }
 
 type Requests struct {
@@ -38,7 +38,7 @@ type Requests struct {
 
 type WebApp struct {
 	Replicas                int                   `json:"replicas,omitempty"`
-	Enabled                 *bool                 `json:"enabled,omitempty"`
+	Enabled                 bool                  `json:"enabled,omitempty"`
 	Port                    int                   `json:"port,omitempty"`
 	Requests                Requests              `json:"requests,omitempty"`
 	Limits                  Limits                `json:"limits,omitempty"`
@@ -54,8 +54,8 @@ type WebApp struct {
 }
 
 type Sidekiq struct {
-	Enabled  *bool    `json:"enabled,omitempty"`
-	Split    *bool    `json:"split,omitempty"`
+	Enabled  bool     `json:"enabled,omitempty"`
+	Split    bool     `json:"split,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
@@ -63,7 +63,7 @@ type Sidekiq struct {
 }
 
 type Searchkiq struct {
-	Enabled  *bool    `json:"enabled,omitempty"`
+	Enabled  bool     `json:"enabled,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
@@ -71,7 +71,7 @@ type Searchkiq struct {
 }
 
 type Systemkiq struct {
-	Enabled  *bool    `json:"enabled,omitempty"`
+	Enabled  bool     `json:"enabled,omitempty"`
 	Requests Requests `json:"requests,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Replicas int      `json:"replicas,omitempty"`
@@ -79,14 +79,14 @@ type Systemkiq struct {
 }
 
 type CnvrgRouter struct {
-	Enabled  *bool  `json:"enabled,omitempty"`
+	Enabled  bool   `json:"enabled,omitempty"`
 	Image    string `json:"image,omitempty"`
 	SvcName  string `json:"svcName,omitempty"`
 	NodePort int    `json:"nodePort,omitempty"`
 }
 
 type Hyper struct {
-	Enabled                 *bool    `json:"enabled,omitempty"`
+	Enabled                 bool     `json:"enabled,omitempty"`
 	Image                   string   `json:"image,omitempty"`
 	Port                    int      `json:"port,omitempty"`
 	Replicas                int      `json:"replicas,omitempty"`
@@ -109,7 +109,7 @@ type Registry struct {
 }
 
 type Ldap struct {
-	Enabled       *bool  `json:"enabled,omitempty"`
+	Enabled       bool   `json:"enabled,omitempty"`
 	Host          string `json:"host,omitempty"`
 	Port          string `json:"port,omitempty"`
 	Account       string `json:"account,omitempty"`
@@ -167,7 +167,7 @@ type ControlPlane struct {
 }
 
 type Mpi struct {
-	Enabled              *bool             `json:"enabled,omitempty"`
+	Enabled              bool              `json:"enabled,omitempty"`
 	Image                string            `json:"image,omitempty"`
 	KubectlDeliveryImage string            `json:"kubectlDeliveryImage,omitempty"`
 	ExtraArgs            map[string]string `json:"extraArgs,omitempty"`
@@ -177,7 +177,7 @@ type Mpi struct {
 }
 
 var mpiDefault = Mpi{
-	Enabled:              &defaultFalse,
+	Enabled:              false,
 	Image:                "mpioperator/mpi-operator:v0.2.3",
 	KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
 	ExtraArgs:            nil,
@@ -198,7 +198,7 @@ var mpiDefault = Mpi{
 }
 
 var hpa = Hpa{
-	Enabled:     &defaultFalse,
+	Enabled:     false,
 	Utilization: 85,
 	MaxReplicas: 5,
 }
@@ -223,7 +223,7 @@ var controlPlaneDefault = ControlPlane{
 	Image: "core:3.6.99",
 
 	WebApp: WebApp{
-		Enabled:  &defaultFalse,
+		Enabled:  false,
 		Replicas: 1,
 		Port:     8080,
 		Requests: Requests{
@@ -257,8 +257,8 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Sidekiq: Sidekiq{
-		Enabled: &defaultFalse,
-		Split:   &defaultFalse,
+		Enabled: false,
+		Split:   false,
 		Requests: Requests{
 			Cpu:    "1000m",
 			Memory: "3750Mi",
@@ -272,7 +272,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Searchkiq: Searchkiq{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		Requests: Requests{
 			Cpu:    "750m",
 			Memory: "1Gi",
@@ -286,7 +286,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Systemkiq: Systemkiq{
-		Enabled: &defaultFalse,
+		Enabled: false,
 		Requests: Requests{
 			Cpu:    "500m",
 			Memory: "1Gi",
@@ -300,7 +300,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Hyper: Hyper{
-		Enabled:  &defaultFalse,
+		Enabled:  false,
 		Image:    "hyper-server:latest",
 		Port:     5050,
 		Replicas: 1,
@@ -320,7 +320,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	CnvrgRouter: CnvrgRouter{
-		Enabled:  &defaultFalse,
+		Enabled:  false,
 		Image:    "nginx:1.21.0",
 		SvcName:  "cnvrg-router",
 		NodePort: 30081,
@@ -352,7 +352,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Ldap: Ldap{
-		Enabled:       &defaultFalse,
+		Enabled:       false,
 		Host:          "",
 		Port:          "",
 		Account:       "userPrincipalName",
