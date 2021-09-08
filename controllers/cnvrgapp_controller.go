@@ -55,7 +55,7 @@ var appLog logr.Logger
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=*,resources=*,verbs=*
 
-func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	appLog = r.Log.WithValues("name", req.NamespacedName)
 	appLog.Info("starting cnvrgapp reconciliation")
@@ -82,7 +82,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), cnvrgApp); err != nil {
+			if err := r.Update(ctx, cnvrgApp); err != nil {
 				appLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
@@ -101,7 +101,7 @@ func (r *CnvrgAppReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				return ctrl.Result{}, nil
 			}
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
+			if err := r.Update(ctx, cnvrgInfra); err != nil {
 				appLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
 				return ctrl.Result{}, err
 			}
@@ -525,7 +525,7 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 		}
 		// grafana datasource
 		appLog.Info("applying grafana datasource")
-		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r, appLog)
+		url, user, pass, err := desired.GetPromCredsSecret(app.Spec.Monitoring.Prometheus.CredsRef, app.Namespace, r.Client, appLog)
 		if err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
@@ -892,7 +892,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	p := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			appLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
+			appLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.ObjectNew.GetName())
 			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)

@@ -58,7 +58,7 @@ var infraLog logr.Logger
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrginfras,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrginfras/status,verbs=get;update;patch
 
-func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	infraLog = r.Log.WithValues("name", req.NamespacedName)
 	infraLog.Info("starting cnvrginfra reconciliation")
 
@@ -85,7 +85,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	if cnvrgInfra.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
 			cnvrgInfra.ObjectMeta.Finalizers = append(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
-			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
+			if err := r.Update(ctx, cnvrgInfra); err != nil {
 				infraLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
@@ -104,7 +104,7 @@ func (r *CnvrgInfraReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 				return ctrl.Result{}, nil
 			}
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
-			if err := r.Update(context.Background(), cnvrgInfra); err != nil {
+			if err := r.Update(ctx, cnvrgInfra); err != nil {
 				infraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
 				return ctrl.Result{}, err
 			}
@@ -337,7 +337,7 @@ func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInf
 
 		// grafana datasource
 		infraLog.Info("applying grafana datasource")
-		url, basicAuthUser, basicAuthPass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r, infraLog)
+		url, basicAuthUser, basicAuthPass, err := desired.GetPromCredsSecret(infra.Spec.Monitoring.Prometheus.CredsRef, infra.Spec.InfraNamespace, r.Client, infraLog)
 		if err != nil {
 			return err
 		}
@@ -595,7 +595,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	} else {
 
 		if viper.GetBool("own-istio-resources") {
-			err := desired.Apply(networking.IstioCrds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+			err := desired.Apply(networking.IstioCrds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r.Client, r.Scheme, r.Log)
 			if err != nil {
 				infraLog.Error(err, "can't apply istio CRDs")
 				os.Exit(1)
@@ -603,14 +603,14 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 
 		if viper.GetBool("own-prometheus-resources") {
-			err := desired.Apply(monitoring.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+			err := desired.Apply(monitoring.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r.Client, r.Scheme, r.Log)
 			if err != nil {
 				infraLog.Error(err, "can't apply prometheus CRDs")
 				os.Exit(1)
 			}
 		}
 
-		err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r, r.Scheme, r.Log)
+		err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}, r.Client, r.Scheme, r.Log)
 		if err != nil {
 			infraLog.Error(err, "can't apply control plane crds")
 			os.Exit(1)
@@ -623,7 +623,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 			// run reconcile only changing cnvrginfra/object marked for deletion
 			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.ObjectOld) {
-				infraLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.MetaNew.GetName())
+				infraLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.ObjectNew.GetName())
 				oldObject := e.ObjectOld.(*mlopsv1.CnvrgInfra)
 				newObject := e.ObjectNew.(*mlopsv1.CnvrgInfra)
 				// deleting cnvrg cr
