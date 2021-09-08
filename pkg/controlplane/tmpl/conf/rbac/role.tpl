@@ -245,3 +245,11 @@ rules:
   -  "*"
   verbs:
   -  "*"
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - "cnvrgclusterprovisioners"
+  verbs:
+  - get
+  - list
+  - watch

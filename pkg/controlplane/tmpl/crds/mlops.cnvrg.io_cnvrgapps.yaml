@@ -848,7 +848,7 @@ spec:
               message:
                 type: string
               progress:
-                type: string
+                type: integer
               status:
                 type: string
             type: object
