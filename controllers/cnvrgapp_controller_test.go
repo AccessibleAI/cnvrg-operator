@@ -2176,6 +2176,42 @@ var _ = Describe("CnvrgApp controller", func() {
 
 	})
 
+	Context("Test Events", func() {
+
+		It("Simple event test", func() {
+
+			ns := createNs()
+			ctx := context.Background()
+			testApp := getDefaultTestAppSpec(ns)
+			testApp.Spec.Dbs.Pg.Enabled = true
+
+			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
+
+			deployment := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			events := corev1.EventList{}
+			if err := k8sClient.List(ctx, &events); err != nil {
+				fmt.Println(err)
+			}
+			es := corev1.EventSource{Component: "cnvrgapp"}
+			for _, e := range events.Items {
+				if e.Source == es {
+					Succeed()
+					return
+				}
+			}
+			Fail("expected cnvrgapp event not found")
+		})
+
+	})
+
 })
 
 func createNs() string {

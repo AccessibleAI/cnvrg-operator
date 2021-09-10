@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/retry"
 	"path/filepath"
 	"reflect"
@@ -45,8 +46,9 @@ const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
 
 type CnvrgAppReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	recorder record.EventRecorder
+	Log      logr.Logger
+	Scheme   *runtime.Scheme
 }
 
 var appLog logr.Logger
@@ -144,13 +146,15 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	appLog.Info(statusMsg)
 
 	if ready { // ura, done
-		s := mlopsv1.Status{ Status:   mlopsv1.StatusReady, Message:  statusMsg, Progress: percentageReady}
+		s := mlopsv1.Status{Status: mlopsv1.StatusReady, Message: statusMsg, Progress: percentageReady}
 		r.updateStatusMessage(s, cnvrgApp)
 		appLog.Info("stack is ready!")
+		r.recorder.Event(cnvrgApp, "Normal", "Created", fmt.Sprintf("cnvrgapp %s successfully deployed", req.NamespacedName))
 		return ctrl.Result{}, nil
 	} else { // reconcile again
 		requeueAfter, _ := time.ParseDuration("30s")
 		appLog.Info("stack not ready yet, requeuing...")
+		r.recorder.Event(cnvrgApp, "Normal", "Creating", fmt.Sprintf("cnvrgapp %s not ready yet, done: %d%%", req.NamespacedName, percentageReady))
 		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
 }
@@ -729,9 +733,14 @@ func (r *CnvrgAppReconciler) removeFluentbitConfiguration(cnvrgApp *mlopsv1.Cnvr
 }
 
 func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlopsv1.CnvrgApp) {
+
 	if app.Status.Status == mlopsv1.StatusRemoving {
 		appLog.Info("skipping status update, current cnvrg spec under removing status...")
 		return
+	}
+	if status.Status == mlopsv1.StatusError {
+		msg := fmt.Sprintf("%s/%s error acoured during reconcile", app.GetNamespace(), app.GetName())
+		r.recorder.Event(app, "Warning", "ReconcileError", msg)
 	}
 	ctx := context.Background()
 	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
@@ -889,14 +898,27 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	appPredicate := predicate.Funcs{
 
+		CreateFunc: func(createEvent event.CreateEvent) bool {
+			msg := fmt.Sprintf("cnvrgapp: %s/%s has been created", createEvent.Object.GetNamespace(), createEvent.Object.GetName())
+			r.recorder.Event(createEvent.Object, "Normal", "Created", msg)
+			return true
+		},
+
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
-			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+			shouldReconcile := e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+			if shouldReconcile {
+				msg := fmt.Sprintf("cnvrgapp: %s/%s has been updated", e.ObjectNew.GetNamespace(), e.ObjectNew.GetName())
+				r.recorder.Event(e.ObjectNew, "Normal", "Updated", msg)
+			}
+			return shouldReconcile
 		},
 
 		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			msg := fmt.Sprintf("cnvrgapp: %s/%s has been deleted", deleteEvent.Object.GetNamespace(), deleteEvent.Object.GetName())
+			r.recorder.Event(deleteEvent.Object, "Normal", "SuccessfulDelete", msg)
 			infraLog.V(1).Info("received delete event", "objectName", deleteEvent.Object.GetName())
-			return false
+			return !deleteEvent.DeleteStateUnknown
 		},
 	}
 
@@ -912,7 +934,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return true
 		},
 	}
-
+	r.recorder = mgr.GetEventRecorderFor("cnvrgapp")
 	cnvrgAppController := ctrl.
 		NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgApp{}, builder.WithPredicates(appPredicate))

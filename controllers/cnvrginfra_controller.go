@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/retry"
 	"os"
 	"path/filepath"
@@ -50,8 +51,9 @@ const CnvrginfraFinalizer = "cnvrginfra.mlops.cnvrg.io/finalizer"
 
 type CnvrgInfraReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	recorder record.EventRecorder
+	Log      logr.Logger
+	Scheme   *runtime.Scheme
 }
 
 var infraLog logr.Logger
@@ -626,14 +628,27 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	infraPredicate := predicate.Funcs{
 
+		CreateFunc: func(createEvent event.CreateEvent) bool {
+			msg := fmt.Sprintf("cnvrginfra: %s has been created", createEvent.Object.GetName())
+			r.recorder.Event(createEvent.Object, "Normal", "Created", msg)
+			return true
+		},
+
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
-			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+			shouldReconcile := e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+			if shouldReconcile {
+				msg := fmt.Sprintf("cnvrginfra: %s has been updated", e.ObjectNew.GetName())
+				r.recorder.Event(e.ObjectNew, "Normal", "Updated", msg)
+			}
+			return shouldReconcile
 		},
 
 		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			msg := fmt.Sprintf("cnvrginfra: %s has been deleted", deleteEvent.Object.GetName())
+			r.recorder.Event(deleteEvent.Object, "Normal", "SuccessfulDelete", msg)
 			infraLog.V(1).Info("received delete event", "objectName", deleteEvent.Object.GetName())
-			return false
+			return !deleteEvent.DeleteStateUnknown
 		},
 	}
 
@@ -642,8 +657,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
 			if reflect.TypeOf(&v1core.ConfigMap{}) == reflect.TypeOf(e.ObjectNew) && e.ObjectNew.GetName() == mlopsv1.InfraReconcilerCm {
-				// Infra reconciler ConfigMap
-				// should always trigger reconcile loop
+				// Infra reconciler ConfigMap should always trigger reconcile loop
 				return true
 			}
 			return false
@@ -654,7 +668,7 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return true
 		},
 	}
-
+	r.recorder = mgr.GetEventRecorderFor("cnvrginfra")
 	cnvrgInfraController := ctrl.
 		NewControllerManagedBy(mgr).
 		For(&mlopsv1.CnvrgInfra{}, builder.WithPredicates(infraPredicate))
