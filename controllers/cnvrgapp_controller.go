@@ -144,19 +144,12 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	appLog.Info(statusMsg)
 
 	if ready { // ura, done
-		s := mlopsv1.Status{
-			Status:   mlopsv1.StatusReady,
-			Message:  statusMsg,
-			Progress: percentageReady}
+		s := mlopsv1.Status{ Status:   mlopsv1.StatusReady, Message:  statusMsg, Progress: percentageReady}
 		r.updateStatusMessage(s, cnvrgApp)
 		appLog.Info("stack is ready!")
 		return ctrl.Result{}, nil
 	} else { // reconcile again
-		requeueAfter, err := time.ParseDuration("30s")
-		if err != nil {
-			appLog.Error(err, "wrong duration for requeueAfter")
-			return ctrl.Result{}, err
-		}
+		requeueAfter, _ := time.ParseDuration("30s")
 		appLog.Info("stack not ready yet, requeuing...")
 		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
