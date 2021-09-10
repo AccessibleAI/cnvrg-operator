@@ -31,6 +31,7 @@ import (
 	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -92,16 +93,21 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
-			cnvrgInfra, err := r.getCnvrgAppSpec(req.NamespacedName)
+			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+				if err := r.Update(ctx, cnvrgApp); err != nil {
+					cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
+					if err != nil {
+						appLog.Error(err, "error getting cnvrgapp for finalizer cleanup")
+						return err
+					}
+					cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+					return r.Update(ctx, cnvrgApp)
+				}
+				return err
+			})
 			if err != nil {
-				return ctrl.Result{}, err
-			}
-			if cnvrgInfra == nil {
-				return ctrl.Result{}, nil
-			}
-			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			if err := r.Update(ctx, cnvrgInfra); err != nil {
-				appLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
+				appLog.Info("error in removing finalizer")
 				return ctrl.Result{}, err
 			}
 		}
@@ -888,30 +894,35 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	appLog = r.Log.WithValues("initializing", "crds")
 
-	p := predicate.Funcs{
+	appPredicate := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			appLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.ObjectNew.GetName())
-			if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(e.ObjectOld) {
-				oldObject := e.ObjectOld.(*mlopsv1.CnvrgApp)
-				newObject := e.ObjectNew.(*mlopsv1.CnvrgApp)
-				// deleting cnvrg cr
-				if !newObject.ObjectMeta.DeletionTimestamp.IsZero() {
-					return true
-				}
-				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrgapp spec wasn't changed, assuming status update, won't reconcile
-				appLog.V(1).Info("update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
+			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+		},
 
-				return !shouldReconcileOnSpecChange
-			}
+		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			infraLog.V(1).Info("received delete event", "objectName", deleteEvent.Object.GetName())
+			return false
+		},
+	}
+
+	appOwnsPredicate := predicate.Funcs{
+
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
+			return false
+		},
+
+		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			infraLog.V(1).Info("received delete event", "objectName", deleteEvent.Object.GetName())
 			return true
 		},
 	}
 
 	cnvrgAppController := ctrl.
 		NewControllerManagedBy(mgr).
-		For(&mlopsv1.CnvrgApp{}).
-		WithEventFilter(p)
+		For(&mlopsv1.CnvrgApp{}, builder.WithPredicates(appPredicate))
 
 	for _, v := range desired.Kinds {
 
@@ -926,8 +937,9 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 		u := &unstructured.Unstructured{}
 		u.SetGroupVersionKind(v)
-		cnvrgAppController.Owns(u)
+		cnvrgAppController.Owns(u, builder.WithPredicates(appOwnsPredicate))
 	}
+
 	appLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
 	return cnvrgAppController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).

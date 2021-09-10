@@ -36,6 +36,7 @@ import (
 	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -96,16 +97,21 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			if err := r.cleanup(cnvrgInfra); err != nil {
 				return ctrl.Result{}, err
 			}
-			cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
-			if err != nil {
-				return ctrl.Result{}, err
-			}
-			if cnvrgInfra == nil {
-				return ctrl.Result{}, nil
-			}
 			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
-			if err := r.Update(ctx, cnvrgInfra); err != nil {
-				infraLog.Info("error in removing finalizer, checking if cnvrgInfra object still exists")
+			err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+				if err := r.Update(ctx, cnvrgInfra); err != nil {
+					cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
+					if err != nil {
+						infraLog.Error(err, "error getting cnvrginfra for finalizer cleanup")
+						return err
+					}
+					cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
+					return r.Update(ctx, cnvrgInfra)
+				}
+				return err
+			})
+			if err != nil {
+				infraLog.Info("error in removing finalizer")
 				return ctrl.Result{}, err
 			}
 		}
@@ -412,7 +418,7 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		return false, err
 	}
 	if cnvrgInfra == nil {
-		return false, nil // probably cnvrgapp was removed
+		return true, nil // all (probably) good, cnvrginfra was removed
 	}
 	infraLog = r.Log.WithValues("name", name, "ns", cnvrgInfra.Spec.InfraNamespace)
 
@@ -458,10 +464,10 @@ func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.Namespaced
 	var cnvrgInfra mlopsv1.CnvrgInfra
 	if err := r.Get(ctx, namespacedName, &cnvrgInfra); err != nil {
 		if errors.IsNotFound(err) {
-			infraLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
+			infraLog.Info("unable to fetch CnvrgInfra, probably cr was deleted")
 			return nil, nil
 		}
-		infraLog.Error(err, "unable to fetch CnvrgApp")
+		infraLog.Error(err, "unable to fetch CnvrgInfra")
 		return nil, err
 	}
 	return &cnvrgInfra, nil
@@ -476,6 +482,7 @@ func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 		return err
 	}
 
+	infraLog.Info("cleanup has been finished")
 	return nil
 }
 
@@ -617,40 +624,35 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 	}
 
-	p := predicate.Funcs{
+	infraPredicate := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
+			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
+			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+		},
 
-			// run reconcile only changing cnvrginfra/object marked for deletion
-			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(e.ObjectOld) {
-				infraLog.V(1).Info("received UpdateEvent", "eventSourcesObjectName", e.ObjectNew.GetName())
-				oldObject := e.ObjectOld.(*mlopsv1.CnvrgInfra)
-				newObject := e.ObjectNew.(*mlopsv1.CnvrgInfra)
-				// deleting cnvrg cr
-				if !newObject.ObjectMeta.DeletionTimestamp.IsZero() {
-					return true
-				}
-				shouldReconcileOnSpecChange := reflect.DeepEqual(oldObject.Spec, newObject.Spec) // cnvrginfra spec wasn't changed, assuming status update, won't reconcile
+		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			infraLog.V(1).Info("received delete event", "objectName", deleteEvent.Object.GetName())
+			return false
+		},
+	}
 
-				if !shouldReconcileOnSpecChange && viper.GetBool("verbose") {
-					infraLog.V(1).Info("printing the diff between oldObject.Spec and newObject.Spec")
-					diff, _ := messagediff.PrettyDiff(oldObject.Spec, newObject.Spec)
-					infraLog.V(1).Info(diff)
-				}
+	infraOwnsPredicate := predicate.Funcs{
 
-				infraLog.V(1).Info("cnvrginfra update received", "shouldReconcileOnSpecChange", shouldReconcileOnSpecChange)
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
+			return false
+		},
 
-				return !shouldReconcileOnSpecChange
-
-			}
+		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			infraLog.V(1).Info("received delete event", "objectName", deleteEvent.Object.GetName())
 			return true
 		},
 	}
 
 	cnvrgInfraController := ctrl.
 		NewControllerManagedBy(mgr).
-		For(&mlopsv1.CnvrgInfra{}).
-		WithEventFilter(p)
+		For(&mlopsv1.CnvrgInfra{}, builder.WithPredicates(infraPredicate))
 
 	for _, v := range desired.Kinds {
 
@@ -665,8 +667,9 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		}
 		u := &unstructured.Unstructured{}
 		u.SetGroupVersionKind(v)
-		cnvrgInfraController.Owns(u)
+		cnvrgInfraController.Owns(u, builder.WithPredicates(infraOwnsPredicate))
 	}
+
 	infraLog.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
 	return cnvrgInfraController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
