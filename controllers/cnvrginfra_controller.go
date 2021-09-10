@@ -656,10 +656,11 @@ func (r *CnvrgInfraReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
-			if reflect.TypeOf(&v1core.ConfigMap{}) == reflect.TypeOf(e.ObjectNew) && e.ObjectNew.GetName() == mlopsv1.InfraReconcilerCm {
+			if e.ObjectNew.GetName() == mlopsv1.InfraReconcilerCm {
 				// Infra reconciler ConfigMap should always trigger reconcile loop
 				return true
 			}
+
 			return false
 		},
 
