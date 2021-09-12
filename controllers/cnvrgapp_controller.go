@@ -294,7 +294,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 
 	// check prometheus status
 	if cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
-		name := types.NamespacedName{Name: cnvrgApp.Spec.Monitoring.Prometheus.SvcName, Namespace: cnvrgApp.Namespace}
+		name := types.NamespacedName{Name: "prometheus-cnvrg-ccp-prometheus", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckStatefulSetReadiness(name)
 		if err != nil {
 			return false, 0, nil, err
