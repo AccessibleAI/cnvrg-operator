@@ -511,6 +511,10 @@ spec:
                 type: string
               progress:
                 type: integer
+              stackReadiness:
+                additionalProperties:
+                  type: boolean
+                type: object
               status:
                 type: string
             type: object
