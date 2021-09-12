@@ -126,7 +126,11 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if percentageReady == 100 {
 		percentageReady = 99
 	}
-	s := mlopsv1.Status{mlopsv1.StatusReconciling, fmt.Sprintf("reconciling... (%d%%)", percentageReady), percentageReady, stackReadiness}
+	s := mlopsv1.Status{
+		Status:         mlopsv1.StatusReconciling,
+		Message:        fmt.Sprintf("reconciling... (%d%%)", percentageReady),
+		Progress:       percentageReady,
+		StackReadiness: stackReadiness}
 	r.updateStatusMessage(s, cnvrgApp)
 
 	// apply spec manifests
@@ -143,7 +147,11 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	appLog.Info(statusMsg)
 
 	if ready { // ura, done
-		s := mlopsv1.Status{mlopsv1.StatusReady, statusMsg, percentageReady, stackReadiness}
+		s := mlopsv1.Status{
+			Status:         mlopsv1.StatusReady,
+			Message:        statusMsg,
+			Progress:       percentageReady,
+			StackReadiness: stackReadiness}
 		r.updateStatusMessage(s, cnvrgApp)
 		appLog.Info("stack is ready!")
 		r.recorder.Event(cnvrgApp, "Normal", "Created", fmt.Sprintf("cnvrgapp %s successfully deployed", req.NamespacedName))
