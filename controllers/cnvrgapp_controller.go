@@ -771,6 +771,9 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 		if status.Progress >= 0 {
 			app.Status.Progress = status.Progress
 		}
+		if status.StackReadiness != nil {
+			app.Status.StackReadiness = status.StackReadiness
+		}
 		err = r.Status().Update(ctx, app)
 		return err
 	})
