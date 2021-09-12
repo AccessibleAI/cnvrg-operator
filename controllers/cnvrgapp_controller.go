@@ -117,7 +117,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	// check if enabled control plane workloads are all in ready status
-	ready, percentageReady, err := r.getControlPlaneReadinessStatus(cnvrgApp)
+	ready, percentageReady, stackReadiness, err := r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -126,10 +126,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if percentageReady == 100 {
 		percentageReady = 99
 	}
-	s := mlopsv1.Status{
-		Status:   mlopsv1.StatusReconciling,
-		Message:  fmt.Sprintf("reconciling... (%d%%)", percentageReady),
-		Progress: percentageReady}
+	s := mlopsv1.Status{mlopsv1.StatusReconciling, fmt.Sprintf("reconciling... (%d%%)", percentageReady), percentageReady, stackReadiness}
 	r.updateStatusMessage(s, cnvrgApp)
 
 	// apply spec manifests
@@ -138,7 +135,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	// get control plan readiness
-	ready, percentageReady, err = r.getControlPlaneReadinessStatus(cnvrgApp)
+	ready, percentageReady, stackReadiness, err = r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -146,7 +143,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	appLog.Info(statusMsg)
 
 	if ready { // ura, done
-		s := mlopsv1.Status{Status: mlopsv1.StatusReady, Message: statusMsg, Progress: percentageReady}
+		s := mlopsv1.Status{mlopsv1.StatusReady, statusMsg, percentageReady, stackReadiness}
 		r.updateStatusMessage(s, cnvrgApp)
 		appLog.Info("stack is ready!")
 		r.recorder.Event(cnvrgApp, "Normal", "Created", fmt.Sprintf("cnvrgapp %s successfully deployed", req.NamespacedName))
@@ -186,7 +183,7 @@ func (r *CnvrgAppReconciler) getEsCredsSecret(app *mlopsv1.CnvrgApp) (user strin
 	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
 }
 
-func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, error) {
+func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, map[string]bool, error) {
 
 	readyState := make(map[string]bool)
 
@@ -195,7 +192,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["webApp"] = ready
 	}
@@ -205,7 +202,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: "sidekiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["sidekiq"] = ready
 	}
@@ -215,7 +212,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: "searchkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["searchkiq"] = ready
 	}
@@ -225,9 +222,9 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: "systemkiq", Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
-		readyState["searchkiq"] = ready
+		readyState["systemkiq"] = ready
 	}
 
 	// check postgres status
@@ -235,7 +232,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Pg.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["pg"] = ready
 	}
@@ -245,7 +242,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Minio.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["minio"] = ready
 	}
@@ -255,7 +252,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Redis.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["redis"] = ready
 	}
@@ -265,13 +262,13 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Dbs.Es.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckStatefulSetReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		// if es is ready, trigger fluentbit reconfiguration
 		if ready {
 			appLog.Info("es is ready, triggering fluentbit reconfiguration")
 			if err := r.addFluentbitConfiguration(cnvrgApp); err != nil {
-				return false, 0, err
+				return false, 0, nil, err
 			}
 		}
 		readyState["es"] = ready
@@ -282,9 +279,29 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		name := types.NamespacedName{Name: cnvrgApp.Spec.Logging.Kibana.SvcName, Namespace: cnvrgApp.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
-			return false, 0, err
+			return false, 0, nil, err
 		}
 		readyState["kibana"] = ready
+	}
+
+	// check prometheus status
+	if cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Monitoring.Prometheus.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckStatefulSetReadiness(name)
+		if err != nil {
+			return false, 0, nil, err
+		}
+		readyState["prometheus"] = ready
+	}
+
+	// check prometheus status
+	if cnvrgApp.Spec.Monitoring.Grafana.Enabled {
+		name := types.NamespacedName{Name: cnvrgApp.Spec.Monitoring.Grafana.SvcName, Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckDeploymentReadiness(name)
+		if err != nil {
+			return false, 0, nil, err
+		}
+		readyState["grafana"] = ready
 	}
 
 	percentageReady := 0
@@ -301,7 +318,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 		percentageReady = readyCount * 100 / len(readyState)
 	}
 
-	return readyCount == len(readyState), percentageReady, nil
+	return readyCount == len(readyState), percentageReady, readyState, nil
 }
 
 func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
