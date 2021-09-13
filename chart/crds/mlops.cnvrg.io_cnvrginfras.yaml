@@ -502,8 +502,6 @@ spec:
                   value:
                     type: string
                 type: object
-            required:
-            - capsule
             type: object
           status:
             properties:
