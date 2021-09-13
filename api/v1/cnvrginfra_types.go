@@ -22,7 +22,7 @@ type CnvrgInfraSpec struct {
 	Annotations    map[string]string    `json:"annotations,omitempty"`
 	ImageHub       string               `json:"imageHub,omitempty"`
 	ConfigReloader ConfigReloader       `json:"configReloader,omitempty"`
-	Capsule        Capsule              `json:"capsule"`
+	Capsule        Capsule              `json:"capsule,omitempty"`
 }
 
 // +kubebuilder:object:root=true
