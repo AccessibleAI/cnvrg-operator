@@ -251,3 +251,14 @@ rules:
   - "cnvrgclusterprovisioners"
   verbs:
   - "*"
+- apiGroups:
+    - mlops.cnvrg.io
+  resources:
+    - cnvrgapps
+  verbs:
+    - create
+    - get
+    - list
+    - patch
+    - update
+    - watch
