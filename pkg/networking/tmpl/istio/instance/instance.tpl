@@ -47,7 +47,7 @@ spec:
         {{- end }}
         serviceAnnotations:
         {{- range $name, $value := .Spec.Networking.Istio.IngressSvcAnnotations }}
-          {{ $name }}: {{ $value }}
+          {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
           maxReplicas: 5
