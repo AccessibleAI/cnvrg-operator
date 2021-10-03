@@ -18,6 +18,8 @@ controlPlane:
     featureFlags: { }
   hyper:
     enabled: true
+  cnvrgScheduler:
+    enabled: true
   objectStorage:
     type: minio
     bucket: cnvrg-storage

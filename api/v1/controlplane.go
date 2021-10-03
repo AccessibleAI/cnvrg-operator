@@ -101,6 +101,13 @@ type Hyper struct {
 	ReadinessTimeoutSeconds int      `json:"readinessTimeoutSeconds,omitempty"`
 }
 
+type CnvrgScheduler struct {
+	Enabled  bool     `json:"enabled,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
+	Replicas int      `json:"replicas,omitempty"`
+}
+
 type Registry struct {
 	Name     string `json:"name,omitempty"`
 	URL      string `json:"url,omitempty"`
@@ -152,18 +159,19 @@ type BaseConfig struct {
 }
 
 type ControlPlane struct {
-	Image         string        `json:"image,omitempty"`
-	WebApp        WebApp        `json:"webapp,omitempty"`
-	Sidekiq       Sidekiq       `json:"sidekiq,omitempty"`
-	Searchkiq     Searchkiq     `json:"searchkiq,omitempty"`
-	Systemkiq     Systemkiq     `json:"systemkiq,omitempty"`
-	Hyper         Hyper         `json:"hyper,omitempty"`
-	CnvrgRouter   CnvrgRouter   `json:"cnvrgRouter,omitempty"`
-	BaseConfig    BaseConfig    `json:"baseConfig,omitempty"`
-	Ldap          Ldap          `json:"ldap,omitempty"`
-	SMTP          SMTP          `json:"smtp,omitempty"`
-	ObjectStorage ObjectStorage `json:"objectStorage,omitempty"`
-	Mpi           Mpi           `json:"mpi,omitempty"`
+	Image          string         `json:"image,omitempty"`
+	WebApp         WebApp         `json:"webapp,omitempty"`
+	Sidekiq        Sidekiq        `json:"sidekiq,omitempty"`
+	Searchkiq      Searchkiq      `json:"searchkiq,omitempty"`
+	Systemkiq      Systemkiq      `json:"systemkiq,omitempty"`
+	Hyper          Hyper          `json:"hyper,omitempty"`
+	CnvrgScheduler CnvrgScheduler `json:"cnvrgScheduler,omitempty"`
+	CnvrgRouter    CnvrgRouter    `json:"cnvrgRouter,omitempty"`
+	BaseConfig     BaseConfig     `json:"baseConfig,omitempty"`
+	Ldap           Ldap           `json:"ldap,omitempty"`
+	SMTP           SMTP           `json:"smtp,omitempty"`
+	ObjectStorage  ObjectStorage  `json:"objectStorage,omitempty"`
+	Mpi            Mpi            `json:"mpi,omitempty"`
 }
 
 type Mpi struct {
@@ -317,6 +325,19 @@ var controlPlaneDefault = ControlPlane{
 		},
 		ReadinessPeriodSeconds:  100,
 		ReadinessTimeoutSeconds: 60,
+	},
+
+	CnvrgScheduler: CnvrgScheduler{
+		Enabled: true,
+		Requests: Requests{
+			Cpu:    "500m",
+			Memory: "1000Mi",
+		},
+		Limits: Limits{
+			Cpu:    "2",
+			Memory: "4Gi",
+		},
+		Replicas: 1,
 	},
 
 	CnvrgRouter: CnvrgRouter{
