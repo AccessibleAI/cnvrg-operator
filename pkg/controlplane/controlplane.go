@@ -471,16 +471,6 @@ func cnvrgScheduler() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
-		//{
-		//
-		//	TemplatePath:   path + "/hyper/svc.tpl",
-		//	Template:       nil,
-		//	ParsedTemplate: "",
-		//	Obj:            &unstructured.Unstructured{},
-		//	GVR:            desired.Kinds[desired.SvcGVR],
-		//	Own:            true,
-		//	Updatable:      true,
-		//},
 	}
 }
 
