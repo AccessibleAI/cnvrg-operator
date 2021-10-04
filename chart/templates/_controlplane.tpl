@@ -14,6 +14,8 @@ controlPlane:
     {{- end }}
   hyper:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
+  cnvrgScheduler:
+    enabled: {{ .Values.controlPlane.cnvrgScheduler.enabled }}
   cnvrgRouter:
     enabled: {{ .Values.controlPlane.cnvrgRouter.enabled }}
     image: {{ .Values.controlPlane.cnvrgRouter.image }}

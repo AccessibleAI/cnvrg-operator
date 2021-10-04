@@ -459,6 +459,21 @@ func hyperState() []*desired.State {
 	}
 }
 
+func cnvrgScheduler() []*desired.State {
+	return []*desired.State{
+		{
+
+			TemplatePath:   path + "/scheduler/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.DeploymentGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func ssoState() []*desired.State {
 	return []*desired.State{
 		{
@@ -589,6 +604,10 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if cnvrgApp.Spec.ControlPlane.Hyper.Enabled {
 		state = append(state, hyperState()...)
+	}
+
+	if cnvrgApp.Spec.ControlPlane.CnvrgScheduler.Enabled {
+		state = append(state, cnvrgScheduler()...)
 	}
 
 	if cnvrgApp.Spec.ControlPlane.CnvrgRouter.Enabled {
