@@ -16,6 +16,8 @@ controlPlane:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
   cnvrgScheduler:
     enabled: {{ .Values.controlPlane.cnvrgScheduler.enabled }}
+  cnvrgClusterProvisionerOperator:
+    enabled: {{ .Values.controlPlane.cnvrgClusterProvisionerOperator.enabled }}
   cnvrgRouter:
     enabled: {{ .Values.controlPlane.cnvrgRouter.enabled }}
     image: {{ .Values.controlPlane.cnvrgRouter.image }}

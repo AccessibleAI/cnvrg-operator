@@ -474,6 +474,91 @@ func cnvrgScheduler() []*desired.State {
 	}
 }
 
+func cnvrgClusterProvisionerOperator() []*desired.State {
+	return []*desired.State{
+		{
+
+			TemplatePath:   path + "/ccp/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.DeploymentGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SaGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/mgr-role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/rb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/mgr-rb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.RoleBindingGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.ConfigMapGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/ccp/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.SvcGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func ssoState() []*desired.State {
 	return []*desired.State{
 		{
@@ -608,6 +693,10 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if cnvrgApp.Spec.ControlPlane.CnvrgScheduler.Enabled {
 		state = append(state, cnvrgScheduler()...)
+	}
+
+	if cnvrgApp.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
+		state = append(state, cnvrgClusterProvisionerOperator()...)
 	}
 
 	if cnvrgApp.Spec.ControlPlane.CnvrgRouter.Enabled {

@@ -20,6 +20,8 @@ controlPlane:
     enabled: true
   cnvrgScheduler:
     enabled: true
+  cnvrgClusterProvisionerOperator:
+    enabled: false
   objectStorage:
     type: minio
     bucket: cnvrg-storage

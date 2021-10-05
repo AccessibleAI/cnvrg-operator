@@ -108,6 +108,14 @@ type CnvrgScheduler struct {
 	Replicas int      `json:"replicas,omitempty"`
 }
 
+type CnvrgClusterProvisionerOperator struct {
+	Enabled     bool     `json:"enabled,omitempty"`
+	Requests    Requests `json:"requests,omitempty"`
+	Limits      Limits   `json:"limits,omitempty"`
+	Image       string   `json:"image,omitempty"`
+	AwsCredsRef string   `json:"awsCredsRef,omitempty"`
+}
+
 type Registry struct {
 	Name     string `json:"name,omitempty"`
 	URL      string `json:"url,omitempty"`
@@ -159,19 +167,20 @@ type BaseConfig struct {
 }
 
 type ControlPlane struct {
-	Image          string         `json:"image,omitempty"`
-	WebApp         WebApp         `json:"webapp,omitempty"`
-	Sidekiq        Sidekiq        `json:"sidekiq,omitempty"`
-	Searchkiq      Searchkiq      `json:"searchkiq,omitempty"`
-	Systemkiq      Systemkiq      `json:"systemkiq,omitempty"`
-	Hyper          Hyper          `json:"hyper,omitempty"`
-	CnvrgScheduler CnvrgScheduler `json:"cnvrgScheduler,omitempty"`
-	CnvrgRouter    CnvrgRouter    `json:"cnvrgRouter,omitempty"`
-	BaseConfig     BaseConfig     `json:"baseConfig,omitempty"`
-	Ldap           Ldap           `json:"ldap,omitempty"`
-	SMTP           SMTP           `json:"smtp,omitempty"`
-	ObjectStorage  ObjectStorage  `json:"objectStorage,omitempty"`
-	Mpi            Mpi            `json:"mpi,omitempty"`
+	Image                           string                          `json:"image,omitempty"`
+	WebApp                          WebApp                          `json:"webapp,omitempty"`
+	Sidekiq                         Sidekiq                         `json:"sidekiq,omitempty"`
+	Searchkiq                       Searchkiq                       `json:"searchkiq,omitempty"`
+	Systemkiq                       Systemkiq                       `json:"systemkiq,omitempty"`
+	Hyper                           Hyper                           `json:"hyper,omitempty"`
+	CnvrgScheduler                  CnvrgScheduler                  `json:"cnvrgScheduler,omitempty"`
+	CnvrgClusterProvisionerOperator CnvrgClusterProvisionerOperator `json:"cnvrgClusterProvisionerOperator,omitempty"`
+	CnvrgRouter                     CnvrgRouter                     `json:"cnvrgRouter,omitempty"`
+	BaseConfig                      BaseConfig                      `json:"baseConfig,omitempty"`
+	Ldap                            Ldap                            `json:"ldap,omitempty"`
+	SMTP                            SMTP                            `json:"smtp,omitempty"`
+	ObjectStorage                   ObjectStorage                   `json:"objectStorage,omitempty"`
+	Mpi                             Mpi                             `json:"mpi,omitempty"`
 }
 
 type Mpi struct {
@@ -338,6 +347,20 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "4Gi",
 		},
 		Replicas: 1,
+	},
+
+	CnvrgClusterProvisionerOperator: CnvrgClusterProvisionerOperator{
+		Enabled: false,
+		Requests: Requests{
+			Cpu:    "1",
+			Memory: "1Gi",
+		},
+		Limits: Limits{
+			Cpu:    "2",
+			Memory: "4Gi",
+		},
+		Image:       "cnvrg/ccp-operator:v1",
+		AwsCredsRef: "",
 	},
 
 	CnvrgRouter: CnvrgRouter{
