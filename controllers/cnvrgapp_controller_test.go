@@ -1016,6 +1016,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Labels).Should(HaveKeyWithValue("foo", "bar"))
 			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
+
 		It("Scheduler Annotations", func() {
 			ns := createNs()
 			ctx := context.Background()
@@ -1036,6 +1037,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(deployment.Annotations).Should(HaveKeyWithValue("foo1", "bar1"))
 			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
+
 		It("Scheduler Tenancy", func() {
 			ns := createNs()
 			ctx := context.Background()
