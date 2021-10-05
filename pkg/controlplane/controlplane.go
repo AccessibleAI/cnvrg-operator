@@ -478,6 +478,16 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 	return []*desired.State{
 		{
 
+			TemplatePath:   path + "/ccp/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVR:            desired.Kinds[desired.DeploymentGVR],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
 			TemplatePath:   path + "/ccp/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
