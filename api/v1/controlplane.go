@@ -359,7 +359,8 @@ var controlPlaneDefault = ControlPlane{
 			Cpu:    "2",
 			Memory: "4Gi",
 		},
-		Image: "cnvrg/ccp-operator:v1",
+		Image:       "cnvrg/ccp-operator:v1",
+		AwsCredsRef: "",
 	},
 
 	CnvrgRouter: CnvrgRouter{
