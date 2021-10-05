@@ -5,7 +5,7 @@ metadata:
   namespace: {{ ns . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: cnvrg-ccp-operator-manager-role
 subjects:
   - kind: ServiceAccount
