@@ -28,12 +28,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: accesskey
-                  name: cnvrg-aws-sec
+                  name: {{ .Spec.ControlPlane.CnvrgClusterProvisionerOperator.AwsCredsRef }}
             - name: USER_SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   key: secretkey
-                  name: cnvrg-aws-sec
+                  name: {{ .Spec.ControlPlane.CnvrgClusterProvisionerOperator.AwsCredsRef }}
           image: {{ .Spec.ControlPlane.CnvrgClusterProvisionerOperator.Image }}
           imagePullPolicy: Always
           livenessProbe:

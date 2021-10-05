@@ -488,16 +488,6 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 		},
 		{
 
-			TemplatePath:   path + "/ccp/aws-sec.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-
 			TemplatePath:   path + "/ccp/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

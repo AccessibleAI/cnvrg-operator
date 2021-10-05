@@ -109,10 +109,11 @@ type CnvrgScheduler struct {
 }
 
 type CnvrgClusterProvisionerOperator struct {
-	Enabled  bool     `json:"enabled,omitempty"`
-	Requests Requests `json:"requests,omitempty"`
-	Limits   Limits   `json:"limits,omitempty"`
-	Image    string   `json:"image,omitempty"`
+	Enabled     bool     `json:"enabled,omitempty"`
+	Requests    Requests `json:"requests,omitempty"`
+	Limits      Limits   `json:"limits,omitempty"`
+	Image       string   `json:"image,omitempty"`
+	AwsCredsRef string   `json:"awsCredsRef,omitempty"`
 }
 
 type Registry struct {
