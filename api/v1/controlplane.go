@@ -350,7 +350,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	CnvrgClusterProvisionerOperator: CnvrgClusterProvisionerOperator{
-		Enabled: true,
+		Enabled: false,
 		Requests: Requests{
 			Cpu:    "1",
 			Memory: "1Gi",
