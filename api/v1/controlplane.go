@@ -260,7 +260,6 @@ var controlPlaneDefault = ControlPlane{
 		FailureThreshold:        5,
 		OauthProxy: OauthProxyServiceConf{
 			SkipAuthRegex: []string{
-				`^\/api`,
 				`\/assets`,
 				`\/healthz`,
 				`\/public`,
@@ -269,6 +268,9 @@ var controlPlaneDefault = ControlPlane{
 				`\/gitlens.vsix`,
 				`\/ms-python-release.vsix`,
 			},
+			TokenValidationKey:      "",
+			TokenValidationAuthData: "",
+			TokenValidationRegex:    []string{},
 		},
 		Hpa: hpa,
 	},
