@@ -230,6 +230,16 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			emailsDomains += "]"
 
+			tokenValidationRegexes := "["
+			for i, regex := range tokenValidationRegex {
+				if i == (len(tokenValidationRegex) - 1) {
+					tokenValidationRegexes += fmt.Sprintf(`"%v"`, regex)
+				} else {
+					tokenValidationRegexes += fmt.Sprintf(`"%v", `, regex)
+				}
+			}
+			tokenValidationRegexes += "]"
+
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),

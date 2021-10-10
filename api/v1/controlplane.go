@@ -283,7 +283,7 @@ var controlPlaneDefault = ControlPlane{
 			},
 			TokenValidationKey:      generateSecureToken(16),
 			TokenValidationAuthData: generateSecureToken(6),
-			TokenValidationRegex:    []string{""},
+			TokenValidationRegex:    nil,
 		},
 		Hpa: hpa,
 	},

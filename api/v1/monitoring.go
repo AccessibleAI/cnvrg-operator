@@ -86,7 +86,7 @@ var grafanaInfraDefault = Grafana{
 		SkipAuthRegex:           []string{`\/api\/health`},
 		TokenValidationKey:      "",
 		TokenValidationAuthData: "",
-		TokenValidationRegex:    []string{""},
+		TokenValidationRegex:    nil,
 	},
 }
 
@@ -100,7 +100,7 @@ var grafanaAppDefault = Grafana{
 		SkipAuthRegex:           []string{`\/api\/health`},
 		TokenValidationKey:      "",
 		TokenValidationAuthData: "",
-		TokenValidationRegex:    []string{""},
+		TokenValidationRegex:    nil,
 	},
 }
 

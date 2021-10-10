@@ -108,7 +108,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 			SkipAuthRegex:           nil,
 			TokenValidationKey:      "",
 			TokenValidationAuthData: "",
-			TokenValidationRegex:    []string{""},
+			TokenValidationRegex:    nil,
 		},
 	},
 }
