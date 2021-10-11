@@ -22,7 +22,7 @@ type OauthProxyServiceConf struct {
 
 var ssoDefault = SSO{
 	Enabled:       false,
-	Image:         "cnvrg-oauth-proxy:v7.0.1.c8",
+	Image:         "saas-oauth2-proxy:latest",
 	AdminUser:     "",
 	Provider:      "",
 	EmailDomain:   nil,

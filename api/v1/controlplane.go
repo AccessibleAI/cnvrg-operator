@@ -283,7 +283,9 @@ var controlPlaneDefault = ControlPlane{
 			},
 			TokenValidationKey:      generateSecureToken(16),
 			TokenValidationAuthData: generateSecureToken(6),
-			TokenValidationRegex:    nil,
+			TokenValidationRegex: []string{
+				`^\/api`,
+			},
 		},
 		Hpa: hpa,
 	},
