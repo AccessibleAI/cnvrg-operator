@@ -256,7 +256,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///opt/app-root/src/templates/#/cnvrg-static/"]`, upstreamPort),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
-				`custom_templates_dir = "/opt/app-root/src/templates"`,
+				`custom_templates_dir = "/saas/templates"`,
 				"ssl_insecure_skip_verify = true",
 				`cookie_name = "_oauth2_proxy"`,
 				`cookie_expire = "168h"`,
