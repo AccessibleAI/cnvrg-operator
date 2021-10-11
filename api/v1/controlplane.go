@@ -1,5 +1,10 @@
 package v1
 
+import (
+	"crypto/rand"
+	"encoding/hex"
+)
+
 // +kubebuilder:validation:Enum=minio;aws;azure;gcp
 type ObjectStorageType string
 
@@ -236,6 +241,14 @@ var infraRegistryDefault = Registry{
 	Password: "",
 }
 
+func generateSecureToken(length int) string {
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
+}
+
 var controlPlaneDefault = ControlPlane{
 	Image: "core:3.6.99",
 
@@ -260,7 +273,6 @@ var controlPlaneDefault = ControlPlane{
 		FailureThreshold:        5,
 		OauthProxy: OauthProxyServiceConf{
 			SkipAuthRegex: []string{
-				`^\/api`,
 				`\/assets`,
 				`\/healthz`,
 				`\/public`,
@@ -268,6 +280,11 @@ var controlPlaneDefault = ControlPlane{
 				`\/vscode.tar.gz`,
 				`\/gitlens.vsix`,
 				`\/ms-python-release.vsix`,
+			},
+			TokenValidationKey:      generateSecureToken(16),
+			TokenValidationAuthData: generateSecureToken(6),
+			TokenValidationRegex: []string{
+				`^\/api`,
 			},
 		},
 		Hpa: hpa,

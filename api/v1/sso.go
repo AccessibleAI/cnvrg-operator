@@ -14,12 +14,15 @@ type SSO struct {
 }
 
 type OauthProxyServiceConf struct {
-	SkipAuthRegex []string `json:"skipAuthRegex,omitempty"`
+	SkipAuthRegex           []string `json:"skipAuthRegex,omitempty"`
+	TokenValidationKey      string   `json:"tokenValidationKey,omitempty"`
+	TokenValidationAuthData string   `json:"tokenValidationAuthData,omitempty"`
+	TokenValidationRegex    []string `json:"tokenValidationRegex,omitempty"`
 }
 
 var ssoDefault = SSO{
 	Enabled:       false,
-	Image:         "cnvrg-oauth-proxy:v7.0.1.c8",
+	Image:         "saas-oauth2-proxy:latest",
 	AdminUser:     "",
 	Provider:      "",
 	EmailDomain:   nil,

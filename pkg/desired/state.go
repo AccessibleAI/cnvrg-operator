@@ -207,7 +207,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int, tokenValidationKey string, tokenValidationAuthData string, tokenValidationRegex []string) string {
 			sso := getSSOConfig(obj)
 
 			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
@@ -230,11 +230,24 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			emailsDomains += "]"
 
+			tokenValidationRegexes := "["
+			for i, regex := range tokenValidationRegex {
+				if i == (len(tokenValidationRegex) - 1) {
+					tokenValidationRegexes += fmt.Sprintf(`"%v"`, regex)
+				} else {
+					tokenValidationRegexes += fmt.Sprintf(`"%v", `, regex)
+				}
+			}
+			tokenValidationRegexes += "]"
+
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
+				fmt.Sprintf(`token_validation_key = "%v"`, tokenValidationKey),
+				fmt.Sprintf(`token_validation_auth_data = "%v"`, tokenValidationAuthData),
+				fmt.Sprintf(`token_validation_regex = %v`, tokenValidationRegexes),
 				fmt.Sprintf(`email_domains = %v`, emailsDomains),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
@@ -243,7 +256,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///opt/app-root/src/templates/#/cnvrg-static/"]`, upstreamPort),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
-				`custom_templates_dir = "/opt/app-root/src/templates"`,
+				`custom_templates_dir = "/saas/templates"`,
 				"ssl_insecure_skip_verify = true",
 				`cookie_name = "_oauth2_proxy"`,
 				`cookie_expire = "168h"`,
