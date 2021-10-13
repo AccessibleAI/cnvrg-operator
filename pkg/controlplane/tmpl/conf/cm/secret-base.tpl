@@ -13,6 +13,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
+  CNVRG_SSO_KEY: {{ printf "%s:%s" .Spec.SSO.ClientID .Spec.SSO.ClientSecret | b64enc }}
   OAUTH_PROXY_API_KEY: {{ .Spec.ControlPlane.WebApp.OauthProxy.TokenValidationKey | b64enc }}
   OAUTH_PROXY_API_AUTH_DATA: {{ .Spec.ControlPlane.WebApp.OauthProxy.TokenValidationAuthData | b64enc }}
   OAUTH_PROXY_TOKENS_ENABLED: "{{ .Spec.SSO.Enabled | toString | b64enc }}"
