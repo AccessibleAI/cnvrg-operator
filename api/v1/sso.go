@@ -11,6 +11,8 @@ type SSO struct {
 	CookieSecret  string   `json:"cookieSecret,omitempty"`
 	AzureTenant   string   `json:"azureTenant,omitempty"`
 	OidcIssuerURL string   `json:"oidcIssuerUrl,omitempty"`
+	RealmName     string   `json:"realmName,omitempty"`
+	ServiceUrl    string   `json:"serviceUrl,omitempty"`
 }
 
 type OauthProxyServiceConf struct {
@@ -31,5 +33,6 @@ var ssoDefault = SSO{
 	CookieSecret:  "",
 	AzureTenant:   "", // if IDP is Azure AD
 	OidcIssuerURL: "", // if IDP oidc
-
+	RealmName:     "",
+	ServiceUrl:    "",
 }
