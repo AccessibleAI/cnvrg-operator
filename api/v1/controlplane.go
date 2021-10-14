@@ -354,7 +354,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	CnvrgScheduler: CnvrgScheduler{
-		Enabled: true,
+		Enabled: false,
 		Requests: Requests{
 			Cpu:    "500m",
 			Memory: "1000Mi",
