@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
@@ -46,6 +48,14 @@ func removeString(slice []string, s string) (result []string) {
 	return
 }
 
+func generateSecureToken(length int) string {
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
+}
+
 func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec) {
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
@@ -57,6 +67,13 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 				desiredAppSpec.Dbs.Es.JavaOpts = fmt.Sprintf("-Xms%dg -Xmx%dg", heapMem, heapMem)
 			}
 		}
+	}
+
+	if app.Spec.ControlPlane.WebApp.OauthProxy.TokenValidationKey == "" {
+		desiredAppSpec.ControlPlane.WebApp.OauthProxy.TokenValidationKey = generateSecureToken(16)
+	}
+	if app.Spec.ControlPlane.WebApp.OauthProxy.TokenValidationAuthData == "" {
+		desiredAppSpec.ControlPlane.WebApp.OauthProxy.TokenValidationAuthData = generateSecureToken(6)
 	}
 
 	if app.Spec.Networking.Ingress.IstioGwName == "" {
