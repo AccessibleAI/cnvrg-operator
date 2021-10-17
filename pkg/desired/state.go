@@ -262,6 +262,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				`cookie_expire = "168h"`,
 				"cookie_secure = false",
 				"cookie_httponly = true",
+				"insecure_oidc_allow_unverified_email = true",
 			}
 
 			return strings.Join(proxyConf, "\n")

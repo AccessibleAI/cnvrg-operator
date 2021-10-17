@@ -13,5 +13,5 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  conf: {{ oauthProxyConfig . .Spec.Logging.Kibana.SvcName nil .Spec.SSO.Provider .Spec.Logging.Kibana.Port 3000 .Spec.ControlPlane.WebApp.OauthProxy.TokenValidationKey .Spec.ControlPlane.WebApp.OauthProxy.TokenValidationAuthData .Spec.ControlPlane.WebApp.OauthProxy.TokenValidationRegex | b64enc }}
+  conf: {{ oauthProxyConfig . .Spec.Logging.Kibana.SvcName nil .Spec.SSO.Provider .Spec.Logging.Kibana.Port 3000 .Spec.Logging.Kibana.OauthProxy.TokenValidationKey .Spec.Logging.Kibana.OauthProxy.TokenValidationAuthData .Spec.Logging.Kibana.OauthProxy.TokenValidationRegex | b64enc }}
 
