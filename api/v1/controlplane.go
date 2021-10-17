@@ -268,8 +268,8 @@ var controlPlaneDefault = ControlPlane{
 				`\/gitlens.vsix`,
 				`\/ms-python-release.vsix`,
 			},
-			TokenValidationKey:      "", // generateSecureToken(16),
-			TokenValidationAuthData: "", // generateSecureToken(6),
+			TokenValidationKey:      "",
+			TokenValidationAuthData: "",
 			TokenValidationRegex: []string{
 				`^\/api`,
 			},
