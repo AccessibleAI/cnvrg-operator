@@ -816,9 +816,17 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	}
 
 	if viper.GetBool("verbose") {
-		appLog.Info("diff between desiredSpec and actual")
-		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgApp.Spec)
-		appLog.Info(diff)
+
+		if diff, equal := messagediff.PrettyDiff(desiredSpec, cnvrgApp.Spec); !equal {
+			appLog.Info("diff between desiredSpec and actual")
+			appLog.Info(diff)
+		}
+
+		if diff, equal := messagediff.PrettyDiff(cnvrgApp.Spec, desiredSpec); !equal {
+			appLog.Info("diff between actual and desired")
+			appLog.Info(diff)
+		}
+
 	}
 
 	equal := reflect.DeepEqual(desiredSpec, cnvrgApp.Spec)
