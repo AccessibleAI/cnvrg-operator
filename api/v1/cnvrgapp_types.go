@@ -17,8 +17,8 @@ type CnvrgAppSpec struct {
 	Monitoring            CnvrgAppMonitoring `json:"monitoring,omitempty"`
 	SSO                   SSO                `json:"sso,omitempty"`
 	Tenancy               Tenancy            `json:"tenancy,omitempty"`
-	CnvrgAppPriorityClass PriorityClass      `json:"cnvrgAppPriorityClass"`
-	CnvrgJobPriorityClass PriorityClass      `json:"cnvrgJobPriorityClass"`
+	CnvrgAppPriorityClass PriorityClass      `json:"cnvrgAppPriorityClass,omitempty"`
+	CnvrgJobPriorityClass PriorityClass      `json:"cnvrgJobPriorityClass,omitempty"`
 }
 
 // +kubebuilder:object:root=true

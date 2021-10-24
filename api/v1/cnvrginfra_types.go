@@ -23,8 +23,8 @@ type CnvrgInfraSpec struct {
 	ImageHub              string               `json:"imageHub,omitempty"`
 	ConfigReloader        ConfigReloader       `json:"configReloader,omitempty"`
 	Capsule               Capsule              `json:"capsule,omitempty"`
-	CnvrgAppPriorityClass PriorityClass        `json:"cnvrgAppPriorityClass"`
-	CnvrgJobPriorityClass PriorityClass        `json:"cnvrgJobPriorityClass"`
+	CnvrgAppPriorityClass PriorityClass        `json:"cnvrgAppPriorityClass,omitempty"`
+	CnvrgJobPriorityClass PriorityClass        `json:"cnvrgJobPriorityClass,omitempty"`
 }
 
 // +kubebuilder:object:root=true

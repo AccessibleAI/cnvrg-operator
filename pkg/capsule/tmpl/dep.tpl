@@ -25,6 +25,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       serviceAccountName: cnvrg-capsule
       containers:
         - name: capsule
