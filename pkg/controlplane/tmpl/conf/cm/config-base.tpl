@@ -31,7 +31,7 @@ data:
   CNVRG_PASSENGER_BIND_PORT: "{{ cnvrgPassengerBindPort . }}"
   CNVRG_JOB_UID: "{{ .Spec.ControlPlane.BaseConfig.CnvrgJobUID }}"
   CNVRG_JOBS_SERVICE_ACCOUNT: "cnvrg-job"
-  CNVRG_JOBS_PRIORITY_CLASS: "{{ .Spec.CnvrgJobPriorityClass }}"
+  CNVRG_JOBS_PRIORITY_CLASS: "{{ .Spec.CnvrgJobPriorityClass.Name }}"
   HAS_CNVRG_SCHEDULER: "{{ .Spec.ControlPlane.CnvrgScheduler.Enabled }}"
   CNVRG_SSO_REALM: "{{ .Spec.SSO.RealmName }}"
   CNVRG_SSO_SERVICE_URL: "{{ .Spec.SSO.ServiceUrl }}"

@@ -29,7 +29,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       nodeSelector:
         {{- range $key, $val := .Spec.Logging.Fluentbit.NodeSelector }}
         {{ $key }}: {{ $val }}

@@ -2131,11 +2131,13 @@ var _ = Describe("CnvrgApp controller", func() {
 	})
 
 	Context("Test Priority class", func() {
-		FIt("CnvrgApp and CnvrgJob priority classes names", func() {
+		It("CnvrgApp and CnvrgJob priority classes names", func() {
 			ns := createNs()
 			ctx := context.Background()
 			infra := getDefaultTestInfraSpec(ns)
 			app := getDefaultTestAppSpec(ns)
+			app.Spec.CnvrgJobPriorityClass.Name = ""
+			app.Spec.CnvrgAppPriorityClass.Name = ""
 			app.Spec.Dbs.Pg.Enabled = true
 			// create infra
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -2160,8 +2162,10 @@ var _ = Describe("CnvrgApp controller", func() {
 				return true
 			}, timeout, interval).Should(BeTrue())
 
-			Expect(expectedApp.Spec.CnvrgAppPriorityClass).To(Equal(infra.Spec.CnvrgAppPriorityClass.Name))
-			Expect(expectedApp.Spec.CnvrgJobPriorityClass).To(Equal(infra.Spec.CnvrgJobPriorityClass.Name))
+			Expect(expectedApp.Spec.CnvrgAppPriorityClass.Name).To(Equal(infra.Spec.CnvrgAppPriorityClass.Name))
+			Expect(expectedApp.Spec.CnvrgJobPriorityClass.Name).To(Equal(infra.Spec.CnvrgJobPriorityClass.Name))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 	})
 	Context("Test AppMonitoring", func() {
@@ -2347,6 +2351,8 @@ func getEmptyTestAppSpec(ns string) *mlopsv1.CnvrgApp {
 
 func getDefaultTestAppSpec(ns string) *mlopsv1.CnvrgApp {
 	testSpec := mlopsv1.DefaultCnvrgAppSpec()
+	testSpec.CnvrgAppPriorityClass.Name = "foo-bar"
+	testSpec.CnvrgJobPriorityClass.Name = "foo-bar"
 	testSpec.ClusterDomain = "test.local"
 	return &mlopsv1.CnvrgApp{
 		TypeMeta: metav1.TypeMeta{

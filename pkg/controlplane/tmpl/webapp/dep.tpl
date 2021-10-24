@@ -54,7 +54,7 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"

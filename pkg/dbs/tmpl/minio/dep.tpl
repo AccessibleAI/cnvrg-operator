@@ -29,7 +29,7 @@ spec:
         owner: cnvrg-control-plane
         cnvrg-component: minio
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}

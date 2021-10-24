@@ -15,7 +15,7 @@ spec:
       labels:
         control-plane: controller-manager
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       containers:
         - args:
             - --health-probe-bind-address=:8081

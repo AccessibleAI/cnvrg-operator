@@ -100,12 +100,12 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		}
 	}
 
-	if app.Spec.CnvrgAppPriorityClass == "" {
-		desiredAppSpec.CnvrgAppPriorityClass = infra.Spec.CnvrgAppPriorityClass.Name
+	if app.Spec.CnvrgAppPriorityClass.Name == "" && infra != nil {
+		desiredAppSpec.CnvrgAppPriorityClass = infra.Spec.CnvrgAppPriorityClass
 	}
 
-	if app.Spec.CnvrgJobPriorityClass == "" {
-		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass.Name
+	if app.Spec.CnvrgAppPriorityClass.Name == "" && infra != nil {
+		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
 	}
 }
 

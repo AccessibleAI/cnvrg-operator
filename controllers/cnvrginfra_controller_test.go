@@ -992,7 +992,6 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Capsule.Enabled = true
 			infra.Spec.Capsule.StorageClass = "foo-bar"
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
-
 			pvc := corev1.PersistentVolumeClaim{}
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Capsule.SvcName, Namespace: ns}, &pvc)

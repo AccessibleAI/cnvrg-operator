@@ -51,9 +51,33 @@ spec:
               clusterDomain:
                 type: string
               cnvrgAppPriorityClass:
-                type: string
+                properties:
+                  description:
+                    type: string
+                  name:
+                    type: string
+                  value:
+                    format: int32
+                    type: integer
+                required:
+                - description
+                - name
+                - value
+                type: object
               cnvrgJobPriorityClass:
-                type: string
+                properties:
+                  description:
+                    type: string
+                  name:
+                    type: string
+                  value:
+                    format: int32
+                    type: integer
+                required:
+                - description
+                - name
+                - value
+                type: object
               controlPlane:
                 properties:
                   baseConfig:

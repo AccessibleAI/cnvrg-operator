@@ -30,7 +30,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       containers:
       - args:
         - --web.listen-address=127.0.0.1:9100

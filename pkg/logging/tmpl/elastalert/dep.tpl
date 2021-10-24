@@ -29,7 +29,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}

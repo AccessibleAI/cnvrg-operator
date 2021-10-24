@@ -810,7 +810,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	infra, err := r.getCnvrgInfra()
 	if err != nil {
 		appLog.Error(err, "can't get cnvrg infra")
-		return false, err
+		//return false, err
 	}
 
 	calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, infra)
