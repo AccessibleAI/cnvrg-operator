@@ -74,6 +74,34 @@ spec:
                 type: object
               clusterDomain:
                 type: string
+              cnvrgAppPriorityClass:
+                properties:
+                  description:
+                    type: string
+                  name:
+                    type: string
+                  value:
+                    format: int32
+                    type: integer
+                required:
+                - description
+                - name
+                - value
+                type: object
+              cnvrgJobPriorityClass:
+                properties:
+                  description:
+                    type: string
+                  name:
+                    type: string
+                  value:
+                    format: int32
+                    type: integer
+                required:
+                - description
+                - name
+                - value
+                type: object
               configReloader:
                 properties:
                   enabled:
@@ -516,6 +544,9 @@ spec:
                   value:
                     type: string
                 type: object
+            required:
+            - cnvrgAppPriorityClass
+            - cnvrgJobPriorityClass
             type: object
           status:
             properties:

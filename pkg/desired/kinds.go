@@ -30,6 +30,7 @@ const (
 	StorageClassGVR         GVRName = "StorageClassGVR"
 	PodDisruptionBudgetGVR  GVRName = "PodDisruptionBudget"
 	HpaGVR                  GVRName = "HpaGVR"
+	PriorityClassGCR        GVRName = "PriorityClassGCR"
 )
 
 var Kinds = map[GVRName]schema.GroupVersionKind{
@@ -172,5 +173,10 @@ var Kinds = map[GVRName]schema.GroupVersionKind{
 		Group:   "autoscaling",
 		Version: "v2beta2",
 		Kind:    "HorizontalPodAutoscaler",
+	},
+	PriorityClassGCR: schema.GroupVersionKind{
+		Group:   "scheduling.k8s.io",
+		Version: "v1",
+		Kind:    "PriorityClass",
 	},
 }

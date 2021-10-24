@@ -32,6 +32,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       k8s:
+        priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
         podAnnotations:
           {{- range $k, $v := .Spec.Annotations }}
           {{$k}}: "{{$v}}"
@@ -98,6 +99,7 @@ spec:
     pilot:
       enabled: true
       k8s:
+        priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
         podAnnotations:
           {{- range $k, $v := .Spec.Annotations }}
           {{$k}}: "{{$v}}"

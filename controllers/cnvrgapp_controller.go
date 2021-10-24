@@ -807,7 +807,13 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	// Get default cnvrgApp spec
 	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
 
-	calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec)
+	infra, err := r.getCnvrgInfra()
+	if err != nil {
+		appLog.Error(err, "can't get cnvrg infra")
+		return false, err
+	}
+
+	calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, infra)
 
 	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride, mergo.WithTransformers(cnvrgSpecBoolTransformer{})); err != nil {

@@ -5,18 +5,20 @@ import (
 )
 
 type CnvrgAppSpec struct {
-	ClusterDomain string             `json:"clusterDomain,omitempty"`
-	ImageHub      string             `json:"imageHub,omitempty"`
-	Labels        map[string]string  `json:"labels,omitempty"`
-	Annotations   map[string]string  `json:"annotations,omitempty"`
-	ControlPlane  ControlPlane       `json:"controlPlane,omitempty"`
-	Registry      Registry           `json:"registry,omitempty"`
-	Dbs           AppDbs             `json:"dbs,omitempty"`
-	Networking    CnvrgAppNetworking `json:"networking,omitempty"`
-	Logging       CnvrgAppLogging    `json:"logging,omitempty"`
-	Monitoring    CnvrgAppMonitoring `json:"monitoring,omitempty"`
-	SSO           SSO                `json:"sso,omitempty"`
-	Tenancy       Tenancy            `json:"tenancy,omitempty"`
+	ClusterDomain         string             `json:"clusterDomain,omitempty"`
+	ImageHub              string             `json:"imageHub,omitempty"`
+	Labels                map[string]string  `json:"labels,omitempty"`
+	Annotations           map[string]string  `json:"annotations,omitempty"`
+	ControlPlane          ControlPlane       `json:"controlPlane,omitempty"`
+	Registry              Registry           `json:"registry,omitempty"`
+	Dbs                   AppDbs             `json:"dbs,omitempty"`
+	Networking            CnvrgAppNetworking `json:"networking,omitempty"`
+	Logging               CnvrgAppLogging    `json:"logging,omitempty"`
+	Monitoring            CnvrgAppMonitoring `json:"monitoring,omitempty"`
+	SSO                   SSO                `json:"sso,omitempty"`
+	Tenancy               Tenancy            `json:"tenancy,omitempty"`
+	CnvrgAppPriorityClass string             `json:"cnvrgAppPriorityClass"`
+	CnvrgJobPriorityClass string             `json:"cnvrgJobPriorityClass"`
 }
 
 // +kubebuilder:object:root=true
@@ -45,17 +47,19 @@ func init() {
 
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
-		ClusterDomain: "",
-		ImageHub:      "docker.io/cnvrg",
-		ControlPlane:  controlPlaneDefault,
-		Registry:      appRegistryDefault,
-		Dbs:           appDbsDefaults,
-		Logging:       cnvrgAppLoggingDefault,
-		Networking:    cnvrgAppNetworkingDefault,
-		Monitoring:    cnvrgAppMonitoringDefault,
-		SSO:           ssoDefault,
-		Tenancy:       tenancyDefault,
-		Labels:        map[string]string{"owner": "cnvrg-control-plane"},
-		Annotations:   nil,
+		ClusterDomain:         "",
+		ImageHub:              "docker.io/cnvrg",
+		ControlPlane:          controlPlaneDefault,
+		Registry:              appRegistryDefault,
+		Dbs:                   appDbsDefaults,
+		Logging:               cnvrgAppLoggingDefault,
+		Networking:            cnvrgAppNetworkingDefault,
+		Monitoring:            cnvrgAppMonitoringDefault,
+		SSO:                   ssoDefault,
+		Tenancy:               tenancyDefault,
+		Labels:                map[string]string{"owner": "cnvrg-control-plane"},
+		Annotations:           nil,
+		CnvrgAppPriorityClass: "",
+		CnvrgJobPriorityClass: "",
 	}
 }

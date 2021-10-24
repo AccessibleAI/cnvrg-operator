@@ -28,6 +28,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
       serviceAccountName: dcgm-exporter
       volumes:
         - name: "pod-gpu-resources"

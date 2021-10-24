@@ -7,22 +7,24 @@ import (
 var InfraReconcilerCm = "infra-reconciler-cm"
 
 type CnvrgInfraSpec struct {
-	ClusterDomain  string               `json:"clusterDomain,omitempty"`
-	InfraNamespace string               `json:"infraNamespace,omitempty"`
-	Monitoring     CnvrgInfraMonitoring `json:"monitoring,omitempty"`
-	Networking     CnvrgInfraNetworking `json:"networking,omitempty"`
-	Logging        CnvrgInfraLogging    `json:"logging,omitempty"`
-	Registry       Registry             `json:"registry,omitempty"`
-	Storage        Storage              `json:"storage,omitempty"`
-	Dbs            InfraDbs             `json:"dbs,omitempty"`
-	SSO            SSO                  `json:"sso,omitempty"`
-	Gpu            Gpu                  `json:"gpu,omitempty"`
-	Tenancy        Tenancy              `json:"tenancy,omitempty"`
-	Labels         map[string]string    `json:"labels,omitempty"`
-	Annotations    map[string]string    `json:"annotations,omitempty"`
-	ImageHub       string               `json:"imageHub,omitempty"`
-	ConfigReloader ConfigReloader       `json:"configReloader,omitempty"`
-	Capsule        Capsule              `json:"capsule,omitempty"`
+	ClusterDomain         string               `json:"clusterDomain,omitempty"`
+	InfraNamespace        string               `json:"infraNamespace,omitempty"`
+	Monitoring            CnvrgInfraMonitoring `json:"monitoring,omitempty"`
+	Networking            CnvrgInfraNetworking `json:"networking,omitempty"`
+	Logging               CnvrgInfraLogging    `json:"logging,omitempty"`
+	Registry              Registry             `json:"registry,omitempty"`
+	Storage               Storage              `json:"storage,omitempty"`
+	Dbs                   InfraDbs             `json:"dbs,omitempty"`
+	SSO                   SSO                  `json:"sso,omitempty"`
+	Gpu                   Gpu                  `json:"gpu,omitempty"`
+	Tenancy               Tenancy              `json:"tenancy,omitempty"`
+	Labels                map[string]string    `json:"labels,omitempty"`
+	Annotations           map[string]string    `json:"annotations,omitempty"`
+	ImageHub              string               `json:"imageHub,omitempty"`
+	ConfigReloader        ConfigReloader       `json:"configReloader,omitempty"`
+	Capsule               Capsule              `json:"capsule,omitempty"`
+	CnvrgAppPriorityClass PriorityClass        `json:"cnvrgAppPriorityClass"`
+	CnvrgJobPriorityClass PriorityClass        `json:"cnvrgJobPriorityClass"`
 }
 
 // +kubebuilder:object:root=true
@@ -51,22 +53,24 @@ func init() {
 
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	infraDefault := CnvrgInfraSpec{
-		ClusterDomain:  "",
-		ImageHub:       "docker.io/cnvrg",
-		InfraNamespace: "cnvrg-infra",
-		SSO:            ssoDefault,
-		Storage:        storageDefault,
-		Networking:     cnvrgInfraNetworkingDefault,
-		Monitoring:     infraMonitoringDefault,
-		Logging:        cnvrgInfraLoggingDefault,
-		Registry:       infraRegistryDefault,
-		Dbs:            infraDbsDefaults,
-		Gpu:            gpuDefaults,
-		Tenancy:        tenancyDefault,
-		Labels:         map[string]string{"owner": "cnvrg-control-plane"},
-		Annotations:    nil,
-		ConfigReloader: defaultConfigReloader,
-		Capsule:        capsuleDefault,
+		ClusterDomain:         "",
+		ImageHub:              "docker.io/cnvrg",
+		InfraNamespace:        "cnvrg-infra",
+		SSO:                   ssoDefault,
+		Storage:               storageDefault,
+		Networking:            cnvrgInfraNetworkingDefault,
+		Monitoring:            infraMonitoringDefault,
+		Logging:               cnvrgInfraLoggingDefault,
+		Registry:              infraRegistryDefault,
+		Dbs:                   infraDbsDefaults,
+		Gpu:                   gpuDefaults,
+		Tenancy:               tenancyDefault,
+		Labels:                map[string]string{"owner": "cnvrg-control-plane"},
+		Annotations:           nil,
+		ConfigReloader:        defaultConfigReloader,
+		Capsule:               capsuleDefault,
+		CnvrgAppPriorityClass: PriorityClass{Name: "cnvrg-apps", Value: 2000000, Description: "cnvrg control plane apps priority class"},
+		CnvrgJobPriorityClass: PriorityClass{Name: "cnvrg-jobs", Value: 1000000, Description: "cnvrg jobs priority class"},
 	}
 	return infraDefault
 }

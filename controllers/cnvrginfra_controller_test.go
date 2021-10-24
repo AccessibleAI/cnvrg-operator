@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	v12 "k8s.io/api/scheduling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
@@ -1002,6 +1003,55 @@ var _ = Describe("CnvrgInfra controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			Expect(*pvc.Spec.StorageClassName).To(Equal(infra.Spec.Capsule.StorageClass))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
+		})
+	})
+
+	Context("Test Priority class", func() {
+		It("cnvrg app priority class  ", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Capsule.Enabled = true
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			pr := v12.PriorityClass{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.CnvrgAppPriorityClass.Name, Namespace: ns}, &pr)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			expectedPr := v12.PriorityClass{
+				ObjectMeta:  metav1.ObjectMeta{Name: infra.Spec.CnvrgAppPriorityClass.Name},
+				Value:       infra.Spec.CnvrgAppPriorityClass.Value,
+				Description: infra.Spec.CnvrgAppPriorityClass.Description,
+			}
+			Expect(expectedPr.Value).To(Equal(pr.Value))
+			Expect(expectedPr.Description).To(Equal(pr.Description))
+			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
+		})
+		It("cnvrg job priority class  ", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			infra.Spec.Capsule.Enabled = true
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			pr := v12.PriorityClass{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.CnvrgJobPriorityClass.Name, Namespace: ns}, &pr)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			expectedPr := v12.PriorityClass{
+				ObjectMeta:  metav1.ObjectMeta{Name: infra.Spec.CnvrgJobPriorityClass.Name},
+				Value:       infra.Spec.CnvrgJobPriorityClass.Value,
+				Description: infra.Spec.CnvrgJobPriorityClass.Description,
+			}
+			Expect(expectedPr.Value).To(Equal(pr.Value))
+			Expect(expectedPr.Description).To(Equal(pr.Description))
 			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())
 		})
 	})

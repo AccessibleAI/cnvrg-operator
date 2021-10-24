@@ -28,6 +28,7 @@ spec:
         owner: cnvrg-control-plane
         cnvrg-component: redis
     spec:
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}

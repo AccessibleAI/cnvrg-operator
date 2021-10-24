@@ -254,6 +254,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`cookie_secret = "%v"`, sso.CookieSecret),
 				fmt.Sprintf(`oidc_issuer_url = "%v"`, sso.OidcIssuerURL),
 				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///opt/app-root/src/templates/#/cnvrg-static/"]`, upstreamPort),
+				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/saas/templates"`,
@@ -262,7 +263,6 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				`cookie_expire = "168h"`,
 				"cookie_secure = false",
 				"cookie_httponly = true",
-				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 			}
 
 			return strings.Join(proxyConf, "\n")

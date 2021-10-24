@@ -29,6 +29,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
       serviceAccountName: cnvrg-operator
       securityContext:
         runAsUser: 1000

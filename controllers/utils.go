@@ -56,7 +56,7 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec) {
+func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra) {
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
 		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
@@ -98,6 +98,14 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		if !reflect.DeepEqual(desiredAppSpec.Networking.Proxy.NoProxy, app.Spec.Networking.Proxy.NoProxy) {
 			app.Spec.Networking.Proxy.NoProxy = nil
 		}
+	}
+
+	if app.Spec.CnvrgAppPriorityClass == "" {
+		desiredAppSpec.CnvrgAppPriorityClass = infra.Spec.CnvrgAppPriorityClass.Name
+	}
+
+	if app.Spec.CnvrgJobPriorityClass == "" {
+		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass.Name
 	}
 }
 

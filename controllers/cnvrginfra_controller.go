@@ -13,6 +13,7 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/priorityclass"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/registry"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/reloader"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/storage"
@@ -135,6 +136,12 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 
 	var reconcileResult error
+
+	// apply priority classes
+	if err := desired.Apply(priorityclass.State(), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
 
 	// registry
 	infraLog.Info("applying registry")

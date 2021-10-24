@@ -2130,6 +2130,40 @@ var _ = Describe("CnvrgApp controller", func() {
 		})
 	})
 
+	Context("Test Priority class", func() {
+		FIt("CnvrgApp and CnvrgJob priority classes names", func() {
+			ns := createNs()
+			ctx := context.Background()
+			infra := getDefaultTestInfraSpec(ns)
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.Dbs.Pg.Enabled = true
+			// create infra
+			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
+			// create app
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+
+			deployment := v1.Deployment{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Spec.Dbs.Pg.SvcName, Namespace: ns}, &deployment)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			expectedApp := mlopsv1.CnvrgApp{}
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: app.Name, Namespace: ns}, &expectedApp)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+
+			Expect(expectedApp.Spec.CnvrgAppPriorityClass).To(Equal(infra.Spec.CnvrgAppPriorityClass.Name))
+			Expect(expectedApp.Spec.CnvrgJobPriorityClass).To(Equal(infra.Spec.CnvrgJobPriorityClass.Name))
+		})
+	})
 	Context("Test AppMonitoring", func() {
 		It("Prom creds secret generator", func() {
 			ns := createNs()

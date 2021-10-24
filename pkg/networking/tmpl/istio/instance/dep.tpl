@@ -30,6 +30,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Spec.Registry.Name }}
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
       serviceAccountName: istio-operator
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

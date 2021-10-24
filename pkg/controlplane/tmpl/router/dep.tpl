@@ -22,6 +22,7 @@ spec:
       labels:
         app: {{ .Spec.ControlPlane.CnvrgRouter.SvcName }}
     spec:
+      priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"

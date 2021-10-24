@@ -50,6 +50,10 @@ spec:
                 type: object
               clusterDomain:
                 type: string
+              cnvrgAppPriorityClass:
+                type: string
+              cnvrgJobPriorityClass:
+                type: string
               controlPlane:
                 properties:
                   baseConfig:
@@ -916,6 +920,9 @@ spec:
                   value:
                     type: string
                 type: object
+            required:
+            - cnvrgAppPriorityClass
+            - cnvrgJobPriorityClass
             type: object
           status:
             properties:

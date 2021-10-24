@@ -55,6 +55,7 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: cnvrg-ccp-prometheus
+  priorityClassName: {{ .Spec.CnvrgAppPriorityClass }}
   podMonitorNamespaceSelector: {}
   podMonitorSelector: {}
   probeNamespaceSelector: {}
