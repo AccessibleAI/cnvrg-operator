@@ -253,7 +253,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
 				fmt.Sprintf(`cookie_secret = "%v"`, sso.CookieSecret),
 				fmt.Sprintf(`oidc_issuer_url = "%v"`, sso.OidcIssuerURL),
-				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///opt/app-root/src/templates/#/cnvrg-static/"]`, upstreamPort),
+				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///saas/templates/#/cnvrg-static/"]`, upstreamPort),
 				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
