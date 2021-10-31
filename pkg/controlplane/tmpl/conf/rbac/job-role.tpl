@@ -11,6 +11,7 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
+{{- if not .Spec.ControlPlane.BaseConfig.CnvrgJobRbacStrict }}
 rules:
 - apiGroups:
   - ""
@@ -24,3 +25,4 @@ rules:
   - services
   verbs:
   - '*'
+{{- end }}

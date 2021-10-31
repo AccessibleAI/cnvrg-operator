@@ -84,6 +84,8 @@ spec:
                     properties:
                       agentCustomTag:
                         type: string
+                      cnvrgJobRbacStrict:
+                        type: boolean
                       cnvrgJobUid:
                         type: string
                       featureFlags:

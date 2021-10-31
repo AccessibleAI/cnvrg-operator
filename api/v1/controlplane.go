@@ -164,6 +164,7 @@ type BaseConfig struct {
 	AgentCustomTag       string            `json:"agentCustomTag,omitempty"`
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
+	CnvrgJobRbacStrict   bool              `json:"cnvrgJobRbacStrict,omitempty"`
 }
 
 type ControlPlane struct {
@@ -377,12 +378,13 @@ var controlPlaneDefault = ControlPlane{
 	Mpi: mpiDefault,
 
 	BaseConfig: BaseConfig{
-		JobsStorageClass: "",
-		FeatureFlags:     nil,
-		SentryURL:        "",
-		AgentCustomTag:   "latest",
-		Intercom:         "true",
-		CnvrgJobUID:      "1000",
+		JobsStorageClass:   "",
+		FeatureFlags:       nil,
+		SentryURL:          "",
+		AgentCustomTag:     "latest",
+		Intercom:           "true",
+		CnvrgJobUID:        "1000",
+		CnvrgJobRbacStrict: false,
 	},
 
 	ObjectStorage: ObjectStorage{
