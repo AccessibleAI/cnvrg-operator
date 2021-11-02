@@ -3,6 +3,7 @@ package desired
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/Dimss/crypt/apr1_crypt"
@@ -13,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"io/ioutil"
+	appv1 "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -382,7 +384,7 @@ func (s *State) GenerateDeployable() error {
 		zap.S().Errorf("%v, template: %v", err, s.TemplatePath)
 		return err
 	}
-	s.Obj.SetGroupVersionKind(s.GVR)
+	s.Obj.SetGroupVersionKind(s.GVK)
 	if err := s.Template.Execute(&tpl, s.TemplateData); err != nil {
 		zap.S().Error(err, "rendering template error", "file", s.TemplatePath)
 		return err
@@ -428,10 +430,10 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 			continue
 		}
 		actualObject := &unstructured.Unstructured{}
-		actualObject.SetGroupVersionKind(manifest.GVR)
+		actualObject.SetGroupVersionKind(manifest.GVK)
 		err := client.Get(ctx, types.NamespacedName{Name: manifest.Obj.GetName(), Namespace: manifest.Obj.GetNamespace()}, actualObject)
 		if err != nil && errors.IsNotFound(err) {
-			log.V(1).Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
+			log.V(1).Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVK.Kind)
 			if err := client.Create(ctx, manifest.Obj); err != nil {
 				log.Error(err, "error creating object", "name", manifest.Obj.GetName())
 				return err
@@ -439,9 +441,12 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 		} else {
 
 			if !manifest.Updatable {
-				log.Info("skipping update, manifest is not updatable", "manifest", manifest.Obj.GetName(), "kind", manifest.GVR.Kind)
+				log.Info("skipping update, manifest is not updatable", "manifest", manifest.Obj.GetName(), "kind", manifest.GVK.Kind)
 				continue
 			}
+
+			// for deployment|statefulset|daemonset do not override labels and annotations, but merge them
+			manifest.mergeMetadata(actualObject, log)
 
 			// if override true, do not merge object with existing state
 			// currently, Override=true set only for fluentbit CM
@@ -464,6 +469,132 @@ func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Clien
 		}
 	}
 	return nil
+}
+
+func (s *State) mergeMetadata(actualObject *unstructured.Unstructured, log logr.Logger) {
+	var e error
+	var jsonStr []byte
+	if s.GVK.Kind == "Deployment" {
+
+		manifest, err := objectToDeployment(s.Obj)
+		if err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+		actual, err := objectToDeployment(actualObject)
+		if err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.ObjectMeta.Labels, actual.ObjectMeta.Labels); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.Spec.Template.ObjectMeta.Labels, actual.Spec.Template.ObjectMeta.Labels); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.ObjectMeta.Annotations, actual.ObjectMeta.Annotations); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.Spec.Template.ObjectMeta.Annotations, actual.Spec.Template.ObjectMeta.Annotations); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		jsonStr, e = json.Marshal(manifest)
+	}
+
+	if s.GVK.Kind == "StatefulSet" {
+
+		manifest, err := objectToStatefulSet(s.Obj)
+		if err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+		actual, err := objectToStatefulSet(actualObject)
+		if err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.ObjectMeta.Labels, actual.ObjectMeta.Labels); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.Spec.Template.ObjectMeta.Labels, actual.Spec.Template.ObjectMeta.Labels); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.ObjectMeta.Annotations, actual.ObjectMeta.Annotations); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+
+		}
+
+		if err := mergo.Merge(&manifest.Spec.Template.ObjectMeta.Annotations, actual.Spec.Template.ObjectMeta.Annotations); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		jsonStr, e = json.Marshal(manifest)
+
+	}
+
+	if s.GVK.Kind == "DaemonSet" {
+
+		manifest, err := objectToDaemonSet(s.Obj)
+		if err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+		actual, err := objectToDaemonSet(actualObject)
+		if err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.ObjectMeta.Labels, actual.ObjectMeta.Labels); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.Spec.Template.ObjectMeta.Labels, actual.Spec.Template.ObjectMeta.Labels); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.ObjectMeta.Annotations, actual.ObjectMeta.Annotations); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		if err := mergo.Merge(&manifest.Spec.Template.ObjectMeta.Annotations, actual.Spec.Template.ObjectMeta.Annotations); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+
+		jsonStr, e = json.Marshal(manifest)
+
+	}
+
+	if e == nil && len(jsonStr) > 0 {
+		dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
+		if _, _, err := dec.Decode(jsonStr, nil, s.Obj); err != nil {
+			log.Error(err, "error merging metadata")
+			return
+		}
+	} else if e != nil {
+		log.Error(e, "error merging metadata")
+	}
+
 }
 
 func (s *State) dumpTemplateToFile() error {
@@ -491,6 +622,44 @@ func (s *State) dumpTemplateToFile() error {
 			return err
 		}
 
+	}
+	return nil
+}
+
+func objectToDeployment(obj interface{}) (*appv1.Deployment, error) {
+
+	d := &appv1.Deployment{}
+	if err := objectToUnstructured(obj, d); err != nil {
+		return nil, err
+	}
+	return d, nil
+}
+
+func objectToStatefulSet(obj interface{}) (*appv1.StatefulSet, error) {
+
+	s := &appv1.StatefulSet{}
+	if err := objectToUnstructured(obj, s); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func objectToDaemonSet(obj interface{}) (*appv1.DaemonSet, error) {
+
+	d := &appv1.DaemonSet{}
+	if err := objectToUnstructured(obj, d); err != nil {
+		return nil, err
+	}
+	return d, nil
+}
+
+func objectToUnstructured(obj interface{}, dst interface{}) error {
+	un, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		return err
+	}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(un, dst); err != nil {
+		return err
 	}
 	return nil
 }

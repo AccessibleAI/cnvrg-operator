@@ -14,7 +14,7 @@ func registryState() []*desired.State {
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.SecretGVR],
+			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
 		},

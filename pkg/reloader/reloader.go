@@ -15,7 +15,7 @@ func reloaderState() []*desired.State {
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
-			GVR:            desired.Kinds[desired.DeploymentGVR],
+			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
 		},

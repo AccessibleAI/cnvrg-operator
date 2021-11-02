@@ -40,7 +40,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			prom := &unstructured.Unstructured{}
-			prom.SetGroupVersionKind(desired.Kinds[desired.PrometheusGVR])
+			prom.SetGroupVersionKind(desired.Kinds[desired.PrometheusGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-infra-prometheus", Namespace: ns}, prom)
 				if err != nil {
@@ -286,7 +286,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
 				if err != nil {
@@ -309,7 +309,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
 				if err != nil {
@@ -332,7 +332,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
 				if err != nil {
@@ -359,7 +359,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
 				if err != nil {
@@ -386,7 +386,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.Labels = labels
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
 				if err != nil {
@@ -413,7 +413,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
-			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: fmt.Sprintf(mlopsv1.IstioGwName, ns), Namespace: ns}, gw)
 				if err != nil {
@@ -433,7 +433,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
-			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "foo-bar", Namespace: ns}, gw)
 				if err != nil {
@@ -451,7 +451,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			time.Sleep(time.Second * 3)
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: ns}, istio)
@@ -473,7 +473,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 
 			vs := &unstructured.Unstructured{}
-			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVK])
 
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.Monitoring.Grafana.SvcName, Namespace: ns}, vs)
@@ -503,7 +503,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			infra.Spec.InfraNamespace = ns
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
-			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVK])
 			time.Sleep(time.Second * 3)
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: fmt.Sprintf(mlopsv1.IstioGwName, ns), Namespace: ns}, gw)
@@ -526,7 +526,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			deployment := v1.Deployment{}
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			istio := &unstructured.Unstructured{}
-			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVR])
+			istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: "istio-operator", Namespace: ns}, &deployment)
 				if err != nil {

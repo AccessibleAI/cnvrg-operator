@@ -1741,7 +1741,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 			gw := &unstructured.Unstructured{}
-			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)
 				if err != nil {
@@ -1751,7 +1751,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			vs := &unstructured.Unstructured{}
-			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVK])
 
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, vs)
@@ -1836,7 +1836,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 
 			gw := &unstructured.Unstructured{}
-			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVK])
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)
 				if err != nil {
@@ -1846,7 +1846,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 
 			vs := &unstructured.Unstructured{}
-			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVK])
 
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, vs)
@@ -1929,7 +1929,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(k8sClient.Create(ctx, testApp)).Should(Succeed())
 
 			vs := &unstructured.Unstructured{}
-			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVR])
+			vs.SetGroupVersionKind(desired.Kinds[desired.IstioVsGVK])
 
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: testApp.Spec.ControlPlane.WebApp.SvcName, Namespace: ns}, vs)
@@ -1987,7 +1987,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(vs.Object["spec"].(map[string]interface{})["gateways"]).Should(ContainElement(gwName))
 
 			gw := &unstructured.Unstructured{}
-			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVR])
+			gw.SetGroupVersionKind(desired.Kinds[desired.IstioGwGVK])
 			time.Sleep(time.Second * 3)
 			Eventually(func() bool {
 				err := k8sClient.Get(ctx, types.NamespacedName{Name: gwName, Namespace: ns}, gw)

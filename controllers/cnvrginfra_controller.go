@@ -530,7 +530,7 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 	istioManifests := networking.InfraNetworkingState(cnvrgInfra)
 	for _, m := range istioManifests {
 		// Make sure IstioOperator was deployed
-		if m.GVR == desired.Kinds[desired.IstioGVR] {
+		if m.GVK == desired.Kinds[desired.IstioGVK] {
 			if m.TemplateData == nil {
 				m.TemplateData = cnvrgInfra
 			}

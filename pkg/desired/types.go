@@ -16,7 +16,7 @@ type State struct {
 	Template       *template.Template
 	ParsedTemplate string
 	Obj            *unstructured.Unstructured
-	GVR            schema.GroupVersionKind
+	GVK            schema.GroupVersionKind
 	Own            bool
 	Override       bool
 	Updatable      bool
