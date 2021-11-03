@@ -13,6 +13,9 @@ spec:
   gpu:
     nvidiaDp:
       enabled: {{.Values.gpu.nvidiaDp.enabled}}
+  hpu:
+    hpuDp:
+      enabled: {{.Values.gpu.nvidiaDp.enabled}}
   capsule:
     enabled: {{.Values.capsule.enabled}}
     image: {{ .Values.capsule.image}}
