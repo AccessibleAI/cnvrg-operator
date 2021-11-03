@@ -11,7 +11,7 @@ type Hpu struct {
 
 var hpuDpDefault = HpuDp{
 	Enabled: false,
-	Image:   "k8s-device-plugin:v0.9.0",
+	Image:   "vault.habana.ai/docker-k8s-device-plugin/docker-k8s-device-plugin:latest",
 }
 
 var hpuDefaults = Hpu{

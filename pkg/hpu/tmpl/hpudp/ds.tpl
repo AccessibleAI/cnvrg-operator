@@ -1,55 +1,45 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: hpu-device-plugin-daemonset
+  name: habanalabs-device-plugin-daemonset-gaudi
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Data.Annotations }}
+    {{ - range $k, $v := .Data.Annotations }}
     {{$k}}: "{{$v}}"
-    {{- end }}
+    {{ - end }}
   labels:
-    {{- range $k, $v := .Data.Labels }}
+    {{ - range $k, $v := .Data.Labels }}
     {{$k}}: "{{$v}}"
-    {{- end }}
+    {{ - end }}
 spec:
   selector:
     matchLabels:
-      name: hpu-device-plugin-ds
+      name: habanalabs-device-plugin-ds
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
+      # This annotation is deprecated. Kept here for backward compatibility
+      # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
       annotations:
-        {{- range $k, $v := .Data.Annotations }}
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+        {{ - range $k, $v := .Data.Annotations }}
         {{$k}}: "{{$v}}"
-        {{- end }}
+        {{ - end }}
       labels:
-        name: hpu-device-plugin-ds
-        {{- range $k, $v := .Data.Labels }}
+        name: habanalabs-device-plugin-ds
+        {{ - range $k, $v := .Data.Labels }}
         {{$k}}: "{{$v}}"
-        {{- end }}
+        {{ - end }}
     spec:
-      serviceAccountName: hpu-device-plugin
-      tolerations:
-        - key: hpu.com/gpu
-          operator: Exists
-          effect: NoSchedule
       priorityClassName: "system-node-critical"
-      nodeSelector:
-        accelerator: hpu
       containers:
         - image: {{ image .Data.ImageHub .Data.NvidiaDp.Image }}
-          name: hpu-device-plugin-ctr
-          args: ["--fail-on-init-error=true"]
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
-            limits:
-              cpu: 500m
-              memory: 500Mi
+          name: habanalabs-device-plugin-ctr
+          command: ["habanalabs-device-plugin"]
+          args: ["--dev_type", " gaudi"]
           securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
+            privileged: true
           volumeMounts:
             - name: device-plugin
               mountPath: /var/lib/kubelet/device-plugins
