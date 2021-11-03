@@ -10,7 +10,6 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/gpu"
-	"github.com/AccessibleAI/cnvrg-operator/pkg/hpu"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
@@ -267,18 +266,19 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	// hpu device plugin
-	if cnvrgInfra.Spec.Hpu.HpuDp.Enabled {
-		infraLog.Info("hpu device plugin")
-		hpuDpData := desired.TemplateData{
+	if cnvrgInfra.Spec.Gpu.HabanaDp.Enabled {
+		infraLog.Info("habana device plugin")
+		habanaDpData := desired.TemplateData{
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
 			Data: map[string]interface{}{
-				"HpuDp":       cnvrgInfra.Spec.Hpu.HpuDp,
+				"HabanaDp":    cnvrgInfra.Spec.Gpu.HabanaDp,
+				"Registry":    cnvrgInfra.Spec.Registry,
 				"ImageHub":    cnvrgInfra.Spec.ImageHub,
 				"Annotations": cnvrgInfra.Spec.Annotations,
 				"Labels":      cnvrgInfra.Spec.Labels,
 			},
 		}
-		if err := desired.Apply(hpu.HpuDpState(hpuDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+		if err := desired.Apply(gpu.HabanaDpState(habanaDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
