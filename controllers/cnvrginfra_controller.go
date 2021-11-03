@@ -273,7 +273,6 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			Namespace: cnvrgInfra.Spec.InfraNamespace,
 			Data: map[string]interface{}{
 				"HpuDp":       cnvrgInfra.Spec.Hpu.HpuDp,
-				"Registry":    cnvrgInfra.Spec.Registry,
 				"ImageHub":    cnvrgInfra.Spec.ImageHub,
 				"Annotations": cnvrgInfra.Spec.Annotations,
 				"Labels":      cnvrgInfra.Spec.Labels,

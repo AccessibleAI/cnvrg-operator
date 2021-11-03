@@ -33,10 +33,11 @@ spec:
         {{ - end }}
     spec:
       priorityClassName: "system-node-critical"
+      serviceAccountName: cnvrg-control-plane
       nodeSelector:
         node.kubernetes.io/instance-type: dl1.24xlarge
       containers:
-        - image: {{ image .Data.ImageHub .Data.NvidiaDp.Image }}
+        - image: {{ image .Data.ImageHub .Data.HpuDp.Image }}
           name: habanalabs-device-plugin-ctr
           resources:
             requests:
