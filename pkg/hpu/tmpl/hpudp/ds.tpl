@@ -33,9 +33,18 @@ spec:
         {{ - end }}
     spec:
       priorityClassName: "system-node-critical"
+      nodeSelector:
+        node.kubernetes.io/instance-type: dl1.24xlarge
       containers:
         - image: {{ image .Data.ImageHub .Data.NvidiaDp.Image }}
           name: habanalabs-device-plugin-ctr
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 500Mi
           command: ["habanalabs-device-plugin"]
           args: ["--dev_type", " gaudi"]
           securityContext:
