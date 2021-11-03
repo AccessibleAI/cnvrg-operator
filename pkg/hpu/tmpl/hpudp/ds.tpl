@@ -48,12 +48,20 @@ spec:
               memory: 500Mi
           command: ["habanalabs-device-plugin"]
           args: ["--dev_type", " gaudi"]
+          env:
+          - name: LD_LIBRARY_PATH
+            value: "/usr/lib/habanalabs/"
           securityContext:
             privileged: true
           volumeMounts:
             - name: device-plugin
               mountPath: /var/lib/kubelet/device-plugins
+            - name: habana-lib
+              mountPath: /usr/lib/habanalabs
       volumes:
         - name: device-plugin
           hostPath:
             path: /var/lib/kubelet/device-plugins
+        - name: habana-lib
+          hostPath:
+            path: /usr/lib/habanalabs
