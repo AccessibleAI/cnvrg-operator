@@ -17,6 +17,7 @@ type CnvrgInfraSpec struct {
 	Dbs                   InfraDbs             `json:"dbs,omitempty"`
 	SSO                   SSO                  `json:"sso,omitempty"`
 	Gpu                   Gpu                  `json:"gpu,omitempty"`
+	Hpu                   Hpu                  `json:"hpu,omitempty"`
 	Tenancy               Tenancy              `json:"tenancy,omitempty"`
 	Labels                map[string]string    `json:"labels,omitempty"`
 	Annotations           map[string]string    `json:"annotations,omitempty"`
@@ -64,6 +65,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Registry:              infraRegistryDefault,
 		Dbs:                   infraDbsDefaults,
 		Gpu:                   gpuDefaults,
+		Hpu:                   hpuDefaults,
 		Tenancy:               tenancyDefault,
 		Labels:                map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations:           nil,
