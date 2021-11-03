@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: habanalabs-device-plugin-daemonset-gaudi
+  name: habanalabs-device-plugin-daemonset-hpu
   namespace: {{ .Namespace }}
   annotations:
     {{- range $k, $v := .Data.Annotations }}
