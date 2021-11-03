@@ -265,6 +265,25 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		}
 	}
 
+	// habana device plugin
+	if cnvrgInfra.Spec.Gpu.HabanaDp.Enabled {
+		infraLog.Info("habana device plugin")
+		habanaDpData := desired.TemplateData{
+			Namespace: cnvrgInfra.Spec.InfraNamespace,
+			Data: map[string]interface{}{
+				"HabanaDp":    cnvrgInfra.Spec.Gpu.HabanaDp,
+				"Registry":    cnvrgInfra.Spec.Registry,
+				"ImageHub":    cnvrgInfra.Spec.ImageHub,
+				"Annotations": cnvrgInfra.Spec.Annotations,
+				"Labels":      cnvrgInfra.Spec.Labels,
+			},
+		}
+		if err := desired.Apply(gpu.HabanaDpState(habanaDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			reconcileResult = err
+		}
+	}
+
 	// capsule backup service
 	infraLog.Info("applying capsule")
 	if err := desired.Apply(capsule.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {

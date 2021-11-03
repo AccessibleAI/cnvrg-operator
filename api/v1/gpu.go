@@ -7,6 +7,7 @@ type NvidiaDp struct {
 
 type Gpu struct {
 	NvidiaDp NvidiaDp `json:"nvidiaDp,omitempty"`
+	HabanaDp HabanaDp `json:"habanaDp,omitempty"`
 }
 
 var nvidiaDpDefault = NvidiaDp{
@@ -16,4 +17,15 @@ var nvidiaDpDefault = NvidiaDp{
 
 var gpuDefaults = Gpu{
 	NvidiaDp: nvidiaDpDefault,
+	HabanaDp: habanaDpDefault,
+}
+
+type HabanaDp struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+var habanaDpDefault = HabanaDp{
+	Enabled: false,
+	Image:   "vault.habana.ai/docker-k8s-device-plugin/docker-k8s-device-plugin:latest",
 }
