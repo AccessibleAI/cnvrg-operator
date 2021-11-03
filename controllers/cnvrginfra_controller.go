@@ -265,7 +265,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		}
 	}
 
-	// hpu device plugin
+	// habana device plugin
 	if cnvrgInfra.Spec.Gpu.HabanaDp.Enabled {
 		infraLog.Info("habana device plugin")
 		habanaDpData := desired.TemplateData{

@@ -166,17 +166,14 @@ spec:
               type: object
             gpu:
               properties:
-                nvidiaDp:
+                habanaDp:
                   properties:
                     enabled:
                       type: boolean
                     image:
                       type: string
                   type: object
-              type: object
-            hpu:
-              properties:
-                hpuDp:
+                nvidiaDp:
                   properties:
                     enabled:
                       type: boolean

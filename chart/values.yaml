@@ -9,9 +9,9 @@ annotations: { }
 gpu:
   nvidiaDp:
     enabled: true
-hpu:
-  hpuDp:
+  habanaDp:
     enabled: false
+
 controlPlane:
   image: core:3.9.13
   baseConfig:
