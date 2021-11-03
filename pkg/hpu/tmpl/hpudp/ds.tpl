@@ -4,13 +4,13 @@ metadata:
   name: habanalabs-device-plugin-daemonset-gaudi
   namespace: {{ .Namespace }}
   annotations:
-    {{ - range $k, $v := .Data.Annotations }}
+    {{- range $k, $v := .Data.Annotations }}
     {{$k}}: "{{$v}}"
-    {{ - end }}
+    {{- end }}
   labels:
-    {{ - range $k, $v := .Data.Labels }}
+    {{- range $k, $v := .Data.Labels }}
     {{$k}}: "{{$v}}"
-    {{ - end }}
+    {{- end }}
 spec:
   selector:
     matchLabels:
@@ -23,14 +23,14 @@ spec:
       # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ""
-        {{ - range $k, $v := .Data.Annotations }}
+        {{- range $k, $v := .Data.Annotations }}
         {{$k}}: "{{$v}}"
-        {{ - end }}
+        {{- end }}
       labels:
         name: habanalabs-device-plugin-ds
-        {{ - range $k, $v := .Data.Labels }}
+        {{- range $k, $v := .Data.Labels }}
         {{$k}}: "{{$v}}"
-        {{ - end }}
+        {{- end }}
     spec:
       priorityClassName: "system-node-critical"
       serviceAccountName: cnvrg-control-plane
