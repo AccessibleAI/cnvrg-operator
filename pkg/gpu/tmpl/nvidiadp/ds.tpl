@@ -29,6 +29,7 @@ spec:
     spec:
       serviceAccountName: nvidia-device-plugin
       tolerations:
+        - operator: Exists
         - key: nvidia.com/gpu
           operator: Exists
           effect: NoSchedule
