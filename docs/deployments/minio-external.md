@@ -8,5 +8,6 @@ helm install cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 1500s \
  --set controlPlane.objectStorage.endpoint="<object-storage-end-point-url>" \
  --set controlPlane.objectStorage.bucket="<bucket-name>" \
  --set controlPlane.objectStorage.accessKey="<access-key>" \
- --set controlPlane.objectStorage.secretKey="<secret-key>"
+ --set controlPlane.objectStorage.secretKey="<secret-key>" \
+ --set dbs.minio.enabled=false
 ```
