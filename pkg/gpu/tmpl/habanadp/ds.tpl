@@ -34,6 +34,8 @@ spec:
     spec:
       priorityClassName: "system-node-critical"
       serviceAccountName: habana-device-plugin
+      tolerations:
+        - operator: Exists
       nodeSelector:
         node.kubernetes.io/instance-type: dl1.24xlarge
       containers:
