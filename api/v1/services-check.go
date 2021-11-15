@@ -1,9 +1,9 @@
 package v1
 
-type ServicesCheck struct {
+type IngressCheck struct {
 	Enabled bool `json:"enabled,omitempty"`
 }
 
-var servicesCheckDefault = ServicesCheck{
+var ingressCheckDefault = IngressCheck{
 	Enabled: true,
 }

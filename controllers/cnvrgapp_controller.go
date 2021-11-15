@@ -8,11 +8,11 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/controlplane"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
+	ingresscheck "github.com/AccessibleAI/cnvrg-operator/pkg/ingresscheck"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/registry"
-	services_check "github.com/AccessibleAI/cnvrg-operator/pkg/services-check"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -197,13 +197,13 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	readyState := make(map[string]bool)
 
 	// check services-check status
-	if cnvrgApp.Spec.ServicesCheck.Enabled {
+	if cnvrgApp.Spec.IngressCheck.Enabled {
 		//name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
 		//ready, err := r.CheckDeploymentReadiness(name)
 		//if err != nil {
 		//	return false, 0, nil, err
 		//}
-		readyState["servicesCheck"] = false
+		readyState["ingressCheck"] = false
 	}
 
 	// check webapp status
@@ -395,7 +395,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 
 	// monitoring
-	if err := r.servicesCheckState(cnvrgApp); err != nil {
+	if err := r.ingressCheckState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
@@ -508,9 +508,9 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 	return nil
 }
 
-func (r *CnvrgAppReconciler) servicesCheckState(app *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) ingressCheckState(app *mlopsv1.CnvrgApp) error {
 	// apply app monitoring state
-	if err := desired.Apply(services_check.ServicesCheckState(app), app, r.Client, r.Scheme, appLog); err != nil {
+	if err := desired.Apply(ingresscheck.IngressCheckState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
 	}

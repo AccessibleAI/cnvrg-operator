@@ -19,7 +19,7 @@ type CnvrgAppSpec struct {
 	Tenancy               Tenancy            `json:"tenancy,omitempty"`
 	CnvrgAppPriorityClass PriorityClass      `json:"cnvrgAppPriorityClass,omitempty"`
 	CnvrgJobPriorityClass PriorityClass      `json:"cnvrgJobPriorityClass,omitempty"`
-	ServicesCheck         ServicesCheck      `json:"servicesCheck,omitempty"`
+	IngressCheck          IngressCheck       `json:"ingressCheck,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -62,6 +62,6 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Annotations:           nil,
 		CnvrgAppPriorityClass: PriorityClass{},
 		CnvrgJobPriorityClass: PriorityClass{},
-		ServicesCheck:         servicesCheckDefault,
+		IngressCheck:          ingressCheckDefault,
 	}
 }
