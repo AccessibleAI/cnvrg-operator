@@ -32,6 +32,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      serviceAccountName: cnvrg-control-plane
       containers:
         - name: python-server
           image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
@@ -39,7 +40,7 @@ spec:
           command:
             - "/bin/bash"
             - "-lc"
-            - "python -m http.server"
+            - "python3 -m http.server --bind 127.0.0.1 -d false"
         - name: ingresscheck
           image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
           imagePullPolicy: Always
@@ -83,7 +84,7 @@ spec:
               while $(cat ${flagFile}); do
 
                 if [[ $(curl -sk {{ httpScheme . }}cnvrg-ingress-test.{{ .Spec.ClusterDomain }} -o /dev/null -w '%{http_code}') != 200 ]]; then
-                  echo "[$(date)] grafana [{{ httpScheme . }}cnvrg-ingress-test.{{ .Spec.ClusterDomain }}] not ready"
+                  echo "[$(date)] ingresstest [{{ httpScheme . }}cnvrg-ingress-test.{{ .Spec.ClusterDomain }}] not ready"
                   sleep 1
                   continue
                 fi

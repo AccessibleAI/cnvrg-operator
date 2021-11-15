@@ -17,7 +17,7 @@ func ingressCheck() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
-			Updatable:      true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/vs.tpl",
@@ -26,7 +26,7 @@ func ingressCheck() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
-			Updatable:      true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/job.tpl",
@@ -35,7 +35,7 @@ func ingressCheck() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.JobGVK],
 			Own:            true,
-			Updatable:      true,
+			Updatable:      false,
 		},
 	}
 }
