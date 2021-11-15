@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/services-check/tmpl"
+const path = "/pkg/ingresscheck/tmpl"
 
 func ingressCheck() []*desired.State {
 	return []*desired.State{

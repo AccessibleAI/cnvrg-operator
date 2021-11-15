@@ -8,7 +8,7 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/controlplane"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-	ingresscheck "github.com/AccessibleAI/cnvrg-operator/pkg/ingresscheck"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/ingresscheck"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
@@ -21,6 +21,7 @@ import (
 	"gopkg.in/d4l3k/messagediff.v1"
 	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
+	v1batch "k8s.io/api/batch/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -196,14 +197,14 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 
 	readyState := make(map[string]bool)
 
-	// check services-check status
+	// check ingresscheck status
 	if cnvrgApp.Spec.IngressCheck.Enabled {
-		//name := types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace}
-		//ready, err := r.CheckDeploymentReadiness(name)
-		//if err != nil {
-		//	return false, 0, nil, err
-		//}
-		readyState["ingressCheck"] = false
+		name := types.NamespacedName{Name: "ingresscheck", Namespace: cnvrgApp.Namespace}
+		ready, err := r.CheckJobReadiness(name)
+		if err != nil {
+			return false, 0, nil, err
+		}
+		readyState["ingressCheck"] = ready
 	}
 
 	// check webapp status
@@ -394,7 +395,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
-	// monitoring
+	// ingress check
 	if err := r.ingressCheckState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
@@ -509,7 +510,7 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) ingressCheckState(app *mlopsv1.CnvrgApp) error {
-	// apply app monitoring state
+	// apply ingress check state
 	if err := desired.Apply(ingresscheck.IngressCheckState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
@@ -1027,6 +1028,23 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return cnvrgAppController.
 		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
 		Complete(r)
+}
+
+func (r *CnvrgAppReconciler) CheckJobReadiness(name types.NamespacedName) (bool, error) {
+	ctx := context.Background()
+	job := &v1batch.Job{}
+
+	if err := r.Get(ctx, name, job); err != nil && errors.IsNotFound(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	if job.Status.Succeeded >= 1 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (r *CnvrgAppReconciler) CheckDeploymentReadiness(name types.NamespacedName) (bool, error) {

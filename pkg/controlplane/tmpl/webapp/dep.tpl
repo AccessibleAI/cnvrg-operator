@@ -158,7 +158,7 @@ spec:
           secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
       {{- end }}
       initContainers:
-      - name: services-check
+      - name: ingresscheck
         image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         envFrom:
         - secretRef:

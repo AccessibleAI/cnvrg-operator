@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: services-check
+  name: ingresscheck
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -9,25 +9,25 @@ metadata:
       {{- end }}
   labels:
     cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
-    app: services-check
+    app: ingresscheck
     owner: cnvrg-control-plane
-    cnvrg-component: services-check
+    cnvrg-component: ingresscheck
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
   template:
     metadata:
-      name: services-check
+      name: ingresscheck
       annotations:
         {{- range $k, $v := .Spec.Annotations }}
           {{$k}}: "{{$v}}"
           {{- end }}
       labels:
         cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
-        app: services-check
+        app: ingresscheck
         owner: cnvrg-control-plane
-        cnvrg-component: services-check
+        cnvrg-component: ingresscheck
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
@@ -40,7 +40,7 @@ spec:
             - "/bin/bash"
             - "-lc"
             - "python -m http.server"
-        - name: services-check
+        - name: ingresscheck
           image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
           imagePullPolicy: Always
           envFrom:
