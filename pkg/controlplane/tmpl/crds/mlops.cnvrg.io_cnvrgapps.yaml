@@ -673,6 +673,11 @@ spec:
               type: object
             imageHub:
               type: string
+            ingressCheck:
+              properties:
+                enabled:
+                  type: boolean
+              type: object
             labels:
               additionalProperties:
                 type: string
@@ -905,11 +910,6 @@ spec:
                   type: string
                 user:
                   type: string
-              type: object
-            servicesCheck:
-              properties:
-                enabled:
-                  type: boolean
               type: object
             sso:
               properties:
