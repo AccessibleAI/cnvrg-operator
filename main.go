@@ -185,6 +185,7 @@ func informPkger() {
 	pkger.Include("/pkg/reloader/tmpl")
 	pkger.Include("/pkg/capsule/tmpl")
 	pkger.Include("/pkg/priorityclass/tmpl")
+	pkger.Include("/pkg/services-check/tmpl")
 }
 
 func main() {
