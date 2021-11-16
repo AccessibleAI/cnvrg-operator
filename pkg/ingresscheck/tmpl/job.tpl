@@ -31,7 +31,11 @@ spec:
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
+      selector:
+        matchLabels:
+          app: ingresscheck
     spec:
+      shareProcessNamespace: true
       serviceAccountName: cnvrg-control-plane
       containers:
         - name: python-server
@@ -40,7 +44,9 @@ spec:
           command:
             - "/bin/bash"
             - "-lc"
-            - "python3 -m http.server --bind 127.0.0.1 -d false"
+            - "npm install http-server -g && http-server -p 8000"
+          ports:
+            - containerPort: 8000
         - name: ingresscheck
           image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
           imagePullPolicy: Always
@@ -78,7 +84,6 @@ spec:
             - "-lc"
             - |
               #!/bin/bash
-              apt-get update && apt-get install -y curl
               flagFile=/tmp/services_not_ready
               echo true > ${flagFile}
               while $(cat ${flagFile}); do
@@ -91,6 +96,8 @@ spec:
 
                 echo false > ${flagFile}
                 echo "[$(date)] test service is ready!"
+                echo "killing server process"
+                pkill http-server
               done
       restartPolicy: Never
   backoffLimit: 4

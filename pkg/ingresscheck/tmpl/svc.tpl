@@ -24,5 +24,5 @@ spec:
       nodePort: {{ .Spec.Monitoring.Prometheus.NodePort }}
       {{- end }}
   selector:
-    app: cnvrg-ingress-test
+    app: ingresscheck
 
