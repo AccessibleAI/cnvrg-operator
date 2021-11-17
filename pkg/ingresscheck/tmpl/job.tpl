@@ -87,8 +87,8 @@ spec:
 
                 echo false > ${flagFile}
                 echo "[$(date)] test service is ready!"
-                echo "killing server process"
-                pkill python3
               done
+              echo "killing server process"
+              pkill python3
       restartPolicy: Never
   backoffLimit: 4
