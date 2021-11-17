@@ -8,7 +8,6 @@ metadata:
       {{$k}}: "{{$v}}"
       {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     app: ingresscheck
     owner: cnvrg-control-plane
     cnvrg-component: ingresscheck
@@ -24,7 +23,6 @@ spec:
           {{$k}}: "{{$v}}"
           {{- end }}
       labels:
-        cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
         app: ingresscheck
         owner: cnvrg-control-plane
         cnvrg-component: ingresscheck
@@ -35,18 +33,8 @@ spec:
         matchLabels:
           app: ingresscheck
     spec:
-      shareProcessNamespace: true
       serviceAccountName: cnvrg-control-plane
       containers:
-        - name: python-server
-          image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
-          imagePullPolicy: Always
-          command:
-            - "/bin/bash"
-            - "-lc"
-            - "npm install http-server -g && http-server -p 8000"
-          ports:
-            - containerPort: 8000
         - name: ingresscheck
           image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
           imagePullPolicy: Always
@@ -79,11 +67,14 @@ spec:
             - configMapRef:
                 name: {{ .Spec.Networking.Proxy.ConfigRef }}
             {{- end }}
+          ports:
+            - containerPort: 8000
           command:
             - "/bin/bash"
             - "-lc"
             - |
               #!/bin/bash
+              mkdir -p /tmp/http-server && cd /tmp/http-server && touch index.html && python3 -m http.server 8000 &
               flagFile=/tmp/services_not_ready
               echo true > ${flagFile}
               while $(cat ${flagFile}); do
@@ -97,7 +88,7 @@ spec:
                 echo false > ${flagFile}
                 echo "[$(date)] test service is ready!"
                 echo "killing server process"
-                pkill http-server
+                pkill python3
               done
       restartPolicy: Never
   backoffLimit: 4
