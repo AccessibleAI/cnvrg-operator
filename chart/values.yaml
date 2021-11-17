@@ -56,6 +56,7 @@ controlPlane:
     password: ""
     domain: ""
     opensslVerifyMode: ""
+    sender: "info@cnvrg.io"
   systemkiq:
     enabled: true
     hpa:
