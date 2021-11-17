@@ -1525,7 +1525,25 @@ var _ = Describe("CnvrgApp controller", func() {
 			}, timeout, interval).Should(BeTrue())
 			Expect(string(secret.Data["SMTP_OPENSSL_VERIFY_MODE"])).To(Equal("foo"))
 			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
+		})
 
+		It("SMTP Sender", func() {
+			ctx := context.Background()
+			ns := createNs()
+			app := getDefaultTestAppSpec(ns)
+			app.Spec.ControlPlane.SMTP.Sender = "test@cnvrg.io"
+			Expect(k8sClient.Create(ctx, app)).Should(Succeed())
+			secret := corev1.Secret{}
+
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: "cp-smtp", Namespace: ns}, &secret)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(string(secret.Data["SMTP_SENDER"])).To(Equal("test@cnvrg.io"))
+			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 		})
 
 	})
