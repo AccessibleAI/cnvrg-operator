@@ -13,6 +13,8 @@ monitoring:
   {{- end }}
   dcgmExporter:
     enabled: {{ .Values.monitoring.dcgmExporter.enabled }}
+  habanaExporter:
+    enabled: { { .Values.monitoring.habanaExporter.enabled } }
   grafana:
     enabled: {{ .Values.monitoring.grafana.enabled }}
   kubeStateMetrics:
