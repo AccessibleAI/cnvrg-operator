@@ -54,6 +54,11 @@ type DcgmExporter struct {
 	Image   string `json:"image,omitempty"`
 }
 
+type HabanaExporter struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
 type CnvrgIdleMetricsExporter struct {
 	Enabled bool              `json:"enabled,omitempty"`
 	Labels  map[string]string `json:"labels,omitempty"`
@@ -66,6 +71,7 @@ type CnvrgInfraMonitoring struct {
 	KubeStateMetrics         KubeStateMetrics         `json:"kubeStateMetrics,omitempty"`
 	Grafana                  Grafana                  `json:"grafana,omitempty"`
 	DcgmExporter             DcgmExporter             `json:"dcgmExporter,omitempty"`
+	HabanaExporter           HabanaExporter           `json:"habanaExporter,omitempty"`
 	DefaultServiceMonitors   DefaultServiceMonitors   `json:"defaultServiceMonitors,omitempty"`
 	CnvrgIdleMetricsExporter CnvrgIdleMetricsExporter `json:"cnvrgIdleMetricsExporter,omitempty"`
 }
@@ -176,6 +182,10 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	DcgmExporter: DcgmExporter{
 		Enabled: false,
 		Image:   "dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
+	},
+	HabanaExporter: HabanaExporter{
+		Enabled: false,
+		Image:   "lamatriz/metric-exporter:synapse_1.1.1-94",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
 		Enabled: false,
