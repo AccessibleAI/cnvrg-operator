@@ -131,6 +131,9 @@ monitoring:
   dcgmExporter:
     enabled: true
 
+  habanaExporter:
+    enabled: false
+
   nodeExporter:
     enabled: true
 

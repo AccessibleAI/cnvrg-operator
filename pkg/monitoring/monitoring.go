@@ -591,6 +591,50 @@ func dcgmExporter() []*desired.State {
 	}
 }
 
+func habanaExporter() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/habana-exporter/ds.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.DaemonSetGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+
+		{
+			TemplatePath:   path + "/habana-exporter/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+
+		{
+			TemplatePath:   path + "/habana-exporter/servicemonitor.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+
+		{
+			TemplatePath:   path + "/habana-exporter/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func grafanaOauthProxy() []*desired.State {
 	return []*desired.State{
 		{
@@ -707,6 +751,10 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if infra.Spec.Monitoring.DcgmExporter.Enabled {
 		state = append(state, dcgmExporter()...)
+	}
+
+	if infra.Spec.Monitoring.HabanaExporter.Enabled {
+		state = append(state, habanaExporter()...)
 	}
 
 	if infra.Spec.Monitoring.CnvrgIdleMetricsExporter.Enabled {
