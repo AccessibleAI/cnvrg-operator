@@ -25,4 +25,4 @@ spec:
     - destination:
         port:
           number: {{ .Spec.Monitoring.Prometheus.Port }}
-        host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ ns . }}.svc.cluster.local"
+        host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"

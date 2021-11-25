@@ -25,4 +25,4 @@ spec:
         - destination:
             port:
               number: {{ .Spec.Dbs.Es.Port}}
-            host: "{{ .Spec.Dbs.Es.SvcName }}.{{ ns . }}.svc.cluster.local"
+            host: "{{ .Spec.Dbs.Es.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"

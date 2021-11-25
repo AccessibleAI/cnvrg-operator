@@ -23,6 +23,6 @@ spec:
     timeout: {{ .Spec.Networking.Ingress.Timeout }}
     route:
     - destination:
-        host: "{{ .Spec.Monitoring.Grafana.SvcName }}.{{ ns . }}.svc.cluster.local"
+        host: "{{ .Spec.Monitoring.Grafana.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"
         port:
           number: {{ .Spec.Monitoring.Grafana.Port }}

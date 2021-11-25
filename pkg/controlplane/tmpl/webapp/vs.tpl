@@ -23,7 +23,7 @@ spec:
       timeout: {{ .Spec.Networking.Ingress.Timeout }}
       route:
         - destination:
-            host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ ns . }}.svc.cluster.local"
+            host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"
       headers:
         request:
           set:

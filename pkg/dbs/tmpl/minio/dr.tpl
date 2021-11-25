@@ -12,7 +12,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ ns . }}.svc.cluster.local"
+  host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"
   trafficPolicy:
     loadBalancer:
       consistentHash:

@@ -1,6 +1,7 @@
 package networking
 
 import (
+	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/markbates/pkger"
@@ -161,14 +162,14 @@ func IstioCrds() (crds []*desired.State) {
 	return
 }
 
-func DefaultNoProxy() []string {
+func DefaultNoProxy(clusterLocalDomain string) []string {
 	return append([]string{
 		"localhost",
 		"127.0.0.1",
 		".svc",
-		".svc.cluster.local",
+		fmt.Sprintf(".svc.%s", clusterLocalDomain),
 		"kubernetes.default.svc",
-		"kubernetes.default.svc.cluster.local"}, getK8sApiIP())
+		fmt.Sprintf("kubernetes.default.svc.%s", clusterLocalDomain)}, getK8sApiIP())
 }
 
 func getK8sApiIP() string {

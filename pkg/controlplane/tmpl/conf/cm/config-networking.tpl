@@ -17,6 +17,7 @@ data:
   DEFAULT_URL: "{{ httpScheme . }}{{ appDomain . }}"
   DEFAULT_COMPUTE_CLUSTER_DOMAIN: "{{ defaultComputeClusterDomain .}}"
   DEFAULT_COMPUTE_CLUSTER_HTTPS: "{{ .Spec.Networking.HTTPS.Enabled }}"
+  CNVRG_CLUSTER_LOCAL_DOMAIN: "{{ .Spec.ClusterLocalDomain }}"
   HYPER_SERVER_URL: "{{ hyperServerUrl .}}"
   HYPER_SERVER_PORT: "{{ .Spec.ControlPlane.Hyper.Port }}"
   ROUTE_BY_ISTIO: "{{ routeBy . "ISTIO" }}"
