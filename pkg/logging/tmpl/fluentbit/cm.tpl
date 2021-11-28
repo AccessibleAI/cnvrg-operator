@@ -29,7 +29,6 @@ data:
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-output.conf
     {{- end }}
 
-  {{- $clusterInternalDomain := .Data.ClusterInternalDomain }}
   {{- range $_, $app := .Data.AppInstance }}
 
   {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf: |
@@ -57,7 +56,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $clusterInternalDomain }}
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           Off
         Replace_Dots              On
