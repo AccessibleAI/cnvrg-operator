@@ -56,7 +56,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $app.ClusterInternalDomain }}
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ .Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           Off
         Replace_Dots              On
