@@ -7,7 +7,7 @@ metadata:
   namespace: {{ template "spec.cnvrgNs" . }}
 spec:
   clusterDomain: "{{ .Values.clusterDomain }}"
-  clusterLocalDomain: "{{.Values.clusterLocalDomain}}"
+  clusterInternalDomain: "{{.Values.clusterInternalDomain}}"
   imageHub: {{ .Values.imageHub }}
   {{- include "spec.labelsAndAnnotations" . | indent 2 }}
   {{- include "spec.controlPlane" . | indent 2 }}

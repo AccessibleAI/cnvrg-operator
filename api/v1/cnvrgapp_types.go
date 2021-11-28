@@ -6,7 +6,7 @@ import (
 
 type CnvrgAppSpec struct {
 	ClusterDomain         string             `json:"clusterDomain,omitempty"`
-	ClusterLocalDomain    string             `json:"clusterLocalDomain"`
+	ClusterInternalDomain string             `json:"clusterInternalDomain"`
 	ImageHub              string             `json:"imageHub,omitempty"`
 	Labels                map[string]string  `json:"labels,omitempty"`
 	Annotations           map[string]string  `json:"annotations,omitempty"`
@@ -50,7 +50,7 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain:         "",
-		ClusterLocalDomain:    "cluster.local",
+		ClusterInternalDomain: "cluster.local",
 		ImageHub:              "docker.io/cnvrg",
 		ControlPlane:          controlPlaneDefault,
 		Registry:              appRegistryDefault,

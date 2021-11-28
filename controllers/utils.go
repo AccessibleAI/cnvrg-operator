@@ -86,7 +86,7 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	if app.Spec.Networking.Proxy.Enabled {
 		desiredAppSpec.Networking.Proxy.NoProxy = app.Spec.Networking.Proxy.NoProxy
 		// make sure no_proxy includes all default values
-		for _, defaultNoProxy := range networking.DefaultNoProxy(app.Spec.ClusterLocalDomain) {
+		for _, defaultNoProxy := range networking.DefaultNoProxy(app.Spec.ClusterInternalDomain) {
 			if !containsString(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
 				desiredAppSpec.Networking.Proxy.NoProxy = append(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy)
 			}
@@ -117,7 +117,7 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 
 	if infra.Spec.Networking.Proxy.Enabled {
 		desiredInfraSpec.Networking.Proxy.NoProxy = infra.Spec.Networking.Proxy.NoProxy
-		for _, defaultNoProxy := range networking.DefaultNoProxy(infra.Spec.ClusterLocalDomain) {
+		for _, defaultNoProxy := range networking.DefaultNoProxy(infra.Spec.ClusterInternalDomain) {
 			if !containsString(desiredInfraSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
 				desiredInfraSpec.Networking.Proxy.NoProxy = append(desiredInfraSpec.Networking.Proxy.NoProxy, defaultNoProxy)
 			}

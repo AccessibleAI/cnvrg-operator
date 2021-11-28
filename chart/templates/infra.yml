@@ -6,7 +6,7 @@ metadata:
   name: cnvrg-infra
 spec:
   clusterDomain: "{{ .Values.clusterDomain }}"
-  clusterLocalDomain: "{{.Values.clusterLocalDomain}}"
+  clusterInternalDomain: "{{.Values.clusterInternalDomain}}"
   infraNamespace: {{ template "spec.cnvrgNs" . }}
   imageHub: {{ .Values.imageHub }}
   configReloader:

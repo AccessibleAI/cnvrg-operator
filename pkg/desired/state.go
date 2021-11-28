@@ -159,7 +159,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return fmt.Sprintf("http://%s.%s.svc.%s:%d",
 				cnvrgApp.Spec.Dbs.Es.SvcName,
 				cnvrgApp.Namespace,
-				cnvrgApp.Spec.ClusterLocalDomain,
+				cnvrgApp.Spec.ClusterInternalDomain,
 				cnvrgApp.Spec.Dbs.Es.Port)
 		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {

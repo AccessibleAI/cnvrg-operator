@@ -23,4 +23,4 @@ spec:
     timeout: 864000s
     route:
     - destination:
-        host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"
+        host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"

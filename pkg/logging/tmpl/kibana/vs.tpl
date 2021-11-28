@@ -25,4 +25,4 @@ spec:
     - destination:
         port:
           number: {{.Spec.Logging.Kibana.Port}}
-        host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterLocalDomain }}"
+        host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"

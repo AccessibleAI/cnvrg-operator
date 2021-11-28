@@ -162,14 +162,14 @@ func IstioCrds() (crds []*desired.State) {
 	return
 }
 
-func DefaultNoProxy(clusterLocalDomain string) []string {
+func DefaultNoProxy(clusterInternalDomain string) []string {
 	return append([]string{
 		"localhost",
 		"127.0.0.1",
 		".svc",
-		fmt.Sprintf(".svc.%s", clusterLocalDomain),
+		fmt.Sprintf(".svc.%s", clusterInternalDomain),
 		"kubernetes.default.svc",
-		fmt.Sprintf("kubernetes.default.svc.%s", clusterLocalDomain)}, getK8sApiIP())
+		fmt.Sprintf("kubernetes.default.svc.%s", clusterInternalDomain)}, getK8sApiIP())
 }
 
 func getK8sApiIP() string {

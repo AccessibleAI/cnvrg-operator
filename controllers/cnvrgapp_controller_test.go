@@ -2007,7 +2007,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 			ctx := context.Background()
 			ns := createNs()
-			expectedNoProxy := networking.DefaultNoProxy()
+			expectedNoProxy := networking.DefaultNoProxy("cluster.local")
 			app := getDefaultTestAppSpec(ns)
 			app.Spec.Networking.Proxy.Enabled = true
 			app.Spec.Networking.Proxy.HttpProxy = []string{
@@ -2054,7 +2054,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			noProxy := []string{".foo.bar"}
-			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
+			expectedNoProxy := append(noProxy, networking.DefaultNoProxy("cluster.local")...)
 			app := getDefaultTestAppSpec(ns)
 			cm := corev1.ConfigMap{}
 
