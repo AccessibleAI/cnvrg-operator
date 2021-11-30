@@ -332,6 +332,8 @@ spec:
                         type: object
                       port:
                         type: integer
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:

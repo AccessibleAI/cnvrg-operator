@@ -6,7 +6,7 @@ import (
 
 type CnvrgAppSpec struct {
 	ClusterDomain         string             `json:"clusterDomain,omitempty"`
-	ClusterInternalDomain string             `json:"clusterInternalDomain"`
+	ClusterInternalDomain string             `json:"clusterInternalDomain,omitempty"`
 	ImageHub              string             `json:"imageHub,omitempty"`
 	Labels                map[string]string  `json:"labels,omitempty"`
 	Annotations           map[string]string  `json:"annotations,omitempty"`

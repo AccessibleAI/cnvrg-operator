@@ -10,7 +10,7 @@ type PrometheusOperator struct {
 type Prometheus struct {
 	Enabled             bool              `json:"enabled,omitempty"`
 	Image               string            `json:"image,omitempty"`
-	Replicas            int               `json:"replicas"`
+	Replicas            int               `json:"replicas,omitempty"`
 	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
 	Requests            Requests          `json:"requests,omitempty"`
 	Limits              Limits            `json:"limits,omitempty"`
