@@ -10,6 +10,7 @@ type PrometheusOperator struct {
 type Prometheus struct {
 	Enabled             bool              `json:"enabled,omitempty"`
 	Image               string            `json:"image,omitempty"`
+	Replicas            int               `json:"replicas"`
 	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
 	Requests            Requests          `json:"requests,omitempty"`
 	Limits              Limits            `json:"limits,omitempty"`
@@ -113,6 +114,7 @@ var grafanaAppDefault = Grafana{
 var prometheusInfraDefault = Prometheus{
 	Enabled:             false,
 	Image:               "prometheus:v2.22.1",
+	Replicas:            1,
 	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
 		Cpu:    "200m",
@@ -135,6 +137,7 @@ var prometheusInfraDefault = Prometheus{
 var prometheusAppDefault = Prometheus{
 	Enabled:             false,
 	Image:               "prometheus:v2.22.1",
+	Replicas:            1,
 	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
 		Cpu:    "200m",
