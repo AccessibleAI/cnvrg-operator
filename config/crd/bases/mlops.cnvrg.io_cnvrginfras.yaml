@@ -562,8 +562,6 @@ spec:
                   value:
                     type: string
                 type: object
-            required:
-            - clusterInternalDomain
             type: object
           status:
             properties:
