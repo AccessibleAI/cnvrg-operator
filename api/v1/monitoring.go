@@ -185,7 +185,7 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	},
 	HabanaExporter: HabanaExporter{
 		Enabled: false,
-		Image:   "lamatriz/metric-exporter:synapse_1.1.1-94",
+		Image:   "vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
 		Enabled: false,

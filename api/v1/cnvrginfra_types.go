@@ -8,7 +8,7 @@ var InfraReconcilerCm = "infra-reconciler-cm"
 
 type CnvrgInfraSpec struct {
 	ClusterDomain         string               `json:"clusterDomain,omitempty"`
-	ClusterInternalDomain string               `json:"clusterInternalDomain"`
+	ClusterInternalDomain string               `json:"clusterInternalDomain,omitempty"`
 	InfraNamespace        string               `json:"infraNamespace,omitempty"`
 	Monitoring            CnvrgInfraMonitoring `json:"monitoring,omitempty"`
 	Networking            CnvrgInfraNetworking `json:"networking,omitempty"`
