@@ -25,6 +25,7 @@ type CnvrgInfraSpec struct {
 	Capsule               Capsule              `json:"capsule,omitempty"`
 	CnvrgAppPriorityClass PriorityClass        `json:"cnvrgAppPriorityClass,omitempty"`
 	CnvrgJobPriorityClass PriorityClass        `json:"cnvrgJobPriorityClass,omitempty"`
+	Cri                   CriType              `json:"cri,omitempty"`
 }
 
 // +kubebuilder:object:root=true

@@ -10,6 +10,13 @@ const (
 	GcpObjectStorageType   ObjectStorageType = "gcp"
 )
 
+type CriType string
+
+const (
+	CriTypeDocker     CriType = "docker"
+	CriTypeContainerd CriType = "containerd"
+)
+
 type ConsistentHash struct {
 	Key   string `json:"key,omitempty"`
 	Value string `json:"value,omitempty"`

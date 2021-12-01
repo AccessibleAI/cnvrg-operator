@@ -1,12 +1,18 @@
 package controllers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"reflect"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
 	"strconv"
 	"strings"
@@ -56,7 +62,35 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
+func DiscoverCri() (mlopsv1.CriType, error) {
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return "", err
+	}
+
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return "", err
+	}
+
+	nodeList, err := clientset.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{Limit: 1})
+	if err != nil {
+		return "", err
+	}
+	//nodeList := &v1.NodeList{}
+	//if err := cr.List(context.Background(), nodeList, client.Limit(1)); err != nil {
+	//	return "", err
+	//}
+	node := nodeList.Items[0]
+	fmt.Println(node)
+	return mlopsv1.CriTypeDocker, nil
+}
+
 func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra) {
+	if app.Spec.Cri == "" {
+		DiscoverCri()
+	}
+
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
 		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
