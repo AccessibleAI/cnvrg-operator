@@ -462,11 +462,9 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		return false, err
 	}
 
-	if viper.GetBool("verbose") {
-		infraLog.V(1).Info("printing the diff between desiredSpec and actual")
-		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
-		infraLog.V(1).Info(diff)
-	}
+	infraLog.V(1).Info("printing the diff between desiredSpec and actual")
+	diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
+	infraLog.V(1).Info(diff)
 
 	// Compare desiredSpec and current cnvrgInfra spec,
 	// if they are not equal, update the cnvrgInfra spec with desiredSpec,

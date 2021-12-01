@@ -1009,9 +1009,8 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			}
 			if gvk == desired.Kinds[desired.DeploymentGVK] || gvk == desired.Kinds[desired.StatefulSetGVK] || gvk == desired.Kinds[desired.JobGVK] {
 				if containsString(healthCheckWorkloads, e.ObjectNew.GetName()) {
-
+					return true
 				}
-
 			}
 			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
 			return false
