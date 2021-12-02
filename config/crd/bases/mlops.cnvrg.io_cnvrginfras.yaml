@@ -109,6 +109,8 @@ spec:
                 image:
                   type: string
               type: object
+            cri:
+              type: string
             dbs:
               properties:
                 redis:
