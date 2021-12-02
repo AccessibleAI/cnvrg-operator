@@ -36,7 +36,7 @@ data:
         Name              tail
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
-        Parser            docker | cri
+        Parser            {{ .Data.CriClass }}
         DB                /var/log/cnvrg_flb_kube.db
         Skip_Long_Lines   On
         Refresh_Interval  10

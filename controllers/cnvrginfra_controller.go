@@ -215,6 +215,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			"Annotations":           cnvrgInfra.Spec.Annotations,
 			"Labels":                cnvrgInfra.Spec.Labels,
 			"ClusterInternalDomain": cnvrgInfra.Spec.ClusterInternalDomain,
+			"CriClass":              getCriClass(cnvrgInfra.Spec.Cri),
 		},
 	}
 	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
@@ -293,6 +294,17 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	}
 
 	return reconcileResult
+}
+
+func getCriClass(criType mlopsv1.CriType) string {
+	switch criType {
+	case mlopsv1.CriTypeContainerd:
+		return "cri"
+	case mlopsv1.CriTypeDocker:
+		return "docker"
+	default:
+		return "docker"
+	}
 }
 
 func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
