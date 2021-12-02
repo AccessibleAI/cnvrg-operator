@@ -211,9 +211,10 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	fluentbitData := desired.TemplateData{
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
 		Data: map[string]interface{}{
-			"AppInstance": cnvrgApps,
-			"Annotations": cnvrgInfra.Spec.Annotations,
-			"Labels":      cnvrgInfra.Spec.Labels,
+			"AppInstance":           cnvrgApps,
+			"Annotations":           cnvrgInfra.Spec.Annotations,
+			"Labels":                cnvrgInfra.Spec.Labels,
+			"ClusterInternalDomain": cnvrgInfra.Spec.ClusterInternalDomain,
 		},
 	}
 	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {

@@ -72,7 +72,7 @@ spec:
               cpu: 100m
               memory: 200Mi
         - name: hlml-service
-          image: lamatriz/hlml-service:synapse_1.1.1-94
+          image: vault.habana.ai/gaudi-metric-exporter/hlml-service:latest
           env:
           - name: LD_LIBRARY_PATH
             value: "/usr/lib/habanalabs"

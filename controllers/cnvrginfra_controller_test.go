@@ -703,7 +703,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 
 			ctx := context.Background()
 			ns := createNs()
-			expectedNoProxy := networking.DefaultNoProxy()
+			expectedNoProxy := networking.DefaultNoProxy("cluster.local")
 			infra := getDefaultTestInfraSpec(ns)
 			infra.Spec.Networking.Proxy.Enabled = true
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
@@ -750,7 +750,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 			ctx := context.Background()
 			ns := createNs()
 			noProxy := []string{".foo.bar"}
-			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
+			expectedNoProxy := append(noProxy, networking.DefaultNoProxy("cluster.local")...)
 			infra := getDefaultTestInfraSpec(ns)
 			infra.Spec.Networking.Proxy.Enabled = true
 			infra.Spec.Networking.Proxy.HttpProxy = []string{
@@ -793,7 +793,7 @@ var _ = Describe("CnvrgInfra controller", func() {
 		})
 		It("Proxy configmap test creation - k8s api server", func() {
 			noProxy := []string{".foo.bar"}
-			expectedNoProxy := append(noProxy, networking.DefaultNoProxy()...)
+			expectedNoProxy := append(noProxy, networking.DefaultNoProxy("cluster.local")...)
 			ctx := context.Background()
 			ns := createNs()
 			infra := getDefaultTestInfraSpec(ns)

@@ -1,4 +1,5 @@
 clusterDomain: ""
+clusterInternalDomain: "cluster.local"
 spec: allinone # allinone|infra|ccp
 imageHub: docker.io/cnvrg
 

@@ -8,6 +8,7 @@ var InfraReconcilerCm = "infra-reconciler-cm"
 
 type CnvrgInfraSpec struct {
 	ClusterDomain         string               `json:"clusterDomain,omitempty"`
+	ClusterInternalDomain string               `json:"clusterInternalDomain,omitempty"`
 	InfraNamespace        string               `json:"infraNamespace,omitempty"`
 	Monitoring            CnvrgInfraMonitoring `json:"monitoring,omitempty"`
 	Networking            CnvrgInfraNetworking `json:"networking,omitempty"`
@@ -55,6 +56,7 @@ func init() {
 func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 	infraDefault := CnvrgInfraSpec{
 		ClusterDomain:         "",
+		ClusterInternalDomain: "cluster.local",
 		ImageHub:              "docker.io/cnvrg",
 		InfraNamespace:        "cnvrg-infra",
 		SSO:                   ssoDefault,

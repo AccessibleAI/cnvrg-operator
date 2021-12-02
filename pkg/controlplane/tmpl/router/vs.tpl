@@ -25,4 +25,4 @@ spec:
         - destination:
             port:
               number: 80
-            host: "{{ .Spec.ControlPlane.CnvrgRouter.SvcName }}.{{ ns . }}.svc.cluster.local"
+            host: "{{ .Spec.ControlPlane.CnvrgRouter.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"

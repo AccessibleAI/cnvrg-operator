@@ -25,4 +25,4 @@ spec:
     - destination:
         port:
           number: 8000
-        host: "cnvrg-ingress-test.{{ ns . }}.svc.cluster.local"
+        host: "cnvrg-ingress-test.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
