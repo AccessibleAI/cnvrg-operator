@@ -8,9 +8,6 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
@@ -62,33 +59,28 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
-func DiscoverCri() (mlopsv1.CriType, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
+func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
+	nodeList := &v1.NodeList{}
+	if err := clientset.List(context.Background(), nodeList, client.Limit(1)); err != nil {
 		return "", err
 	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return "", err
-	}
-
-	nodeList, err := clientset.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{Limit: 1})
-	if err != nil {
-		return "", err
-	}
-	//nodeList := &v1.NodeList{}
-	//if err := cr.List(context.Background(), nodeList, client.Limit(1)); err != nil {
-	//	return "", err
-	//}
 	node := nodeList.Items[0]
-	fmt.Println(node)
-	return mlopsv1.CriTypeDocker, nil
+	cri := node.Status.NodeInfo.ContainerRuntimeVersion
+	if strings.Contains(cri, string(mlopsv1.CriTypeContainerd)) {
+		return mlopsv1.CriTypeContainerd, nil
+	} else {
+		return mlopsv1.CriTypeDocker, nil
+	}
 }
 
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra) {
-	if app.Spec.Cri == "" {
-		DiscoverCri()
+func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) {
+	if app.Spec.Cri == "" || infra.Spec.Cri == "" {
+		cri, err := DiscoverCri(clientset)
+		if err != nil {
+			return
+		}
+		app.Spec.Cri = cri
+		infra.Spec.Cri = cri
 	}
 
 	// set default heap size for ES if not set by user
