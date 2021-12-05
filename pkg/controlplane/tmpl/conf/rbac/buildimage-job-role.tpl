@@ -11,18 +11,3 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-{{- if not .Spec.ControlPlane.BaseConfig.CnvrgJobRbacStrict }}
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - '*'
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - '*'
-{{- end }}

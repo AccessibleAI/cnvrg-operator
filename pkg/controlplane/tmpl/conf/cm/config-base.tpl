@@ -35,7 +35,7 @@ data:
   HAS_CNVRG_SCHEDULER: "{{ .Spec.ControlPlane.CnvrgScheduler.Enabled }}"
   CNVRG_SSO_REALM: "{{ .Spec.SSO.RealmName }}"
   CNVRG_SSO_SERVICE_URL: "{{ .Spec.SSO.ServiceUrl }}"
-  CRI: "{{ .Spec.Cri }}"
+  CNVRG_CRI: "{{ .Spec.Cri }}"
   CNVRG_BUILD_IMAGE_JOB_SA: "cnvrg-buildimage-job"
   {{- if ne .Spec.ControlPlane.BaseConfig.JobsStorageClass "" }}
   CNVRG_JOBS_STORAGECLASS: "{{ .Spec.ControlPlane.BaseConfig.JobsStorageClass }}" # if is set, app's job will use this storageClass for notebooks/experiments
