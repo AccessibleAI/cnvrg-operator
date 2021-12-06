@@ -308,6 +308,8 @@ func getCriClass(criType mlopsv1.CriType) string {
 	switch criType {
 	case mlopsv1.CriTypeContainerd:
 		return "cri"
+	case mlopsv1.CriTypeCrio:
+		return "cri"
 	case mlopsv1.CriTypeDocker:
 		return "docker"
 	default:
