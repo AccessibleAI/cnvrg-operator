@@ -112,6 +112,10 @@ spec:
                   type: string
               type: object
             cri:
+              enum:
+              - docker
+              - containerd
+              - cri-o
               type: string
             dbs:
               properties:

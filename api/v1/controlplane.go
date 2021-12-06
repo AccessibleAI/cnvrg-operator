@@ -10,6 +10,7 @@ const (
 	GcpObjectStorageType   ObjectStorageType = "gcp"
 )
 
+// +kubebuilder:validation:Enum=docker;containerd;cri-o;
 type CriType string
 
 const (
