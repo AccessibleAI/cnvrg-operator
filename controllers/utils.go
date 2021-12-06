@@ -74,13 +74,12 @@ func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 }
 
 func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) {
-	if app.Spec.Cri == "" || infra.Spec.Cri == "" {
+	if app.Spec.Cri == "" {
 		cri, err := DiscoverCri(clientset)
 		if err != nil {
 			return
 		}
 		app.Spec.Cri = cri
-		infra.Spec.Cri = cri
 	}
 
 	// set default heap size for ES if not set by user
@@ -135,7 +134,15 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	}
 }
 
-func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec) {
+func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) {
+	if infra.Spec.Cri == "" {
+		cri, err := DiscoverCri(clientset)
+		if err != nil {
+			return
+		}
+
+		desiredInfraSpec.Cri = cri
+	}
 
 	if infra.Spec.Networking.Ingress.IstioGwName == "" {
 		desiredInfraSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, infra.Spec.InfraNamespace)

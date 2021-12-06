@@ -9,7 +9,7 @@ spec:
   clusterInternalDomain: "{{.Values.clusterInternalDomain}}"
   infraNamespace: {{ template "spec.cnvrgNs" . }}
   imageHub: {{ .Values.imageHub }}
-  cri: {{ .Values.cri }}
+  cri: "{{ .Values.cri }}"
   configReloader:
     enabled: {{.Values.configReloader.enabled}}
   gpu:

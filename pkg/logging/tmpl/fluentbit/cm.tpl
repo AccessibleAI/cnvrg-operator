@@ -29,6 +29,7 @@ data:
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-output.conf
     {{- end }}
 
+  {{ $criClass := .Data.CriClass }}
   {{- range $_, $app := .Data.AppInstance }}
 
   {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf: |
@@ -36,7 +37,7 @@ data:
         Name              tail
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
-        Parser            {{ .Data.CriClass }}
+        Parser            {{ $criClass }}
         DB                /var/log/cnvrg_flb_kube.db
         Skip_Long_Lines   On
         Refresh_Interval  10
