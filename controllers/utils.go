@@ -79,12 +79,11 @@ func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 }
 
 func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) error {
-	if app.Spec.Cri == mlopsv1.CriTypeAutodiscovery {
+	if app.Spec.Cri == "" {
 		cri, err := DiscoverCri(clientset)
 		if err != nil {
 			return err
 		}
-		app.Spec.Cri = ""
 		desiredAppSpec.Cri = cri
 	}
 
@@ -143,13 +142,12 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 }
 
 func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {
-	if infra.Spec.Cri == mlopsv1.CriTypeAutodiscovery {
+	if infra.Spec.Cri == "" {
 		cri, err := DiscoverCri(clientset)
 		if err != nil {
 			return err
 		}
 
-		infra.Spec.Cri = ""
 		desiredInfraSpec.Cri = cri
 	}
 

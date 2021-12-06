@@ -74,7 +74,6 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		Capsule:               capsuleDefault,
 		CnvrgAppPriorityClass: PriorityClass{Name: "cnvrg-apps", Value: 2000000, Description: "cnvrg control plane apps priority class"},
 		CnvrgJobPriorityClass: PriorityClass{Name: "cnvrg-jobs", Value: 1000000, Description: "cnvrg jobs priority class"},
-		Cri:                   CriTypeAutodiscovery,
 	}
 	return infraDefault
 }

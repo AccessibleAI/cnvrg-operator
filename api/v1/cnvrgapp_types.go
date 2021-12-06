@@ -66,6 +66,5 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		CnvrgAppPriorityClass: PriorityClass{},
 		CnvrgJobPriorityClass: PriorityClass{},
 		IngressCheck:          ingressCheckDefault,
-		Cri:                   CriTypeAutodiscovery,
 	}
 }

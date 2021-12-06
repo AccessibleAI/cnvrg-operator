@@ -226,4 +226,4 @@ backup:
   rotation: 5
   period: 24h
 
-cri: "autodiscovery"
+cri: ""
