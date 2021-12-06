@@ -994,6 +994,24 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	appOwnsPredicate := predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
+			gvk := e.ObjectNew.GetObjectKind().GroupVersionKind()
+			app := mlopsv1.DefaultCnvrgAppSpec()
+			healthCheckWorkloads := []string{
+				"ingresscheck",
+				"sidekiq",
+				"searchkiq",
+				"systemkiq",
+				app.ControlPlane.WebApp.SvcName,
+				app.Dbs.Pg.SvcName,
+				app.Dbs.Minio.SvcName,
+				app.Dbs.Redis.SvcName,
+				app.Dbs.Es.SvcName,
+			}
+			if gvk == desired.Kinds[desired.DeploymentGVK] || gvk == desired.Kinds[desired.StatefulSetGVK] || gvk == desired.Kinds[desired.JobGVK] {
+				if containsString(healthCheckWorkloads, e.ObjectNew.GetName()) {
+					return true
+				}
+			}
 			infraLog.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
 			return false
 		},
