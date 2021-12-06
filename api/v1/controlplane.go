@@ -15,6 +15,7 @@ type CriType string
 const (
 	CriTypeDocker     CriType = "docker"
 	CriTypeContainerd CriType = "containerd"
+	CriTypeCrio       CriType = "cri-o"
 )
 
 type ConsistentHash struct {

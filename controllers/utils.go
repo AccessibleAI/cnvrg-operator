@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
@@ -68,16 +69,20 @@ func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 	cri := node.Status.NodeInfo.ContainerRuntimeVersion
 	if strings.Contains(cri, string(mlopsv1.CriTypeContainerd)) {
 		return mlopsv1.CriTypeContainerd, nil
-	} else {
+	} else if strings.Contains(cri, string(mlopsv1.CriTypeCrio)) {
+		return mlopsv1.CriTypeCrio, nil
+	} else if strings.Contains(cri, string(mlopsv1.CriTypeDocker)) {
 		return mlopsv1.CriTypeDocker, nil
+	} else {
+		return "", errors.New("could not recognize cri. you can set it manually in cnvrgapp and cnvrginfra")
 	}
 }
 
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) {
+func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) error {
 	if app.Spec.Cri == "" {
 		cri, err := DiscoverCri(clientset)
 		if err != nil {
-			return
+			return err
 		}
 		app.Spec.Cri = cri
 	}
@@ -132,13 +137,15 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	if app.Spec.CnvrgAppPriorityClass.Name == "" && infra != nil {
 		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
 	}
+
+	return nil
 }
 
-func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) {
+func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {
 	if infra.Spec.Cri == "" {
 		cri, err := DiscoverCri(clientset)
 		if err != nil {
-			return
+			return err
 		}
 
 		desiredInfraSpec.Cri = cri
@@ -161,4 +168,6 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 			infra.Spec.Networking.Proxy.NoProxy = nil
 		}
 	}
+
+	return nil
 }

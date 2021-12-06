@@ -474,7 +474,10 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
 
-	calculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec, r.Client)
+	if err := calculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec, r.Client); err != nil {
+		infraLog.Error(err, "can't calculate defaults")
+		return false, err
+	}
 
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride, mergo.WithTransformers(cnvrgSpecBoolTransformer{})); err != nil {
