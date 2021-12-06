@@ -10,13 +10,14 @@ const (
 	GcpObjectStorageType   ObjectStorageType = "gcp"
 )
 
-// +kubebuilder:validation:Enum=docker;containerd;cri-o;
+// +kubebuilder:validation:Enum=autodiscovery;docker;containerd;cri-o;
 type CriType string
 
 const (
-	CriTypeDocker     CriType = "docker"
-	CriTypeContainerd CriType = "containerd"
-	CriTypeCrio       CriType = "cri-o"
+	CriTypeAutodiscovery CriType = "autodiscovery"
+	CriTypeDocker        CriType = "docker"
+	CriTypeContainerd    CriType = "containerd"
+	CriTypeCrio          CriType = "cri-o"
 )
 
 type ConsistentHash struct {
