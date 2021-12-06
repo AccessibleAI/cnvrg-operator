@@ -137,14 +137,6 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	var reconcileResult error
 
-	if cnvrgInfra.Spec.Cri == "" {
-		cri, err := DiscoverCri(r.Client)
-		if err != nil {
-			return err
-		}
-		cnvrgInfra.Spec.Cri = cri
-	}
-
 	// apply priority classes
 	if err := desired.Apply(priorityclass.State(), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
