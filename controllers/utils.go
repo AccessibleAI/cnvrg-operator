@@ -84,7 +84,8 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		if err != nil {
 			return err
 		}
-		app.Spec.Cri = cri
+		app.Spec.Cri = ""
+		desiredAppSpec.Cri = cri
 	}
 
 	// set default heap size for ES if not set by user
@@ -148,6 +149,7 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 			return err
 		}
 
+		infra.Spec.Cri = ""
 		desiredInfraSpec.Cri = cri
 	}
 
