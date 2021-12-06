@@ -29,7 +29,7 @@ data:
     @INCLUDE {{ $app.SpecName }}-{{ $app.SpecNs }}-output.conf
     {{- end }}
 
-  {{ $criClass := .Data.CriClass }}
+  {{ $criType := .Data.CriType }}
   {{- range $_, $app := .Data.AppInstance }}
 
   {{ $app.SpecName }}-{{ $app.SpecNs }}-input.conf: |
@@ -37,7 +37,7 @@ data:
         Name              tail
         Tag               kube.{{ $app.SpecNs }}.*
         Path              /var/log/containers/*_{{ $app.SpecNs }}_*.log
-        Parser            {{ $criClass }}
+        Parser            {{ $criType }}
         DB                /var/log/cnvrg_flb_kube.db
         Skip_Long_Lines   On
         Refresh_Interval  10
@@ -112,7 +112,15 @@ data:
 
     [PARSER]
         # http://rubular.com/r/tjUt3Awgg4
-        Name cri
+        Name containerd
+        Format regex
+        Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+
+    [PARSER]
+        # http://rubular.com/r/tjUt3Awgg4
+        Name cri-o
         Format regex
         Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
         Time_Key    time
