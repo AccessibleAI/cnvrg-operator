@@ -141,6 +141,7 @@ type SMTP struct {
 	Password          string `json:"password,omitempty"`
 	Domain            string `json:"domain,omitempty"`
 	OpensslVerifyMode string `json:"opensslVerifyMode,omitempty"`
+	Sender            string `json:"sender,omitempty"`
 }
 
 type ObjectStorage struct {
@@ -419,5 +420,6 @@ var controlPlaneDefault = ControlPlane{
 		Password:          "",
 		Domain:            "",
 		OpensslVerifyMode: "",
+		Sender:            "info@cnvrg.io",
 	},
 }
