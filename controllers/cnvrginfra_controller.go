@@ -211,9 +211,10 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	fluentbitData := desired.TemplateData{
 		Namespace: cnvrgInfra.Spec.InfraNamespace,
 		Data: map[string]interface{}{
-			"AppInstance": cnvrgApps,
-			"Annotations": cnvrgInfra.Spec.Annotations,
-			"Labels":      cnvrgInfra.Spec.Labels,
+			"AppInstance":           cnvrgApps,
+			"Annotations":           cnvrgInfra.Spec.Annotations,
+			"Labels":                cnvrgInfra.Spec.Labels,
+			"ClusterInternalDomain": cnvrgInfra.Spec.ClusterInternalDomain,
 		},
 	}
 	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
@@ -461,11 +462,9 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 		return false, err
 	}
 
-	if viper.GetBool("verbose") {
-		infraLog.V(1).Info("printing the diff between desiredSpec and actual")
-		diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
-		infraLog.V(1).Info(diff)
-	}
+	infraLog.V(1).Info("printing the diff between desiredSpec and actual")
+	diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgInfra.Spec)
+	infraLog.V(1).Info(diff)
 
 	// Compare desiredSpec and current cnvrgInfra spec,
 	// if they are not equal, update the cnvrgInfra spec with desiredSpec,

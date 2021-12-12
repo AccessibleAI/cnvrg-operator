@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Spec.Logging.Kibana.SvcName }}
+  name: cnvrg-ingress-test
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -13,9 +13,9 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{.Spec.Logging.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}"
+  - "cnvrg-ingress-test.{{ .Spec.ClusterDomain }}"
   gateways:
-  - {{ .Spec.Networking.Ingress.IstioGwName}}
+  - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
   - retries:
       attempts: {{ .Spec.Networking.Ingress.RetriesAttempts }}
@@ -24,5 +24,5 @@ spec:
     route:
     - destination:
         port:
-          number: {{.Spec.Logging.Kibana.Port}}
-        host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
+          number: 8000
+        host: "cnvrg-ingress-test.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"

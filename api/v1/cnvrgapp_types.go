@@ -6,6 +6,7 @@ import (
 
 type CnvrgAppSpec struct {
 	ClusterDomain         string             `json:"clusterDomain,omitempty"`
+	ClusterInternalDomain string             `json:"clusterInternalDomain,omitempty"`
 	ImageHub              string             `json:"imageHub,omitempty"`
 	Labels                map[string]string  `json:"labels,omitempty"`
 	Annotations           map[string]string  `json:"annotations,omitempty"`
@@ -19,6 +20,7 @@ type CnvrgAppSpec struct {
 	Tenancy               Tenancy            `json:"tenancy,omitempty"`
 	CnvrgAppPriorityClass PriorityClass      `json:"cnvrgAppPriorityClass,omitempty"`
 	CnvrgJobPriorityClass PriorityClass      `json:"cnvrgJobPriorityClass,omitempty"`
+	IngressCheck          IngressCheck       `json:"ingressCheck,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -48,6 +50,7 @@ func init() {
 func DefaultCnvrgAppSpec() CnvrgAppSpec {
 	return CnvrgAppSpec{
 		ClusterDomain:         "",
+		ClusterInternalDomain: "cluster.local",
 		ImageHub:              "docker.io/cnvrg",
 		ControlPlane:          controlPlaneDefault,
 		Registry:              appRegistryDefault,
@@ -61,5 +64,6 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Annotations:           nil,
 		CnvrgAppPriorityClass: PriorityClass{},
 		CnvrgJobPriorityClass: PriorityClass{},
+		IngressCheck:          ingressCheckDefault,
 	}
 }

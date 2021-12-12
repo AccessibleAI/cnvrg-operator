@@ -1,4 +1,5 @@
 clusterDomain: ""
+clusterInternalDomain: "cluster.local"
 spec: allinone # allinone|infra|ccp
 imageHub: docker.io/cnvrg
 
@@ -131,6 +132,9 @@ monitoring:
 
   dcgmExporter:
     enabled: true
+
+  habanaExporter:
+    enabled: false
 
   nodeExporter:
     enabled: true

@@ -156,9 +156,10 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return "http://" + cnvrgApp.Spec.ControlPlane.Hyper.SvcName
 		},
 		"esFullInternalUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {
-			return fmt.Sprintf("http://%s.%s.svc.cluster.local:%d",
+			return fmt.Sprintf("http://%s.%s.svc.%s:%d",
 				cnvrgApp.Spec.Dbs.Es.SvcName,
 				cnvrgApp.Namespace,
+				cnvrgApp.Spec.ClusterInternalDomain,
 				cnvrgApp.Spec.Dbs.Es.Port)
 		},
 		"objectStorageUrl": func(cnvrgApp mlopsv1.CnvrgApp) string {

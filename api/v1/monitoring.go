@@ -10,6 +10,7 @@ type PrometheusOperator struct {
 type Prometheus struct {
 	Enabled             bool              `json:"enabled,omitempty"`
 	Image               string            `json:"image,omitempty"`
+	Replicas            int               `json:"replicas,omitempty"`
 	BasicAuthProxyImage string            `json:"basicAuthProxyImage,omitempty"`
 	Requests            Requests          `json:"requests,omitempty"`
 	Limits              Limits            `json:"limits,omitempty"`
@@ -54,6 +55,11 @@ type DcgmExporter struct {
 	Image   string `json:"image,omitempty"`
 }
 
+type HabanaExporter struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
 type CnvrgIdleMetricsExporter struct {
 	Enabled bool              `json:"enabled,omitempty"`
 	Labels  map[string]string `json:"labels,omitempty"`
@@ -66,6 +72,7 @@ type CnvrgInfraMonitoring struct {
 	KubeStateMetrics         KubeStateMetrics         `json:"kubeStateMetrics,omitempty"`
 	Grafana                  Grafana                  `json:"grafana,omitempty"`
 	DcgmExporter             DcgmExporter             `json:"dcgmExporter,omitempty"`
+	HabanaExporter           HabanaExporter           `json:"habanaExporter,omitempty"`
 	DefaultServiceMonitors   DefaultServiceMonitors   `json:"defaultServiceMonitors,omitempty"`
 	CnvrgIdleMetricsExporter CnvrgIdleMetricsExporter `json:"cnvrgIdleMetricsExporter,omitempty"`
 }
@@ -107,6 +114,7 @@ var grafanaAppDefault = Grafana{
 var prometheusInfraDefault = Prometheus{
 	Enabled:             false,
 	Image:               "prometheus:v2.22.1",
+	Replicas:            1,
 	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
 		Cpu:    "200m",
@@ -129,6 +137,7 @@ var prometheusInfraDefault = Prometheus{
 var prometheusAppDefault = Prometheus{
 	Enabled:             false,
 	Image:               "prometheus:v2.22.1",
+	Replicas:            1,
 	BasicAuthProxyImage: "nginx:1.20",
 	Requests: Requests{
 		Cpu:    "200m",
@@ -176,6 +185,10 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	DcgmExporter: DcgmExporter{
 		Enabled: false,
 		Image:   "dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
+	},
+	HabanaExporter: HabanaExporter{
+		Enabled: false,
+		Image:   "vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
 		Enabled: false,

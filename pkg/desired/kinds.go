@@ -31,6 +31,7 @@ const (
 	PodDisruptionBudgetGVK  GVKName = "PodDisruptionBudget"
 	HpaGVK                  GVKName = "HpaGVK"
 	PriorityClassGVK        GVKName = "PriorityClassGVK"
+	JobGVK                  GVKName = "JobGvk"
 )
 
 var Kinds = map[GVKName]schema.GroupVersionKind{
@@ -178,5 +179,10 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 		Group:   "scheduling.k8s.io",
 		Version: "v1",
 		Kind:    "PriorityClass",
+	},
+	JobGVK: schema.GroupVersionKind{
+		Kind:    "Job",
+		Group:   "batch",
+		Version: "v1",
 	},
 }
