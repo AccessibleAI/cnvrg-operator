@@ -1073,6 +1073,7 @@ func getEmptyTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {
 
 func getDefaultTestInfraSpec(ns string) *mlopsv1.CnvrgInfra {
 	testSpec := mlopsv1.DefaultCnvrgInfraSpec()
+	testSpec.Cri = mlopsv1.CriTypeDocker
 	testSpec.InfraNamespace = ns
 	testSpec.ClusterDomain = "test.local"
 	return &mlopsv1.CnvrgInfra{
