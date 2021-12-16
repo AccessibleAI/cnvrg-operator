@@ -2369,6 +2369,7 @@ func getEmptyTestAppSpec(ns string) *mlopsv1.CnvrgApp {
 
 func getDefaultTestAppSpec(ns string) *mlopsv1.CnvrgApp {
 	testSpec := mlopsv1.DefaultCnvrgAppSpec()
+	testSpec.Cri = mlopsv1.CriTypeDocker
 	testSpec.CnvrgAppPriorityClass.Name = "foo-bar"
 	testSpec.CnvrgJobPriorityClass.Name = "foo-bar"
 	testSpec.ClusterDomain = "test.local"
