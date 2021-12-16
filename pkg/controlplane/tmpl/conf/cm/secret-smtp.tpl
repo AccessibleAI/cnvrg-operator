@@ -19,3 +19,4 @@ data:
   SMTP_PASSWORD: {{ .Spec.ControlPlane.SMTP.Password | b64enc }}
   SMTP_DOMAIN: {{ .Spec.ControlPlane.SMTP.Domain | b64enc }}
   SMTP_OPENSSL_VERIFY_MODE: {{ .Spec.ControlPlane.SMTP.OpensslVerifyMode | b64enc }}
+  SMTP_SENDER: {{ .Spec.ControlPlane.SMTP.Sender | b64enc }}
