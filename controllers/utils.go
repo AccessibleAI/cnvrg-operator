@@ -66,7 +66,7 @@ func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 		return "", err
 	}
 	if len(nodeList.Items) == 0 {
-		return "", errors.New("could not recognize cri. you can set it manually in cnvrgapp and cnvrginfra")
+		return "", errors.New("could not recognize cri because we could not list nodes. you can set it manually in cnvrgapp and cnvrginfra")
 	}
 	node := nodeList.Items[0]
 	cri := node.Status.NodeInfo.ContainerRuntimeVersion
