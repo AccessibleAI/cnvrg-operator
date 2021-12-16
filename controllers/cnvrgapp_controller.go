@@ -841,7 +841,10 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 		//return false, err
 	}
 
-	calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, infra)
+	if err := calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, infra, r.Client); err != nil {
+		appLog.Error(err, "can't calculate defaults")
+		return false, err
+	}
 
 	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride, mergo.WithTransformers(cnvrgSpecBoolTransformer{})); err != nil {

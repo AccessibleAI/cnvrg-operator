@@ -1,12 +1,16 @@
 package controllers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
+	v1 "k8s.io/api/core/v1"
 	"reflect"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
 	"strconv"
 	"strings"
@@ -56,7 +60,33 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra) {
+func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
+	nodeList := &v1.NodeList{}
+	if err := clientset.List(context.Background(), nodeList, client.Limit(1)); err != nil {
+		return "", err
+	}
+	node := nodeList.Items[0]
+	cri := node.Status.NodeInfo.ContainerRuntimeVersion
+	if strings.Contains(cri, string(mlopsv1.CriTypeContainerd)) {
+		return mlopsv1.CriTypeContainerd, nil
+	} else if strings.Contains(cri, string(mlopsv1.CriTypeCrio)) {
+		return mlopsv1.CriTypeCrio, nil
+	} else if strings.Contains(cri, string(mlopsv1.CriTypeDocker)) {
+		return mlopsv1.CriTypeDocker, nil
+	} else {
+		return "", errors.New("could not recognize cri. you can set it manually in cnvrgapp and cnvrginfra")
+	}
+}
+
+func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) error {
+	if app.Spec.Cri == "" {
+		cri, err := DiscoverCri(clientset)
+		if err != nil {
+			return err
+		}
+		desiredAppSpec.Cri = cri
+	}
+
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
 		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")
@@ -107,9 +137,19 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	if app.Spec.CnvrgAppPriorityClass.Name == "" && infra != nil {
 		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
 	}
+
+	return nil
 }
 
-func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec) {
+func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {
+	if infra.Spec.Cri == "" {
+		cri, err := DiscoverCri(clientset)
+		if err != nil {
+			return err
+		}
+
+		desiredInfraSpec.Cri = cri
+	}
 
 	if infra.Spec.Networking.Ingress.IstioGwName == "" {
 		desiredInfraSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, infra.Spec.InfraNamespace)
@@ -128,4 +168,6 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 			infra.Spec.Networking.Proxy.NoProxy = nil
 		}
 	}
+
+	return nil
 }

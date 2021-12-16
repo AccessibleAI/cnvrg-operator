@@ -9,6 +9,7 @@ spec:
   clusterDomain: "{{ .Values.clusterDomain }}"
   clusterInternalDomain: "{{.Values.clusterInternalDomain}}"
   imageHub: {{ .Values.imageHub }}
+  cri: "{{ .Values.cri }}"
   {{- include "spec.labelsAndAnnotations" . | indent 2 }}
   {{- include "spec.controlPlane" . | indent 2 }}
   {{- include "spec.registry" . | indent 2 }}

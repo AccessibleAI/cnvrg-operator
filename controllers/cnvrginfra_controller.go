@@ -215,6 +215,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 			"Annotations":           cnvrgInfra.Spec.Annotations,
 			"Labels":                cnvrgInfra.Spec.Labels,
 			"ClusterInternalDomain": cnvrgInfra.Spec.ClusterInternalDomain,
+			"CriType":               cnvrgInfra.Spec.Cri,
 		},
 	}
 	if err := desired.Apply(logging.FluentbitConfigurationState(fluentbitData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
@@ -454,7 +455,10 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
 
-	calculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec)
+	if err := calculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec, r.Client); err != nil {
+		infraLog.Error(err, "can't calculate defaults")
+		return false, err
+	}
 
 	// Merge current cnvrgInfra spec into default spec ( make it indeed desiredSpec )
 	if err := mergo.Merge(&desiredSpec, cnvrgInfra.Spec, mergo.WithOverride, mergo.WithTransformers(cnvrgSpecBoolTransformer{})); err != nil {

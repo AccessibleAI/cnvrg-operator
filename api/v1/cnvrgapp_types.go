@@ -21,6 +21,7 @@ type CnvrgAppSpec struct {
 	CnvrgAppPriorityClass PriorityClass      `json:"cnvrgAppPriorityClass,omitempty"`
 	CnvrgJobPriorityClass PriorityClass      `json:"cnvrgJobPriorityClass,omitempty"`
 	IngressCheck          IngressCheck       `json:"ingressCheck,omitempty"`
+	Cri                   CriType            `json:"cri,omitempty"`
 }
 
 // +kubebuilder:object:root=true

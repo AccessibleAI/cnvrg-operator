@@ -73,6 +73,36 @@ func rbacState() []*desired.State {
 			Own:            true,
 			Updatable:      false,
 		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/buildimage-job-role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/buildimage-job-rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/buildimage-job-sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      false,
+		},
 	}
 }
 
