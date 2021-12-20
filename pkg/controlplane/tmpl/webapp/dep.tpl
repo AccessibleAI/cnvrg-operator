@@ -70,6 +70,17 @@ spec:
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Redis.CredsRef }}
+        env:
+          - name: OAUTH2_PROXY_TOKEN_VALIDATION_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cp-base-secret
+                key: OAUTH_PROXY_API_KEY
+          - name: OAUTH2_PROXY_TOKEN_VALIDATION_AUTH_DATA
+            valueFrom:
+              secretKeyRef:
+                name: cp-base-secret
+                key: OAUTH_PROXY_API_AUTH_DATA
         volumeMounts:
           - name: "oauth-proxy-webapp"
             mountPath: "/opt/app-root/conf/proxy-config"
