@@ -26,6 +26,6 @@ type HabanaDp struct {
 }
 
 var habanaDpDefault = HabanaDp{
-	Enabled: false,
+	Enabled: true,
 	Image:   "vault.habana.ai/docker-k8s-device-plugin/docker-k8s-device-plugin:latest",
 }

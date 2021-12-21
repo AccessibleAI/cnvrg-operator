@@ -187,7 +187,7 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 		Image:   "dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
 	},
 	HabanaExporter: HabanaExporter{
-		Enabled: false,
+		Enabled: true,
 		Image:   "vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
