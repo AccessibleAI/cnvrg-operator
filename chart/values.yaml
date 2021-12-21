@@ -11,7 +11,7 @@ gpu:
   nvidiaDp:
     enabled: true
   habanaDp:
-    enabled: false
+    enabled: true
 
 controlPlane:
   image: core:3.9.13
@@ -134,7 +134,7 @@ monitoring:
     enabled: true
 
   habanaExporter:
-    enabled: false
+    enabled: true
 
   nodeExporter:
     enabled: true
