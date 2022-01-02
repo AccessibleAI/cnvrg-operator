@@ -184,10 +184,10 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	},
 	DcgmExporter: DcgmExporter{
 		Enabled: false,
-		Image:   "dcgm-exporter:2.1.4-2.3.1-ubuntu18.04",
+		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.0.13-2.1.2-ubuntu20.04",
 	},
 	HabanaExporter: HabanaExporter{
-		Enabled: false,
+		Enabled: true,
 		Image:   "vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{

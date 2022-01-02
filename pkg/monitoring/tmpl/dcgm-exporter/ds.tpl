@@ -46,7 +46,7 @@ spec:
                 - SYS_ADMIN
             runAsNonRoot: false
             runAsUser: 0
-          image: {{image .Spec.ImageHub .Spec.Monitoring.DcgmExporter.Image }}
+          image: {{ .Spec.Monitoring.DcgmExporter.Image }}
           imagePullPolicy: "IfNotPresent"
           args:
             - -f
