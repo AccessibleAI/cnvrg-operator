@@ -105,10 +105,8 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 			Memory: "2Gi",
 		},
 		OauthProxy: OauthProxyServiceConf{
-			SkipAuthRegex:           nil,
-			TokenValidationKey:      "",
-			TokenValidationAuthData: "",
-			TokenValidationRegex:    nil,
+			SkipAuthRegex:        nil,
+			TokenValidationRegex: nil,
 		},
 	},
 }
