@@ -81,10 +81,10 @@ spec:
         ports:
         - containerPort: 8080
         volumeMounts:
-        - name: "elastalert-auth-proxy"
+        - name: elastalert-auth-proxy
           mountPath: "/etc/nginx"
           readOnly: true
-        - name: "htpasswd"
+        - name: htpasswd
           mountPath: "/etc/nginx/htpasswd"
           readOnly: true
         resources:
@@ -105,6 +105,6 @@ spec:
       - name: elastalert-auth-proxy
         configMap:
           name: elastalert-auth-proxy
-      - name: "htpasswd"
+      - name: htpasswd
         secret:
           secretName: {{ .Spec.Logging.Elastalert.CredsRef }}

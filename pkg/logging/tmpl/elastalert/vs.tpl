@@ -24,5 +24,5 @@ spec:
     route:
     - destination:
         port:
-          number: 8080
+          number: 80
         host: "{{ .Spec.Logging.Elastalert.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
