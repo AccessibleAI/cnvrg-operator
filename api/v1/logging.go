@@ -17,17 +17,19 @@ type Fluentbit struct {
 }
 
 type Elastalert struct {
-	Enabled      bool              `json:"enabled,omitempty"`
-	Image        string            `json:"image,omitempty"`
-	Port         int               `json:"port,omitempty"`
-	NodePort     int               `json:"nodePort,omitempty"`
-	StorageSize  string            `json:"storageSize,omitempty"`
-	SvcName      string            `json:"svcName,omitempty"`
-	StorageClass string            `json:"storageClass,omitempty"`
-	Requests     Requests          `json:"requests,omitempty"`
-	Limits       Limits            `json:"limits,omitempty"`
-	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
-	PvcName      string            `json:"pvcName,omitempty"`
+	Enabled        bool              `json:"enabled,omitempty"`
+	Image          string            `json:"image,omitempty"`
+	AuthProxyImage string            `json:"authProxyImage,omitempty"`
+	CredsRef       string            `json:"credsRef,omitempty"`
+	Port           int               `json:"port,omitempty"`
+	NodePort       int               `json:"nodePort,omitempty"`
+	StorageSize    string            `json:"storageSize,omitempty"`
+	SvcName        string            `json:"svcName,omitempty"`
+	StorageClass   string            `json:"storageClass,omitempty"`
+	Requests       Requests          `json:"requests,omitempty"`
+	Limits         Limits            `json:"limits,omitempty"`
+	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
+	PvcName        string            `json:"pvcName,omitempty"`
 }
 
 type Kibana struct {
@@ -71,13 +73,15 @@ var fluentbitDefault = Fluentbit{
 
 var cnvrgAppLoggingDefault = CnvrgAppLogging{
 	Elastalert: Elastalert{
-		Enabled:      false,
-		Image:        "elastalert:3.0.0-beta.1",
-		Port:         80,
-		NodePort:     32030,
-		StorageSize:  "30Gi",
-		SvcName:      "elastalert",
-		StorageClass: "",
+		Enabled:        false,
+		Image:          "elastalert:3.0.0-beta.1",
+		CredsRef:       "elastalert-creds",
+		AuthProxyImage: "nginx:1.20",
+		Port:           80,
+		NodePort:       32030,
+		StorageSize:    "30Gi",
+		SvcName:        "elastalert",
+		StorageClass:   "",
 		Requests: Requests{
 			Cpu:    "100m",
 			Memory: "200Mi",

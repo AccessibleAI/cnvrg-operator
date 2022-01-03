@@ -76,11 +76,35 @@ spec:
           name: elastalert-config
         - mountPath: /opt/elastalert/rules
           name: {{ .Spec.Logging.Elastalert.SvcName }}
+      - name: "elastalert-auth-proxy"
+        image: {{ image .Spec.ImageHub .Spec.Logging.Elastalert.AuthProxyImage }}
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: "elastalert-auth-proxy"
+          mountPath: "/etc/nginx"
+          readOnly: true
+        - name: "htpasswd"
+          mountPath: "/etc/nginx/htpasswd"
+          readOnly: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
       restartPolicy: Always
       volumes:
       - name: {{ .Spec.Logging.Elastalert.SvcName }}
         persistentVolumeClaim:
           claimName: {{ .Spec.Logging.Elastalert.PvcName }}
-      - configMap:
+      - name: elastalert-config
+        configMap:
           name: elastalert-config
-        name: elastalert-config
+      - name: elastalert-auth-proxy
+        configMap:
+          name: elastalert-auth-proxy
+      - name: "htpasswd"
+        secret:
+          secretName: {{ .Spec.Logging.Elastalert.CredsRef }}

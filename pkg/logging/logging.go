@@ -8,21 +8,39 @@ import (
 
 const path = "/pkg/logging/tmpl"
 
-func elastAlert() []*desired.State {
+func ElastCreds(data *desired.TemplateData) []*desired.State {
+	return []*desired.State{
+		{
+			TemplateData:   data,
+			TemplatePath:   path + "/elastalert/credsec.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
+func ElastAlert() []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/elastalert/sa.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
 		},
 		{
+			TemplatePath:   path + "/elastalert/authproxycm.tpl",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
 			TemplatePath:   path + "/elastalert/role.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
@@ -30,8 +48,6 @@ func elastAlert() []*desired.State {
 		},
 		{
 			TemplatePath:   path + "/elastalert/rolebinding.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
@@ -39,45 +55,41 @@ func elastAlert() []*desired.State {
 		},
 		{
 			TemplatePath:   path + "/elastalert/pvc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
-			TemplateData:   nil,
 			Updatable:      false,
 		},
 		{
 
 			TemplatePath:   path + "/elastalert/svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
-			TemplateData:   nil,
 			Updatable:      true,
 		},
 		{
 
 			TemplatePath:   path + "/elastalert/cm.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
-			TemplateData:   nil,
 			Updatable:      true,
 		},
 		{
 
 			TemplatePath:   path + "/elastalert/dep.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
-			TemplateData:   nil,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/elastalert/vs.tpl",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IstioVsGVK],
+			Own:            true,
 			Updatable:      true,
 		},
 	}
@@ -102,8 +114,6 @@ func kibanaIstioVs() []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/kibana/vs.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
@@ -278,28 +288,22 @@ func kibanaOauthProxy() []*desired.State {
 	}
 }
 
-func CnvrgAppLoggingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
+func CnvrgAppKibanaState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.Logging.Elastalert.Enabled {
-		state = append(state, elastAlert()...)
+	state = append(state, kibana()...)
+
+	if cnvrgApp.Spec.SSO.Enabled {
+		state = append(state, kibanaOauthProxy()...)
 	}
-	if cnvrgApp.Spec.Logging.Kibana.Enabled {
-		state = append(state, kibana()...)
 
-		if cnvrgApp.Spec.SSO.Enabled {
-			state = append(state, kibanaOauthProxy()...)
-		}
-
-		switch cnvrgApp.Spec.Networking.Ingress.Type {
-		case mlopsv1.IstioIngress:
-			state = append(state, kibanaIstioVs()...)
-		case mlopsv1.NginxIngress:
-			state = append(state, kibanaIngress()...)
-		case mlopsv1.OpenShiftIngress:
-			state = append(state, kibanaOcpRoute()...)
-		}
-
+	switch cnvrgApp.Spec.Networking.Ingress.Type {
+	case mlopsv1.IstioIngress:
+		state = append(state, kibanaIstioVs()...)
+	case mlopsv1.NginxIngress:
+		state = append(state, kibanaIngress()...)
+	case mlopsv1.OpenShiftIngress:
+		state = append(state, kibanaOcpRoute()...)
 	}
 
 	return state
