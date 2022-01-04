@@ -71,6 +71,13 @@ spec:
   containers:
     - name: "prom-auth-proxy"
       image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
       ports:
         - containerPort: 9091
           name: web
