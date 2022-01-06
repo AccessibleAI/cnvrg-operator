@@ -165,5 +165,6 @@ ifeq (, $(shell which controller-gen))
 	}
 CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
-CONTROLLER_GEN=$(shell which controller-gen)
+# CONTROLLER_GEN=$(shell which controller-gen)
+CONTROLLER_GEN=/Users/dima/.go/bin/controller-gen
 endif

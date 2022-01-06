@@ -407,7 +407,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 
 	if app.Spec.Logging.Kibana.Enabled {
-		appLog.Info("applying logging")
+		appLog.Info("applying kibana")
 		kibanaConfigSecretData, err := r.getKibanaConfigSecretData(app)
 		if err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
@@ -417,13 +417,64 @@ func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
-		if err := desired.Apply(logging.CnvrgAppLoggingState(app), app, r.Client, r.Scheme, appLog); err != nil {
+		if err := desired.Apply(logging.CnvrgAppKibanaState(app), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
 	}
 
+	if app.Spec.Logging.Elastalert.Enabled {
+		appLog.Info("applying elastalert")
+
+		// create elastalert creds ref
+		data, err := generateElastalertCreds(app)
+		if err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		}
+		if err := desired.Apply(logging.ElastCreds(data), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		}
+
+		if err := desired.Apply(logging.ElastAlert(), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		}
+
+	}
+
 	return nil
+}
+
+func generateElastalertCreds(app *mlopsv1.CnvrgApp) (*desired.TemplateData, error) {
+	user := "cnvrg"
+	pass := desired.RandomString()
+	passwordHash, err := apr1_crypt.New().Generate([]byte(pass), nil)
+	if err != nil {
+		appLog.Error(err, "error generating elastalert hash")
+		return nil, err
+	}
+
+	httpSchema := "http://"
+	if app.Spec.Networking.HTTPS.Enabled {
+		httpSchema = "https://"
+	}
+
+	data := &desired.TemplateData{
+		Data: map[string]interface{}{
+			"Namespace":     app.Namespace,
+			"Annotations":   app.Spec.Annotations,
+			"Labels":        app.Spec.Labels,
+			"CredsRef":      app.Spec.Logging.Elastalert.CredsRef,
+			"User":          user,
+			"Pass":          pass,
+			"Htpasswd":      fmt.Sprintf("%s:%s", user, passwordHash),
+			"ElastAlertUrl": fmt.Sprintf("%s%s.%s", httpSchema, app.Spec.Logging.Elastalert.SvcName, app.Spec.ClusterDomain),
+		},
+	}
+
+	return data, nil
 }
 
 func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
