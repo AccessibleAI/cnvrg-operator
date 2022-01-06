@@ -150,16 +150,6 @@ func controlPlaneConfigState() []*desired.State {
 		},
 		{
 
-			TemplatePath:   path + "/conf/cm/secret-oauth-proxy-tokens.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SecretGVK],
-			Own:            true,
-			Updatable:      false,
-		},
-		{
-
 			TemplatePath:   path + "/conf/cm/secret-ldap.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -273,6 +263,16 @@ func webAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/webapp/oauthtoken.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			Own:            true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/webapp/pdb.tpl",
