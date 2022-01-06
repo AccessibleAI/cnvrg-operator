@@ -60,7 +60,7 @@ current-version:
 	set -e ;\
 	currentBranch=$$(git rev-parse --abbrev-ref HEAD) ;\
 	currentVersion=$$(git fetch --tags && git tag -l --sort -version:refname | head -n 1) ;\
- 	if [[ $$currentBranch =~ .*"rc".* ]]; then echo "Hello"; fi ;\
+ 	if [[ $$currentBranch =~ .*"rc".* ]]; then currentVersion=$$currentBranch; fi ;\
 	echo $$currentVersion > /tmp/newVersion ;\
     }
 
