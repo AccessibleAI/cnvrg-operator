@@ -210,7 +210,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int, tokenValidationKey string, tokenValidationAuthData string, tokenValidationRegex []string) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int, tokenValidationRegex []string) string {
 			sso := getSSOConfig(obj)
 
 			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
@@ -248,8 +248,6 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
-				fmt.Sprintf(`token_validation_key = "%v"`, tokenValidationKey),
-				fmt.Sprintf(`token_validation_auth_data = "%v"`, tokenValidationAuthData),
 				fmt.Sprintf(`token_validation_regex = %v`, tokenValidationRegexes),
 				fmt.Sprintf(`email_domains = %v`, emailsDomains),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),

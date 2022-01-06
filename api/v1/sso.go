@@ -17,10 +17,8 @@ type SSO struct {
 }
 
 type OauthProxyServiceConf struct {
-	SkipAuthRegex           []string `json:"skipAuthRegex,omitempty"`
-	TokenValidationKey      string   `json:"tokenValidationKey,omitempty"`
-	TokenValidationAuthData string   `json:"tokenValidationAuthData,omitempty"`
-	TokenValidationRegex    []string `json:"tokenValidationRegex,omitempty"`
+	SkipAuthRegex        []string `json:"skipAuthRegex,omitempty"`
+	TokenValidationRegex []string `json:"tokenValidationRegex,omitempty"`
 }
 
 var ssoDefault = SSO{
