@@ -78,6 +78,10 @@ spec:
                 name: cp-object-storage
             - secretRef:
                 name: cp-smtp
+            {{- if isTrue .Spec.ControlPlane.Cvat.Enabled }}
+            - secretRef:
+                name: {{ .Spec.ControlPlane.Cvat.Pg.CredsRef }}
+            {{- end }}
             - secretRef:
                 name: {{ .Spec.Dbs.Es.CredsRef }}
             - secretRef:

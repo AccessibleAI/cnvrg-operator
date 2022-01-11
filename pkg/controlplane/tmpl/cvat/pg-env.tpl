@@ -13,6 +13,5 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  CVAT_ENABLED: "{{ .Spec.ControlPlane.BaseConfig.AgentCustomTag }}"
   CNVRG_CVAT_POSTGRES_DB: "cvat"
   CNVRG_CVAT_POSTGRES_USER: "root"
