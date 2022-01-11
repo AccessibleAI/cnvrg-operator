@@ -69,6 +69,8 @@ spec:
                 name: cp-base-config
             - configMapRef:
                 name: cp-networking-config
+            - configMapRef:
+                name: cvat-pg-config
             - secretRef:
                 name: cp-base-secret
             - secretRef:

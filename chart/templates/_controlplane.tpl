@@ -64,6 +64,10 @@ controlPlane:
       maxReplicas: {{ .Values.controlPlane.webapp.hpa.maxReplicas }}
   cvat:
     enabled: {{ .Values.controlPlane.cvat.enabled }}
+    pg:
+      enabled: {{ .Values.controlPlane.cvat.enabled }}
+    redis:
+      enabled: {{ .Values.controlPlane.cvat.enabled }}
   mpi:
     enabled: {{ .Values.controlPlane.mpi.enabled }}
     image: {{ .Values.controlPlane.mpi.image }}

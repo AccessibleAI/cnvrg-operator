@@ -31,10 +31,14 @@ spec:
     openAPIV3Schema:
       properties:
         apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
-          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -153,6 +157,133 @@ spec:
                         memory:
                           type: string
                       type: object
+                  type: object
+                cvat:
+                  properties:
+                    enabled:
+                      type: boolean
+                    pg:
+                      properties:
+                        backup:
+                          properties:
+                            bucketRef:
+                              type: string
+                            credsRef:
+                              type: string
+                            enabled:
+                              type: boolean
+                            period:
+                              type: string
+                            rotation:
+                              type: integer
+                          type: object
+                        credsRef:
+                          type: string
+                        effectiveCacheSize:
+                          type: string
+                        enabled:
+                          type: boolean
+                        hugePages:
+                          properties:
+                            enabled:
+                              type: boolean
+                            memory:
+                              type: string
+                            size:
+                              type: string
+                          type: object
+                        image:
+                          type: string
+                        limits:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                        maxConnections:
+                          type: integer
+                        nodeSelector:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        port:
+                          type: integer
+                        pvcName:
+                          type: string
+                        requests:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                        serviceAccount:
+                          type: string
+                        sharedBuffers:
+                          type: string
+                        storageClass:
+                          type: string
+                        storageSize:
+                          type: string
+                        svcName:
+                          type: string
+                      type: object
+                    redis:
+                      properties:
+                        backup:
+                          properties:
+                            bucketRef:
+                              type: string
+                            credsRef:
+                              type: string
+                            enabled:
+                              type: boolean
+                            period:
+                              type: string
+                            rotation:
+                              type: integer
+                          type: object
+                        credsRef:
+                          type: string
+                        enabled:
+                          type: boolean
+                        image:
+                          type: string
+                        limits:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                        nodeSelector:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        port:
+                          type: integer
+                        pvcName:
+                          type: string
+                        requests:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                        serviceAccount:
+                          type: string
+                        storageClass:
+                          type: string
+                        storageSize:
+                          type: string
+                        svcName:
+                          type: string
+                      type: object
+                  required:
+                  - pg
+                  - redis
                   type: object
                 hyper:
                   properties:
@@ -450,6 +581,8 @@ spec:
                     svcName:
                       type: string
                   type: object
+              required:
+              - cvat
               type: object
             cri:
               enum:

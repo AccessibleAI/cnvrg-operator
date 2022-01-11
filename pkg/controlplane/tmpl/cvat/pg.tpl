@@ -52,14 +52,17 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: {{ .Spec.ControlPlane.Cvat.Pg.ServiceAccount }}
+      securityContext:
+        runAsUser: 26
+        fsGroup: 26
       containers:
         - name: cvat-postgres
-          envFrom:
+          env:
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: cvat-pg-config
-                  key: CNVRG_CVAT_POSTGRES_DB
+                  key: CNVRG_CVAT_POSTGRES_DBNAME
             - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
@@ -85,13 +88,16 @@ spec:
           readinessProbe:
             exec:
               command:
-                - /usr/libexec/check-container
+                - sh
+                - -c
+                - su - postgres -c "pg_isready --host=$POD_IP"
             initialDelaySeconds: 5
             timeoutSeconds: 1
           securityContext:
             capabilities: {}
             privileged: false
           terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
           volumeMounts:
             - mountPath: /var/lib/pgsql/data
               name: postgres-data
