@@ -52,9 +52,6 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: {{ .Spec.ControlPlane.Cvat.Pg.ServiceAccount }}
-      securityContext:
-        runAsUser: 26
-        fsGroup: 26
       containers:
         - name: cvat-postgres
           env:
