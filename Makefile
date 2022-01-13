@@ -36,6 +36,8 @@ override-release: current-version docker-build docker-push chart
 	git tag $$(cat /tmp/newVersion)
 	git push origin $$(cat /tmp/newVersion)
 
+rc-release: current-version docker-build docker-push chart
+
 patch-release: patch-version docker-build docker-push chart
 	git tag $$(cat /tmp/newVersion);
 	git push origin $$(cat /tmp/newVersion)
