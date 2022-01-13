@@ -587,9 +587,6 @@ spec:
                         svcName:
                           type: string
                       type: object
-                  required:
-                  - pg
-                  - redis
                   type: object
                 es:
                   properties:
@@ -808,8 +805,6 @@ spec:
                     svcName:
                       type: string
                   type: object
-              required:
-              - cvat
               type: object
             imageHub:
               type: string

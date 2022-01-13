@@ -503,7 +503,7 @@ func cvatState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
-			Updatable:      true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/secret.tpl",
@@ -568,7 +568,7 @@ func cvatState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
-			Updatable:      true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/cvat-redis/secret.tpl",
