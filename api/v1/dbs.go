@@ -82,13 +82,13 @@ type AppDbs struct {
 	Redis Redis `json:"redis,omitempty"`
 	Minio Minio `json:"minio,omitempty"`
 	Es    Es    `json:"es,omitempty"`
-	Cvat  Cvat  `json:"cvat"`
+	Cvat  Cvat  `json:"cvat,omitempty"`
 }
 
 type Cvat struct {
 	Enabled bool  `json:"enabled,omitempty"`
-	Pg      Pg    `json:"pg"`
-	Redis   Redis `json:"redis"`
+	Pg      Pg    `json:"pg,omitempty"`
+	Redis   Redis `json:"redis,omitempty"`
 }
 
 type InfraDbs struct {
