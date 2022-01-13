@@ -69,8 +69,6 @@ spec:
                 name: cp-base-config
             - configMapRef:
                 name: cp-networking-config
-            - configMapRef:
-                name: cvat-pg-config
             - secretRef:
                 name: cp-base-secret
             - secretRef:
@@ -79,9 +77,11 @@ spec:
                 name: cp-object-storage
             - secretRef:
                 name: cp-smtp
-            {{- if isTrue .Spec.ControlPlane.Cvat.Enabled }}
+            {{- if isTrue .Spec.Dbs.Cvat.Enabled }}
             - secretRef:
-                name: {{ .Spec.ControlPlane.Cvat.Pg.CredsRef }}
+                name: {{ .Spec.Dbs.Cvat.Pg.CredsRef }}
+            - secretRef:
+                name: {{ .Spec.Dbs.Cvat.Redis.CredsRef }}
             {{- end }}
             - secretRef:
                 name: {{ .Spec.Dbs.Es.CredsRef }}

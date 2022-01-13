@@ -69,8 +69,6 @@ controlPlane:
     hpa:
       enabled: true
       maxReplicas: 5
-  cvat:
-    enabled: false
   mpi:
     enabled: true
     image: "mpioperator/mpi-operator:v0.2.3"
@@ -92,6 +90,8 @@ controlPlane:
     ssl: "false"
 
 dbs:
+  cvat:
+    enabled: false
   es:
     enabled: true
     storageSize: 80Gi

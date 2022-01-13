@@ -659,74 +659,6 @@ func mpiInfraState() []*desired.State {
 	}
 }
 
-func cvatState() []*desired.State {
-	return []*desired.State{
-		{
-			TemplatePath:   path + "/cvat/pg.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.DeploymentGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/cvat/pg-env.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.ConfigMapGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/cvat/pg-pvc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.PvcGVK],
-			Own:            true,
-			Updatable:      false,
-		},
-		{
-			TemplatePath:   path + "/cvat/pg-secret.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SecretGVK],
-			Own:            true,
-			Updatable:      false,
-		},
-		{
-			TemplatePath:   path + "/cvat/pg-svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SvcGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/cvat/redis.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.DeploymentGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/cvat/redis-svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SvcGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-	}
-}
-
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, rbacState()...)
@@ -746,9 +678,6 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		}
 		if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
 			state = append(state, webAppIngress()...)
-		}
-		if cnvrgApp.Spec.ControlPlane.Cvat.Enabled {
-			state = append(state, cvatState()...)
 		}
 	}
 

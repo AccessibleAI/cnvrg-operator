@@ -90,9 +90,9 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.Cri = cri
 	}
 
-	if app.Spec.ControlPlane.Cvat.Enabled {
-		desiredAppSpec.ControlPlane.Cvat.Pg.Enabled = true
-		desiredAppSpec.ControlPlane.Cvat.Redis.Enabled = true
+	if app.Spec.Dbs.Cvat.Enabled {
+		desiredAppSpec.Dbs.Cvat.Pg.Enabled = true
+		desiredAppSpec.Dbs.Cvat.Redis.Enabled = true
 	}
 
 	// set default heap size for ES if not set by user

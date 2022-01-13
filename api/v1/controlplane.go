@@ -183,7 +183,6 @@ type ControlPlane struct {
 	SMTP                            SMTP                            `json:"smtp,omitempty"`
 	ObjectStorage                   ObjectStorage                   `json:"objectStorage,omitempty"`
 	Mpi                             Mpi                             `json:"mpi,omitempty"`
-	Cvat                            Cvat                            `json:"cvat"`
 }
 
 type Mpi struct {
@@ -194,12 +193,6 @@ type Mpi struct {
 	Registry             Registry          `json:"registry,omitempty"`
 	Requests             Requests          `json:"requests,omitempty"`
 	Limits               Limits            `json:"limits,omitempty"`
-}
-
-type Cvat struct {
-	Enabled bool  `json:"enabled,omitempty"`
-	Pg      Pg    `json:"pg"`
-	Redis   Redis `json:"redis"`
 }
 
 var mpiDefault = Mpi{
@@ -220,69 +213,6 @@ var mpiDefault = Mpi{
 		URL:      "docker.io",
 		User:     "",
 		Password: "",
-	},
-}
-
-var cvatDefault = Cvat{
-	Enabled: false,
-	Pg:      cvatPgDefault,
-	Redis:   cvatRedisDefault,
-}
-
-var cvatPgDefault = Pg{
-	Enabled:        false,
-	ServiceAccount: "pg",
-	Image:          "postgres:10.3-alpine",
-	Port:           5432,
-	StorageSize:    "100Gi",
-	SvcName:        "cvat-postgres",
-	StorageClass:   "",
-	Requests: Requests{
-		Cpu:    "1",
-		Memory: "2Gi",
-	},
-	Limits: Limits{
-		Cpu:    "2",
-		Memory: "4Gi",
-	},
-	MaxConnections:     500,
-	SharedBuffers:      "1024MB", // for the shared_buffers we use 1/4 of given memory
-	EffectiveCacheSize: "2048MB", // for the effective_cache_size we set the value to 1/2 of the given memory
-	NodeSelector:       nil,
-	PvcName:            "cvat-pg-storage",
-	HugePages: HugePages{
-		Enabled: false,
-		Size:    "2Mi", // 2Mi/1Gi https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-hugepages/ ,  https://wiki.debian.org/Hugepages#Huge_pages_sizes
-		Memory:  "",
-	},
-	CredsRef: "cvat-pg-secret",
-	Backup: Backup{
-		Enabled:   false,
-		BucketRef: "cp-object-storage",
-		CredsRef:  "cvat-pg-secret",
-		Rotation:  5,
-		Period:    "24h",
-	},
-}
-
-var cvatRedisDefault = Redis{
-	Enabled:        false,
-	ServiceAccount: "redis",
-	Image:          "redis:4.0.5-alpine",
-	SvcName:        "cvat-redis",
-	Port:           6379,
-	StorageSize:    "10Gi",
-	StorageClass:   "",
-	NodeSelector:   nil,
-	CredsRef:       "",
-	PvcName:        "",
-	Limits: Limits{
-		Cpu:    "1000m",
-		Memory: "2Gi",
-	},
-	Requests: Requests{
-		Cpu:    "250m",
-		Memory: "500Mi",
 	},
 }
 
@@ -447,8 +377,6 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	Mpi: mpiDefault,
-
-	Cvat: cvatDefault,
 
 	BaseConfig: BaseConfig{
 		JobsStorageClass:   "",

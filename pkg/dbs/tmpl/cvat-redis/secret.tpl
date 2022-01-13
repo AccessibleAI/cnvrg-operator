@@ -1,7 +1,7 @@
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: cvat-pg-config
+  name: {{ .Spec.Dbs.Cvat.Redis.CredsRef }}
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -13,7 +13,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  CNVRG_CVAT_POSTGRES_DBNAME: "cvat"
-  CNVRG_CVAT_POSTGRES_USER: "root"
-  CNVRG_CVAT_REDIS_HOST: {{ .Spec.ControlPlane.Cvat.Redis.SvcName }}
-  CNVRG_CVAT_POSTGRES_HOST: {{ .Spec.ControlPlane.Cvat.Pg.SvcName }}
+  {{- $conf := redisConf "" | b64enc }}
+  redis.conf: {{ $conf }}
+  CNVRG_CVAT_REDIS_HOST: {{ .Spec.Dbs.Cvat.Redis.SvcName | b64enc }}

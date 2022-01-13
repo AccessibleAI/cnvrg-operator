@@ -1,16 +1,15 @@
 apiVersion: v1
-kind: Secret
+kind: ServiceAccount
 metadata:
-  name: cvat-pg-secret
+  name: {{ .Spec.Dbs.Cvat.Pg.ServiceAccount }}
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-data:
-  CNVRG_CVAT_POSTGRES_PASSWORD: {{ randAlphaNum 128 | lower | b64enc }}
+imagePullSecrets:
+  - name: {{ .Spec.Registry.Name }}

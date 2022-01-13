@@ -1,5 +1,11 @@
 {{- define "spec.app_dbs" }}
 dbs:
+  cvat:
+    enabled: {{ .Values.dbs.cvat.enabled }}
+    pg:
+      enabled: {{ .Values.dbs.cvat.enabled }}
+    redis:
+      enabled: {{ .Values.dbs.cvat.enabled }}
   es:
     enabled: {{ .Values.dbs.es.enabled }}
     storageSize: {{ .Values.dbs.es.storageSize }}

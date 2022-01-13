@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Spec.ControlPlane.Cvat.Pg.PvcName }}
+  name: {{ .Spec.Dbs.Cvat.Pg.PvcName }}
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -16,7 +16,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Spec.ControlPlane.Cvat.Pg.StorageSize }}
-  {{- if ne .Spec.ControlPlane.Cvat.Pg.StorageClass "" }}
-  storageClassName: {{ .Spec.ControlPlane.Cvat.Pg.StorageClass }}
+      storage: {{ .Spec.Dbs.Cvat.Pg.StorageSize }}
+  {{- if ne .Spec.Dbs.Cvat.Pg.StorageClass "" }}
+  storageClassName: {{ .Spec.Dbs.Cvat.Pg.StorageClass }}
   {{- end }}

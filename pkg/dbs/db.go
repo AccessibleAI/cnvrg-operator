@@ -457,8 +457,147 @@ func minioIngress() []*desired.State {
 	}
 }
 
+func cvatState() []*desired.State {
+	return []*desired.State{
+		// cvat pg
+		{
+			TemplatePath:   path + "/cvat-pg/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.DeploymentGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-pg/pvc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.PvcGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/cvat-pg/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-pg/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-pg/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-pg/secret.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/cvat-pg/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+
+		// cvat redis
+		{
+			TemplatePath:   path + "/cvat-redis/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.DeploymentGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-redis/pvc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.PvcGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/cvat-redis/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-redis/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-redis/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cvat-redis/secret.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/cvat-redis/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
+
+	// cvat pg and redis
+	if cnvrgApp.Spec.Dbs.Cvat.Enabled {
+		state = append(state, cvatState()...)
+	}
 
 	// pg
 	if cnvrgApp.Spec.Dbs.Pg.Enabled {
