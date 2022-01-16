@@ -74,12 +74,12 @@ spec:
           - name: OAUTH2_PROXY_TOKEN_VALIDATION_KEY
             valueFrom:
               secretKeyRef:
-                name: cp-base-secret
+                name: cp-oauth-proxy-tokens-secret
                 key: OAUTH_PROXY_API_KEY
           - name: OAUTH2_PROXY_TOKEN_VALIDATION_AUTH_DATA
             valueFrom:
               secretKeyRef:
-                name: cp-base-secret
+                name: cp-oauth-proxy-tokens-secret
                 key: OAUTH_PROXY_API_AUTH_DATA
         volumeMounts:
           - name: "oauth-proxy-webapp"
@@ -97,6 +97,8 @@ spec:
             name: cp-networking-config
         - secretRef:
             name: cp-base-secret
+        - secretRef:
+            name: cp-oauth-proxy-tokens-secret
         - secretRef:
             name: cp-ldap
         - secretRef:

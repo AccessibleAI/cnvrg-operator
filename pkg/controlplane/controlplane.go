@@ -265,6 +265,16 @@ func webAppState() []*desired.State {
 			Updatable:      true,
 		},
 		{
+
+			TemplatePath:   path + "/webapp/oauthtoken.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
 			TemplatePath:   path + "/webapp/pdb.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

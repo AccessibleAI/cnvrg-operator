@@ -36,6 +36,8 @@ override-release: current-version docker-build docker-push chart
 	git tag $$(cat /tmp/newVersion)
 	git push origin $$(cat /tmp/newVersion)
 
+rc-release: current-version docker-build docker-push chart
+
 patch-release: patch-version docker-build docker-push chart
 	git tag $$(cat /tmp/newVersion);
 	git push origin $$(cat /tmp/newVersion)
@@ -58,7 +60,9 @@ manager: pack generate fmt vet
 current-version:
 	{ \
 	set -e ;\
+	currentBranch=$$(git rev-parse --abbrev-ref HEAD) ;\
 	currentVersion=$$(git fetch --tags && git tag -l --sort -version:refname | head -n 1) ;\
+ 	if [[ $$currentBranch =~ .*"rc".* ]]; then currentVersion=$$currentBranch; fi ;\
 	echo $$currentVersion > /tmp/newVersion ;\
     }
 
@@ -165,6 +169,6 @@ ifeq (, $(shell which controller-gen))
 	}
 CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
-# CONTROLLER_GEN=$(shell which controller-gen)
-CONTROLLER_GEN=/Users/dima/.go/bin/controller-gen
+CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
