@@ -12,6 +12,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Set up Helm
+      uses: azure/setup-helm@v1
+
+    - name: Run chart-testing (lint)
+      run: kubectl; exit 1
+
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
@@ -135,6 +141,10 @@ jobs:
     - name: Set up Helm
       if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       uses: azure/setup-helm@v1
+
+    - name: Run chart-testing (lint)
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
+      run: kubectl
 
     - name: Run chart-testing (lint)
       if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
