@@ -12,12 +12,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Helm
-      uses: azure/setup-helm@v1
-
-    - name: Run chart-testing (lint)
-      run: kubectl; exit 1
-
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
@@ -144,15 +138,15 @@ jobs:
 
     - name: Run chart-testing (lint)
       if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
-      run: kubectl
-
-    - name: Run chart-testing (lint)
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       run: helm lint chart/
 
     - name: Create kind cluster
       if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       uses: helm/kind-action@v1.2.0
+
+    - name: Install Crds
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
+      run: kubectl apply -f chart/crds/
 
     - name: Run chart-testing (install)
       if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
