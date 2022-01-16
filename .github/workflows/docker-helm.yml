@@ -127,24 +127,24 @@ jobs:
         EOF
 
     - name: Change Chart Version
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       run: |
         VERSION=${{ steps.tag_bump.outputs.new_tag }} envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file chart/Chart.yaml
 
     - name: Set up Helm
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       uses: azure/setup-helm@v1
 
     - name: Run chart-testing (lint)
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       run: helm lint chart/
 
     - name: Create kind cluster
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       uses: helm/kind-action@v1.2.0
 
     - name: Run chart-testing (install)
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       run: helm install cnvrg ./chart  --dry-run --namespace=cnvrg  --debug
 
     - name: Changelog Release
@@ -157,7 +157,7 @@ jobs:
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
     - name: Package and release helm
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       env:
         CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
