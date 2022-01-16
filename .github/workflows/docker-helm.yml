@@ -22,7 +22,6 @@ jobs:
       env:
         MSG: ${{ github.event.inputs.msg }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DEFAULT_BUMP: patch
 
     - name: Set up Python
       uses: actions/setup-python@v2
