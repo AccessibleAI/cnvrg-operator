@@ -82,6 +82,13 @@ type AppDbs struct {
 	Redis Redis `json:"redis,omitempty"`
 	Minio Minio `json:"minio,omitempty"`
 	Es    Es    `json:"es,omitempty"`
+	Cvat  Cvat  `json:"cvat,omitempty"`
+}
+
+type Cvat struct {
+	Enabled bool  `json:"enabled,omitempty"`
+	Pg      Pg    `json:"pg,omitempty"`
+	Redis   Redis `json:"redis,omitempty"`
 }
 
 type InfraDbs struct {
@@ -201,6 +208,70 @@ var appDbsDefaults = AppDbs{
 	Redis: redisDefault,
 	Minio: minioDefaults,
 	Es:    esDefault,
+	Cvat:  cvatDefault,
+}
+
+var cvatDefault = Cvat{
+	Enabled: false,
+	Pg:      cvatPgDefault,
+	Redis:   cvatRedisDefault,
+}
+
+var cvatPgDefault = Pg{
+	Enabled:        false,
+	ServiceAccount: "cvat-pg",
+	Image:          "postgresql-12-centos7:latest",
+	Port:           5432,
+	StorageSize:    "100Gi",
+	SvcName:        "cvat-postgres",
+	StorageClass:   "",
+	Requests: Requests{
+		Cpu:    "1",
+		Memory: "2Gi",
+	},
+	Limits: Limits{
+		Cpu:    "2",
+		Memory: "4Gi",
+	},
+	MaxConnections:     500,
+	SharedBuffers:      "1024MB", // for the shared_buffers we use 1/4 of given memory
+	EffectiveCacheSize: "2048MB", // for the effective_cache_size we set the value to 1/2 of the given memory
+	NodeSelector:       nil,
+	PvcName:            "cvat-pg-storage",
+	HugePages: HugePages{
+		Enabled: false,
+		Size:    "2Mi", // 2Mi/1Gi https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-hugepages/ ,  https://wiki.debian.org/Hugepages#Huge_pages_sizes
+		Memory:  "",
+	},
+	CredsRef: "cvat-pg-secret",
+	Backup: Backup{
+		Enabled:   false,
+		BucketRef: "cp-object-storage",
+		CredsRef:  "cvat-pg-secret",
+		Rotation:  5,
+		Period:    "24h",
+	},
+}
+
+var cvatRedisDefault = Redis{
+	Enabled:        false,
+	ServiceAccount: "cvat-redis",
+	Image:          "cnvrg-redis:v3.0.5.c2",
+	SvcName:        "cvat-redis",
+	Port:           6379,
+	StorageSize:    "10Gi",
+	StorageClass:   "",
+	NodeSelector:   nil,
+	CredsRef:       "cvat-redis-secret",
+	PvcName:        "cvat-redis-storage",
+	Limits: Limits{
+		Cpu:    "1000m",
+		Memory: "2Gi",
+	},
+	Requests: Requests{
+		Cpu:    "250m",
+		Memory: "500Mi",
+	},
 }
 
 var infraDbsDefaults = InfraDbs{
