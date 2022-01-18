@@ -1,5 +1,6 @@
 name: 'Assert Branch Naming Convention'
-on: pull_request
+on:
+  push:
 
 jobs:
   branch-naming-rules:
