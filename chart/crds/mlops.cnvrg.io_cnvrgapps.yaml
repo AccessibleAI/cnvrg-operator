@@ -425,10 +425,6 @@ spec:
                           items:
                             type: string
                           type: array
-                        tokenValidationAuthData:
-                          type: string
-                        tokenValidationKey:
-                          type: string
                         tokenValidationRegex:
                           items:
                             type: string
@@ -881,10 +877,6 @@ spec:
                           items:
                             type: string
                           type: array
-                        tokenValidationAuthData:
-                          type: string
-                        tokenValidationKey:
-                          type: string
                         tokenValidationRegex:
                           items:
                             type: string
@@ -930,10 +922,6 @@ spec:
                           items:
                             type: string
                           type: array
-                        tokenValidationAuthData:
-                          type: string
-                        tokenValidationKey:
-                          type: string
                         tokenValidationRegex:
                           items:
                             type: string

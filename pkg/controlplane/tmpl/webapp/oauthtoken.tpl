@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: oauth-proxy-webapp
+  name: cp-oauth-proxy-tokens-secret
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -13,4 +13,5 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  conf: {{ oauthProxyConfig . .Spec.ControlPlane.WebApp.SvcName .Spec.ControlPlane.WebApp.OauthProxy.SkipAuthRegex .Spec.SSO.Provider .Spec.ControlPlane.WebApp.Port 3000 .Spec.ControlPlane.WebApp.OauthProxy.TokenValidationRegex | b64enc }}
+  OAUTH_PROXY_API_KEY: {{ randAlphaNum 32 | lower | b64enc }}
+  OAUTH_PROXY_API_AUTH_DATA: {{ randAlphaNum 12 | lower | b64enc }}

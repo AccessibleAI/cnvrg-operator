@@ -107,16 +107,6 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		}
 	}
 
-	if app.Spec.SSO.Enabled && app.Spec.ControlPlane.WebApp.Enabled {
-
-		if app.Spec.ControlPlane.WebApp.OauthProxy.TokenValidationKey == "" {
-			desiredAppSpec.ControlPlane.WebApp.OauthProxy.TokenValidationKey = generateSecureToken(16)
-		}
-		if app.Spec.ControlPlane.WebApp.OauthProxy.TokenValidationAuthData == "" {
-			desiredAppSpec.ControlPlane.WebApp.OauthProxy.TokenValidationAuthData = generateSecureToken(6)
-		}
-	}
-
 	if app.Spec.Networking.Ingress.IstioGwName == "" {
 		desiredAppSpec.Networking.Ingress.IstioGwName = fmt.Sprintf(mlopsv1.IstioGwName, app.Namespace)
 	}

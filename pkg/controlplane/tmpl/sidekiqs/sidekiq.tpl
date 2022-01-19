@@ -72,6 +72,8 @@ spec:
             - secretRef:
                 name: cp-base-secret
             - secretRef:
+                name: cp-oauth-proxy-tokens-secret
+            - secretRef:
                 name: cp-ldap
             - secretRef:
                 name: cp-object-storage
