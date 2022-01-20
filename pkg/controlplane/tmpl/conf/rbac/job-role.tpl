@@ -17,12 +17,8 @@ rules:
   - ""
   resources:
   - pods
-  verbs:
-  - '*'
-- apiGroups:
-  - ""
-  resources:
   - services
+  - configmaps
   verbs:
   - '*'
 {{- end }}
