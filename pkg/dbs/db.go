@@ -535,15 +535,6 @@ func cvatState() []*desired.State {
 			Updatable:      true,
 		},
 		{
-			TemplatePath:   path + "/cvat-redis/pvc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.PvcGVK],
-			Own:            true,
-			Updatable:      false,
-		},
-		{
 			TemplatePath:   path + "/cvat-redis/role.tpl",
 			Template:       nil,
 			ParsedTemplate: "",

@@ -256,7 +256,7 @@ var cvatPgDefault = Pg{
 var cvatRedisDefault = Redis{
 	Enabled:        false,
 	ServiceAccount: "cvat-redis",
-	Image:          "cnvrg-redis:v3.0.5.c2",
+	Image:          "redis:4.0.5-alpine",
 	SvcName:        "cvat-redis",
 	Port:           6379,
 	StorageSize:    "10Gi",

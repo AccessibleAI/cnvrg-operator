@@ -13,6 +13,4 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  {{- $conf := redisConf "" | b64enc }}
-  redis.conf: {{ $conf }}
   CNVRG_CVAT_REDIS_HOST: {{ .Spec.Dbs.Cvat.Redis.SvcName | b64enc }}

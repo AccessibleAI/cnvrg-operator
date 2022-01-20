@@ -36,13 +36,9 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Cvat.Redis.ServiceAccount }}
-      securityContext:
-        runAsUser: 1000
-        fsGroup: 1000
       containers:
-        - image: {{ image .Spec.ImageHub .Spec.Dbs.Cvat.Redis.Image }}
+        - image: {{ .Spec.Dbs.Cvat.Redis.Image }}
           name: redis
-          command: [ "/bin/bash", "-lc", "redis-server /config/redis.conf" ]
           ports:
             - containerPort: {{ .Spec.Dbs.Cvat.Redis.Port }}
           resources:
@@ -52,15 +48,3 @@ spec:
             requests:
               cpu: {{ .Spec.Dbs.Cvat.Redis.Requests.Cpu }}
               memory: {{ .Spec.Dbs.Cvat.Redis.Requests.Memory }}
-          volumeMounts:
-            - name: redis-data
-              mountPath: /data
-            - name: redis-config
-              mountPath: /config
-      volumes:
-        - name: redis-data
-          persistentVolumeClaim:
-            claimName: {{ .Spec.Dbs.Cvat.Redis.PvcName }}
-        - name: redis-config
-          secret:
-            secretName: {{ .Spec.Dbs.Cvat.Redis.CredsRef }}
