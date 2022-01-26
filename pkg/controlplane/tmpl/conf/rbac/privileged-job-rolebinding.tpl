@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: cnvrg-job
+  name: cnvrg-privileged-job
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
