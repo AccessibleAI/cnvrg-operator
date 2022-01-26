@@ -718,7 +718,7 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, rbacState()...)
 
-	if !cnvrgApp.Spec.ControlPlane.BaseConfig.CnvrgPrivilegedJob {
+	if cnvrgApp.Spec.ControlPlane.BaseConfig.CnvrgPrivilegedJob {
 		state = append(state, privilegedRbacState()...)
 	}
 

@@ -385,7 +385,7 @@ var controlPlaneDefault = ControlPlane{
 		Intercom:           "true",
 		CnvrgJobUID:        "1000",
 		CnvrgJobRbacStrict: false,
-		CnvrgPrivilegedJob: false,
+		CnvrgPrivilegedJob: true,
 	},
 
 	ObjectStorage: ObjectStorage{

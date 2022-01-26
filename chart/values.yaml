@@ -19,6 +19,7 @@ controlPlane:
     agentCustomTag: latest
     intercom: "true"
     featureFlags: { }
+    cnvrgPrivilegedJob: true
   hyper:
     enabled: true
   cnvrgScheduler:
