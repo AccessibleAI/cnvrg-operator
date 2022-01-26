@@ -18,5 +18,3 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: cnvrg-spark-job
-  - kind: ServiceAccount
-    name: cnvrg-mpi-job
