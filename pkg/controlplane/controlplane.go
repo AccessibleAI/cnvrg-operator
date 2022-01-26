@@ -105,16 +105,6 @@ func rbacState() []*desired.State {
 		},
 		{
 
-			TemplatePath:   path + "/conf/rbac/mpi-job-sa.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SaGVK],
-			Own:            true,
-			Updatable:      false,
-		},
-		{
-
 			TemplatePath:   path + "/conf/rbac/spark-job-sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
