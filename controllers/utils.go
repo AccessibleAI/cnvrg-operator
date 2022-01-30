@@ -90,6 +90,11 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.Cri = cri
 	}
 
+	if app.Spec.Dbs.Cvat.Enabled {
+		desiredAppSpec.Dbs.Cvat.Pg.Enabled = true
+		desiredAppSpec.Dbs.Cvat.Redis.Enabled = true
+	}
+
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
 		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")

@@ -348,6 +348,10 @@ elasticsearch:
 			}
 		},
 		"redisConf": func(password string) string {
+			passConf := ""
+			if password != "" {
+				passConf = fmt.Sprintf("requirepass %s", password)
+			}
 			return fmt.Sprintf(`
 dir /data/
 appendonly "yes"
@@ -355,8 +359,8 @@ appendfilename "appendonly.aof"
 appendfsync everysec
 auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 128mb
-requirepass %s
-`, password)
+%s
+`, passConf)
 		},
 	}
 }

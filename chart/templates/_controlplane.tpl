@@ -62,6 +62,7 @@ controlPlane:
     hpa:
       enabled: {{ .Values.controlPlane.webapp.hpa.enabled }}
       maxReplicas: {{ .Values.controlPlane.webapp.hpa.maxReplicas }}
+
   mpi:
     enabled: {{ .Values.controlPlane.mpi.enabled }}
     image: {{ .Values.controlPlane.mpi.image }}
