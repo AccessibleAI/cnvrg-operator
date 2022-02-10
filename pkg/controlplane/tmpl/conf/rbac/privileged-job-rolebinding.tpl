@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: RoleBinding
 metadata:
-  name: cnvrg-job
+  name: cnvrg-privileged-job
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -11,14 +11,10 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-{{- if not .Spec.ControlPlane.BaseConfig.CnvrgJobRbacStrict }}
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  - services
-  - configmaps
-  verbs:
-  - '*'
-{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cnvrg-privileged-job
+subjects:
+  - kind: ServiceAccount
+    name: cnvrg-spark-job

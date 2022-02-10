@@ -166,6 +166,7 @@ type BaseConfig struct {
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
 	CnvrgJobRbacStrict   bool              `json:"cnvrgJobRbacStrict,omitempty"`
+	CnvrgPrivilegedJob   bool              `json:"cnvrgPrivilegedJob,omitempty"`
 }
 
 type ControlPlane struct {
@@ -384,6 +385,7 @@ var controlPlaneDefault = ControlPlane{
 		Intercom:           "true",
 		CnvrgJobUID:        "1000",
 		CnvrgJobRbacStrict: false,
+		CnvrgPrivilegedJob: true,
 	},
 
 	ObjectStorage: ObjectStorage{

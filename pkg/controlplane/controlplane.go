@@ -103,6 +103,41 @@ func rbacState() []*desired.State {
 			Own:            true,
 			Updatable:      false,
 		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/spark-job-sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
+func privilegedRbacState() []*desired.State {
+	return []*desired.State{
+		{
+
+			TemplatePath:   path + "/conf/rbac/privileged-job-role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/conf/rbac/privileged-job-rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 
@@ -672,6 +707,11 @@ func mpiInfraState() []*desired.State {
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, rbacState()...)
+
+	if cnvrgApp.Spec.ControlPlane.BaseConfig.CnvrgPrivilegedJob {
+		state = append(state, privilegedRbacState()...)
+	}
+
 	state = append(state, controlPlaneConfigState()...)
 
 	if cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
