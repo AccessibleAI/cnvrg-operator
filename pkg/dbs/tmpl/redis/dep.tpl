@@ -36,10 +36,7 @@ spec:
         {{ $key }}: {{ $val }}
         {{- end }}
       tolerations:
-        - key: "{{ .Spec.Tenancy.Key }}"
-          operator: "Equal"
-          value: "{{ .Spec.Tenancy.Value }}"
-          effect: "NoSchedule"
+        - operator: "Exists"
       {{- else if (gt (len .Spec.Dbs.Redis.NodeSelector) 0) }}
       nodeSelector:
         {{- range $key, $val := .Spec.Dbs.Redis.NodeSelector }}
