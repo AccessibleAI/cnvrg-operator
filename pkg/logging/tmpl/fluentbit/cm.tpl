@@ -83,7 +83,7 @@ data:
         HTTP_User                 {{ $app.EsUser }}
         HTTP_Passwd               {{ $app.EsPass }}
 
-      [OUTPUT]
+    [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*kiq*
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
@@ -113,7 +113,7 @@ data:
         HTTP_User                 {{ $app.EsUser }}
         HTTP_Passwd               {{ $app.EsPass }}
 
-      [OUTPUT]
+    [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*scheduler*
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
@@ -142,7 +142,7 @@ data:
         Logstash_Prefix            cnvrg-jobs
         HTTP_User                 {{ $app.EsUser }}
         HTTP_Passwd               {{ $app.EsPass }}
-
+        
     {{- end }}
 
   parsers.conf: |
