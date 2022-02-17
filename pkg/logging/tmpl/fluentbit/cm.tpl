@@ -58,12 +58,88 @@ data:
         Match                     kube.{{ $app.SpecNs }}.*
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
-        Logstash_Format           Off
+        Logstash_Format           On
+        Logstash_DateFormat       %Y.%m
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
-        Index                     cnvrg
-        Logstash_Prefix            cnvrg
+        Index                     cnvrg-all
+        Logstash_Prefix            cnvrg-all
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
+
+    [OUTPUT]
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*app*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Port                      9200
+        Logstash_Format           On
+        Logstash_DateFormat       %Y.%m
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg-app
+        Logstash_Prefix            cnvrg-app
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
+
+      [OUTPUT]
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*kiq*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Port                      9200
+        Logstash_Format           On
+        Logstash_DateFormat       %Y.%m
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg-app
+        Logstash_Prefix            cnvrg-app
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
+
+    [OUTPUT]
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*hyper*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Port                      9200
+        Logstash_Format           On
+        Logstash_DateFormat       %Y.%m
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg-app
+        Logstash_Prefix            cnvrg-app
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
+
+      [OUTPUT]
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*scheduler*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Port                      9200
+        Logstash_Format           On
+        Logstash_DateFormat       %Y.%m
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg-app
+        Logstash_Prefix            cnvrg-app
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
+
+    [OUTPUT]
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*cnvrg-j*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Port                      9200
+        Logstash_Format           On
+        Logstash_DateFormat       %Y.%m
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg-jobs
+        Logstash_Prefix            cnvrg-jobs
         HTTP_User                 {{ $app.EsUser }}
         HTTP_Passwd               {{ $app.EsPass }}
 
