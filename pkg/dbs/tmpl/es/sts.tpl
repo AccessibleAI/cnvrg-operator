@@ -70,7 +70,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: elastic
-        image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}
+        image: cnvrg/cnvrg-es:es_indices
         env:
         - name: "ES_CLUSTER_NAME"
           value: "cnvrg-es"
