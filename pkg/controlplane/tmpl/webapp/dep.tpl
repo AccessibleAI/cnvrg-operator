@@ -41,6 +41,17 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{ .Spec.ControlPlane.WebApp.SvcName }}
+              namespaces:
+              - {{ ns . }}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
