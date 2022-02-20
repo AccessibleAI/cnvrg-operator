@@ -41,7 +41,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: {{ .Spec.ControlPlane.Systemkiq.SvcName }}
+                  app: systemkiq
               namespaces:
               - {{ ns . }}
               topologyKey: kubernetes.io/hostname

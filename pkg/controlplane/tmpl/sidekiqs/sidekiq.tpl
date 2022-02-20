@@ -42,7 +42,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: {{ .Spec.ControlPlane.Sidekiq.SvcName }}
+                  app: sidekiq
               namespaces:
               - {{ ns . }}
               topologyKey: kubernetes.io/hostname
