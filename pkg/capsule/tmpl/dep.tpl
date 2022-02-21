@@ -27,6 +27,12 @@ spec:
     spec:
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       serviceAccountName: cnvrg-capsule
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - operator: "Exists"
+      {{- end }}
       containers:
         - name: capsule
           command:
