@@ -43,6 +43,7 @@ type Grafana struct {
 	Port       int                   `json:"port,omitempty"`
 	NodePort   int                   `json:"nodePort,omitempty"`
 	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
+	CredsRef   string                `json:"credsRef,omitempty"`
 }
 
 type DefaultServiceMonitors struct {
@@ -93,6 +94,7 @@ var grafanaInfraDefault = Grafana{
 		SkipAuthRegex:        []string{`\/api\/health`},
 		TokenValidationRegex: nil,
 	},
+	CredsRef: "grafana-creds",
 }
 
 var grafanaAppDefault = Grafana{
@@ -105,6 +107,7 @@ var grafanaAppDefault = Grafana{
 		SkipAuthRegex:        []string{`\/api\/health`},
 		TokenValidationRegex: nil,
 	},
+	CredsRef: "grafana-creds",
 }
 
 var prometheusInfraDefault = Prometheus{

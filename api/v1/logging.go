@@ -42,6 +42,7 @@ type Kibana struct {
 	Requests       Requests              `json:"requests,omitempty"`
 	Limits         Limits                `json:"limits,omitempty"`
 	OauthProxy     OauthProxyServiceConf `json:"oauthProxy,omitempty"`
+	CredsRef       string                `json:"credsRef,omitempty"`
 }
 
 type CnvrgAppLogging struct {
@@ -112,6 +113,7 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 			SkipAuthRegex:        nil,
 			TokenValidationRegex: nil,
 		},
+		CredsRef: "kibana-creds",
 	},
 }
 
