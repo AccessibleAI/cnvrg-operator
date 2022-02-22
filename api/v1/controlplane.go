@@ -310,7 +310,7 @@ var controlPlaneDefault = ControlPlane{
 	Systemkiq: Systemkiq{
 		Enabled: false,
 		Requests: Requests{
-			Cpu:    "500m",
+			Cpu:    "300m",
 			Memory: "2Gi",
 		},
 		Limits: Limits{
