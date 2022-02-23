@@ -62,7 +62,7 @@ var fluentbitDefault = Fluentbit{
 		"varlibdockercontainers": "/var/lib/docker/containers",
 	},
 	Requests: Requests{
-		Cpu:    "50",
+		Cpu:    "50m",
 		Memory: "200Mi",
 	},
 	Limits: Limits{
