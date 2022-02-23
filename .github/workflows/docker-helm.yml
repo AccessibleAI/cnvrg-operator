@@ -147,7 +147,7 @@ jobs:
 
     - name: Install Crds
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
-      run: kubectl apply -f chart/crds/
+      run: kubectl apply -f chart/crds/; sleep 2
 
     - name: Run chart-testing (install)
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
