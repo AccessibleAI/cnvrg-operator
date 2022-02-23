@@ -16,6 +16,15 @@ spec:
         control-plane: controller-manager
     spec:
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
+      {{- end }}
       containers:
         - args:
             - --health-probe-bind-address=:8081

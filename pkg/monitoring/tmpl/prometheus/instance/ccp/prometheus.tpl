@@ -102,10 +102,7 @@ spec:
     {{ $key }}: {{ $val }}
     {{- end }}
   tolerations:
-    - key: "{{ .Spec.Tenancy.Key }}"
-      operator: "Equal"
-      value: "{{ .Spec.Tenancy.Value }}"
-      effect: "NoSchedule"
+    - operator: "Exists"
   {{- else if (gt (len .Spec.Dbs.Es.NodeSelector) 0) }}
   nodeSelector:
     {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
