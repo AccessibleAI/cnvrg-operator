@@ -35,6 +35,17 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: systemkiq
+              namespaces:
+              - {{ ns . }}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
