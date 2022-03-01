@@ -90,8 +90,8 @@ spec:
         env:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
-        - name: "CNVRG_JOBS_INDEX"
-          value: "cnvrg_jobs*"
+        - name: "CNVRG_ENDPOINTS_INDEX"
+          value: "cnvrg_endpoints*"
         envFrom:
         - configMapRef:
             name: cp-base-config
