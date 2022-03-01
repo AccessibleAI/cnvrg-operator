@@ -59,7 +59,7 @@ data:
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
-        Logstash_DateFormat       %Y.%m
+        Logstash_DateFormat       %m.%Y
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
@@ -74,7 +74,7 @@ data:
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
-        Logstash_DateFormat       %Y.%m
+        Logstash_DateFormat       %m.%Y
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
@@ -89,7 +89,7 @@ data:
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
-        Logstash_DateFormat       %Y.%m
+        Logstash_DateFormat       %m.%Y
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
@@ -104,7 +104,7 @@ data:
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
-        Logstash_DateFormat       %Y.%m
+        Logstash_DateFormat       %m.%Y
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
@@ -119,7 +119,7 @@ data:
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
-        Logstash_DateFormat       %Y.%m
+        Logstash_DateFormat       %m.%Y
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
@@ -130,16 +130,31 @@ data:
 
     [OUTPUT]
         Name                      es
-        Match                     kube.{{ $app.SpecNs }}.*cnvrg-j*
+        Match                     kube.{{ $app.SpecNs }}.*job*
         Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
-        Logstash_DateFormat       %Y.%m
+        Logstash_DateFormat       %m.%Y
         Replace_Dots              On
         Retry_Limit               False
         Trace_Error               On
         Index                     cnvrg-jobs
         Logstash_Prefix            cnvrg-jobs
+        HTTP_User                 {{ $app.EsUser }}
+        HTTP_Passwd               {{ $app.EsPass }}
+
+    [OUTPUT]
+        Name                      es
+        Match                     kube.{{ $app.SpecNs }}.*cnvrg-je*
+        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Port                      9200
+        Logstash_Format           On
+        Logstash_DateFormat       %m.%Y
+        Replace_Dots              On
+        Retry_Limit               False
+        Trace_Error               On
+        Index                     cnvrg-endpoints
+        Logstash_Prefix            cnvrg-endpoints
         HTTP_User                 {{ $app.EsUser }}
         HTTP_Passwd               {{ $app.EsPass }}
         

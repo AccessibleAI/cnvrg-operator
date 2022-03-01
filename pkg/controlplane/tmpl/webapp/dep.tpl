@@ -90,7 +90,7 @@ spec:
         env:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
-        - name: "cnvrg_jobs_index"
+        - name: "CNVRG_JOBS_INDEX"
           value: "cnvrg_jobs*"
         envFrom:
         - configMapRef:

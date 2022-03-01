@@ -90,6 +90,8 @@ spec:
                       type: boolean
                     cnvrgJobUid:
                       type: string
+                    cnvrgPrivilegedJob:
+                      type: boolean
                     featureFlags:
                       additionalProperties:
                         type: string
