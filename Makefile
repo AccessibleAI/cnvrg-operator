@@ -149,11 +149,11 @@ generate: controller-gen
 
 # Build the docker image
 docker-build: pack generate manifests
-		docker build . -t docker.io/cnvrg/cnvrg-operator:es-indices
+		docker build . -t docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
 
 # Push the docker image
 docker-push:
-	docker push docker.io/cnvrg/cnvrg-operator:es-indices
+	docker push docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
 
 # find or download controller-gen
 # download controller-gen if necessary
