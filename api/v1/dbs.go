@@ -183,7 +183,7 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
-	Image:          "cnvrg-es:v7.8.1.a1",
+	Image:          "cnvrg-es:v7.8.1.a1-indices",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
