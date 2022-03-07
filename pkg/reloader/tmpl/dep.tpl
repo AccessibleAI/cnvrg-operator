@@ -38,10 +38,7 @@ spec:
       nodeSelector:
         {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
       tolerations:
-        - key: "{{ .Spec.Tenancy.Key }}"
-          operator: "Equal"
-          value: "{{ .Spec.Tenancy.Value }}"
-          effect: "NoSchedule"
+        - operator: "Exists"
       {{- end }}
       containers:
         - name: config-reloader

@@ -37,10 +37,7 @@ spec:
         {{ $key }}: {{ $val }}
         {{- end }}
       tolerations:
-        - key: "{{ .Spec.Tenancy.Key }}"
-          operator: "Equal"
-          value: "{{ .Spec.Tenancy.Value }}"
-          effect: "NoSchedule"
+        - operator: "Exists"
       {{- else if (gt (len .Spec.Logging.Elastalert.NodeSelector) 0) }}
       nodeSelector:
         {{- range $key, $val := .Spec.Logging.Elastalert.NodeSelector }}

@@ -106,7 +106,7 @@ var minioDefaults = Minio{
 	NodePort:       30090,
 	StorageClass:   "",
 	Requests: Requests{
-		Cpu:    "1",
+		Cpu:    "200m",
 		Memory: "2Gi",
 	},
 	Limits: Limits{
@@ -132,7 +132,7 @@ var pgDefault = Pg{
 	SvcName:        "postgres",
 	StorageClass:   "",
 	Requests: Requests{
-		Cpu:    "4",
+		Cpu:    "1",
 		Memory: "4Gi",
 	},
 	Limits: Limits{
@@ -190,7 +190,7 @@ var esDefault = Es{
 	NodePort:       32200,
 	StorageClass:   "",
 	Requests: Requests{
-		Cpu:    "2",
+		Cpu:    "500m",
 		Memory: "4Gi",
 	},
 	Limits: Limits{
