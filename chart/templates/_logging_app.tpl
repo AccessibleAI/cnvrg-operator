@@ -12,4 +12,5 @@ logging:
     {{- end }}
   kibana:
     enabled: {{ .Values.logging.kibana.enabled }}
+    svcName: {{ .Values.logging.kibana.svcName }}
 {{- end }}

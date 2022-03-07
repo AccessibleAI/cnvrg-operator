@@ -66,6 +66,7 @@ controlPlane:
       maxReplicas: 5
   webapp:
     enabled: true
+    svcName: "app"
     replicas: 1
     hpa:
       enabled: true
@@ -128,6 +129,7 @@ logging:
     storageClass: ""
     nodeSelector: { }
   kibana:
+    svcName: "kibana"
     enabled: true
 
 monitoring:
@@ -146,6 +148,7 @@ monitoring:
 
   grafana:
     enabled: true
+    svcName: "grafana"
 
   prometheusOperator:
     enabled: true
