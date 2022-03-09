@@ -102,7 +102,7 @@ spec:
         - name: "CNVRG_RUN_MODE"
           value: "webapp"
         - name: "CNVRG_ENDPOINTS_INDEX"
-          value: "cnvrg_endpoints*"
+          value: "cnvrg-endpoints*"
         envFrom:
         - configMapRef:
             name: cp-base-config
