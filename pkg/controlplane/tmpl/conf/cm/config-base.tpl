@@ -37,7 +37,7 @@ data:
   CNVRG_SSO_SERVICE_URL: "{{ .Spec.SSO.ServiceUrl }}"
   CNVRG_CRI: "{{ .Spec.Cri }}"
   CNVRG_BUILD_IMAGE_JOB_SA: "cnvrg-buildimage-job"
-  CNVRG_ENDPOINTS_INDEX: "cnvrg_endpoints*"
+  CNVRG_ENDPOINTS_INDEX: "cnvrg-endpoints*"
   CNVRG_SPARK_JOB_SA: "cnvrg-spark-job"
   CVAT_ENABLED: "{{ .Spec.Dbs.Cvat.Enabled }}"
   {{- if ne .Spec.ControlPlane.BaseConfig.JobsStorageClass "" }}
