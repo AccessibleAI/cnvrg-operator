@@ -12,6 +12,7 @@ controlPlane:
     {{- else }}
     featureFlags: { }
     {{- end }}
+    cnvrgPrivilegedJob: {{ .Values.controlPlane.baseConfig.cnvrgPrivilegedJob }}
   hyper:
     enabled: {{ .Values.controlPlane.hyper.enabled }}
   cnvrgScheduler:

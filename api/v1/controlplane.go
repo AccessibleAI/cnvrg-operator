@@ -166,6 +166,7 @@ type BaseConfig struct {
 	Intercom             string            `json:"intercom,omitempty"`
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
 	CnvrgJobRbacStrict   bool              `json:"cnvrgJobRbacStrict,omitempty"`
+	CnvrgPrivilegedJob   bool              `json:"cnvrgPrivilegedJob,omitempty"`
 }
 
 type ControlPlane struct {
@@ -246,7 +247,7 @@ var controlPlaneDefault = ControlPlane{
 		Replicas: 1,
 		Port:     8080,
 		Requests: Requests{
-			Cpu:    "2",
+			Cpu:    "500m",
 			Memory: "4Gi",
 		},
 		Limits: Limits{
@@ -281,7 +282,7 @@ var controlPlaneDefault = ControlPlane{
 		Enabled: false,
 		Split:   false,
 		Requests: Requests{
-			Cpu:    "1000m",
+			Cpu:    "200m",
 			Memory: "3750Mi",
 		},
 		Limits: Limits{
@@ -295,7 +296,7 @@ var controlPlaneDefault = ControlPlane{
 	Searchkiq: Searchkiq{
 		Enabled: false,
 		Requests: Requests{
-			Cpu:    "750m",
+			Cpu:    "200m",
 			Memory: "1Gi",
 		},
 		Limits: Limits{
@@ -309,8 +310,8 @@ var controlPlaneDefault = ControlPlane{
 	Systemkiq: Systemkiq{
 		Enabled: false,
 		Requests: Requests{
-			Cpu:    "500m",
-			Memory: "1Gi",
+			Cpu:    "300m",
+			Memory: "2Gi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
@@ -343,7 +344,7 @@ var controlPlaneDefault = ControlPlane{
 	CnvrgScheduler: CnvrgScheduler{
 		Enabled: false,
 		Requests: Requests{
-			Cpu:    "500m",
+			Cpu:    "200m",
 			Memory: "1000Mi",
 		},
 		Limits: Limits{
@@ -356,7 +357,7 @@ var controlPlaneDefault = ControlPlane{
 	CnvrgClusterProvisionerOperator: CnvrgClusterProvisionerOperator{
 		Enabled: false,
 		Requests: Requests{
-			Cpu:    "1",
+			Cpu:    "200m",
 			Memory: "1Gi",
 		},
 		Limits: Limits{
@@ -384,6 +385,7 @@ var controlPlaneDefault = ControlPlane{
 		Intercom:           "true",
 		CnvrgJobUID:        "1000",
 		CnvrgJobRbacStrict: false,
+		CnvrgPrivilegedJob: true,
 	},
 
 	ObjectStorage: ObjectStorage{

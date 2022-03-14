@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: cnvrg-job
+  name: cnvrg-privileged-job
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -11,7 +11,6 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-{{- if not .Spec.ControlPlane.BaseConfig.CnvrgJobRbacStrict }}
 rules:
 - apiGroups:
   - ""
@@ -21,4 +20,3 @@ rules:
   - configmaps
   verbs:
   - '*'
-{{- end }}

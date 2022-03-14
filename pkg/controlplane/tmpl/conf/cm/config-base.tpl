@@ -37,6 +37,7 @@ data:
   CNVRG_SSO_SERVICE_URL: "{{ .Spec.SSO.ServiceUrl }}"
   CNVRG_CRI: "{{ .Spec.Cri }}"
   CNVRG_BUILD_IMAGE_JOB_SA: "cnvrg-buildimage-job"
+  CNVRG_SPARK_JOB_SA: "cnvrg-spark-job"
   CVAT_ENABLED: "{{ .Spec.Dbs.Cvat.Enabled }}"
   {{- if ne .Spec.ControlPlane.BaseConfig.JobsStorageClass "" }}
   CNVRG_JOBS_STORAGECLASS: "{{ .Spec.ControlPlane.BaseConfig.JobsStorageClass }}" # if is set, app's job will use this storageClass for notebooks/experiments

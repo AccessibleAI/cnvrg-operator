@@ -359,6 +359,7 @@ appendfilename "appendonly.aof"
 appendfsync everysec
 auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 128mb
+timeout 15
 %s
 `, passConf)
 		},
