@@ -286,6 +286,23 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		}
 	}
 
+	// metagpu device plugin
+	if cnvrgInfra.Spec.Gpu.MetaGpuDp.Enabled {
+		infraLog.Info("metagpu device plugin")
+		metagpuDpData := desired.TemplateData{
+			Namespace: cnvrgInfra.Spec.InfraNamespace,
+			Data: map[string]interface{}{
+				"Annotations": cnvrgInfra.Spec.Annotations,
+				"Labels":      cnvrgInfra.Spec.Labels,
+				"MetaGpuDp":   cnvrgInfra.Spec.Gpu.MetaGpuDp,
+			},
+		}
+		if err := desired.Apply(gpu.MetagpudpState(metagpuDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+			reconcileResult = err
+		}
+	}
+
 	// capsule backup service
 	infraLog.Info("applying capsule")
 	if err := desired.Apply(capsule.State(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
