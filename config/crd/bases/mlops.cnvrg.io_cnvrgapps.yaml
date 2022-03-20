@@ -860,6 +860,8 @@ spec:
                   type: object
                 kibana:
                   properties:
+                    credsRef:
+                      type: string
                     enabled:
                       type: boolean
                     image:
@@ -912,6 +914,8 @@ spec:
                   type: object
                 grafana:
                   properties:
+                    credsRef:
+                      type: string
                     enabled:
                       type: boolean
                     image:

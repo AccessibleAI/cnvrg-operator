@@ -7,17 +7,17 @@ metadata:
     {{- end }}
   labels:
     cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-grafana-oauth"
-    app: grafana
+    app: {{ .Spec.Monitoring.Grafana.SvcName }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: grafana
+  name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: grafana
+      app: {{ .Spec.Monitoring.Grafana.SvcName }}
   template:
     metadata:
       annotations:
@@ -25,7 +25,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
-        app: grafana
+        app: {{ .Spec.Monitoring.Grafana.SvcName }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
@@ -43,7 +43,7 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
-      serviceAccountName: grafana
+      serviceAccountName: {{ .Spec.Monitoring.Grafana.SvcName }}
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"

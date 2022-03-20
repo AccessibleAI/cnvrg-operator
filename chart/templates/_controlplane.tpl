@@ -59,6 +59,7 @@ controlPlane:
       maxReplicas: {{ .Values.controlPlane.systemkiq.hpa.maxReplicas }}
   webapp:
     enabled: {{ .Values.controlPlane.webapp.enabled }}
+    svcName: {{ .Values.controlPlane.webapp.svcName }}
     replicas: {{ .Values.controlPlane.webapp.replicas }}
     hpa:
       enabled: {{ .Values.controlPlane.webapp.hpa.enabled }}

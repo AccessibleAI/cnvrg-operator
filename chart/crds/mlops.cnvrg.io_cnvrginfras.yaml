@@ -259,6 +259,8 @@ spec:
                   type: object
                 grafana:
                   properties:
+                    credsRef:
+                      type: string
                     enabled:
                       type: boolean
                     image:
