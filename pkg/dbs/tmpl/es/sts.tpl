@@ -140,7 +140,6 @@ spec:
           - "/bin/bash"
           - "-lc"
           - |
-            sleep 120
             curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_ilm/policy/cleanup_policy_app?pretty" \
                 -H 'Content-Type: application/json' \
                 -d '{
@@ -248,7 +247,6 @@ spec:
                   "index_patterns": ["cnvrg-endpoints*"],                 
                   "settings": { "index.lifecycle.name": "cleanup_policy_endpoints" }
                 }'
-            exit 1
         env:
         - name: "ES_CLUSTER_NAME"
           value: "cnvrg-es"
