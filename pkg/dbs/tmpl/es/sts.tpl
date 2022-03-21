@@ -135,7 +135,7 @@ spec:
         - name: es-storage
           mountPath: "/usr/share/elasticsearch/data"
       - name: es-ilm
-        image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}
+        image: curlimages/curl
         command:
           - "/bin/bash"
           - "-lc"
