@@ -140,8 +140,6 @@ spec:
               - "/bin/bash"
               - "-lc"
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
-                if [ "$ready" == "200" ]; then
                   curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_ilm/policy/cleanup_policy_app?pretty" \
                       -H 'Content-Type: application/json' \
                       -d '{
@@ -249,7 +247,6 @@ spec:
                         "index_patterns": ["cnvrg-endpoints*"],                 
                         "settings": { "index.lifecycle.name": "cleanup_policy_endpoints" }
                       }'
-                fi
         env:
         - name: "ES_CLUSTER_NAME"
           value: "cnvrg-es"
