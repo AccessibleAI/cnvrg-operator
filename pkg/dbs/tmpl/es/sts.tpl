@@ -141,7 +141,7 @@ spec:
           - "-lc"
           - |
             ready=$(curl -s -u $CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
-            while [ "$ready" != "200" ];do ready=$(curl -s -u $CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}'); done
+            while [ "$ready" != "200" ];do ready=$(curl -s -u $CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}' && echo $ready); done
             curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_ilm/policy/cleanup_policy_app?pretty" \
                 -H 'Content-Type: application/json' \
                 -d '{
