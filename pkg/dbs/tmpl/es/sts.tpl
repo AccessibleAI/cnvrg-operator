@@ -140,9 +140,9 @@ spec:
           - "/bin/bash"
           - "-lc"
           - |
-            ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+            ready=$(curl -s -u $CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
             if [ "$ready" == "200" ]; then
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_ilm/policy/cleanup_policy_app?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_ilm/policy/cleanup_policy_app?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "policy": {                       
@@ -158,7 +158,7 @@ spec:
                     }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_ilm/policy/cleanup_policy_jobs?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_ilm/policy/cleanup_policy_jobs?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "policy": {                       
@@ -174,7 +174,7 @@ spec:
                     }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_ilm/policy/cleanup_policy_all?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_ilm/policy/cleanup_policy_all?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "policy": {                       
@@ -190,7 +190,7 @@ spec:
                     }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_ilm/policy/cleanup_policy_endpoints?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_ilm/policy/cleanup_policy_endpoints?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "policy": {                       
@@ -206,44 +206,44 @@ spec:
                     }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/cnvrg-app*/_settings?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/cnvrg-app*/_settings?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{ "lifecycle.name": "cleanup_policy_app" }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/cnvrg-jobs*/_settings?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/cnvrg-jobs*/_settings?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{ "lifecycle.name": "cleanup_policy_jobs" }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/cnvrg-all*/_settings?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/cnvrg-all*/_settings?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{ "lifecycle.name": "cleanup_policy_all" }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/cnvrg-endpoints*/_settings?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/cnvrg-endpoints*/_settings?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{ "lifecycle.name": "cleanup_policy_endpoints" }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_template/logging_policy_template_app?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_template/logging_policy_template_app?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "index_patterns": ["cnvrg-app*"],                 
                     "settings": { "index.lifecycle.name": "cleanup_policy_app" }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_template/logging_policy_template_jobs?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_template/logging_policy_template_jobs?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "index_patterns": ["cnvrg-jobs*"],                 
                     "settings": { "index.lifecycle.name": "cleanup_policy_jobs" }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_template/logging_policy_template_all?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_template/logging_policy_template_all?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "index_patterns": ["cnvrg-all*"],                 
                     "settings": { "index.lifecycle.name": "cleanup_policy_all" }
                   }'
 
-              curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "elasticsearch:9200/_template/logging_policy_template_endpoints?pretty" \
+              curl -X PUT -u "$CNVRG_ES_USER:$CNVRG_ES_PASS" "$ES_NETWORK_HOST:9200/_template/logging_policy_template_endpoints?pretty" \
                   -H 'Content-Type: application/json' \
                   -d '{
                     "index_patterns": ["cnvrg-endpoints*"],                 
