@@ -249,6 +249,9 @@ spec:
                     "index_patterns": ["cnvrg-endpoints*"],                 
                     "settings": { "index.lifecycle.name": "cleanup_policy_endpoints" }
                   }'
+              exit 1
+            else
+              exit 0
             fi
         env:
         - name: "ES_CLUSTER_NAME"
