@@ -13,7 +13,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  cleanup_policy_all: '3d'
-  cleanup_policy_app: '30d'
-  cleanup_policy_jobs: '14d'
-  cleanup_policy_endpoints: '1825d'
+  CLEANUP_POLICY_ALL: '3d'
+  CLEANUP_POLICY_APP: '30d'
+  CLEANUP_POLICY_JOBS: '14d'
+  CLEANUP_POLICY_ENDPOINTS: '1825d'
