@@ -30,7 +30,7 @@ func esState() []*desired.State {
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SaGVK],
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
 		},
