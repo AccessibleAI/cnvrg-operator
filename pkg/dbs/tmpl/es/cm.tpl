@@ -2,14 +2,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: es-ilm-cm
-  namespace: {{ .Data.Namespace }}
+  namespace: {{ ns . }}
   annotations:
-    {{- range $k, $v := .Data.Annotations }}
+    {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
-    {{- range $k, $v := .Data.Labels }}
+    {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
