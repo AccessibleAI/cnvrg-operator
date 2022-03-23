@@ -15,6 +15,7 @@ data:
   {{- $secret := randAlphaNum 20 | b64enc }}
   {{- $deviceToken := generateMetagpuToken $secret "l0" }}
   {{- $containerToken := generateMetagpuToken $secret "l1" }}
+  MG_EX: {{ $deviceToken }} # duplicated is for the exporter
   config.yaml: |
     accelerator: nvidia
     processesDiscoveryPeriod: 5

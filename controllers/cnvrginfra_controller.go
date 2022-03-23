@@ -295,6 +295,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 				"Annotations": cnvrgInfra.Spec.Annotations,
 				"Labels":      cnvrgInfra.Spec.Labels,
 				"MetaGpuDp":   cnvrgInfra.Spec.Gpu.MetaGpuDp,
+				"ImageHub":    cnvrgInfra.Spec.ImageHub,
 			},
 		}
 		if err := desired.Apply(gpu.MetagpudpState(metagpuDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {

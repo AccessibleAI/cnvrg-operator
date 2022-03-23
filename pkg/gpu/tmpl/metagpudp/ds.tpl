@@ -44,7 +44,7 @@ spec:
         accelerator: nvidia
       containers:
         - name: metagpu-device-plugin
-          image: "docker.io/cnvrg/metagpu-device-plugin:main"
+          image: {{ image .Data.ImageHub .Data.MetaGpuDp.Image }}
           imagePullPolicy: Always
           command:
             - /usr/bin/mgdp
@@ -60,8 +60,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            - name: MG_CTL_TOKEN
-              value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1ldGFncHVAaW5zdGFuY2UiLCJ2aXNpYmlsaXR5TGV2ZWwiOiJsMCJ9.2rHykHFcHoIr-OCoPA5Am4ubf31-RJcayZnOTK6db94
           volumeMounts:
             - name: device-plugin
               mountPath: /var/lib/kubelet/device-plugins
@@ -72,15 +70,16 @@ spec:
               name: proc
               readOnly: true
         - name: metagpu-exporter
-          image: "docker.io/cnvrg/metagpu-device-plugin:main"
+          image: {{ image .Data.ImageHub .Data.MetaGpuDp.Image }}
           imagePullPolicy: Always
           command:
             - /usr/bin/mgex
             - start
-            - -t
-            - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1ldGFncHVAaW5zdGFuY2UiLCJ2aXNpYmlsaXR5TGV2ZWwiOiJsMCJ9.2rHykHFcHoIr-OCoPA5Am4ubf31-RJcayZnOTK6db94
           ports:
             - containerPort: 2112
+          envFrom:
+            - configMapRef:
+                name: metagpu-device-plugin-config
       volumes:
         - name: device-plugin
           hostPath:
