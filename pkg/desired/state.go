@@ -9,6 +9,7 @@ import (
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
 	"github.com/go-logr/logr"
+	"github.com/golang-jwt/jwt"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
@@ -362,6 +363,16 @@ auto-aof-rewrite-min-size 128mb
 timeout 15
 %s
 `, passConf)
+		},
+		// token visibility levels: https://github.com/AccessibleAI/metagpu-device-plugin/blob/main/pkg/mgsrv/server.go#L30
+		"generateMetagpuToken": func(secret string, tokenLevel string) string {
+			claims := jwt.MapClaims{"email": "metagpu@instance", "visibilityLevel": tokenLevel}
+			containerScopeToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+			tokenString, err := containerScopeToken.SignedString([]byte(secret))
+			if err != nil {
+				fmt.Println(err)
+			}
+			return tokenString
 		},
 	}
 }

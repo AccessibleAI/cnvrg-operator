@@ -60,8 +60,8 @@ func MetagpudpState(data interface{}) []*desired.State {
 			TemplatePath: path + "/metagpudp/cm.tpl",
 			Obj:          &unstructured.Unstructured{},
 			GVK:          desired.Kinds[desired.ConfigMapGVK],
-			Own:          true,
-			Updatable:    true,
+			Own:          false,
+			Updatable:    false,
 			TemplateData: data,
 		},
 		{
