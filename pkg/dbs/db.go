@@ -32,7 +32,7 @@ func esState() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
-			Updatable:      true,
+			Updatable:      false,
 		},
 		{
 			TemplatePath:   path + "/es/sa.tpl",
