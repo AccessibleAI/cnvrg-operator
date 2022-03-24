@@ -32,3 +32,4 @@ spec:
             {{- else }}
             x-forwarded-proto: http
             {{- end}}
+
