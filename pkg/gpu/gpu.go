@@ -38,6 +38,19 @@ func NvidiaDpState(data interface{}) []*desired.State {
 	return nvidiaDp
 }
 
+func MetagpudpPresenceState(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath: path + "/metagpudp/presence.tpl",
+			Obj:          &unstructured.Unstructured{},
+			GVK:          desired.Kinds[desired.ConfigMapGVK],
+			Own:          true,
+			Updatable:    true,
+			TemplateData: data,
+		},
+	}
+}
+
 func MetagpudpState(data interface{}) []*desired.State {
 	return []*desired.State{
 		{
