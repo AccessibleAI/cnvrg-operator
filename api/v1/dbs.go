@@ -75,14 +75,14 @@ type Es struct {
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
-	CleanupPolicy  CleanupPolicy	 `json:"cleanupPolicy,omitempty"`
+	CleanupPolicy  CleanupPolicy     `json:"cleanupPolicy,omitempty"`
 }
 
 type CleanupPolicy struct {
-	All				string			`json:"all,omitempty"`
-	App				string			`json:"app,omitempty"`
-	Jobs			string			`json:"jobs,omitempty"`
-	Endpoints		string			`json:"endpoints,omitempty"`
+	All       string `json:"all,omitempty"`
+	App       string `json:"app,omitempty"`
+	Jobs      string `json:"jobs,omitempty"`
+	Endpoints string `json:"endpoints,omitempty"`
 }
 
 type AppDbs struct {
