@@ -55,6 +55,9 @@ spec:
             - containerPort: 50052
           securityContext:
             privileged: true
+          envFrom:
+            - configMapRef:
+                name: metagpu-device-plugin-config
           env:
             - name: POD_IP
               valueFrom:
