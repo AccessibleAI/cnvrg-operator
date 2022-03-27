@@ -209,6 +209,12 @@ var esDefault = Es{
 	PatchEsNodes: false,
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
+	CleanupPolicy: CleanupPolicy{
+		All: "3d",
+		App: "30d",
+		Jobs: "14d",
+		Endpoints: "1825d",
+	},
 }
 
 var appDbsDefaults = AppDbs{
