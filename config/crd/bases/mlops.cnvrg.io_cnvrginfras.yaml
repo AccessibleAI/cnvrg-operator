@@ -182,6 +182,13 @@ spec:
                     image:
                       type: string
                   type: object
+                metaGpuDp:
+                  properties:
+                    enabled:
+                      type: boolean
+                    image:
+                      type: string
+                  type: object
                 nvidiaDp:
                   properties:
                     enabled:

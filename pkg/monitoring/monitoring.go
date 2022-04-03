@@ -553,6 +553,15 @@ func defaultServiceMonitors() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+		{
+			TemplatePath:   path + "/default-servicemonitors/metagpu.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 

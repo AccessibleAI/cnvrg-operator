@@ -92,6 +92,8 @@ spec:
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
+          - configMapRef:
+              name: es-ilm-cm
         ports:
         - containerPort: {{ .Spec.Dbs.Es.Port }}
         resources:
