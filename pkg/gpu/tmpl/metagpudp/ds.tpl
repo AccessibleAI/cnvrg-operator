@@ -29,11 +29,7 @@ spec:
         {{- end }}
     spec:
       tolerations:
-        - key: CriticalAddonsOnly
-          operator: Exists
-        - key: nvidia.com/gpu
-          operator: Exists
-          effect: NoSchedule
+        - operator: Exists
       priorityClassName: "system-node-critical"
       imagePullSecrets:
         - name: regcred
