@@ -270,6 +270,7 @@ var controlPlaneDefault = ControlPlane{
 				`\/vscode.tar.gz`,
 				`\/gitlens.vsix`,
 				`\/ms-python-release.vsix`,
+				`\/webhooks`,
 			},
 			TokenValidationRegex: []string{
 				`^\/api`,

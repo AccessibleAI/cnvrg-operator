@@ -12,7 +12,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  CLEANUP_POLICY_ALL: '3d'
-  CLEANUP_POLICY_APP: '30d'
-  CLEANUP_POLICY_JOBS: '14d'
-  CLEANUP_POLICY_ENDPOINTS: '1825d'
+  CLEANUP_POLICY_ALL: {{ .Spec.Dbs.Es.CleanupPolicy.All }}
+  CLEANUP_POLICY_APP: {{ .Spec.Dbs.Es.CleanupPolicy.App }}
+  CLEANUP_POLICY_JOBS: {{ .Spec.Dbs.Es.CleanupPolicy.Jobs }}
+  CLEANUP_POLICY_ENDPOINTS: {{ .Spec.Dbs.Es.CleanupPolicy.Endpoints }}
