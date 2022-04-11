@@ -268,6 +268,7 @@ var controlPlaneDefault = ControlPlane{
 				`\/public`,
 				`\/pack`,
 				`\/vscode.tar.gz`,
+				`\/jupyter.vsix`,
 				`\/gitlens.vsix`,
 				`\/ms-python-release.vsix`,
 				`\/webhooks`,
