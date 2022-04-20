@@ -57,8 +57,9 @@ type DcgmExporter struct {
 }
 
 type HabanaExporter struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Enabled   bool   `json:"enabled,omitempty"`
+	Image     string `json:"image,omitempty"`
+	HlmlImage string `json:"hlmlImage,omitempty"`
 }
 
 type CnvrgIdleMetricsExporter struct {
@@ -186,8 +187,9 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.0.13-2.1.2-ubuntu20.04",
 	},
 	HabanaExporter: HabanaExporter{
-		Enabled: true,
-		Image:   "vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest",
+		Enabled:   true,
+		Image:     "vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest",
+		HlmlImage: "vault.habana.ai/gaudi-metric-exporter/hlml-service:latest",
 	},
 	DefaultServiceMonitors: DefaultServiceMonitors{
 		Enabled: false,

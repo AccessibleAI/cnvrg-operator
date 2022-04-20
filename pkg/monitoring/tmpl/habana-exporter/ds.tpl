@@ -72,7 +72,7 @@ spec:
               cpu: 100m
               memory: 200Mi
         - name: hlml-service
-          image: vault.habana.ai/gaudi-metric-exporter/hlml-service:latest
+          image: {{ .Spec.Monitoring.HabanaExporter.HlmlImage }}
           env:
           - name: LD_LIBRARY_PATH
             value: "/usr/lib/habanalabs"
