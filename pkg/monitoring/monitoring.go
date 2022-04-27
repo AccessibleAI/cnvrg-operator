@@ -681,6 +681,29 @@ func cnvrgIdleMetricsServiceMonitors() []*desired.State {
 	}
 }
 
+func cnvrgUsageMetricsServiceMonitors() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/cnvrg-usage-exporter/usage-metrics.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/cnvrg-usage-exporter/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.DeploymentGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
@@ -714,6 +737,10 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if cnvrgApp.Spec.Monitoring.CnvrgIdleMetricsExporter.Enabled {
 		state = append(state, cnvrgIdleMetricsServiceMonitors()...)
+	}
+
+	if cnvrgApp.Spec.Monitoring.CnvrgUsageMetricsExporter.Enabled {
+		state = append(state, cnvrgUsageMetricsServiceMonitors()...)
 	}
 
 	return state

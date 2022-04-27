@@ -171,6 +171,7 @@ Helm chart command line options
 `monitoring.prometheus.storageClass` |  - | storage class, if blank default storage class will be used
 `monitoring.defaultServiceMonitors.enabled` |  true | set to false to disable defaultServiceMonitors
 `monitoring.cnvrgIdleMetricsExporter.enabled` |  true | set to false to disable cnvrgIdleMetricsExporter
+`monitoring.cnvrgUsageMetricsExporter.enabled` |  true | set to false to disable cnvrgUsageMetricsExporter
 
 #### Networking options
 

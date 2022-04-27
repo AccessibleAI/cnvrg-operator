@@ -16,5 +16,7 @@ monitoring:
     {{- end }}
   cnvrgIdleMetricsExporter:
     enabled: {{ .Values.monitoring.cnvrgIdleMetricsExporter.enabled }}
+  cnvrgUsageMetricsExporter:
+    enabled: {{ .Values.monitoring.cnvrgUsageMetricsExporter.enabled }}
 {{- end }}
 {{- end }}

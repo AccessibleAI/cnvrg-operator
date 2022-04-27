@@ -67,6 +67,11 @@ type CnvrgIdleMetricsExporter struct {
 	Labels  map[string]string `json:"labels,omitempty"`
 }
 
+type CnvrgUsageMetricsExporter struct {
+	Enabled bool              `json:"enabled,omitempty"`
+	Labels  map[string]string `json:"labels,omitempty"`
+}
+
 type CnvrgInfraMonitoring struct {
 	PrometheusOperator       PrometheusOperator       `json:"prometheusOperator,omitempty"`
 	Prometheus               Prometheus               `json:"prometheus,omitempty"`
@@ -80,9 +85,10 @@ type CnvrgInfraMonitoring struct {
 }
 
 type CnvrgAppMonitoring struct {
-	Prometheus               Prometheus               `json:"prometheus,omitempty"`
-	Grafana                  Grafana                  `json:"grafana,omitempty"`
-	CnvrgIdleMetricsExporter CnvrgIdleMetricsExporter `json:"cnvrgIdleMetricsExporter,omitempty"`
+	Prometheus                Prometheus                `json:"prometheus,omitempty"`
+	Grafana                   Grafana                   `json:"grafana,omitempty"`
+	CnvrgIdleMetricsExporter  CnvrgIdleMetricsExporter  `json:"cnvrgIdleMetricsExporter,omitempty"`
+	CnvrgUsageMetricsExporter CnvrgUsageMetricsExporter `json:"cnvrgUsageMetricsExporter,omitempty"`
 }
 
 var grafanaInfraDefault = Grafana{
@@ -161,6 +167,9 @@ var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 	Prometheus: prometheusAppDefault,
 	Grafana:    grafanaAppDefault,
 	CnvrgIdleMetricsExporter: CnvrgIdleMetricsExporter{
+		Enabled: false,
+	},
+	CnvrgUsageMetricsExporter: CnvrgUsageMetricsExporter{
 		Enabled: false,
 	},
 }
