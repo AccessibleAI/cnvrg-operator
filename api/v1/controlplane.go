@@ -273,6 +273,7 @@ var controlPlaneDefault = ControlPlane{
 				`\/ms-python-release.vsix`,
 				`\/webhooks`,
 				`\/api/v2/metrics`,
+				`\/api/v1/events/endpoint_rule_alert`,
 			},
 			TokenValidationRegex: []string{
 				`^\/api`,
