@@ -170,7 +170,7 @@ var cnvrgAppMonitoringDefault = CnvrgAppMonitoring{
 		Enabled: false,
 	},
 	CnvrgUsageMetricsExporter: CnvrgUsageMetricsExporter{
-		Enabled: false,
+		Enabled: true,
 	},
 }
 
