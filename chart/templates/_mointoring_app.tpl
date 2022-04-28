@@ -3,6 +3,7 @@
 monitoring:
   grafana:
     enabled: {{ .Values.monitoring.grafana.enabled }}
+    svcName: {{ .Values.monitoring.grafana.svcName }}
   prometheus:
     enabled: {{ .Values.monitoring.prometheus.enabled }}
     storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"

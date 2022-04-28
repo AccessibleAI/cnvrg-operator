@@ -8,7 +8,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: grafana
+    app: {{ .Spec.Monitoring.Grafana.SvcName }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -24,4 +24,4 @@ spec:
     nodePort: {{ .Spec.Monitoring.Grafana.NodePort }}
     {{- end }}
   selector:
-    app: grafana
+    app: {{ .Spec.Monitoring.Grafana.SvcName }}

@@ -44,7 +44,7 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
-      serviceAccountName: {{ .Spec.Logging.Kibana.ServiceAccount }}
+      serviceAccountName: {{ .Spec.Logging.Kibana.SvcName }}
       volumes:
         - name: "kibana-config"
           secret:

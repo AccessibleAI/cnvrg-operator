@@ -268,8 +268,11 @@ var controlPlaneDefault = ControlPlane{
 				`\/public`,
 				`\/pack`,
 				`\/vscode.tar.gz`,
+				`\/jupyter.vsix`,
 				`\/gitlens.vsix`,
 				`\/ms-python-release.vsix`,
+				`\/webhooks`,
+				`\/api/v2/metrics`,
 			},
 			TokenValidationRegex: []string{
 				`^\/api`,

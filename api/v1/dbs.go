@@ -75,6 +75,14 @@ type Es struct {
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
+	CleanupPolicy  CleanupPolicy     `json:"cleanupPolicy,omitempty"`
+}
+
+type CleanupPolicy struct {
+	All       string `json:"all,omitempty"`
+	App       string `json:"app,omitempty"`
+	Jobs      string `json:"jobs,omitempty"`
+	Endpoints string `json:"endpoints,omitempty"`
 }
 
 type AppDbs struct {
@@ -183,7 +191,7 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
-	Image:          "cnvrg-es:v7.8.1.a1",
+	Image:          "cnvrg-es:v7.8.1.a1-dynamic-indices",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
@@ -201,6 +209,12 @@ var esDefault = Es{
 	PatchEsNodes: false,
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
+	CleanupPolicy: CleanupPolicy{
+		All: "3d",
+		App: "30d",
+		Jobs: "14d",
+		Endpoints: "1825d",
+	},
 }
 
 var appDbsDefaults = AppDbs{

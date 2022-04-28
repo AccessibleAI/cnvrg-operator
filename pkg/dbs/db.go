@@ -26,6 +26,15 @@ func EsCreds(data interface{}) []*desired.State {
 func esState() []*desired.State {
 	return []*desired.State{
 		{
+			TemplatePath:   path + "/es/cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
 			TemplatePath:   path + "/es/sa.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
