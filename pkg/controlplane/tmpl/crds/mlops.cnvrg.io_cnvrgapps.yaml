@@ -901,6 +901,15 @@ spec:
               type: object
             monitoring:
               properties:
+                cnvrgUsageMetricsExporter:
+                  properties:
+                    enabled:
+                      type: boolean
+                    labels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  type: object
                 cnvrgIdleMetricsExporter:
                   properties:
                     enabled:
