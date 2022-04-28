@@ -66,6 +66,7 @@ controlPlane:
       maxReplicas: 5
   webapp:
     enabled: true
+    svcName: "app"
     replicas: 1
     hpa:
       enabled: true
@@ -99,6 +100,11 @@ dbs:
     storageClass: ""
     patchEsNodes: true
     nodeSelector: { }
+    cleanupPolicy:
+      all: "3d"
+      app: "30d"
+      jobs: "14d"
+      endpoints: "1825d"
   minio:
     enabled: true
     storageSize: 100Gi
@@ -128,6 +134,7 @@ logging:
     storageClass: ""
     nodeSelector: { }
   kibana:
+    svcName: "kibana"
     enabled: true
 
 monitoring:
@@ -146,6 +153,7 @@ monitoring:
 
   grafana:
     enabled: true
+    svcName: "grafana"
 
   prometheusOperator:
     enabled: true

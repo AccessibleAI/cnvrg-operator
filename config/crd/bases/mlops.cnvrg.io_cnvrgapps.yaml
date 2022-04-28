@@ -90,8 +90,6 @@ spec:
                       type: boolean
                     cnvrgJobUid:
                       type: string
-                    cnvrgPrivilegedJob:
-                      type: boolean
                     featureFlags:
                       additionalProperties:
                         type: string
@@ -860,6 +858,8 @@ spec:
                   type: object
                 kibana:
                   properties:
+                    credsRef:
+                      type: string
                     enabled:
                       type: boolean
                     image:
@@ -912,6 +912,8 @@ spec:
                   type: object
                 grafana:
                   properties:
+                    credsRef:
+                      type: string
                     enabled:
                       type: boolean
                     image:

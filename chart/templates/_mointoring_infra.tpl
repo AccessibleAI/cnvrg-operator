@@ -17,6 +17,7 @@ monitoring:
     enabled: {{ .Values.monitoring.habanaExporter.enabled }}
   grafana:
     enabled: {{ .Values.monitoring.grafana.enabled }}
+    svcName: {{ .Values.monitoring.grafana.svcName }}
   kubeStateMetrics:
     enabled: {{ .Values.monitoring.kubeStateMetrics.enabled }}
   nodeExporter:

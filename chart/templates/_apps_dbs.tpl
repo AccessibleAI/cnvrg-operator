@@ -17,6 +17,11 @@ dbs:
       {{$key}}: {{$value}}
     {{- end }}
     {{- end }}
+    cleanupPolicy:
+        all: {{.Values.dbs.es.cleanupPolicy.all}}
+        app: {{.Values.dbs.es.cleanupPolicy.app}}
+        jobs: {{.Values.dbs.es.cleanupPolicy.jobs}}
+        endpoints: {{.Values.dbs.es.cleanupPolicy.endpoints}}
   {{- if and (eq .Values.controlPlane.objectStorage.endpoint "") (eq .Values.controlPlane.objectStorage.type "minio")}}
   minio:
     enabled: {{ .Values.dbs.minio.enabled }}
