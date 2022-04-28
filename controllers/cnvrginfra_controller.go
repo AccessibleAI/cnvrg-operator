@@ -298,10 +298,17 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 				"ImageHub":    cnvrgInfra.Spec.ImageHub,
 			},
 		}
+		// apply metagpu infra state
 		if err := desired.Apply(gpu.MetagpudpState(metagpuDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
+
+	}
+	// turn on/off metagpu presence cm in each app ns based on the infra state
+	if err := r.setMetagpuPresence(cnvrgInfra); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
 	}
 
 	// capsule backup service
@@ -623,6 +630,27 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 	if err != nil {
 		infraLog.Error(err, "can't update status")
 	}
+}
+
+func (r *CnvrgInfraReconciler) setMetagpuPresence(infra *mlopsv1.CnvrgInfra) error {
+	apps, err := r.getCnvrgAppInstances(infra)
+	if err != nil {
+		return err
+	}
+	for _, app := range apps {
+		mgDpPresence := desired.TemplateData{
+			Namespace: app.SpecNs,
+			Data: map[string]interface{}{
+				"Annotations": infra.Spec.Annotations,
+				"Labels":      infra.Spec.Labels,
+				"Enabled":     infra.Spec.Gpu.MetaGpuDp.Enabled,
+			},
+		}
+		if err := desired.Apply(gpu.MetagpudpPresenceState(mgDpPresence), infra, r.Client, r.Scheme, infraLog); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv1.CnvrgInfra) error {

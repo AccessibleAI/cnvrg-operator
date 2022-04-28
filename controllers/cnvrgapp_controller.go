@@ -8,7 +8,6 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/controlplane"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-	"github.com/AccessibleAI/cnvrg-operator/pkg/gpu"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/ingresscheck"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
@@ -357,12 +356,12 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
-
-	// metagpu configmap
-	if err := r.setMetagpuPresence(cnvrgApp); err != nil {
-		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
-	}
+	//
+	//// metagpu configmap
+	//if err := r.setMetagpuPresence(cnvrgApp); err != nil {
+	//	r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
+	//	return err
+	//}
 
 	// dbs
 	if err := r.dbsState(cnvrgApp); err != nil {
@@ -956,22 +955,22 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 	return &app, nil
 }
 
-func (r *CnvrgAppReconciler) setMetagpuPresence(app *mlopsv1.CnvrgApp) error {
-	infra, err := r.getCnvrgInfra()
-	if err != nil {
-		return err
-	}
-	mgDpPresence := desired.TemplateData{
-		Namespace: app.Namespace,
-		Data: map[string]interface{}{
-			"Annotations": app.Spec.Annotations,
-			"Labels":      app.Spec.Labels,
-			"Enabled":     infra.Spec.Gpu.MetaGpuDp.Enabled,
-		},
-	}
-	return desired.Apply(gpu.MetagpudpPresenceState(mgDpPresence), app, r.Client, r.Scheme, appLog)
-
-}
+//func (r *CnvrgAppReconciler) setMetagpuPresence(app *mlopsv1.CnvrgApp) error {
+//	infra, err := r.getCnvrgInfra()
+//	if err != nil {
+//		return err
+//	}
+//	mgDpPresence := desired.TemplateData{
+//		Namespace: app.Namespace,
+//		Data: map[string]interface{}{
+//			"Annotations": app.Spec.Annotations,
+//			"Labels":      app.Spec.Labels,
+//			"Enabled":     infra.Spec.Gpu.MetaGpuDp.Enabled,
+//		},
+//	}
+//	return desired.Apply(gpu.MetagpudpPresenceState(mgDpPresence), app, r.Client, r.Scheme, appLog)
+//
+//}
 
 func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 
