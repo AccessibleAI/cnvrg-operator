@@ -171,6 +171,10 @@ monitoring:
     enabled: true
     labels: { }
 
+  cnvrgUsageMetricsExporter:
+    enabled: true
+    labels: { }
+
 networking:
   https:
     enabled: false
