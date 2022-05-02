@@ -12,7 +12,6 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	v1 "k8s.io/api/core/v1"
-	"os"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
@@ -64,11 +63,10 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
-func generateKeys() ([]byte, []byte) {
+func generateKeys() ([]byte, []byte, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
-		fmt.Printf("Cannot generate RSA key\n")
-		os.Exit(1)
+		return nil, nil, err
 	}
 	// private key
 	privatePemBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)}
@@ -78,7 +76,7 @@ func generateKeys() ([]byte, []byte) {
 	publicPemBlock := &pem.Block{Type: "RSA PUBLIC KEY", Bytes: x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)}
 	publicPemBytes := pem.EncodeToMemory(publicPemBlock)
 
-	return privatePemBytes, publicPemBytes
+	return privatePemBytes, publicPemBytes, nil
 }
 
 func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {

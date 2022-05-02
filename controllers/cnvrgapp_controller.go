@@ -411,6 +411,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// sso
 	if err := r.ssoState(cnvrgApp); err != nil {
+		appLog.Error(err, "Cannot generate RSA key")
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
@@ -577,7 +578,11 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 func (r *CnvrgAppReconciler) ssoState(app *mlopsv1.CnvrgApp) error {
 	// apply sso state
 	if app.Spec.SSO.Pki.Enabled {
-		privatePemBytes, publicPemBytes := generateKeys()
+		privatePemBytes, publicPemBytes, err := generateKeys()
+		if err != nil {
+			return err
+		}
+
 		ssoData := desired.TemplateData{
 			Namespace: app.Namespace,
 			Data: map[string]interface{}{
