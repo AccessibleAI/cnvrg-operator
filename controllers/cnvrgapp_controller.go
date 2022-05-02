@@ -14,6 +14,7 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/registry"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/sso"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -408,6 +409,12 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
+	// sso
+	if err := r.ssoState(cnvrgApp); err != nil {
+		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
+		return err
+	}
+
 	return nil
 }
 
@@ -564,6 +571,32 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (r *CnvrgAppReconciler) ssoState(app *mlopsv1.CnvrgApp) error {
+	// apply sso state
+	if app.Spec.SSO.Pki.Enabled {
+		privatePemBytes, publicPemBytes := generateKeys()
+		ssoData := desired.TemplateData{
+			Namespace: app.Namespace,
+			Data: map[string]interface{}{
+				"Keys": map[string]string{
+					"PrivateKey": string(privatePemBytes),
+					"PublicKey":  string(publicPemBytes),
+				},
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+				"Pki":         app.Spec.SSO.Pki,
+			},
+		}
+
+		if err := desired.Apply(sso.SsoState(app, ssoData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		}
+	}
+
 	return nil
 }
 

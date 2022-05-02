@@ -294,6 +294,8 @@ spec:
                   properties:
                     enabled:
                       type: boolean
+                    hlmlImage:
+                      type: string
                     image:
                       type: string
                   type: object
@@ -489,6 +491,17 @@ spec:
                   type: boolean
                 oidcIssuerUrl:
                   type: string
+                pki:
+                  properties:
+                    enabled:
+                      type: boolean
+                    privateKeySecret:
+                      type: string
+                    publicKeySecret:
+                      type: string
+                    rootCaSecret:
+                      type: string
+                  type: object
                 provider:
                   type: string
                 realmName:

@@ -3,12 +3,16 @@ package controllers
 import (
 	"context"
 	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/hex"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	v1 "k8s.io/api/core/v1"
+	"os"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
@@ -58,6 +62,23 @@ func generateSecureToken(length int) string {
 		return ""
 	}
 	return hex.EncodeToString(b)
+}
+
+func generateKeys() ([]byte, []byte) {
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		fmt.Printf("Cannot generate RSA key\n")
+		os.Exit(1)
+	}
+	// private key
+	privatePemBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)}
+	privatePemBytes := pem.EncodeToMemory(privatePemBlock)
+
+	// public key
+	publicPemBlock := &pem.Block{Type: "RSA PUBLIC KEY", Bytes: x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)}
+	publicPemBytes := pem.EncodeToMemory(publicPemBlock)
+
+	return privatePemBytes, publicPemBytes
 }
 
 func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
@@ -134,6 +155,18 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 
 	if app.Spec.CnvrgAppPriorityClass.Name == "" && infra != nil {
 		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
+	}
+
+	if app.Spec.SSO.Pki.Enabled {
+		if app.Spec.SSO.Pki.PrivateKeySecret == "" {
+			desiredAppSpec.SSO.Pki.PrivateKeySecret = "okta-pki-private-key"
+		}
+		if app.Spec.SSO.Pki.PublicKeySecret == "" {
+			desiredAppSpec.SSO.Pki.PublicKeySecret = "okta-pki-public-key"
+		}
+		if app.Spec.SSO.Pki.RootCaSecret == "" {
+			desiredAppSpec.SSO.Pki.RootCaSecret = "okta-pki-root-ca"
+		}
 	}
 
 	return nil
