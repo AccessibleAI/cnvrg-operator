@@ -1046,6 +1046,17 @@ spec:
                       type: array
                   type: object
               type: object
+            pki:
+              properties:
+                enabled:
+                  type: boolean
+                privateKeySecret:
+                  type: string
+                publicKeySecret:
+                  type: string
+                rootCaSecret:
+                  type: string
+              type: object
             registry:
               properties:
                 name:
@@ -1081,17 +1092,6 @@ spec:
                   type: boolean
                 oidcIssuerUrl:
                   type: string
-                pki:
-                  properties:
-                    enabled:
-                      type: boolean
-                    privateKeySecret:
-                      type: string
-                    publicKeySecret:
-                      type: string
-                    rootCaSecret:
-                      type: string
-                  type: object
                 provider:
                   type: string
                 realmName:
