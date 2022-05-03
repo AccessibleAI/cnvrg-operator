@@ -13,8 +13,8 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/pki"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/registry"
-	"github.com/AccessibleAI/cnvrg-operator/pkg/sso"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
@@ -409,8 +409,8 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
-	// sso
-	if err := r.ssoState(cnvrgApp); err != nil {
+	// pki
+	if err := r.pkiState(cnvrgApp); err != nil {
 		appLog.Error(err, "Cannot generate RSA key")
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
@@ -575,9 +575,9 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 	return nil
 }
 
-func (r *CnvrgAppReconciler) ssoState(app *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) pkiState(app *mlopsv1.CnvrgApp) error {
 	// apply sso state
-	if app.Spec.SSO.Pki.Enabled {
+	if app.Spec.Pki.Enabled {
 		privatePemBytes, publicPemBytes, err := generateKeys()
 		if err != nil {
 			return err
@@ -592,11 +592,11 @@ func (r *CnvrgAppReconciler) ssoState(app *mlopsv1.CnvrgApp) error {
 				},
 				"Annotations": app.Spec.Annotations,
 				"Labels":      app.Spec.Labels,
-				"Pki":         app.Spec.SSO.Pki,
+				"Pki":         app.Spec.Pki,
 			},
 		}
 
-		if err := desired.Apply(sso.SsoState(app, ssoData), app, r.Client, r.Scheme, appLog); err != nil {
+		if err := desired.Apply(pki.PkiState(app, ssoData), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}

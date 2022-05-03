@@ -14,19 +14,11 @@ type SSO struct {
 	RealmName                        string   `json:"realmName,omitempty"`
 	ServiceUrl                       string   `json:"serviceUrl,omitempty"`
 	InsecureOidcAllowUnverifiedEmail bool     `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
-	Pki                              Pki      `json:"pki,omitempty"`
 }
 
 type OauthProxyServiceConf struct {
 	SkipAuthRegex        []string `json:"skipAuthRegex,omitempty"`
 	TokenValidationRegex []string `json:"tokenValidationRegex,omitempty"`
-}
-
-type Pki struct {
-	Enabled          bool   `json:"enabled,omitempty"`
-	RootCaSecret     string `json:"rootCaSecret,omitempty"`
-	PrivateKeySecret string `json:"privateKeySecret,omitempty"`
-	PublicKeySecret  string `json:"publicKeySecret,omitempty"`
 }
 
 var ssoDefault = SSO{
@@ -43,10 +35,4 @@ var ssoDefault = SSO{
 	RealmName:                        "",
 	ServiceUrl:                       "",
 	InsecureOidcAllowUnverifiedEmail: false,
-	Pki: Pki{
-		Enabled:          false,
-		RootCaSecret:     "",
-		PrivateKeySecret: "",
-		PublicKeySecret:  "",
-	},
 }

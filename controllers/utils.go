@@ -155,15 +155,15 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
 	}
 
-	if app.Spec.SSO.Pki.Enabled {
-		if app.Spec.SSO.Pki.PrivateKeySecret == "" {
-			desiredAppSpec.SSO.Pki.PrivateKeySecret = "okta-pki-private-key"
+	if app.Spec.Pki.Enabled {
+		if app.Spec.Pki.PrivateKeySecret == "" {
+			desiredAppSpec.Pki.PrivateKeySecret = "okta-pki-private-key"
 		}
-		if app.Spec.SSO.Pki.PublicKeySecret == "" {
-			desiredAppSpec.SSO.Pki.PublicKeySecret = "okta-pki-public-key"
+		if app.Spec.Pki.PublicKeySecret == "" {
+			desiredAppSpec.Pki.PublicKeySecret = "okta-pki-public-key"
 		}
-		if app.Spec.SSO.Pki.RootCaSecret == "" {
-			desiredAppSpec.SSO.Pki.RootCaSecret = "okta-pki-root-ca"
+		if app.Spec.Pki.RootCaSecret == "" {
+			desiredAppSpec.Pki.RootCaSecret = "okta-pki-root-ca"
 		}
 	}
 

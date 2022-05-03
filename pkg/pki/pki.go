@@ -1,4 +1,4 @@
-package sso
+package pki
 
 import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/sso/tmpl"
+const path = "/pkg/pki/tmpl"
 
 func pki(data interface{}) []*desired.State {
 	return []*desired.State{
@@ -33,10 +33,10 @@ func pki(data interface{}) []*desired.State {
 	}
 }
 
-func SsoState(cnvrgApp *mlopsv1.CnvrgApp, data interface{}) []*desired.State {
+func PkiState(cnvrgApp *mlopsv1.CnvrgApp, data interface{}) []*desired.State {
 	var state []*desired.State
 
-	if cnvrgApp.Spec.SSO.Pki.Enabled {
+	if cnvrgApp.Spec.Pki.Enabled {
 		state = append(state, pki(data)...)
 	}
 
