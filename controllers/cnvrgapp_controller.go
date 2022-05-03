@@ -576,14 +576,14 @@ func (r *CnvrgAppReconciler) backupsState(app *mlopsv1.CnvrgApp) error {
 }
 
 func (r *CnvrgAppReconciler) pkiState(app *mlopsv1.CnvrgApp) error {
-	// apply sso state
+	// apply pki state
 	if app.Spec.Pki.Enabled {
 		privatePemBytes, publicPemBytes, err := generateKeys()
 		if err != nil {
 			return err
 		}
 
-		ssoData := desired.TemplateData{
+		pkiData := desired.TemplateData{
 			Namespace: app.Namespace,
 			Data: map[string]interface{}{
 				"Keys": map[string]string{
@@ -596,7 +596,7 @@ func (r *CnvrgAppReconciler) pkiState(app *mlopsv1.CnvrgApp) error {
 			},
 		}
 
-		if err := desired.Apply(pki.PkiState(app, ssoData), app, r.Client, r.Scheme, appLog); err != nil {
+		if err := desired.Apply(pki.PkiState(app, pkiData), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
