@@ -17,6 +17,7 @@ type CnvrgAppSpec struct {
 	Logging               CnvrgAppLogging    `json:"logging,omitempty"`
 	Monitoring            CnvrgAppMonitoring `json:"monitoring,omitempty"`
 	SSO                   SSO                `json:"sso,omitempty"`
+	Pki                   Pki                `json:"pki,omitempty"`
 	Tenancy               Tenancy            `json:"tenancy,omitempty"`
 	CnvrgAppPriorityClass PriorityClass      `json:"cnvrgAppPriorityClass,omitempty"`
 	CnvrgJobPriorityClass PriorityClass      `json:"cnvrgJobPriorityClass,omitempty"`

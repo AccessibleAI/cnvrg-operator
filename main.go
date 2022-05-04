@@ -186,6 +186,7 @@ func informPkger() {
 	pkger.Include("/pkg/capsule/tmpl")
 	pkger.Include("/pkg/priorityclass/tmpl")
 	pkger.Include("/pkg/ingresscheck/tmpl")
+	pkger.Include("/pkg/pki/tmpl")
 }
 
 func main() {
