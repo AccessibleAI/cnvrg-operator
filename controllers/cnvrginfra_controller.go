@@ -10,6 +10,7 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/gpu"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/jwks"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/logging"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/monitoring"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
@@ -311,6 +312,13 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 		reconcileResult = err
 	}
 
+	// JWKS
+	infraLog.Info("applying JWKS")
+	if err := r.jwksState(cnvrgInfra); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
+	}
+
 	return reconcileResult
 }
 
@@ -340,6 +348,14 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 		apps = append(apps, app)
 	}
 	return apps, nil
+}
+
+func (r *CnvrgInfraReconciler) jwksState(infra *mlopsv1.CnvrgInfra) error {
+	// apply JWKS state
+	if err := desired.Apply(jwks.State(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
