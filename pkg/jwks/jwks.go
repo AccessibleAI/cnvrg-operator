@@ -64,6 +64,11 @@ func jwks() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+	}
+}
+
+func jwksIstioVs() []*desired.State {
+	return []*desired.State{
 		{
 			TemplatePath:   path + "/vs.tpl",
 			Template:       nil,
@@ -76,11 +81,49 @@ func jwks() []*desired.State {
 	}
 }
 
-func JwksState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
+func jwksOcpRoute() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.OcpRouteGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func jwksIngress() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IngressGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
+func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	var state []*desired.State
 
 	if cnvrgInfra.Spec.Jwks.Enabled {
 		state = append(state, jwks()...)
+	}
+
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+		state = append(state, jwksIstioVs()...)
+	}
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+		state = append(state, jwksOcpRoute()...)
+	}
+	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
+		state = append(state, jwksIngress()...)
 	}
 
 	return state

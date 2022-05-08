@@ -14,6 +14,6 @@ metadata:
     {{- end }}
 spec:
   ports:
-    - port: 80
+    - port: 8080
   selector:
     app: cnvrg-jwks

@@ -34,28 +34,64 @@ spec:
         - operator: "Exists"
       {{- end }}
       containers:
-        - name: cnvrg-jwks
-          command:
-            - ??
-          envFrom:
-            - configMapRef:
-                name: cnvrg-jwks
-          env:
-            - name: GIN_MODE
-              value: release
-          image: {{ image .Spec.ImageHub .Spec.Jwks.Image }}
-          imagePullPolicy: Always
-          resources:
-            requests:
-              cpu: 100
-              memory: 100Mi
-            limits:
-              cpu: 1
-              memory: 1Gi
-          volumeMounts:
-            - mountPath: /tmp/jwks-data
-              name: jwks-data
+      - name: cnvrg-jwks
+        command:
+          - /usr/bin/cnvrg-jwks
+          - start
+        image: {{ image .Spec.ImageHub .Spec.Jwks.Image }}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+          - mountPath: /opt/app-root/config
+            name: cnvrg-jwks
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          successThreshold: 1
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          httpGet:
+            port: 8080
+            path: /healthz
+        readinessProbe:
+          successThreshold: 1
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          httpGet:
+            port: 8080
+            path: /healthz
+      - name: redis-cache
+        image: {{ image .Spec.ImageHub .Spec.Jwks.Cache.Image }}
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        livenessProbe:
+          successThreshold: 1
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          exec:
+            command: ["redis-cli", "ping"]
+        readinessProbe:
+          successThreshold: 1
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          exec:
+            command: [ "redis-cli", "ping" ]
       volumes:
-        - name: jwks-data
-          persistentVolumeClaim:
-            claimName: jwks
+        - name: cnvrg-jwks
+          configMap:
+            name: cnvrg-jwks

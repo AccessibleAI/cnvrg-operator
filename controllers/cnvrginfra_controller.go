@@ -352,7 +352,7 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 
 func (r *CnvrgInfraReconciler) jwksState(infra *mlopsv1.CnvrgInfra) error {
 	// apply JWKS state
-	if err := desired.Apply(jwks.JwksState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+	if err := desired.Apply(jwks.State(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
 		return err
 	}
 	return nil

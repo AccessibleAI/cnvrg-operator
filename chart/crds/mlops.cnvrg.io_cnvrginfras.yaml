@@ -201,6 +201,22 @@ spec:
               type: string
             infraNamespace:
               type: string
+            jwks:
+              properties:
+                cache:
+                  properties:
+                    enabled:
+                      type: boolean
+                    image:
+                      type: string
+                  type: object
+                enabled:
+                  type: boolean
+                image:
+                  type: string
+              required:
+              - cache
+              type: object
             labels:
               additionalProperties:
                 type: string

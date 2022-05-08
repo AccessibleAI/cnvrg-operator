@@ -11,3 +11,11 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - watch
+  - get
+  - list
