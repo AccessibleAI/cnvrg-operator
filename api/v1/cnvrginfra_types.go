@@ -17,6 +17,7 @@ type CnvrgInfraSpec struct {
 	Storage               Storage              `json:"storage,omitempty"`
 	Dbs                   InfraDbs             `json:"dbs,omitempty"`
 	SSO                   SSO                  `json:"sso,omitempty"`
+	Jwks                  Jwks                 `json:"jwks,omitempty"`
 	Gpu                   Gpu                  `json:"gpu,omitempty"`
 	Tenancy               Tenancy              `json:"tenancy,omitempty"`
 	Labels                map[string]string    `json:"labels,omitempty"`
@@ -60,6 +61,7 @@ func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
 		ImageHub:              "docker.io/cnvrg",
 		InfraNamespace:        "cnvrg-infra",
 		SSO:                   ssoDefault,
+		Jwks:                  jwksDefault,
 		Storage:               storageDefault,
 		Networking:            cnvrgInfraNetworkingDefault,
 		Monitoring:            infraMonitoringDefault,
