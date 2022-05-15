@@ -427,10 +427,6 @@ spec:
                           items:
                             type: string
                           type: array
-                        tokenValidationRegex:
-                          items:
-                            type: string
-                          type: array
                       type: object
                     passengerMaxPoolSize:
                       type: integer
@@ -892,10 +888,6 @@ spec:
                           items:
                             type: string
                           type: array
-                        tokenValidationRegex:
-                          items:
-                            type: string
-                          type: array
                       type: object
                     port:
                       type: integer
@@ -936,10 +928,6 @@ spec:
                     oauthProxy:
                       properties:
                         skipAuthRegex:
-                          items:
-                            type: string
-                          type: array
-                        tokenValidationRegex:
                           items:
                             type: string
                           type: array
@@ -1096,6 +1084,19 @@ spec:
                   type: string
                 realmName:
                   type: string
+                saaSSSO:
+                  properties:
+                    allowedGroups:
+                      items:
+                        type: string
+                      type: array
+                    enabled:
+                      type: boolean
+                    extraJWTIssuers:
+                      items:
+                        type: string
+                      type: array
+                  type: object
                 serviceUrl:
                   type: string
               type: object

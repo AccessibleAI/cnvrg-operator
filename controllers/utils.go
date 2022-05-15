@@ -167,7 +167,15 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		}
 	}
 
+	if app.Spec.SSO.Enabled && app.Spec.SSO.SaaSSSO.Enabled {
+		app.Spec.SSO.SaaSSSO.AllowedGroups = append(app.Spec.SSO.SaaSSSO.AllowedGroups, getTenantGroup(app.Spec.ClusterDomain))
+	}
+
 	return nil
+}
+
+func getTenantGroup(clusterDomain string) string {
+	return strings.Split(clusterDomain, ".")[0]
 }
 
 func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {

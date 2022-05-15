@@ -105,7 +105,7 @@ func getSSORedirectUrl(obj interface{}, svc string) string {
 		if infra.Spec.Networking.HTTPS.Enabled {
 			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
 		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
+			return "http://app.*.cicd.cnvrg.me/oauth2/callback"
 		}
 
 	}
@@ -211,7 +211,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int, tokenValidationRegex []string) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int) string {
 			sso := getSSOConfig(obj)
 
 			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
@@ -234,22 +234,11 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			emailsDomains += "]"
 
-			tokenValidationRegexes := "["
-			for i, regex := range tokenValidationRegex {
-				if i == (len(tokenValidationRegex) - 1) {
-					tokenValidationRegexes += fmt.Sprintf(`"%v"`, regex)
-				} else {
-					tokenValidationRegexes += fmt.Sprintf(`"%v", `, regex)
-				}
-			}
-			tokenValidationRegexes += "]"
-
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
-				fmt.Sprintf(`token_validation_regex = %v`, tokenValidationRegexes),
 				fmt.Sprintf(`email_domains = %v`, emailsDomains),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
@@ -257,6 +246,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`oidc_issuer_url = "%v"`, sso.OidcIssuerURL),
 				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///saas/templates/static#/cnvrg-static"]`, upstreamPort),
 				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
+				fmt.Sprintf(`scope = "%s"`, sso.Scope),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/saas/templates"`,
@@ -267,7 +257,22 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				"cookie_httponly = true",
 			}
 
-			return strings.Join(proxyConf, "\n")
+			if sso.SaaSSSO.Enabled {
+				allowedGroups := "["
+				for i, group := range sso.SaaSSSO.AllowedGroups {
+					if i == len(sso.SaaSSSO.AllowedGroups)-1 {
+						allowedGroups += fmt.Sprintf(`"%s"`, group)
+					} else {
+						allowedGroups += fmt.Sprintf(`"%s", `, group)
+					}
+				}
+				allowedGroups += "]"
+				proxyConf = append(proxyConf, fmt.Sprintf(`allowed_groups = %s`, allowedGroups))
+			}
+
+			proxyConfigStr := strings.Join(proxyConf, "\n")
+
+			return proxyConfigStr
 		},
 		"cnvrgPassengerBindAddress": func(cnvrgApp mlopsv1.CnvrgApp) string {
 			if cnvrgApp.Spec.SSO.Enabled {
