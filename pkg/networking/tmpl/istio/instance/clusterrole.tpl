@@ -105,6 +105,8 @@ rules:
       - events
       - namespaces
       - pods
+      - pods/proxy
+      - pods/portforward
       - persistentvolumeclaims
       - secrets
       - services

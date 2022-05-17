@@ -78,9 +78,8 @@ var defaultAppProxy = Proxy{
 
 var istioDefault = Istio{
 	Enabled:               false,
-	OperatorImage:         "istio-operator:1.10.2",
-	PilotImage:            "pilot:1.10.2",
-	ProxyImage:            "proxyv2:1.10.2",
+	OperatorImage:         "istio-operator:1.13.3",
+	PilotImage:            "pilot:1.13.3",
 	ExternalIP:            nil,
 	IngressSvcAnnotations: nil,
 	IngressSvcExtraPorts:  nil,
