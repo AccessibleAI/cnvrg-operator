@@ -11,7 +11,7 @@ type SSO struct {
 	Image                            string   `json:"image,omitempty"`
 	AdminUser                        string   `json:"adminUser,omitempty"`
 	Provider                         string   `json:"provider,omitempty"`
-	Scope                            string   `json:"scope"`
+	Scope                            string   `json:"scope,omitempty"`
 	EmailDomain                      []string `json:"emailDomain,omitempty"`
 	ClientID                         string   `json:"clientId,omitempty"`
 	ClientSecret                     string   `json:"clientSecret,omitempty"`
@@ -30,7 +30,7 @@ type OauthProxyServiceConf struct {
 
 var ssoDefault = SSO{
 	Enabled:                          false,
-	Image:                            "oauth2-proxy:v7.2.0",
+	Image:                            "oauth2-proxy:v7.3.0-latest",
 	AdminUser:                        "",
 	Provider:                         "",
 	Scope:                            "openid",
