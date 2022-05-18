@@ -13,7 +13,7 @@ const (
 )
 
 type Istio struct {
-	Enabled               bool              `json:"enabled"`
+	Enabled               bool              `json:"enabled,omitempty"`
 	OperatorImage         string            `json:"operatorImage,omitempty"`
 	PilotImage            string            `json:"pilotImage,omitempty"`
 	ProxyImage            string            `json:"proxyImage,omitempty"`
@@ -25,9 +25,9 @@ type Istio struct {
 }
 
 type EastWest struct {
-	Enabled        bool             `json:"enabled"`
-	Primary        bool             `json:"primary"`
-	ClusterName    string           `json:"clusterName"`
+	Enabled        bool             `json:"enabled,omitempty"`
+	Primary        bool             `json:"primary,omitempty"`
+	ClusterName    string           `json:"clusterName,omitempty"`
 	Network        string           `json:"network,omitempty"`
 	MeshId         string           `json:"meshId,omitempty"`
 	RemoteClusters []RemoteClusters `json:"remoteClusters,omitempty"`

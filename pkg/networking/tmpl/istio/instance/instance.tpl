@@ -24,7 +24,7 @@ spec:
     - enabled: false
       name: istio-egressgateway
     ingressGateways:
-    - enabled:   {{ (not .Spec.Networking.Istio.EastWest.Enabled) }}
+    - enabled:   {{ or (not .Spec.Networking.Istio.EastWest.Enabled) (.Spec.Networking.Istio.EastWest.Primary) }}
       name: cnvrg-ingressgateway
       label:
         istio: cnvrg-ingressgateway
