@@ -21,6 +21,23 @@ type Istio struct {
 	ExternalIP            []string          `json:"externalIp,omitempty"`
 	LBSourceRanges        []string          `json:"lbSourceRanges,omitempty"`
 	IngressSvcAnnotations map[string]string `json:"ingressSvcAnnotations,omitempty"`
+	EastWest              EastWest          `json:"eastWest,omitempty"`
+}
+
+type EastWest struct {
+	Enabled        bool             `json:"enabled,omitempty"`
+	Primary        bool             `json:"primary,omitempty"`
+	ClusterName    string           `json:"clusterName,omitempty"`
+	Network        string           `json:"network,omitempty"`
+	MeshId         string           `json:"meshId,omitempty"`
+	RemoteClusters []RemoteClusters `json:"remoteClusters,omitempty"`
+}
+
+type RemoteClusters struct {
+	ClusterName string `json:"clusterName,omitempty"`
+	Network     string `json:"network,omitempty"`
+	MeshId      string `json:"meshId,omitempty"`
+	Primary     bool   `json:"primary,omitempty"`
 }
 
 type Ingress struct {
@@ -84,6 +101,14 @@ var istioDefault = Istio{
 	IngressSvcAnnotations: nil,
 	IngressSvcExtraPorts:  nil,
 	LBSourceRanges:        nil,
+	EastWest: EastWest{
+		Enabled:        false,
+		Primary:        false,
+		ClusterName:    "",
+		Network:        "network1",
+		MeshId:         "mesh1",
+		RemoteClusters: nil,
+	},
 }
 
 var httpsDefault = HTTPS{

@@ -294,6 +294,8 @@ spec:
                   properties:
                     enabled:
                       type: boolean
+                    hlmlImage:
+                      type: string
                     image:
                       type: string
                   type: object
@@ -409,6 +411,32 @@ spec:
                   type: object
                 istio:
                   properties:
+                    eastWest:
+                      properties:
+                        clusterName:
+                          type: string
+                        enabled:
+                          type: boolean
+                        meshId:
+                          type: string
+                        network:
+                          type: string
+                        primary:
+                          type: boolean
+                        remoteClusters:
+                          items:
+                            properties:
+                              clusterName:
+                                type: string
+                              meshId:
+                                type: string
+                              network:
+                                type: string
+                              primary:
+                                type: boolean
+                            type: object
+                          type: array
+                      type: object
                     enabled:
                       type: boolean
                     externalIp:
