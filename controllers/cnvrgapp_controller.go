@@ -411,7 +411,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 
 	// pki
 	if err := r.pkiState(cnvrgApp); err != nil {
-		appLog.Error(err, "Cannot generate RSA key")
+		appLog.Error(err, "cannot generate RSA key")
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return err
 	}
@@ -582,7 +582,11 @@ func (r *CnvrgAppReconciler) pkiState(app *mlopsv1.CnvrgApp) error {
 		if err != nil {
 			return err
 		}
-
+		domainId := ""
+		groups := getTenantGroup(app.Spec.ClusterDomain)
+		if len(groups) > 0 {
+			domainId = groups[0]
+		}
 		pkiData := desired.TemplateData{
 			Namespace: app.Namespace,
 			Data: map[string]interface{}{
@@ -593,6 +597,7 @@ func (r *CnvrgAppReconciler) pkiState(app *mlopsv1.CnvrgApp) error {
 				"Annotations": app.Spec.Annotations,
 				"Labels":      app.Spec.Labels,
 				"Pki":         app.Spec.Pki,
+				"DomainID":    domainId,
 			},
 		}
 

@@ -13,7 +13,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "jwks.{{ .Spec.ClusterDomain }}"
+    - "{{ .Spec.Jwks.Name }}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
@@ -25,4 +25,4 @@ spec:
         - destination:
             port:
               number: 8080
-            host: "cnvrg-jwks.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
+            host: "{{ .Spec.Jwks.Name }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"

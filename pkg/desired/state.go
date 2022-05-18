@@ -267,7 +267,19 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 					}
 				}
 				allowedGroups += "]"
+
+				extraJWTIssuers := "["
+				for i, issuer := range sso.SaaSSSO.ExtraJWTIssuers {
+					if i == len(sso.SaaSSSO.AllowedGroups)-1 {
+						extraJWTIssuers += fmt.Sprintf(`"%s"`, issuer)
+					} else {
+						extraJWTIssuers += fmt.Sprintf(`"%s", `, issuer)
+					}
+				}
+				extraJWTIssuers += "]"
+
 				proxyConf = append(proxyConf, fmt.Sprintf(`allowed_groups = %s`, allowedGroups))
+				proxyConf = append(proxyConf, fmt.Sprintf(`extra_jwt_issuers = %s`, extraJWTIssuers))
 			}
 
 			proxyConfigStr := strings.Join(proxyConf, "\n")

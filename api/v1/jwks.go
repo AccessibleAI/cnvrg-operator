@@ -7,6 +7,7 @@ type JwksCache struct {
 
 type Jwks struct {
 	Enabled bool      `json:"enabled,omitempty"`
+	Name    string    `json:"name"`
 	Image   string    `json:"image,omitempty"`
 	Cache   JwksCache `json:"cache"`
 }
@@ -14,6 +15,7 @@ type Jwks struct {
 var jwksDefault = Jwks{
 	Enabled: false,
 	Image:   "cnvrg/jwks:latest",
+	Name:    "cnvrg-jwks",
 	Cache: JwksCache{
 		Enabled: true,
 		Image:   "docker.io/redis",
