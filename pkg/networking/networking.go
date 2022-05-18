@@ -13,6 +13,23 @@ import (
 
 const path = "/pkg/networking/tmpl"
 
+func istioEastWestState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
+	if cnvrgInfra.Spec.Networking.Istio.EastWest.Primary == false {
+		return []*desired.State{
+			{
+				TemplatePath:   path + "/istio/instance/eastwest/ew-cross-net-gw.tpl",
+				Template:       nil,
+				ParsedTemplate: "",
+				Obj:            &unstructured.Unstructured{},
+				GVK:            desired.Kinds[desired.IstioGwGVK],
+				Own:            false,
+				Updatable:      true,
+			},
+		}
+	}
+	return nil
+}
+
 func istioInstanceState() []*desired.State {
 	return []*desired.State{
 		{
@@ -111,6 +128,9 @@ func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Istio.Enabled {
 		state = append(state, istioInstanceState()...)
+		if cnvrgInfra.Spec.Networking.Istio.EastWest.Enabled {
+			state = append(state, istioEastWestState(cnvrgInfra)...)
+		}
 	}
 
 	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {

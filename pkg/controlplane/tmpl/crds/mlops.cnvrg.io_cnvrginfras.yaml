@@ -436,6 +436,10 @@ spec:
                                 type: boolean
                             type: object
                           type: array
+                      required:
+                      - clusterName
+                      - enabled
+                      - primary
                       type: object
                     enabled:
                       type: boolean
@@ -461,6 +465,8 @@ spec:
                       type: string
                     proxyImage:
                       type: string
+                  required:
+                  - enabled
                   type: object
                 proxy:
                   properties:
