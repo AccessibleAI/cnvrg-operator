@@ -123,6 +123,10 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	r.updateStatusMessage(mlopsv1.StatusReconciling, "reconciling", cnvrgInfra)
 
+	if err := r.addIstioNetworkLabel(cnvrgInfra); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// apply manifests
 	if err := r.applyManifests(cnvrgInfra); err != nil {
 		return ctrl.Result{}, err
@@ -131,6 +135,37 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	r.updateStatusMessage(mlopsv1.StatusHealthy, "successfully reconciled", cnvrgInfra)
 	infraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+	namespaceNamespacedName := types.NamespacedName{Name: cnvrgInfra.Spec.InfraNamespace}
+	namespaceObj := v1core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceNamespacedName.Name}}
+	if err := r.Get(context.Background(), namespaceNamespacedName, &namespaceObj); err != nil && errors.IsNotFound(err) {
+		appLog.Error(err, "namespace not found!")
+		return err
+	} else if err != nil {
+		appLog.Error(err, "can't check if namespace exists")
+		return err
+	} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.Istio.EastWest.Network) {
+		appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
+		return nil
+	}
+	mergePatch, err := json.Marshal(map[string]interface{}{
+		"metadata": map[string]interface{}{
+			"labels": map[string]interface{}{
+				"topology.istio.io/network": cnvrgInfra.Spec.Networking.Istio.EastWest.Network,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	if err := r.Patch(context.Background(), &namespaceObj, client.RawPatch(types.MergePatchType, mergePatch)); err != nil {
+		appLog.Error(err, "can't label namespace", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
+		return err
+	}
+	appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
+	return nil
 }
 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
