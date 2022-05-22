@@ -13,23 +13,48 @@ import (
 
 const path = "/pkg/networking/tmpl"
 
-func istioEastWestState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
-	if cnvrgInfra.Spec.Networking.Istio.EastWest.Primary == false {
-		return []*desired.State{
-			{
-				TemplatePath:   path + "/istio/instance/eastwest/ew-cross-net-gw.tpl",
-				Template:       nil,
-				ParsedTemplate: "",
-				Obj:            &unstructured.Unstructured{},
-				GVK:            desired.Kinds[desired.IstioGwGVK],
-				Own:            false,
-				Updatable:      true,
-			},
-		}
+func istioEastWestStatePrimary() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/istio/instance/eastwest/ew-cross-net-gw-primary.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IstioGwGVK],
+			Own:            false,
+			Updatable:      true,
+		},
 	}
-	return nil
 }
 
+func istioEastWestStateRemote() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/istio/instance/eastwest/ew-instance-remote.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IstioGwGVK],
+			Own:            false,
+			Updatable:      true,
+		},
+	}
+}
+
+func istioDefaultInstance() []*desired.State {
+	return []*desired.State{
+		{
+
+			TemplatePath:   path + "/istio/instance/instance.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IstioGVK],
+			Own:            false,
+			Updatable:      true,
+		},
+	}
+}
 func istioInstanceState() []*desired.State {
 	return []*desired.State{
 		{
@@ -82,16 +107,6 @@ func istioInstanceState() []*desired.State {
 			Own:            false,
 			Updatable:      true,
 		},
-		{
-
-			TemplatePath:   path + "/istio/instance/instance.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.IstioGVK],
-			Own:            false,
-			Updatable:      true,
-		},
 	}
 }
 
@@ -128,13 +143,20 @@ func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Istio.Enabled {
 		state = append(state, istioInstanceState()...)
-		if cnvrgInfra.Spec.Networking.Istio.EastWest.Enabled {
-			state = append(state, istioEastWestState(cnvrgInfra)...)
-		}
-	}
 
-	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Istio.EastWest.Primary && cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {
-		state = append(state, ingressState()...)
+		if cnvrgInfra.Spec.Networking.Istio.EastWest.Enabled {
+			if cnvrgInfra.Spec.Networking.Istio.EastWest.Primary {
+				state = append(state, istioEastWestStatePrimary()...)
+				if cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {
+					state = append(state, ingressState()...)
+				}
+			} else {
+				state = append(state, istioEastWestStateRemote()...)
+			}
+		} else {
+			state = append(state, istioDefaultInstance()...)
+			state = append(state, ingressState()...)
+		}
 	}
 
 	if cnvrgInfra.Spec.Networking.Proxy.Enabled {

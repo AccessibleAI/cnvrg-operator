@@ -196,6 +196,7 @@ networking:
       clusterName: ""
       network: "network1"
       meshId: "mesh1"
+
       remoteClusters:
         - { "clusterName": "example1","network": "example1","meshId": "example1","primary": false  }
 sso:

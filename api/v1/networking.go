@@ -34,10 +34,11 @@ type EastWest struct {
 }
 
 type RemoteClusters struct {
-	ClusterName string `json:"clusterName,omitempty"`
-	Network     string `json:"network,omitempty"`
-	MeshId      string `json:"meshId,omitempty"`
-	Primary     bool   `json:"primary,omitempty"`
+	ClusterName   string `json:"clusterName,omitempty"`
+	Network       string `json:"network,omitempty"`
+	MeshId        string `json:"meshId,omitempty"`
+	Primary       bool   `json:"primary,omitempty"`
+	ClusterDomain string `json:"clusterDomain,omitempty"`
 }
 
 type Ingress struct {

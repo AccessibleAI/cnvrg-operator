@@ -141,10 +141,8 @@ func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInf
 	namespaceNamespacedName := types.NamespacedName{Name: cnvrgInfra.Spec.InfraNamespace}
 	namespaceObj := v1core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceNamespacedName.Name}}
 	if err := r.Get(context.Background(), namespaceNamespacedName, &namespaceObj); err != nil && errors.IsNotFound(err) {
-		appLog.Error(err, "namespace not found!")
 		return err
 	} else if err != nil {
-		appLog.Error(err, "can't check if namespace exists")
 		return err
 	} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.Istio.EastWest.Network) {
 		appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
@@ -161,7 +159,6 @@ func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInf
 		return err
 	}
 	if err := r.Patch(context.Background(), &namespaceObj, client.RawPatch(types.MergePatchType, mergePatch)); err != nil {
-		appLog.Error(err, "can't label namespace", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
 		return err
 	}
 	appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)

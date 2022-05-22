@@ -41,10 +41,7 @@ spec:
         nodeSelector:
           {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
         tolerations:
-          - key: "{{ .Spec.Tenancy.Key }}"
-            operator: "Equal"
-            value: "{{ .Spec.Tenancy.Value }}"
-            effect: "NoSchedule"
+          - operator: "Exists"
         {{- end }}
         serviceAnnotations:
         {{- range $name, $value := .Spec.Networking.Istio.IngressSvcAnnotations }}
@@ -92,7 +89,7 @@ spec:
           {{- range $idx, $port := .Spec.Networking.Istio.IngressSvcExtraPorts }}
           - name: port{{ $port}}
             port: {{ $port}}
-            {{- end }}
+          {{- end }}
           {{- end }}
     istiodRemote:
       enabled: false
@@ -118,5 +115,9 @@ spec:
       istioNamespace:  {{ ns . }}
       imagePullSecrets:
         - {{ .Spec.Registry.Name }}
+      meshID: {{ .Spec.Networking.Istio.EastWest.MeshId }}
+      multiCluster:
+        clusterName: {{ .Spec.Networking.Istio.EastWest.ClusterName }}
+      network: {{ .Spec.Networking.Istio.EastWest.Network }}
     meshConfig:
       rootNamespace: {{ ns . }}
