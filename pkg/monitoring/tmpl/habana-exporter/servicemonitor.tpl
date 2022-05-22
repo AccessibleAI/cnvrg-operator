@@ -30,4 +30,4 @@ spec:
     scrapeTimeout: 20s
   namespaceSelector:
     matchNames:
-  - {{ ns . }}
+      - {{ ns . }}
