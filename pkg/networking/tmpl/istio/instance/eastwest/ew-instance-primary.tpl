@@ -115,9 +115,9 @@ spec:
       istioNamespace:  {{ ns . }}
       imagePullSecrets:
         - {{ .Spec.Registry.Name }}
-      meshID: {{ .Spec.Networking.Istio.EastWest.MeshId }}
+      meshID: {{ .Spec.Networking.Istio.EastWest.Cluster.MeshId }}
       multiCluster:
-        clusterName: {{ .Spec.Networking.Istio.EastWest.ClusterName }}
-      network: {{ .Spec.Networking.Istio.EastWest.Network }}
+        clusterName: {{ .Spec.Networking.Istio.EastWest.Cluster.ClusterName }}
+      network: {{ .Spec.Networking.Istio.EastWest.Cluster.Network }}
     meshConfig:
       rootNamespace: {{ ns . }}

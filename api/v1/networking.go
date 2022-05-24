@@ -25,15 +25,12 @@ type Istio struct {
 }
 
 type EastWest struct {
-	Enabled        bool             `json:"enabled,omitempty"`
-	Primary        bool             `json:"primary,omitempty"`
-	ClusterName    string           `json:"clusterName,omitempty"`
-	Network        string           `json:"network,omitempty"`
-	MeshId         string           `json:"meshId,omitempty"`
-	RemoteClusters []RemoteClusters `json:"remoteClusters,omitempty"`
+	Enabled        bool           `json:"enabled,omitempty"`
+	Cluster        IstioCluster   `json:"cluster,omitempty"`
+	RemoteClusters []IstioCluster `json:"remoteClusters,omitempty"`
 }
 
-type RemoteClusters struct {
+type IstioCluster struct {
 	ClusterName   string `json:"clusterName,omitempty"`
 	Network       string `json:"network,omitempty"`
 	MeshId        string `json:"meshId,omitempty"`
@@ -103,11 +100,14 @@ var istioDefault = Istio{
 	IngressSvcExtraPorts:  nil,
 	LBSourceRanges:        nil,
 	EastWest: EastWest{
-		Enabled:        false,
-		Primary:        false,
-		ClusterName:    "",
-		Network:        "network1",
-		MeshId:         "mesh1",
+		Enabled: false,
+		Cluster: IstioCluster{
+			ClusterName:   "",
+			Network:       "network1",
+			MeshId:        "mesh1",
+			Primary:       false,
+			ClusterDomain: "",
+		},
 		RemoteClusters: nil,
 	},
 }

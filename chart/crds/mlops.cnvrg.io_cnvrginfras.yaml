@@ -413,19 +413,26 @@ spec:
                   properties:
                     eastWest:
                       properties:
-                        clusterName:
-                          type: string
+                        cluster:
+                          properties:
+                            clusterDomain:
+                              type: string
+                            clusterName:
+                              type: string
+                            meshId:
+                              type: string
+                            network:
+                              type: string
+                            primary:
+                              type: boolean
+                          type: object
                         enabled:
-                          type: boolean
-                        meshId:
-                          type: string
-                        network:
-                          type: string
-                        primary:
                           type: boolean
                         remoteClusters:
                           items:
                             properties:
+                              clusterDomain:
+                                type: string
                               clusterName:
                                 type: string
                               meshId:
