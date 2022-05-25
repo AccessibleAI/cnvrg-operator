@@ -216,9 +216,6 @@ spec:
                     type: string
                   name:
                     type: string
-                required:
-                - cache
-                - name
                 type: object
               labels:
                 additionalProperties:
