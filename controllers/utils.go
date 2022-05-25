@@ -190,8 +190,12 @@ func getTenantGroup(clusterDomain string) []string {
 }
 
 func getExtraJWTIssuers(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) (issuers []string) {
+	jwksSvcName := "cnvrg-jwks"
+	if infra.Spec.Jwks.Name != "" {
+		jwksSvcName = infra.Spec.Jwks.Name
+	}
 	issuerAddress := fmt.Sprintf("%s.%s/v1/%s/.well-known/jwks.json?client_id=cnvrg-tenant",
-		infra.Spec.Jwks.Name,
+		jwksSvcName,
 		app.Spec.ClusterDomain,
 		strings.Split(app.Spec.ClusterDomain, ".")[0],
 	)
