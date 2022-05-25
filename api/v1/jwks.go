@@ -7,9 +7,9 @@ type JwksCache struct {
 
 type Jwks struct {
 	Enabled bool      `json:"enabled,omitempty"`
-	Name    string    `json:"name"`
+	Name    string    `json:"name,omitempty"`
 	Image   string    `json:"image,omitempty"`
-	Cache   JwksCache `json:"cache"`
+	Cache   JwksCache `json:"cache,omitempty"`
 }
 
 var jwksDefault = Jwks{
