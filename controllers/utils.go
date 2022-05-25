@@ -196,7 +196,7 @@ func getExtraJWTIssuers(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) (issue
 	}
 	issuerAddress := fmt.Sprintf("%s.%s/v1/%s/.well-known/jwks.json?client_id=cnvrg-tenant",
 		jwksSvcName,
-		app.Spec.ClusterDomain,
+		infra.Spec.ClusterDomain,
 		strings.Split(app.Spec.ClusterDomain, ".")[0],
 	)
 	fullUrl := fmt.Sprintf("http://%s", issuerAddress)
