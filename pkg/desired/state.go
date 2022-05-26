@@ -214,7 +214,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int) string {
 			sso := getSSOConfig(obj)
 
-			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/cnvrg-static/`)
+			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/opstatic/`)
 			for i, url := range skipAuthRegex {
 				if i == (len(skipAuthRegex) - 1) {
 					skipAuthUrls += fmt.Sprintf(`"%v"`, url)
