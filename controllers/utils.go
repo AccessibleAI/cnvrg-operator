@@ -172,15 +172,14 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	}
 
 	if app.Spec.SSO.Enabled {
-		if app.Spec.SSO.CookieSecret == "" {
-			desiredAppSpec.SSO.CookieSecret = app.Spec.ClusterDomain
-		} else if app.Spec.SSO.SaaSSSO.Enabled {
+		if app.Spec.SSO.CookieDomain == "" {
+			desiredAppSpec.SSO.CookieDomain = app.Spec.ClusterDomain
+		}
+		if app.Spec.SSO.SaaSSSO.Enabled {
 			// for saas sso, we are setting cookie domain to be cloud.cnvrg.io
 			cookieDomain := strings.Split(app.Spec.ClusterDomain, ".")
 			if len(cookieDomain) >= 3 {
-				desiredAppSpec.SSO.CookieSecret = strings.Join(cookieDomain[len(cookieDomain)-3:], ".")
-			} else {
-				desiredAppSpec.SSO.CookieSecret = app.Spec.ClusterDomain
+				desiredAppSpec.SSO.CookieDomain = strings.Join(cookieDomain[len(cookieDomain)-3:], ".")
 			}
 			desiredAppSpec.SSO.SaaSSSO.AllowedGroups = append(app.Spec.SSO.SaaSSSO.AllowedGroups, getTenantGroup(app.Spec.ClusterDomain)...)
 			desiredAppSpec.SSO.SaaSSSO.ExtraJWTIssuers = append(app.Spec.SSO.SaaSSSO.ExtraJWTIssuers, getExtraJWTIssuers(app, infra)...)
