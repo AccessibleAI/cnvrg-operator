@@ -175,6 +175,12 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		if app.Spec.SSO.CookieDomain == "" {
 			desiredAppSpec.SSO.CookieDomain = app.Spec.ClusterDomain
 		}
+		if desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags == nil {
+			desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags = make(map[string]string)
+		}
+		desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags["JWKS_ISS"] = getJWTIss(app, infra)
+		desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags["JWKS_AUD"] = getJWTAud()
+
 		if app.Spec.SSO.SaaSSSO.Enabled {
 			// for saas sso, we are setting cookie domain to be cloud.cnvrg.io
 			cookieDomain := strings.Split(app.Spec.ClusterDomain, ".")
@@ -184,6 +190,7 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 			desiredAppSpec.SSO.SaaSSSO.AllowedGroups = append(app.Spec.SSO.SaaSSSO.AllowedGroups, getTenantGroup(app.Spec.ClusterDomain)...)
 			desiredAppSpec.SSO.SaaSSSO.ExtraJWTIssuers = append(app.Spec.SSO.SaaSSSO.ExtraJWTIssuers, getExtraJWTIssuers(app, infra)...)
 		}
+
 	}
 
 	return nil
@@ -199,22 +206,28 @@ func getTenantGroup(clusterDomain string) []string {
 	return tenantGroups
 }
 
-func getExtraJWTIssuers(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) (issuers []string) {
+func getJWTIss(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) string {
 	jwksSvcName := "cnvrg-jwks"
 	if infra.Spec.Jwks.Name != "" {
 		jwksSvcName = infra.Spec.Jwks.Name
 	}
-	issuerAddress := fmt.Sprintf("%s.%s/v1/%s/.well-known/jwks.json?client_id=cnvrg-tenant",
+	issuerAddress := fmt.Sprintf("%s.%s/v1/%s/.well-known/jwks.json?client_id",
 		jwksSvcName,
 		infra.Spec.ClusterDomain,
 		strings.Split(app.Spec.ClusterDomain, ".")[0],
 	)
-	fullUrl := fmt.Sprintf("http://%s", issuerAddress)
 	if app.Spec.Networking.HTTPS.Enabled {
-		fullUrl = fmt.Sprintf("https://%s", issuerAddress)
+		return fmt.Sprintf("https://%s", issuerAddress)
+	} else {
+		return fmt.Sprintf("http://%s", issuerAddress)
 	}
-	issuers = append(issuers, fullUrl)
+}
 
+func getJWTAud() string {
+	return "cnvrg-tenant"
+}
+func getExtraJWTIssuers(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) (issuers []string) {
+	issuers = append(issuers, fmt.Sprintf("%s=%s", getJWTIss(app, infra), getJWTAud()))
 	return
 }
 
