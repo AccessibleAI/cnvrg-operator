@@ -250,7 +250,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`cookie_domains = "%s"`, sso.CookieDomain),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
-				`custom_templates_dir = "/saas/templates"`,
+				`custom_templates_dir = "/cnvrg-static"`,
 				"ssl_insecure_skip_verify = true",
 				`cookie_name = "_oauth2_proxy"`,
 				`cookie_expire = "168h"`,
