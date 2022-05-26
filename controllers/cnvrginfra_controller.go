@@ -144,14 +144,14 @@ func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInf
 		return err
 	} else if err != nil {
 		return err
-	} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.Istio.EastWest.Cluster.Network) {
-		appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Cluster.Network)
+	} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.Istio.EastWest.Network) {
+		appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
 		return nil
 	}
 	mergePatch, err := json.Marshal(map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"labels": map[string]interface{}{
-				"topology.istio.io/network": cnvrgInfra.Spec.Networking.Istio.EastWest.Cluster.Network,
+				"topology.istio.io/network": cnvrgInfra.Spec.Networking.Istio.EastWest.Network,
 			},
 		},
 	})
@@ -161,7 +161,7 @@ func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInf
 	if err := r.Patch(context.Background(), &namespaceObj, client.RawPatch(types.MergePatchType, mergePatch)); err != nil {
 		return err
 	}
-	appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Cluster.Network)
+	appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.Istio.EastWest.Network)
 	return nil
 }
 

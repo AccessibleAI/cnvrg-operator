@@ -19,7 +19,7 @@ spec:
     base:
       enabled: true
     cni:
-      enabled: false
+      enabled: true
     egressGateways:
     - enabled: false
       name: istio-egressgateway
@@ -115,9 +115,9 @@ spec:
       istioNamespace:  {{ ns . }}
       imagePullSecrets:
         - {{ .Spec.Registry.Name }}
-      meshID: {{ .Spec.Networking.Istio.EastWest.Cluster.MeshId }}
+      meshID: {{ .Spec.Networking.Istio.EastWest.MeshId }}
       multiCluster:
-        clusterName: {{ .Spec.Networking.Istio.EastWest.Cluster.ClusterName }}
-      network: {{ .Spec.Networking.Istio.EastWest.Cluster.Network }}
+        clusterName: {{ .Spec.Networking.Istio.EastWest.ClusterName }}
+      network: {{ .Spec.Networking.Istio.EastWest.Network }}
     meshConfig:
       rootNamespace: {{ ns . }}

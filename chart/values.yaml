@@ -192,11 +192,10 @@ networking:
     lbSourceRanges: [ ]
     eastWest:
       enabled: false
-      cluster:
-        primary: false
-        clusterName: ""
-        network: "network1"
-        meshId: "mesh1"
+      primary: false
+      clusterName: ""
+      network: "network1"
+      meshId: "mesh1"
       remoteClusters:
         - { "clusterName": "example1","network": "example1","meshId": "example1","primary": false  }
 sso:

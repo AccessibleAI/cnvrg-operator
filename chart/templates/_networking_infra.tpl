@@ -58,10 +58,10 @@ networking:
     {{- end }}
     eastWest:
       enabled: {{ .Values.networking.istio.eastWest.enabled }}
-      primary: {{ .Values.networking.istio.eastWest.cluster.primary }}
-      clusterName: {{ .Values.networking.istio.eastWest.cluster.clusterName }}
-      network: {{ .Values.networking.istio.eastWest.cluster.network }}
-      meshId: {{ .Values.networking.istio.eastWest.cluster.meshId }}
+      primary: {{ .Values.networking.istio.eastWest.primary }}
+      clusterName: {{ .Values.networking.istio.eastWest.clusterName }}
+      network: {{ .Values.networking.istio.eastWest.network }}
+      meshId: {{ .Values.networking.istio.eastWest.meshId }}
     {{- if .Values.networking.istio.eastWest.remoteClusters }}
       remoteClusters:
     {{- range $_, $value := .Values.networking.istio.eastWest.remoteClusters }}
