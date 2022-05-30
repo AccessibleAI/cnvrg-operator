@@ -73,7 +73,11 @@ func generateKeys() ([]byte, []byte, error) {
 	privatePemBytes := pem.EncodeToMemory(privatePemBlock)
 
 	// public key
-	publicPemBlock := &pem.Block{Type: "RSA PUBLIC KEY", Bytes: x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)}
+	b, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
+	if err != nil {
+		return nil, nil, err
+	}
+	publicPemBlock := &pem.Block{Type: "PUBLIC KEY", Bytes: b}
 	publicPemBytes := pem.EncodeToMemory(publicPemBlock)
 
 	return privatePemBytes, publicPemBytes, nil
@@ -167,7 +171,64 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		}
 	}
 
+	if app.Spec.SSO.Enabled {
+		if app.Spec.SSO.CookieDomain == "" {
+			desiredAppSpec.SSO.CookieDomain = app.Spec.ClusterDomain
+		}
+		if desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags == nil {
+			desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags = make(map[string]string)
+		}
+		desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags["JWKS_ISS"] = getJWTIss(app, infra)
+		desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags["JWKS_AUD"] = getJWTAud()
+
+		if app.Spec.SSO.SaaSSSO.Enabled {
+			// for saas sso, we are setting cookie domain to be cloud.cnvrg.io
+			cookieDomain := strings.Split(app.Spec.ClusterDomain, ".")
+			if len(cookieDomain) >= 3 {
+				desiredAppSpec.SSO.CookieDomain = strings.Join(cookieDomain[len(cookieDomain)-3:], ".")
+			}
+			desiredAppSpec.SSO.SaaSSSO.AllowedGroups = append(app.Spec.SSO.SaaSSSO.AllowedGroups, getTenantGroup(app.Spec.ClusterDomain)...)
+			desiredAppSpec.SSO.SaaSSSO.ExtraJWTIssuers = append(app.Spec.SSO.SaaSSSO.ExtraJWTIssuers, getExtraJWTIssuers(app, infra)...)
+		}
+
+	}
+
 	return nil
+}
+
+func getTenantGroup(clusterDomain string) []string {
+	var tenantGroups []string
+	group := strings.Split(clusterDomain, ".")[0]
+	// regular group
+	tenantGroups = append(tenantGroups, group)
+	// Keycloak group - always prefixed with a slash '/`
+	tenantGroups = append(tenantGroups, fmt.Sprintf(`/%s`, group))
+	return tenantGroups
+}
+
+func getJWTIss(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) string {
+	jwksSvcName := "cnvrg-jwks"
+	if infra.Spec.Jwks.Name != "" {
+		jwksSvcName = infra.Spec.Jwks.Name
+	}
+	issuerAddress := fmt.Sprintf("%s.%s/v1/%s/.well-known/jwks.json?client_id",
+		jwksSvcName,
+		infra.Spec.ClusterDomain,
+		strings.Split(app.Spec.ClusterDomain, ".")[0],
+	)
+	if app.Spec.Networking.HTTPS.Enabled {
+		return fmt.Sprintf("https://%s", issuerAddress)
+	} else {
+		return fmt.Sprintf("http://%s", issuerAddress)
+	}
+}
+
+func getJWTAud() string {
+	return "cnvrg-tenant"
+}
+func getExtraJWTIssuers(app *mlopsv1.CnvrgApp, infra *mlopsv1.CnvrgInfra) (issuers []string) {
+	issuers = append(issuers, fmt.Sprintf("%s=%s", getJWTIss(app, infra), getJWTAud()))
+	return
 }
 
 func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {

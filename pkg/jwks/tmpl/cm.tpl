@@ -16,7 +16,7 @@ data:
     discovery:
       secret:
         labelKey: domainId
-        dataKey: pub.key
+        dataKey: CNVRG_PKI_PUBLIC_KEY
     cache:
       enabled: true
       redis:

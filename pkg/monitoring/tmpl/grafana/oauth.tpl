@@ -13,4 +13,4 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  conf: {{ oauthProxyConfig . .Spec.Monitoring.Grafana.SvcName .Spec.Monitoring.Grafana.OauthProxy.SkipAuthRegex .Spec.SSO.Provider .Spec.Monitoring.Grafana.Port 3000 .Spec.Monitoring.Grafana.OauthProxy.TokenValidationRegex | b64enc }}
+  conf: {{ oauthProxyConfig . .Spec.Monitoring.Grafana.SvcName .Spec.Monitoring.Grafana.OauthProxy.SkipAuthRegex .Spec.SSO.Provider .Spec.Monitoring.Grafana.Port 3000 | b64enc }}

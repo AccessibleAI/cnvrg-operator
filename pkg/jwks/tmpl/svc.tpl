@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cnvrg-jwks
+  name: {{ .Spec.Jwks.Name }}
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -16,4 +16,4 @@ spec:
   ports:
     - port: 8080
   selector:
-    app: cnvrg-jwks
+    app: {{ .Spec.Jwks.Name }}

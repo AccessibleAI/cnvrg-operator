@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cnvrg-jwks
+  name: {{ .Spec.Jwks.Name }}
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -16,11 +16,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cnvrg-jwks
+      app: {{ .Spec.Jwks.Name }}
   template:
     metadata:
       labels:
-        app: cnvrg-jwks
+        app: {{ .Spec.Jwks.Name }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}

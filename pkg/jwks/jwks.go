@@ -114,16 +114,15 @@ func State(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if cnvrgInfra.Spec.Jwks.Enabled {
 		state = append(state, jwks()...)
-	}
-
-	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-		state = append(state, jwksIstioVs()...)
-	}
-	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		state = append(state, jwksOcpRoute()...)
-	}
-	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
-		state = append(state, jwksIngress()...)
+		if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+			state = append(state, jwksIstioVs()...)
+		}
+		if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+			state = append(state, jwksOcpRoute()...)
+		}
+		if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.NginxIngress {
+			state = append(state, jwksIngress()...)
+		}
 	}
 
 	return state
