@@ -1,11 +1,15 @@
 package registry
 
 import (
+	"embed"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/registry/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func registryState() []*desired.State {
 	return []*desired.State{
@@ -17,6 +21,7 @@ func registryState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }

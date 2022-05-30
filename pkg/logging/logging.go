@@ -1,12 +1,16 @@
 package logging
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/logging/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func ElastCreds(data *desired.TemplateData) []*desired.State {
 	return []*desired.State{
@@ -19,6 +23,7 @@ func ElastCreds(data *desired.TemplateData) []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -31,6 +36,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.SaGVK],
 			Own:          true,
 			Updatable:    false,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/elastalert/authproxycm.tpl",
@@ -38,6 +44,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.ConfigMapGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/elastalert/role.tpl",
@@ -45,6 +52,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.RoleGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/elastalert/rolebinding.tpl",
@@ -52,6 +60,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.RoleBindingGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/elastalert/pvc.tpl",
@@ -59,6 +68,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.PvcGVK],
 			Own:          true,
 			Updatable:    false,
+			Fs:           &templatesContent,
 		},
 		{
 
@@ -67,6 +77,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.SvcGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 		{
 
@@ -75,6 +86,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.ConfigMapGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 		{
 
@@ -83,6 +95,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.DeploymentGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 		{
 
@@ -91,6 +104,7 @@ func ElastAlert() []*desired.State {
 			GVK:          desired.Kinds[desired.IstioVsGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 	}
 }
@@ -106,6 +120,7 @@ func KibanaConfSecret(data desired.TemplateData) []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -118,6 +133,7 @@ func kibanaIstioVs() []*desired.State {
 			GVK:          desired.Kinds[desired.IstioVsGVK],
 			Own:          true,
 			Updatable:    true,
+			Fs:           &templatesContent,
 		},
 	}
 }
@@ -132,6 +148,7 @@ func kibanaOcpRoute() []*desired.State {
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -146,6 +163,7 @@ func kibanaIngress() []*desired.State {
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -160,6 +178,7 @@ func kibana() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kibana/role.tpl",
@@ -169,6 +188,7 @@ func kibana() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kibana/rolebinding.tpl",
@@ -178,6 +198,7 @@ func kibana() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kibana/dep.tpl",
@@ -187,6 +208,7 @@ func kibana() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kibana/svc.tpl",
@@ -196,6 +218,7 @@ func kibana() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kibana/credsec.tpl",
@@ -205,6 +228,7 @@ func kibana() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -220,6 +244,7 @@ func fluentbitConfigState() []*desired.State {
 			Own:            true,
 			Override:       true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -234,6 +259,7 @@ func fluentbitState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/clusterrole.tpl",
@@ -243,6 +269,7 @@ func fluentbitState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/clusterrolebinding.tpl",
@@ -252,6 +279,7 @@ func fluentbitState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/svc.tpl",
@@ -261,6 +289,7 @@ func fluentbitState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/servicemonitor.tpl",
@@ -270,6 +299,7 @@ func fluentbitState() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/fluentbit/ds.tpl",
@@ -279,6 +309,7 @@ func fluentbitState() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -293,6 +324,7 @@ func kibanaOauthProxy() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }

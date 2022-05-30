@@ -1,11 +1,15 @@
 package gpu
 
 import (
+	"embed"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/gpu/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func nvidiaDp() []*desired.State {
 	return []*desired.State{
@@ -18,6 +22,7 @@ func nvidiaDp() []*desired.State {
 			Own:            true,
 			TemplateData:   nil,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/nvidiadp/ds.tpl",
@@ -27,6 +32,7 @@ func nvidiaDp() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            true,
 			TemplateData:   nil,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -47,6 +53,7 @@ func MetagpudpPresenceState(data interface{}) []*desired.State {
 			Own:          true,
 			Updatable:    true,
 			TemplateData: data,
+			Fs:           &templatesContent,
 		},
 	}
 }
@@ -60,6 +67,7 @@ func MetagpudpState(data interface{}) []*desired.State {
 			Own:          true,
 			Updatable:    false,
 			TemplateData: data,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/metagpudp/binding.tpl",
@@ -68,6 +76,7 @@ func MetagpudpState(data interface{}) []*desired.State {
 			Own:          true,
 			Updatable:    true,
 			TemplateData: data,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/metagpudp/cm.tpl",
@@ -76,6 +85,7 @@ func MetagpudpState(data interface{}) []*desired.State {
 			Own:          false,
 			Updatable:    false,
 			TemplateData: data,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath: path + "/metagpudp/ds.tpl",
@@ -84,6 +94,7 @@ func MetagpudpState(data interface{}) []*desired.State {
 			Own:          true,
 			Updatable:    true,
 			TemplateData: data,
+			Fs:           &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/metagpudp/role.tpl",
@@ -93,6 +104,7 @@ func MetagpudpState(data interface{}) []*desired.State {
 			Own:            true,
 			Updatable:      true,
 			TemplateData:   data,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath: path + "/metagpudp/svc.tpl",
@@ -101,6 +113,7 @@ func MetagpudpState(data interface{}) []*desired.State {
 			Own:          true,
 			Updatable:    true,
 			TemplateData: data,
+			Fs:           &templatesContent,
 		},
 	}
 }
@@ -115,6 +128,7 @@ func habanaDp() []*desired.State {
 			Own:            true,
 			TemplateData:   nil,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/habanadp/ds.tpl",
@@ -124,6 +138,7 @@ func habanaDp() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            true,
 			TemplateData:   nil,
+			Fs:             &templatesContent,
 		},
 	}
 }

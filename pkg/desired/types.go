@@ -1,6 +1,7 @@
 package desired
 
 import (
+	"embed"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"text/template"
@@ -21,4 +22,5 @@ type State struct {
 	Override       bool
 	Updatable      bool
 	TemplateData   interface{}
+	Fs             *embed.FS
 }

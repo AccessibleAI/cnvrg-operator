@@ -1,17 +1,19 @@
 package networking
 
 import (
+	"embed"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-	"github.com/markbates/pkger"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"net"
-	"os"
 )
 
-const path = "/pkg/networking/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS // TODO: this is bat, but I've to hurry up
 
 func istioInstanceState() []*desired.State {
 	return []*desired.State{
@@ -24,6 +26,7 @@ func istioInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent, // TODO: this is bat, but I've to hurry up
 		},
 		{
 
@@ -34,6 +37,7 @@ func istioInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -44,6 +48,7 @@ func istioInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -54,6 +59,7 @@ func istioInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -64,6 +70,7 @@ func istioInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -74,6 +81,7 @@ func istioInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -88,6 +96,7 @@ func ingressState() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioGwGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -102,6 +111,7 @@ func proxyState() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -139,26 +149,25 @@ func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 }
 
 func IstioCrds() (crds []*desired.State) {
-	err := pkger.Walk(path+"/istio/crds", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
+	d, err := templatesContent.ReadDir(path + "/istio/crds")
+	if err != nil {
+		zap.S().Error(err, "error loading istio crds")
+	}
+	for _, f := range d {
 		crd := &desired.State{
 
-			TemplatePath:   path,
+			TemplatePath:   path + "/istio/crds/" + f.Name(),
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.CrdGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		}
 		crds = append(crds, crd)
-		return nil
-	})
-	if err != nil {
-		zap.S().Error(err, "error loading istio crds")
 	}
+
 	return
 }
 

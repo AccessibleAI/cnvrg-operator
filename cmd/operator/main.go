@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/go-logr/zapr"
-	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -173,23 +172,23 @@ func setupCommands() {
 	rootCmd.AddCommand(runOperatorCmd)
 }
 
-func informPkger() {
-	pkger.Include("/pkg/controlplane/tmpl")
-	pkger.Include("/pkg/dbs/tmpl")
-	pkger.Include("/pkg/logging/tmpl")
-	pkger.Include("/pkg/monitoring/tmpl")
-	pkger.Include("/pkg/networking/tmpl")
-	pkger.Include("/pkg/registry/tmpl")
-	pkger.Include("/pkg/storage/tmpl")
-	pkger.Include("/pkg/gpu/tmpl")
-	pkger.Include("/pkg/reloader/tmpl")
-	pkger.Include("/pkg/capsule/tmpl")
-	pkger.Include("/pkg/priorityclass/tmpl")
-	pkger.Include("/pkg/ingresscheck/tmpl")
-}
+//func informPkger() {
+//	pkger.Include("/pkg/controlplane/tmpl")
+//	pkger.Include("/pkg/dbs/tmpl")
+//	pkger.Include("/pkg/logging/tmpl")
+//	pkger.Include("/pkg/monitoring/tmpl")
+//	pkger.Include("/pkg/networking/tmpl")
+//	pkger.Include("/pkg/registry/tmpl")
+//	pkger.Include("/pkg/storage/tmpl")
+//	pkger.Include("/pkg/gpu/tmpl")
+//	pkger.Include("/pkg/reloader/tmpl")
+//	pkger.Include("/pkg/capsule/tmpl")
+//	pkger.Include("/pkg/priorityclass/tmpl")
+//	pkger.Include("/pkg/ingresscheck/tmpl")
+//}
 
 func main() {
-	informPkger()
+	//informPkger()
 	setupCommands()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

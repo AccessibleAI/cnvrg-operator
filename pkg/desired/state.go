@@ -11,10 +11,8 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/golang-jwt/jwt"
 	"github.com/imdario/mergo"
-	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"io/ioutil"
 	appv1 "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -379,12 +377,11 @@ timeout 15
 
 func (s *State) GenerateDeployable() error {
 	var tpl bytes.Buffer
-	f, err := pkger.Open(s.TemplatePath)
+	b, err := s.Fs.ReadFile(s.TemplatePath)
 	if err != nil {
 		zap.S().Error(err, "error reading path", "path", s.TemplatePath)
 		return err
 	}
-	b, err := ioutil.ReadAll(f)
 
 	if err != nil {
 		zap.S().Errorf("%v, error reading file: %v", err, s.TemplatePath)

@@ -1,12 +1,16 @@
 package dbs
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/dbs/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func EsCreds(data interface{}) []*desired.State {
 	return []*desired.State{
@@ -19,6 +23,7 @@ func EsCreds(data interface{}) []*desired.State {
 			TemplateData:   data,
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -33,6 +38,7 @@ func esState() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/es/sa.tpl",
@@ -42,6 +48,7 @@ func esState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/es/role.tpl",
@@ -51,6 +58,7 @@ func esState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/es/rolebinding.tpl",
@@ -60,6 +68,7 @@ func esState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/es/sts.tpl",
@@ -69,6 +78,7 @@ func esState() []*desired.State {
 			GVK:            desired.Kinds[desired.StatefulSetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/es/svc.tpl",
@@ -78,6 +88,7 @@ func esState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -93,6 +104,7 @@ func PgCreds(data interface{}) []*desired.State {
 			TemplateData:   data,
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -107,6 +119,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/pg/role.tpl",
@@ -116,6 +129,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/pg/rolebinding.tpl",
@@ -125,6 +139,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -135,6 +150,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -145,6 +161,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -155,6 +172,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/pg/pdb.tpl",
@@ -164,6 +182,7 @@ func pgState() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -179,6 +198,7 @@ func RedisCreds(data interface{}) []*desired.State {
 			TemplateData:   data,
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -193,6 +213,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/redis/role.tpl",
@@ -202,6 +223,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/redis/rolebinding.tpl",
@@ -211,6 +233,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/redis/pvc.tpl",
@@ -220,6 +243,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -230,6 +254,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/redis/dep.tpl",
@@ -239,6 +264,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/redis/pdb.tpl",
@@ -248,6 +274,7 @@ func redisState() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -262,6 +289,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/minio/sa.tpl",
@@ -271,6 +299,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/minio/role.tpl",
@@ -280,6 +309,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/minio/rolebinding.tpl",
@@ -289,6 +319,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -299,6 +330,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -309,6 +341,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -319,6 +352,7 @@ func singleBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -333,6 +367,7 @@ func sharedBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/minio/sa.tpl",
@@ -342,6 +377,7 @@ func sharedBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -352,6 +388,7 @@ func sharedBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -362,6 +399,7 @@ func sharedBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -372,6 +410,7 @@ func sharedBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -382,6 +421,7 @@ func sharedBackendMinio() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioDestinationRuleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -396,6 +436,7 @@ func esIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -409,6 +450,7 @@ func esIngress() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -422,6 +464,7 @@ func esOcpRoute() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -436,6 +479,7 @@ func minioIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -449,6 +493,7 @@ func minioOcpRoute() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -462,6 +507,7 @@ func minioIngress() []*desired.State {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -477,6 +523,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/pvc.tpl",
@@ -486,6 +533,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/role.tpl",
@@ -495,6 +543,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/rolebinding.tpl",
@@ -504,6 +553,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/sa.tpl",
@@ -513,6 +563,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/secret.tpl",
@@ -522,6 +573,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-pg/svc.tpl",
@@ -531,6 +583,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		// cvat redis
@@ -542,6 +595,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-redis/role.tpl",
@@ -551,6 +605,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-redis/rolebinding.tpl",
@@ -560,6 +615,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-redis/sa.tpl",
@@ -569,6 +625,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-redis/secret.tpl",
@@ -578,6 +635,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/cvat-redis/svc.tpl",
@@ -587,6 +645,7 @@ func cvatState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }

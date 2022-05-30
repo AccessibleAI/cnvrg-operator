@@ -1,11 +1,15 @@
 package priorityclass
 
 import (
+	"embed"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/priorityclass/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func priorityClassState() []*desired.State {
 	return []*desired.State{
@@ -17,6 +21,7 @@ func priorityClassState() []*desired.State {
 			GVK:            desired.Kinds[desired.PriorityClassGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/jobs-class.tpl",
@@ -26,6 +31,7 @@ func priorityClassState() []*desired.State {
 			GVK:            desired.Kinds[desired.PriorityClassGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
