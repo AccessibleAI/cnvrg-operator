@@ -20,15 +20,12 @@ unfocus:
 	ginkgo unfocus controllers/
 
 # Run tests
-test: pack generate fmt vet manifests
+test: generate fmt vet manifests
 	rm -f ./controllers/test-report.html ./controllers/junit.xml
 	CNVRG_OPERATOR_MAX_CONCURRENT_RECONCILES=1 go test ./controllers/ -v -timeout 40m
 
 test-report:
 	docker run -v $$(pwd)/controllers:/tmp cnvrg/xunit-viewer xunit-viewer -r /tmp/junit.xml -o /tmp/test-report.html
-
-pack:
-	pkger
 
 override-release: current-version docker-build docker-push chart
 	git tag -d $$(cat /tmp/newVersion)
@@ -51,7 +48,7 @@ major-release: major-version docker-build docker-push chart
 	git push origin $$(cat /tmp/newVersion)
 
 # Build manager binary
-manager: pack generate fmt vet
+manager: generate fmt vet
 	go build -ldflags "-X 'main.BuildVersion=$(shell cat /tmp/newVersion)'" -mod=readonly -o bin/cnvrg-operator main.go pkged.go
 	$(shell if [ $$(echo $$(cat /tmp/newVersion) | grep dirty | wc -l) -eq "0" ]; then git tag $$(cat /tmp/newVersion); fi)
 
@@ -148,7 +145,7 @@ generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Build the docker image
-docker-build: pack generate manifests
+docker-build: generate manifests
 		docker build . -t docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
 
 # Push the docker image

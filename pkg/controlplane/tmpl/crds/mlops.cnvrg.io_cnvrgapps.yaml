@@ -90,6 +90,8 @@ spec:
                       type: boolean
                     cnvrgJobUid:
                       type: string
+                    cnvrgPrivilegedJob:
+                      type: boolean
                     featureFlags:
                       additionalProperties:
                         type: string
@@ -586,6 +588,17 @@ spec:
                   type: object
                 es:
                   properties:
+                    cleanupPolicy:
+                      properties:
+                        all:
+                          type: string
+                        app:
+                          type: string
+                        endpoints:
+                          type: string
+                        jobs:
+                          type: string
+                      type: object
                     credsRef:
                       type: string
                     enabled:

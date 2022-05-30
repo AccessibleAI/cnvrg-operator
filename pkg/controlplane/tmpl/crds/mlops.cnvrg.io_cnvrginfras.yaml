@@ -294,6 +294,8 @@ spec:
                   properties:
                     enabled:
                       type: boolean
+                    hlmlImage:
+                      type: string
                     image:
                       type: string
                   type: object
