@@ -50,9 +50,10 @@ type HTTPS struct {
 }
 
 type CnvrgAppNetworking struct {
-	Ingress Ingress `json:"ingress,omitempty"`
-	HTTPS   HTTPS   `json:"https,omitempty"`
-	Proxy   Proxy   `json:"proxy,omitempty"`
+	Ingress  Ingress  `json:"ingress,omitempty"`
+	HTTPS    HTTPS    `json:"https,omitempty"`
+	Proxy    Proxy    `json:"proxy,omitempty"`
+	EastWest EastWest `json:"eastWest,omitempty"`
 }
 
 type CnvrgInfraNetworking struct {
@@ -86,6 +87,15 @@ var defaultAppProxy = Proxy{
 	NoProxy:    nil,
 }
 
+var EastWestDefault = EastWest{
+	Enabled:        false,
+	ClusterName:    "",
+	Network:        "network1",
+	MeshId:         "mesh1",
+	Primary:        false,
+	RemoteClusters: nil,
+}
+
 var istioDefault = Istio{
 	Enabled:               false,
 	OperatorImage:         "istio-operator:1.13.4",
@@ -94,14 +104,7 @@ var istioDefault = Istio{
 	IngressSvcAnnotations: nil,
 	IngressSvcExtraPorts:  nil,
 	LBSourceRanges:        nil,
-	EastWest: EastWest{
-		Enabled:        false,
-		ClusterName:    "",
-		Network:        "network1",
-		MeshId:         "mesh1",
-		Primary:        false,
-		RemoteClusters: nil,
-	},
+	EastWest:              EastWestDefault,
 }
 
 var httpsDefault = HTTPS{
@@ -130,9 +133,10 @@ var ingressInfraDefault = Ingress{
 }
 
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
-	Ingress: ingressAppDefault,
-	HTTPS:   httpsDefault,
-	Proxy:   defaultAppProxy,
+	Ingress:  ingressAppDefault,
+	HTTPS:    httpsDefault,
+	Proxy:    defaultAppProxy,
+	EastWest: EastWestDefault,
 }
 
 var cnvrgInfraNetworkingDefault = CnvrgInfraNetworking{
