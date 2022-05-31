@@ -424,9 +424,9 @@ spec:
                         primary:
                           type: boolean
                         remoteClusters:
-                          items:
+                          additionalProperties:
                             type: string
-                          type: array
+                          type: object
                       type: object
                     enabled:
                       type: boolean
