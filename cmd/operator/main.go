@@ -172,23 +172,7 @@ func setupCommands() {
 	rootCmd.AddCommand(runOperatorCmd)
 }
 
-//func informPkger() {
-//	pkger.Include("/pkg/controlplane/tmpl")
-//	pkger.Include("/pkg/dbs/tmpl")
-//	pkger.Include("/pkg/logging/tmpl")
-//	pkger.Include("/pkg/monitoring/tmpl")
-//	pkger.Include("/pkg/networking/tmpl")
-//	pkger.Include("/pkg/registry/tmpl")
-//	pkger.Include("/pkg/storage/tmpl")
-//	pkger.Include("/pkg/gpu/tmpl")
-//	pkger.Include("/pkg/reloader/tmpl")
-//	pkger.Include("/pkg/capsule/tmpl")
-//	pkger.Include("/pkg/priorityclass/tmpl")
-//	pkger.Include("/pkg/ingresscheck/tmpl")
-//}
-
 func main() {
-	//informPkger()
 	setupCommands()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

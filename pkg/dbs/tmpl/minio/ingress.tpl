@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -15,11 +15,15 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "{{.Spec.Dbs.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: {{ .Spec.Dbs.Minio.SvcName }}
-              servicePort: {{ .Spec.Dbs.Minio.Port }}
+              service:
+                name: {{ .Spec.Dbs.Minio.SvcName }}
+                port:
+                  number: {{ .Spec.Dbs.Minio.Port }}

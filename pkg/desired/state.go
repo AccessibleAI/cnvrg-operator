@@ -8,6 +8,7 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
+	yamlgh "github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
 	"github.com/golang-jwt/jwt"
 	"github.com/imdario/mergo"
@@ -409,10 +410,6 @@ func (s *State) GenerateDeployable() error {
 		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
 		return err
 	}
-	if err := s.dumpTemplateToFile(); err != nil {
-		zap.S().Error(err, "dumping template file", "file", s.TemplatePath)
-		return err
-	}
 	return nil
 }
 
@@ -609,7 +606,7 @@ func (s *State) mergeMetadata(actualObject *unstructured.Unstructured, log logr.
 
 }
 
-func (s *State) dumpTemplateToFile() error {
+func (s *State) DumpTemplateToFile() error {
 	templatesDumpDir := viper.GetString("templates-dump-dir")
 	if templatesDumpDir != "" {
 		if _, err := os.Stat(templatesDumpDir); os.IsNotExist(err) {
@@ -620,12 +617,22 @@ func (s *State) dumpTemplateToFile() error {
 		}
 
 		filePath := templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
-		templateFile, err := os.Create(filePath)
+		templateFile, err := os.Create(strings.ReplaceAll(strings.ReplaceAll(filePath, "tpl", "yaml"), "tmpl", ""))
 		if err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
 		}
-		if _, err = templateFile.Write([]byte(s.ParsedTemplate)); err != nil {
+		b, err := s.Obj.MarshalJSON()
+		if err != nil {
+			return err
+		}
+
+		res, err := yamlgh.JSONToYAML(b)
+		if err != nil {
+			return err
+		}
+
+		if _, err = templateFile.Write(res); err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
 		}

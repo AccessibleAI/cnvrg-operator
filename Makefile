@@ -11,7 +11,7 @@ GOBIN=$(shell go env GOBIN)
 endif
 
 # Set default version
-$(shell echo $$(git fetch --tags && git tag -l --sort -version:refname | head -n 1)-dirty-$$(git rev-parse --short HEAD) > /tmp/newVersion)
+# $(shell echo $$(git fetch --tags && git tag -l --sort -version:refname | head -n 1)-dirty-$$(git rev-parse --short HEAD) > /tmp/newVersion)
 
 all: manager
 
@@ -151,6 +151,9 @@ docker-build: generate manifests
 # Push the docker image
 docker-push:
 	docker push docker.io/cnvrg/cnvrg-operator:$(shell cat /tmp/newVersion)
+
+build-copctl:
+	go build -o bin/copctl cmd/copctl/*.go
 
 # find or download controller-gen
 # download controller-gen if necessary

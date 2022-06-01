@@ -899,7 +899,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 		//return false, err
 	}
 
-	if err := calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, infra, r.Client); err != nil {
+	if err := CalculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, infra, r.Client); err != nil {
 		appLog.Error(err, "can't calculate defaults")
 		return false, err
 	}

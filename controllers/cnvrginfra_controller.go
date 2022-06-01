@@ -473,7 +473,7 @@ func (r *CnvrgInfraReconciler) syncCnvrgInfraSpec(name types.NamespacedName) (bo
 	// Get default cnvrgInfra spec
 	desiredSpec := mlopsv1.DefaultCnvrgInfraSpec()
 
-	if err := calculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec, r.Client); err != nil {
+	if err := CalculateAndApplyInfraDefaults(cnvrgInfra, &desiredSpec, r.Client); err != nil {
 		infraLog.Error(err, "can't calculate defaults")
 		return false, err
 	}

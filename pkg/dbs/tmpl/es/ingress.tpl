@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -15,11 +15,15 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "{{.Spec.Dbs.Es.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: {{ .Spec.Dbs.Es.SvcName }}
-              servicePort: {{ .Spec.Dbs.Es.Port }}
+              service:
+                name: {{ .Spec.Dbs.Es.SvcName }}
+                port:
+                  number: {{ .Spec.Dbs.Es.Port }}
