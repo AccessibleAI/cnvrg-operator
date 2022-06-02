@@ -19,7 +19,7 @@ var (
 
 	profileDumpParams = []param{
 		{name: "templates-dump-dir", shorthand: "d", value: "cnvrg-manifests", usage: "dump cnvrg stack components"},
-		{name: "preserve-templates-dir", shorthand: "k", value: true, usage: "preserve templates directories"},
+		{name: "preserve-templates-dir", shorthand: "k", value: false, usage: "preserve templates directories"},
 	}
 	profileDumpCmd = &cobra.Command{
 		Use:   "dump",

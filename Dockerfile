@@ -17,9 +17,11 @@ COPY cmd/ cmd/
 
 # Build
 #RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
-RUN go get github.com/markbates/pkger/cmd/pkger
-RUN pkger && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator cmd/operator/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator cmd/operator/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o copctl cmd/copctl/*.go
+
 
 FROM ubuntu:20.04
 WORKDIR /opt/app-root
 COPY --from=builder /workspace/cnvrg-operator .
+COPY --from=builder /workspace/copctl .
