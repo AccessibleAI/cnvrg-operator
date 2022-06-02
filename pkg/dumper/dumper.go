@@ -1,17 +1,6 @@
 package dumper
 
-import "github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-
 type Dumper interface {
-	BuildState() []*desired.State
+	BuildState() error
 	Dump() error
-	GetCliParams() []*Param
-}
-
-type Param struct {
-	Name      string
-	Shorthand string
-	Value     interface{}
-	Usage     string
-	Required  bool
 }

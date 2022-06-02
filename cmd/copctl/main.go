@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/AccessibleAI/cnvrg-operator/pkg/dumper"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -10,7 +9,7 @@ import (
 var (
 	Version    string
 	Build      string
-	rootParams = []*dumper.Param{}
+	rootParams = []param{}
 
 	rootCmd = &cobra.Command{
 		Use:   "copctl",
@@ -22,10 +21,13 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	setParams(rootParams, rootCmd)
-	setParams(dumper.NewControlPlane().GetCliFlags(), profileDump)
-	profileCmd.AddCommand(profileList)
-	profileCmd.AddCommand(profileDump)
-	profileDump.AddCommand(dumpControlPlane)
+	setParams(profileDumpParams, profileDumpCmd)
+	setParams(dumpControlPlaneParams, dumpControlPlaneCmd)
+	setParams(dumpNetworkParams, dumpNetworkCmd)
+
+	profileCmd.AddCommand(profileDumpCmd)
+	profileDumpCmd.AddCommand(dumpControlPlaneCmd)
+	profileDumpCmd.AddCommand(dumpNetworkCmd)
 	rootCmd.AddCommand(profileCmd)
 }
 

@@ -1209,7 +1209,7 @@ var _ = Describe("CnvrgApp controller", func() {
 			Expect(k8sClient.Delete(ctx, testApp)).Should(Succeed())
 		})
 
-		It("Image for WebApp - disable  ImageHub", func() {
+		It("image for WebApp - disable  ImageHub", func() {
 			ns := createNs()
 			ctx := context.Background()
 
@@ -1739,9 +1739,9 @@ var _ = Describe("CnvrgApp controller", func() {
 
 	})
 
-	Context("Control Plane - Default Istio Ingress", func() {
+	Context("Control Plane - Default Istio ingress", func() {
 
-		It("Default Istio Ingress", func() {
+		It("Default Istio ingress", func() {
 			ns := createNs()
 			gwName := fmt.Sprintf(mlopsv1.IstioGwName, ns)
 			ctx := context.Background()
@@ -1830,7 +1830,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 		})
 
-		It("Custom Istio Ingress Name", func() {
+		It("Custom Istio ingress Name", func() {
 			ns := createNs()
 			gwName := "foo-bar"
 			ctx := context.Background()
@@ -1925,7 +1925,7 @@ var _ = Describe("CnvrgApp controller", func() {
 
 		})
 
-		It("Istio Disabled - Custom Istio Ingress Name", func() {
+		It("Istio Disabled - Custom Istio ingress Name", func() {
 			ns := createNs()
 
 			gwName := "foo-bar"

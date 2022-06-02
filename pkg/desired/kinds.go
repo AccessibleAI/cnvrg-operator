@@ -163,7 +163,7 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 	IngressGVK: schema.GroupVersionKind{
 		Group:   "networking.k8s.io",
 		Version: "v1beta1",
-		Kind:    "Ingress",
+		Kind:    "ingress",
 	},
 	PodDisruptionBudgetGVK: schema.GroupVersionKind{
 		Group:   "policy",

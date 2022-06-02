@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/AccessibleAI/cnvrg-operator/pkg/dumper"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,17 +11,25 @@ import (
 
 type PlainFormatter struct{}
 
-func setParams(params []*dumper.Param, command *cobra.Command) {
+type param struct {
+	name      string
+	shorthand string
+	value     interface{}
+	usage     string
+	required  bool
+}
+
+func setParams(params []param, command *cobra.Command) {
 	for _, param := range params {
-		switch v := param.Value.(type) {
+		switch v := param.value.(type) {
 		case int:
-			command.PersistentFlags().IntP(param.Name, param.Shorthand, v, param.Usage)
+			command.PersistentFlags().IntP(param.name, param.shorthand, v, param.usage)
 		case string:
-			command.PersistentFlags().StringP(param.Name, param.Shorthand, v, param.Usage)
+			command.PersistentFlags().StringP(param.name, param.shorthand, v, param.usage)
 		case bool:
-			command.PersistentFlags().BoolP(param.Name, param.Shorthand, v, param.Usage)
+			command.PersistentFlags().BoolP(param.name, param.shorthand, v, param.usage)
 		}
-		if err := viper.BindPFlag(param.Name, command.PersistentFlags().Lookup(param.Name)); err != nil {
+		if err := viper.BindPFlag(param.name, command.PersistentFlags().Lookup(param.name)); err != nil {
 			panic(err)
 		}
 	}
