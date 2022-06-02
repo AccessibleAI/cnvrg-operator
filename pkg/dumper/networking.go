@@ -37,7 +37,7 @@ func (n *Networking) BuildState() error {
 	return nil
 }
 
-func (n *Networking) Dump() error {
+func (n *Networking) Dump(preserveTemplatesDir bool) error {
 	if err := os.RemoveAll(viper.GetString("templates-dump-dir")); err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func (n *Networking) Dump() error {
 		if err := o.GenerateDeployable(); err != nil {
 			return err
 		}
-		if err := o.DumpTemplateToFile(); err != nil {
+		if err := o.DumpTemplateToFile(preserveTemplatesDir); err != nil {
 			return err
 		}
 	}

@@ -2,5 +2,5 @@ package dumper
 
 type Dumper interface {
 	BuildState() error
-	Dump() error
+	Dump(preserveTmplDirs bool) error
 }

@@ -76,7 +76,7 @@ func (p *ControlPlane) BuildState() error {
 	return nil
 }
 
-func (p *ControlPlane) Dump() error {
+func (p *ControlPlane) Dump(preserveTmplDirs bool) error {
 
 	if err := os.RemoveAll(viper.GetString("templates-dump-dir")); err != nil {
 		log.Fatal(err)
@@ -89,7 +89,7 @@ func (p *ControlPlane) Dump() error {
 		if err := o.GenerateDeployable(); err != nil {
 			log.Fatal(err)
 		}
-		if err := o.DumpTemplateToFile(); err != nil {
+		if err := o.DumpTemplateToFile(preserveTmplDirs); err != nil {
 			log.Fatal(err)
 		}
 	}

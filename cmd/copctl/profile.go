@@ -18,7 +18,8 @@ var (
 	}
 
 	profileDumpParams = []param{
-		{name: "templates-dump-dir", shorthand: "d", value: "./cnvrg-manifests", usage: "dump cnvrg stack components"},
+		{name: "templates-dump-dir", shorthand: "d", value: "cnvrg-manifests", usage: "dump cnvrg stack components"},
+		{name: "preserve-templates-dir", shorthand: "k", value: true, usage: "preserve templates directories"},
 	}
 	profileDumpCmd = &cobra.Command{
 		Use:   "dump",
@@ -52,7 +53,7 @@ var (
 			if err := d.BuildState(); err != nil {
 				log.Fatal(err)
 			}
-			if err := d.Dump(); err != nil {
+			if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
 				log.Fatal(err)
 			}
 		},
@@ -70,7 +71,7 @@ var (
 			if err := d.BuildState(); err != nil {
 				log.Fatal(err)
 			}
-			if err := d.Dump(); err != nil {
+			if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
 				log.Fatal(err)
 			}
 		},

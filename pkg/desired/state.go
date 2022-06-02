@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	mathrand "math/rand"
 	"os"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -606,7 +607,7 @@ func (s *State) mergeMetadata(actualObject *unstructured.Unstructured, log logr.
 
 }
 
-func (s *State) DumpTemplateToFile() error {
+func (s *State) DumpTemplateToFile(preserveTmplDirs bool) error {
 	templatesDumpDir := viper.GetString("templates-dump-dir")
 	if templatesDumpDir != "" {
 		if _, err := os.Stat(templatesDumpDir); os.IsNotExist(err) {
@@ -616,8 +617,17 @@ func (s *State) DumpTemplateToFile() error {
 			}
 		}
 
-		filePath := templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
-		templateFile, err := os.Create(strings.ReplaceAll(strings.ReplaceAll(filePath, "tpl", "yaml"), "tmpl", ""))
+		filePath := ""
+		if preserveTmplDirs {
+			filePath = templatesDumpDir + "/" + s.TemplatePath
+			if err := os.MkdirAll(filepath.Dir(filePath), 0775); err != nil {
+				return err
+			}
+		} else {
+			filePath = templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
+		}
+
+		templateFile, err := os.Create(strings.ReplaceAll(filePath, "tpl", "yaml"))
 		if err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
