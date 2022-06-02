@@ -1,6 +1,7 @@
 package monitoring
 
 import (
+	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/markbates/pkger"
@@ -126,15 +127,6 @@ func infraPrometheusInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.PrometheusGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/prometheus/instance/svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -422,7 +414,22 @@ func promOauthProxy() []*desired.State {
 	}
 }
 
-func promIstioVs() []*desired.State {
+func promIstioSvc(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prometheus/instance/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+			TemplateData:   data,
+		},
+	}
+}
+
+func promIstioVs(data interface{}) []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/prometheus/instance/vs.tpl",
@@ -432,6 +439,7 @@ func promIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			TemplateData:   data,
 		},
 	}
 }
@@ -689,7 +697,23 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		state = append(state, ccpPrometheusInstance()...)
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			state = append(state, promIstioVs()...)
+			if cnvrgApp.Spec.Networking.EastWest.Enabled && cnvrgApp.Spec.Networking.EastWest.Primary {
+				state = append(state, promIstioSvc(nil)...)
+				state = append(state, promIstioVs(nil)...)
+				for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+					data := *cnvrgApp
+					data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
+					state = append(state, promIstioVs(&data)...)
+					state = append(state, promIstioSvc(&data)...)
+				}
+			} else if cnvrgApp.Spec.Networking.EastWest.Enabled && cnvrgApp.Spec.Networking.EastWest.Primary == false {
+				data := *cnvrgApp
+				data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, cnvrgApp.Spec.Networking.EastWest.ClusterName)
+				state = append(state, promIstioSvc(&data)...)
+			} else if cnvrgApp.Spec.Networking.EastWest.Enabled == false {
+				state = append(state, promIstioVs(nil)...)
+				state = append(state, promIstioSvc(nil)...)
+			}
 		case mlopsv1.NginxIngress:
 			state = append(state, promIngress()...)
 		case mlopsv1.OpenShiftIngress:
@@ -732,7 +756,17 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 
 		switch infra.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			state = append(state, promIstioVs()...)
+			if infra.Spec.Networking.Istio.EastWest.Enabled && infra.Spec.Networking.Istio.EastWest.Primary {
+				state = append(state, promIstioVs(nil)...)
+				for _, value := range infra.Spec.Networking.Istio.EastWest.RemoteClusters {
+					data := *infra
+					data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
+					state = append(state, promIstioVs(&data)...)
+				}
+			} else if infra.Spec.Networking.Istio.EastWest.Enabled == false {
+				state = append(state, promIstioVs(nil)...)
+			}
+
 		case mlopsv1.NginxIngress:
 			state = append(state, promIngress()...)
 		case mlopsv1.OpenShiftIngress:
