@@ -54,7 +54,7 @@ For example, you do a dump, then apply the manifests, then you are changing one 
 dump parameters (for example, the image), then you can't apply the manifests again.
 You must completely purge all the deployed manifests, and then apply a new generated manifests again. 
 3. You must ensure that `cnvrg-db-init` config map does not exist in your namespace
-before you applying the manifests. If you'll apply the manifests and teh `cnvrg-db-init`
+before you applying the manifests. If you'll apply the manifests and the `cnvrg-db-init`
 config map exists, you'll get broken environment. So, make sure to delete this configmap
 each time when you are deploying a fresh dumped manifests.
 
