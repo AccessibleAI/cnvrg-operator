@@ -1,4 +1,4 @@
-# Cnvrg Operator CTL - COPCTl
+# Cnvrg Operator CTL - COPCTL
 
 ### Motivation 
 Cnvrg is a fullstack AI/MLOps platform. 
@@ -25,9 +25,9 @@ For example, you can change our default permissions, you can change the amount o
 you can configure cnvrg control plane to use external PG, ElasticSearch, and many more.
 
 ### Quick start 
-Get the `copctl` binary, currently we've a pre-build binaries for Linux and Mac (ARM).
+Get the `copctl` [binary](https://github.com/AccessibleAI/cnvrg-operator/releases/tag/4.3.6-DEV-14449-export-manifests-cli), currently we've a pre-build binaries for Linux and Mac (ARM).
 
-To export the manifest, you'll need first prepare the following:
+To export the manifests, you'll need first prepare the following:
 1. Wildcard domain that will be used by cnvrg control plane
 2. The cnvrg control plane image 
 3. The cnvrg docker registry username and password to pull the image
