@@ -192,6 +192,10 @@ spec:
       {{- end }}
       initContainers:
       - name: ingresscheck
+        {{- if .Spec.Networking.EastWest.Enabled }}
+        securityContext:
+          runAsUser: 1337
+        {{- end }}
         image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         envFrom:
         - secretRef:
@@ -260,6 +264,10 @@ spec:
             echo "[$(date)] all services are ready!"
           done
       - name: seeder
+        {{- if .Spec.Networking.EastWest.Enabled }}
+        securityContext:
+          runAsUser: 1337
+        {{- end }}
         image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         command:
           - /bin/bash
