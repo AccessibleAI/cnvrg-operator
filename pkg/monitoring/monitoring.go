@@ -246,15 +246,6 @@ func grafanaState() []*desired.State {
 			Updatable:      true,
 		},
 		{
-			TemplatePath:   path + "/grafana/svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SvcGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
 			TemplatePath:   path + "/grafana/dep.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -414,7 +405,7 @@ func promOauthProxy() []*desired.State {
 	}
 }
 
-func promIstioSvc(data interface{}) []*desired.State {
+func promSvc(data interface{}) []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/prometheus/instance/svc.tpl",
@@ -472,7 +463,22 @@ func promOcpRoute() []*desired.State {
 	}
 }
 
-func grafanaIstioVs() []*desired.State {
+func grafanaSvc(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/grafana/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+			TemplateData:   data,
+		},
+	}
+}
+
+func grafanaIstioVs(data interface{}) []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/grafana/vs.tpl",
@@ -482,6 +488,7 @@ func grafanaIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			TemplateData:   data,
 		},
 	}
 }
@@ -695,24 +702,22 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	if cnvrgApp.Spec.Monitoring.Prometheus.Enabled {
 		state = append(state, promOauthProxy()...)
 		state = append(state, ccpPrometheusInstance()...)
+		state = append(state, promSvc(nil)...)
+
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			if cnvrgApp.Spec.Networking.EastWest.Enabled && cnvrgApp.Spec.Networking.EastWest.Primary {
-				state = append(state, promIstioSvc(nil)...)
-				state = append(state, promIstioVs(nil)...)
-				for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
-					data := *cnvrgApp
-					data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
-					state = append(state, promIstioVs(&data)...)
-					state = append(state, promIstioSvc(&data)...)
+			if cnvrgApp.Spec.Networking.EastWest.Enabled {
+				if cnvrgApp.Spec.Networking.EastWest.Primary {
+					state = append(state, promIstioVs(nil)...)
+					for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+						data := *cnvrgApp
+						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
+						state = append(state, promIstioVs(&data)...)
+						state = append(state, promSvc(&data)...)
+					}
 				}
-			} else if cnvrgApp.Spec.Networking.EastWest.Enabled && cnvrgApp.Spec.Networking.EastWest.Primary == false {
-				data := *cnvrgApp
-				data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, cnvrgApp.Spec.Networking.EastWest.ClusterName)
-				state = append(state, promIstioSvc(&data)...)
-			} else if cnvrgApp.Spec.Networking.EastWest.Enabled == false {
+			} else {
 				state = append(state, promIstioVs(nil)...)
-				state = append(state, promIstioSvc(nil)...)
 			}
 		case mlopsv1.NginxIngress:
 			state = append(state, promIngress()...)
@@ -723,12 +728,25 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if cnvrgApp.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
+		state = append(state, grafanaSvc(nil)...)
 		if cnvrgApp.Spec.SSO.Enabled {
 			state = append(state, grafanaOauthProxy()...)
 		}
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			state = append(state, grafanaIstioVs()...)
+			if cnvrgApp.Spec.Networking.EastWest.Enabled {
+				if cnvrgApp.Spec.Networking.EastWest.Primary {
+					state = append(state, grafanaIstioVs(nil)...)
+					for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+						data := *cnvrgApp
+						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, value)
+						state = append(state, grafanaIstioVs(&data)...)
+						state = append(state, grafanaSvc(&data)...)
+					}
+				}
+			} else {
+				state = append(state, grafanaIstioVs(nil)...)
+			}
 		case mlopsv1.NginxIngress:
 			state = append(state, grafanaIngress()...)
 		case mlopsv1.OpenShiftIngress:
@@ -753,20 +771,23 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 	if infra.Spec.Monitoring.Prometheus.Enabled {
 		state = append(state, promOauthProxy()...)
 		state = append(state, infraPrometheusInstanceState()...)
+		state = append(state, promSvc(nil)...)
 
 		switch infra.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			if infra.Spec.Networking.Istio.EastWest.Enabled && infra.Spec.Networking.Istio.EastWest.Primary {
-				state = append(state, promIstioVs(nil)...)
-				for _, value := range infra.Spec.Networking.Istio.EastWest.RemoteClusters {
-					data := *infra
-					data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
-					state = append(state, promIstioVs(&data)...)
+			if infra.Spec.Networking.Istio.EastWest.Enabled {
+				if infra.Spec.Networking.Istio.EastWest.Primary {
+					state = append(state, promIstioVs(nil)...)
+					for _, value := range infra.Spec.Networking.Istio.EastWest.RemoteClusters {
+						data := *infra
+						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
+						state = append(state, promIstioVs(&data)...)
+						state = append(state, promSvc(&data)...)
+					}
 				}
-			} else if infra.Spec.Networking.Istio.EastWest.Enabled == false {
+			} else {
 				state = append(state, promIstioVs(nil)...)
 			}
-
 		case mlopsv1.NginxIngress:
 			state = append(state, promIngress()...)
 		case mlopsv1.OpenShiftIngress:
@@ -780,12 +801,26 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 
 	if infra.Spec.Monitoring.Grafana.Enabled {
 		state = append(state, grafanaState()...)
+		state = append(state, grafanaSvc(nil)...)
+
 		if infra.Spec.SSO.Enabled {
 			state = append(state, grafanaOauthProxy()...)
 		}
 		switch infra.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			state = append(state, grafanaIstioVs()...)
+			if infra.Spec.Networking.Istio.EastWest.Enabled {
+				if infra.Spec.Networking.Istio.EastWest.Primary {
+					state = append(state, grafanaIstioVs(nil)...)
+					for _, value := range infra.Spec.Networking.Istio.EastWest.RemoteClusters {
+						data := *infra
+						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, value)
+						state = append(state, grafanaIstioVs(&data)...)
+						state = append(state, grafanaSvc(&data)...)
+					}
+				}
+			} else {
+				state = append(state, grafanaIstioVs(nil)...)
+			}
 		case mlopsv1.NginxIngress:
 			state = append(state, grafanaIngress()...)
 		case mlopsv1.OpenShiftIngress:

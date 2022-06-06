@@ -444,7 +444,7 @@ func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 			return err
 		}
 
-		if err := desired.Apply(logging.ElastAlert(), app, r.Client, r.Scheme, appLog); err != nil {
+		if err := desired.Apply(logging.CnvrgAppElastAlertState(app), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}

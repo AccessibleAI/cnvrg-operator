@@ -34,6 +34,9 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
+        {{- if .Spec.Networking.EastWest.Enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
         owner: cnvrg-control-plane
         cnvrg-component: webapp

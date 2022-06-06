@@ -25,6 +25,9 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
+        {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         app: {{ .Spec.Monitoring.Grafana.SvcName }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
