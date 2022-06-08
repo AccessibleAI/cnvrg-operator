@@ -33,6 +33,9 @@ spec:
         {{- range $k, $v := .Spec.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}
+        {{- if .Spec.Networking.EastWest.Enabled }}
+        traffic.sidecar.istio.io/excludeOutboundIPRanges: 0.0.0.0/0
+        {{- end }}
       labels:
         {{- if .Spec.Networking.EastWest.Enabled }}
         sidecar.istio.io/inject: "true"
@@ -192,10 +195,6 @@ spec:
       {{- end }}
       initContainers:
       - name: ingresscheck
-        {{- if .Spec.Networking.EastWest.Enabled }}
-        securityContext:
-          runAsUser: 1337
-        {{- end }}
         image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         envFrom:
         - secretRef:
@@ -264,10 +263,6 @@ spec:
             echo "[$(date)] all services are ready!"
           done
       - name: seeder
-        {{- if .Spec.Networking.EastWest.Enabled }}
-        securityContext:
-          runAsUser: 1337
-        {{- end }}
         image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         command:
           - /bin/bash
