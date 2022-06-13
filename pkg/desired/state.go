@@ -103,18 +103,18 @@ func getSSORedirectUrl(obj interface{}, svc string) string {
 	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
 		infra := obj.(*mlopsv1.CnvrgInfra)
 		if infra.Spec.Networking.HTTPS.Enabled {
-			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
+			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, strings.ReplaceAll(infra.Spec.ClusterDomain, "eastwest.", ""))
 		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
+			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, strings.ReplaceAll(infra.Spec.ClusterDomain, "eastwest.", ""))
 		}
 
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		app := obj.(*mlopsv1.CnvrgApp)
 		if app.Spec.Networking.HTTPS.Enabled {
-			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
+			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, strings.ReplaceAll(app.Spec.ClusterDomain, "eastwest.", ""))
 		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
+			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, strings.ReplaceAll(app.Spec.ClusterDomain, "eastwest.", ""))
 		}
 	}
 	return ""
