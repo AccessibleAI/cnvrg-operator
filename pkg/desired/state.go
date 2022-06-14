@@ -251,10 +251,11 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/cnvrg-static"`,
 				"ssl_insecure_skip_verify = true",
-				`cookie_name = "_oauth2_proxy"`,
+				`cookie_name = "_cnvrg_oauth2_proxy"`,
 				`cookie_expire = "168h"`,
 				"cookie_secure = false",
 				"cookie_httponly = true",
+				`cookie_samesite = "lax"`,
 			}
 
 			if sso.SaaSSSO.Enabled {
