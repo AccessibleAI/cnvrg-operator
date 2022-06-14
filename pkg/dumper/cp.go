@@ -38,7 +38,13 @@ func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string) *
 		},
 		Spec: mlopsv1.DefaultCnvrgAppSpec(),
 	}
-	infra := &mlopsv1.CnvrgInfra{Spec: mlopsv1.DefaultCnvrgInfraSpec()}
+	infra := &mlopsv1.CnvrgInfra{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "cnvrg-infra",
+			Namespace: ns,
+		},
+		Spec: mlopsv1.DefaultCnvrgInfraSpec(),
+	}
 	if err := controllers.CalculateAndApplyAppDefaults(app, &app.Spec, infra, nil); err != nil {
 		log.Fatal(err)
 	}

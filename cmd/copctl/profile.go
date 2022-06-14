@@ -20,6 +20,7 @@ var (
 	profileDumpParams = []param{
 		{name: "templates-dump-dir", shorthand: "d", value: "cnvrg-manifests", usage: "dump cnvrg stack components"},
 		{name: "preserve-templates-dir", shorthand: "k", value: false, usage: "preserve templates directories"},
+		{name: "namespace", shorthand: "n", value: "cnvrg", usage: "set K8s namespace"},
 	}
 	profileDumpCmd = &cobra.Command{
 		Use:   "dump",
@@ -33,7 +34,6 @@ var (
 		{name: "registry-user", shorthand: "u", value: "", usage: "docker registry user"},
 		{name: "registry-password", shorthand: "p", value: "", usage: "docker registry password"},
 		{name: "cri", shorthand: "c", value: "containerd", usage: "container runtime interface one of: docker|containerd|cri-o"},
-		{name: "namespace", shorthand: "n", value: "cnvrg", usage: "set K8s namespace"},
 	}
 	dumpControlPlaneCmd = &cobra.Command{
 		Use:     "control-plane",
@@ -59,10 +59,8 @@ var (
 		},
 	}
 
-	dumpNetworkParams = []param{
-		{name: "namespace", shorthand: "n", value: "cnvrg", usage: "set K8s namespace"},
-	}
-	dumpNetworkCmd = &cobra.Command{
+	dumpNetworkParams = []param{}
+	dumpNetworkCmd    = &cobra.Command{
 		Use:   "network",
 		Short: "dump cnvrg control plane as raw K8s manifests",
 		Run: func(cmd *cobra.Command, args []string) {
