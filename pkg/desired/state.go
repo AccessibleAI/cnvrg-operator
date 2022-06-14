@@ -254,7 +254,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				`cookie_name = "_oauth2_proxy"`,
 				`cookie_expire = "168h"`,
 				"cookie_secure = false",
-				"cookie_httponly = false",
+				"cookie_httponly = true",
 			}
 
 			if sso.SaaSSSO.Enabled {
