@@ -1066,8 +1066,6 @@ spec:
                     type: string
                   clientSecret:
                     type: string
-                  cookieDomain:
-                    type: string
                   cookieSecret:
                     type: string
                   emailDomain:
