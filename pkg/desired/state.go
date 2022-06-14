@@ -336,6 +336,9 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		},
 		"kibanaSecret": func(host, port, esHost, esUser, esPass, esBasicAuth string) string {
 			return fmt.Sprintf(`
+xpack:
+  security:
+    sameSiteCookies: None
 server:
   name: kibana
   host: %s
