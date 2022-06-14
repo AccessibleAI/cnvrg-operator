@@ -16,7 +16,6 @@ type SSO struct {
 	ClientID                         string   `json:"clientId,omitempty"`
 	ClientSecret                     string   `json:"clientSecret,omitempty"`
 	CookieSecret                     string   `json:"cookieSecret,omitempty"`
-	CookieDomain                     string   `json:"cookieDomain,omitempty"`
 	AzureTenant                      string   `json:"azureTenant,omitempty"`
 	OidcIssuerURL                    string   `json:"oidcIssuerUrl,omitempty"`
 	RealmName                        string   `json:"realmName,omitempty"`  // TODO: remove deprecation
