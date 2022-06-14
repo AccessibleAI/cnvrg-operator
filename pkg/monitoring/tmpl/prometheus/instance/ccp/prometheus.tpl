@@ -33,15 +33,14 @@ spec:
       {{$k}}: "{{$v}}"
       {{- end }}
     {{- end }}
-    {{- if .Spec.Labels}}
     labels:
+      cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
       {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
       sidecar.istio.io/inject: "true"
       {{- end }}
-    {{- end }}
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}

@@ -41,15 +41,14 @@ spec:
       {{$k}}: "{{$v}}"
       {{- end }}
     {{- end }}
-    {{- if .Spec.Labels}}
     labels:
+      cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
       {{- if and (.Spec.Networking.Istio.EastWest.Enabled) (not .Spec.Networking.Istio.EastWest.Primary) }}
       sidecar.istio.io/inject: "true"
       {{- end }}
-    {{- end }}
   ruleSelector:
     matchLabels:
       app: cnvrg-infra-prometheus
