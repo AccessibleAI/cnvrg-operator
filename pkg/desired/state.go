@@ -256,6 +256,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				"cookie_secure = false",
 				"cookie_httponly = false",
 				`cookie_samesite = "lax"`,
+				`redis_connection_idle_timeout = 5`,
 			}
 
 			if sso.SaaSSSO.Enabled {
