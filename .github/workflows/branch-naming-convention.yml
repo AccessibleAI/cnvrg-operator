@@ -12,4 +12,4 @@ jobs:
           allowed_prefixes: 'DEV-,weekly-rc-,DEVOPS-' # All branches should start with the given prefix
           ignore: master,main,saas # Ignore exactly matching branch names from convention
           min_length: 5 # Min length of the branch name
-          max_length: 50 # Max length of the branch name
+          max_length: 300 # Max length of the branch name
