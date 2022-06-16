@@ -27,9 +27,10 @@ type ControlPlane struct {
 	ingress        string
 	app            *mlopsv1.CnvrgApp
 	state          []*desired.State
+	https          bool
 }
 
-func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string) *ControlPlane {
+func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string, https bool) *ControlPlane {
 
 	app := &mlopsv1.CnvrgApp{
 		ObjectMeta: v1.ObjectMeta{
@@ -56,6 +57,7 @@ func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string) *
 		registryUser:   regUser,
 		registryPass:   regPass,
 		ingress:        ingress,
+		https:          https,
 		app:            app,
 	}
 }
@@ -113,14 +115,15 @@ func (p *ControlPlane) setControlPlaneState() error {
 	p.app.Spec.ControlPlane.BaseConfig.FeatureFlags["CNVRG_MOUNT_HOST_FOLDERS"] = "false"
 
 	p.app.Spec.ControlPlane.Image = viper.GetString("control-plane-image")
-	p.app.Spec.Cri = mlopsv1.CriType(viper.GetString("cri"))
+	p.app.Spec.ControlPlane.Image = p.image
+	p.app.Spec.Cri = mlopsv1.CriType(p.cri)
 
-	p.app.Spec.Networking.Ingress.Type = mlopsv1.IngressType(viper.GetString("ingress"))
+	p.app.Spec.Networking.Ingress.Type = mlopsv1.IngressType(p.ingress)
+	p.app.Spec.Networking.HTTPS.Enabled = p.https
 	if p.app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-
 		p.app.Spec.Networking.Ingress.IstioGwEnabled = true
 	}
-	p.app.Spec.ClusterDomain = viper.GetString("wildcard-domain")
+	p.app.Spec.ClusterDomain = p.wildcardDomain
 
 	p.app.Spec.ControlPlane.Sidekiq.Enabled = true
 	p.app.Spec.ControlPlane.Sidekiq.Split = true
