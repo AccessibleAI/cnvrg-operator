@@ -33,13 +33,7 @@ spec:
         {{- range $k, $v := .Spec.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}
-        {{- if .Spec.Networking.EastWest.Enabled }}
-        traffic.sidecar.istio.io/excludeOutboundIPRanges: 0.0.0.0/0
-        {{- end }}
       labels:
-        {{- if .Spec.Networking.EastWest.Enabled }}
-        sidecar.istio.io/inject: "true"
-        {{- end }}
         app: {{.Spec.ControlPlane.WebApp.SvcName}}
         owner: cnvrg-control-plane
         cnvrg-component: webapp
