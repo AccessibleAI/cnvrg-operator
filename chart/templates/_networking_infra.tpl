@@ -64,8 +64,8 @@ networking:
       meshId: {{ .Values.networking.istio.eastWest.meshId }}
     {{- if (gt (len .Values.networking.istio.eastWest.remoteClusters) 0) }}
       remoteClusters:
-    {{- range $key, $value := .Values.networking.istio.eastWest.remoteClusters }}
-        {{$key}}: {{$value}}
+    {{- range $idx, $value := .Values.networking.istio.eastWest.remoteClusters }}
+        - {{$value}}
     {{- end }}
     {{- end }}
     {{- end }}

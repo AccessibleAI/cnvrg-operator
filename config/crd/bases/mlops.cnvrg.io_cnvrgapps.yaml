@@ -1008,9 +1008,9 @@ spec:
                     primary:
                       type: boolean
                     remoteClusters:
-                      additionalProperties:
+                      items:
                         type: string
-                      type: object
+                      type: array
                   type: object
                 https:
                   properties:
