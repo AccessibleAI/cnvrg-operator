@@ -28,9 +28,10 @@ type ControlPlane struct {
 	app            *mlopsv1.CnvrgApp
 	state          []*desired.State
 	https          bool
+	proxy          bool
 }
 
-func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string, https bool) *ControlPlane {
+func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string, https, proxy bool) *ControlPlane {
 
 	app := &mlopsv1.CnvrgApp{
 		ObjectMeta: v1.ObjectMeta{
@@ -59,6 +60,7 @@ func NewControlPlane(image, domain, cri, regUser, regPass, ingress, ns string, h
 		ingress:        ingress,
 		https:          https,
 		app:            app,
+		proxy:          proxy,
 	}
 }
 
@@ -67,6 +69,7 @@ func (p *ControlPlane) BuildState() error {
 	err = p.setControlPlaneState()
 	err = p.setDbsState()
 	p.setPriorityClassState()
+	p.setProxy()
 
 	p.state = controlplane.State(p.app)
 	p.state = append(p.state, dbs.RedisCreds(p.getRedisSecretData())...)
@@ -258,5 +261,14 @@ func (p *ControlPlane) getRegistryData() desired.TemplateData {
 			"Annotations": p.app.Spec.Annotations,
 			"Labels":      p.app.Spec.Labels,
 		},
+	}
+}
+
+func (p *ControlPlane) setProxy() {
+	if p.proxy {
+		p.app.Spec.Networking.Proxy.Enabled = true
+		p.app.Spec.Networking.Proxy.HttpProxy = []string{"http://corp-proxy-example1"}
+		p.app.Spec.Networking.Proxy.HttpsProxy = []string{"http://corp-proxy-example1"}
+		p.app.Spec.Networking.Proxy.NoProxy = networking.DefaultNoProxy("cluster.local")
 	}
 }

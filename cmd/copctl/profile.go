@@ -30,6 +30,7 @@ var (
 	dumpControlPlaneParams = []param{
 		{name: "ingress", value: "ingress", shorthand: "s", usage: "must be one of the: istio|ingress|openshift|nodeport"},
 		{name: "https", value: false, usage: "enabled|disable https"},
+		{name: "proxy", value: false, usage: "enable proxy"},
 		{name: "wildcard-domain", shorthand: "a", value: "", usage: "the wildcard domain for cnvrg stack deployments"},
 		{name: "control-plane-image", shorthand: "i", value: "", usage: "cnvrg control plane image"},
 		{name: "registry-user", shorthand: "u", value: "", usage: "docker registry user"},
@@ -50,6 +51,7 @@ var (
 				viper.GetString("ingress"),
 				viper.GetString("namespace"),
 				viper.GetBool("https"),
+				viper.GetBool("proxy"),
 			)
 			d := dump{cp}
 			if err := d.BuildState(); err != nil {
