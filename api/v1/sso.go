@@ -25,12 +25,13 @@ type SSO struct {
 }
 
 type OauthProxyServiceConf struct {
-	SkipAuthRegex []string `json:"skipAuthRegex,omitempty"`
+	SkipAuthRegex        []string `json:"skipAuthRegex,omitempty"`
+	TokenValidationRegex []string `json:"tokenValidationRegex,omitempty"`
 }
 
 var ssoDefault = SSO{
 	Enabled:                          false,
-	Image:                            "oauth2-proxy:v7.3.0-idle-fix-1",
+	Image:                            "oauth2-proxy:v7.3.0-legacy-support-1",
 	AdminUser:                        "",
 	Provider:                         "",
 	Scope:                            "openid",

@@ -275,6 +275,9 @@ var controlPlaneDefault = ControlPlane{
 				`\/api/v2/metrics`,
 				`\/api/v1/events/endpoint_rule_alert`,
 			},
+			TokenValidationRegex: []string{
+				`^\/api`,
+			},
 		},
 		Hpa: hpa,
 	},
