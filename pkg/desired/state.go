@@ -211,7 +211,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			return "false"
 		},
-		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int) string {
+		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int, tokenValidationRegex []string) string {
 			sso := getSSOConfig(obj)
 
 			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/opstatic/`)
@@ -234,11 +234,22 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			emailsDomains += "]"
 
+			tokenValidationRegexes := "["
+			for i, regex := range tokenValidationRegex {
+				if i == (len(tokenValidationRegex) - 1) {
+					tokenValidationRegexes += fmt.Sprintf(`"%v"`, regex)
+				} else {
+					tokenValidationRegexes += fmt.Sprintf(`"%v", `, regex)
+				}
+			}
+			tokenValidationRegexes += "]"
+
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
+				fmt.Sprintf(`token_validation_regex = %v`, tokenValidationRegexes),
 				fmt.Sprintf(`email_domains = %v`, emailsDomains),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
