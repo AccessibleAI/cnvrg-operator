@@ -174,6 +174,15 @@ func controlPlaneConfigState() []*desired.State {
 			Updatable:      true,
 		},
 		{
+			TemplatePath:   path + "/conf/cm/config-sso.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
 
 			TemplatePath:   path + "/conf/cm/secret-base.tpl",
 			Template:       nil,
@@ -204,15 +213,6 @@ func controlPlaneConfigState() []*desired.State {
 		},
 		{
 			TemplatePath:   path + "/conf/cm/secret-smtp.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SecretGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/conf/cm/secret-sso.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
