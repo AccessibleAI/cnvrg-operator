@@ -9,7 +9,7 @@ type Pki struct {
 
 var pkiDefault = Pki{
 	Enabled:          false,
-	RootCaSecret:     "",
-	PrivateKeySecret: "",
-	PublicKeySecret:  "",
+	RootCaSecret:     "sso-idp-root-ca",
+	PrivateKeySecret: "sso-idp-private-key",
+	PublicKeySecret:  "sso-idp-pki-public-key",
 }

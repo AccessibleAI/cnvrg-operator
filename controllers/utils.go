@@ -159,18 +159,6 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
 	}
 
-	if app.Spec.Pki.Enabled {
-		if app.Spec.Pki.PrivateKeySecret == "" {
-			desiredAppSpec.Pki.PrivateKeySecret = "sso-idp-private-key"
-		}
-		if app.Spec.Pki.PublicKeySecret == "" {
-			desiredAppSpec.Pki.PublicKeySecret = "sso-idp-pki-public-key"
-		}
-		if app.Spec.Pki.RootCaSecret == "" {
-			desiredAppSpec.Pki.RootCaSecret = "sso-idp-root-ca"
-		}
-	}
-
 	if app.Spec.SSO.Enabled {
 		if desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags == nil {
 			desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags = make(map[string]string)
