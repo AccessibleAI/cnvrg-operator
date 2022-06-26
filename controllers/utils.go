@@ -161,13 +161,13 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 
 	if app.Spec.Pki.Enabled {
 		if app.Spec.Pki.PrivateKeySecret == "" {
-			desiredAppSpec.Pki.PrivateKeySecret = "okta-pki-private-key"
+			desiredAppSpec.Pki.PrivateKeySecret = "sso-idp-private-key"
 		}
 		if app.Spec.Pki.PublicKeySecret == "" {
-			desiredAppSpec.Pki.PublicKeySecret = "okta-pki-public-key"
+			desiredAppSpec.Pki.PublicKeySecret = "sso-idp-pki-public-key"
 		}
 		if app.Spec.Pki.RootCaSecret == "" {
-			desiredAppSpec.Pki.RootCaSecret = "okta-pki-root-ca"
+			desiredAppSpec.Pki.RootCaSecret = "sso-idp-root-ca"
 		}
 	}
 
