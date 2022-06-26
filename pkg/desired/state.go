@@ -244,6 +244,16 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 			tokenValidationRegexes += "]"
 
+			extraJWTIssuers := "["
+			for i, issuer := range sso.ExtraJWTIssuers {
+				if i == len(sso.SaaSSSO.AllowedGroups)-1 {
+					extraJWTIssuers += fmt.Sprintf(`"%s"`, issuer)
+				} else {
+					extraJWTIssuers += fmt.Sprintf(`"%s", `, issuer)
+				}
+			}
+			extraJWTIssuers += "]"
+
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
@@ -258,6 +268,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`upstreams = ["http://127.0.0.1:%d/", "file:///cnvrg-static/#/opstatic/"]`, upstreamPort),
 				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 				fmt.Sprintf(`scope = "%s"`, sso.Scope),
+				fmt.Sprintf(`extra_jwt_issuers = %s`, extraJWTIssuers),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/cnvrg-static"`,
@@ -281,18 +292,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				}
 				allowedGroups += "]"
 
-				extraJWTIssuers := "["
-				for i, issuer := range sso.SaaSSSO.ExtraJWTIssuers {
-					if i == len(sso.SaaSSSO.AllowedGroups)-1 {
-						extraJWTIssuers += fmt.Sprintf(`"%s"`, issuer)
-					} else {
-						extraJWTIssuers += fmt.Sprintf(`"%s", `, issuer)
-					}
-				}
-				extraJWTIssuers += "]"
-
 				proxyConf = append(proxyConf, fmt.Sprintf(`allowed_groups = %s`, allowedGroups))
-				proxyConf = append(proxyConf, fmt.Sprintf(`extra_jwt_issuers = %s`, extraJWTIssuers))
+
 			}
 
 			proxyConfigStr := strings.Join(proxyConf, "\n")

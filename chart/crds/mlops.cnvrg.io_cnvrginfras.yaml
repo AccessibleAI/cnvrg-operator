@@ -296,6 +296,10 @@ spec:
                             items:
                               type: string
                             type: array
+                          tokenValidationRegex:
+                            items:
+                              type: string
+                            type: array
                         type: object
                       port:
                         type: integer
@@ -497,6 +501,10 @@ spec:
                     type: array
                   enabled:
                     type: boolean
+                  extraJWTIssuers:
+                    items:
+                      type: string
+                    type: array
                   image:
                     type: string
                   insecureOidcAllowUnverifiedEmail:
@@ -515,10 +523,6 @@ spec:
                         type: array
                       enabled:
                         type: boolean
-                      extraJWTIssuers:
-                        items:
-                          type: string
-                        type: array
                     type: object
                   scope:
                     type: string
