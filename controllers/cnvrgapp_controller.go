@@ -794,7 +794,7 @@ func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgAp
 		return err
 	}
 
-	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass}
+	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass, SvcName: cnvrgApp.Spec.Dbs.Es.SvcName}
 	appInstanceBytes, err := json.Marshal(appInstance)
 	if err != nil {
 		appLog.Error(err, "failed to marshal app instance ")

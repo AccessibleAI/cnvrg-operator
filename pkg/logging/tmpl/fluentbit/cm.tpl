@@ -56,7 +56,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
@@ -71,7 +71,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*app*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
@@ -86,7 +86,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*kiq*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
@@ -101,7 +101,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*hyper*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
@@ -116,7 +116,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*scheduler*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
@@ -131,7 +131,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*job*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
@@ -146,7 +146,7 @@ data:
     [OUTPUT]
         Name                      es
         Match                     kube.{{ $app.SpecNs }}.*cnvrg-je*
-        Host                      elasticsearch.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
+        Host                      {{ $app.SvcName }}.{{ $app.SpecNs }}.svc.{{ $.Data.ClusterInternalDomain }}
         Port                      9200
         Logstash_Format           On
         Logstash_DateFormat       %m.%Y
