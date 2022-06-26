@@ -1,5 +1,5 @@
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
   name: cp-sso
   namespace: {{ ns . }}
@@ -13,7 +13,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  CNVRG_SSO_KEY: {{ printf "%s:%s" .Spec.SSO.ClientID .Spec.SSO.ClientSecret }}
+  CNVRG_SSO_KEY: "{{ printf "%s:%s" .Spec.SSO.ClientID .Spec.SSO.ClientSecret }}"
   SSO_IDP_PRIVATE_KEY_REF: {{ .Spec.Pki.PrivateKeySecret }}
   OAUTH_PROXY_TOKENS_ENABLED: "{{ .Spec.SSO.Enabled }}"
   OAUTH_PROXY_ENABLED: "{{ isTrue .Spec.SSO.Enabled  }}"

@@ -80,6 +80,8 @@ spec:
                 name: cp-base-config
             - configMapRef:
                 name: cp-networking-config
+            - configMapRef:
+                name: cp-sso
             - secretRef:
                 name: cp-base-secret
             - secretRef:
@@ -90,8 +92,6 @@ spec:
                 name: cp-object-storage
             - secretRef:
                 name: cp-smtp
-            - secretRef:
-                name: cp-sso
             {{- if isTrue .Spec.Dbs.Cvat.Enabled }}
             - secretRef:
                 name: {{ .Spec.Dbs.Cvat.Pg.CredsRef }}
