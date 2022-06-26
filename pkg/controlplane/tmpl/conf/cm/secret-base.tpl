@@ -13,9 +13,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  CNVRG_SSO_KEY: {{ printf "%s:%s" .Spec.SSO.ClientID .Spec.SSO.ClientSecret | b64enc }}
-  SSO_IDP_PRIVATE_KEY_REF: {{ .Spec.Pki.PrivateKeySecret }}
-  OAUTH_PROXY_TOKENS_ENABLED: "{{ .Spec.SSO.Enabled | toString | b64enc }}"
   SENTRY_URL: {{ .Spec.ControlPlane.BaseConfig.SentryURL | b64enc }}
   HYPER_SERVER_TOKEN: {{ .Spec.ControlPlane.Hyper.Token | b64enc }}
   SECRET_KEY_BASE: {{ randAlphaNum 128 | lower | b64enc }}

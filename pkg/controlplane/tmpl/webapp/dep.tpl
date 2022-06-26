@@ -116,6 +116,8 @@ spec:
             name: cp-object-storage
         - secretRef:
             name: cp-smtp
+        - secretRef:
+            name: cp-sso
         {{- if isTrue .Spec.Dbs.Cvat.Enabled }}
         - secretRef:
             name: {{ .Spec.Dbs.Cvat.Pg.CredsRef }}
@@ -288,6 +290,8 @@ spec:
             name: cp-object-storage
         - secretRef:
             name: cp-smtp
+        - secretRef:
+            name: cp-sso
         - secretRef:
             name: {{ .Spec.Dbs.Es.CredsRef }}
         - secretRef:

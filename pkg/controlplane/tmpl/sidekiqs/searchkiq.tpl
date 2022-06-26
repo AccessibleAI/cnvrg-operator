@@ -93,6 +93,8 @@ spec:
           - secretRef:
               name: cp-smtp
           - secretRef:
+              name: cp-sso
+          - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
           - secretRef:
               name: {{ .Spec.Dbs.Pg.CredsRef }}
