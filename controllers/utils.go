@@ -177,10 +177,10 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		}
 		desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags["JWKS_ISS"] = getJWTIss(app, infra)
 		desiredAppSpec.ControlPlane.BaseConfig.FeatureFlags["JWKS_AUD"] = getJWTAud()
+		desiredAppSpec.SSO.ExtraJWTIssuers = append(app.Spec.SSO.ExtraJWTIssuers, getExtraJWTIssuers(app, infra)...)
 
 		if app.Spec.SSO.SaaSSSO.Enabled {
 			desiredAppSpec.SSO.SaaSSSO.AllowedGroups = append(app.Spec.SSO.SaaSSSO.AllowedGroups, getTenantGroup(app.Spec.ClusterDomain)...)
-			desiredAppSpec.SSO.SaaSSSO.ExtraJWTIssuers = append(app.Spec.SSO.SaaSSSO.ExtraJWTIssuers, getExtraJWTIssuers(app, infra)...)
 		}
 
 	}
