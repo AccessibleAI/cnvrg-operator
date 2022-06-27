@@ -477,7 +477,7 @@ func generateElastalertCreds(app *mlopsv1.CnvrgApp) (*desired.TemplateData, erro
 			"User":          user,
 			"Pass":          pass,
 			"Htpasswd":      fmt.Sprintf("%s:%s", user, passwordHash),
-			"ElastAlertUrl": fmt.Sprintf("%s%s.%s", httpSchema, app.Spec.Logging.Elastalert.SvcName, app.Spec.ClusterDomain),
+			"ElastAlertUrl": fmt.Sprintf("%s%s.%s", httpSchema, app.Spec.Logging.Elastalert.SvcName, strings.ReplaceAll(app.Spec.ClusterDomain, "eastwest.", "")),
 		},
 	}
 
