@@ -180,11 +180,12 @@ func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 func CnvrgAppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 
+	if cnvrgApp.Spec.Networking.EastWest.Enabled == true && cnvrgApp.Spec.Networking.EastWest.Primary == false {
+		return nil
+	}
+
 	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgApp.Spec.Networking.Ingress.IstioGwEnabled {
 		state = append(state, ingressState()...)
-	}
-	if cnvrgApp.Spec.Networking.EastWest.Primary == false {
-		return nil
 	}
 
 	if cnvrgApp.Spec.Networking.Proxy.Enabled {
