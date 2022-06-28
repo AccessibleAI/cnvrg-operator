@@ -110,7 +110,8 @@ var cnvrgAppLoggingDefault = CnvrgAppLogging{
 			Memory: "2Gi",
 		},
 		OauthProxy: OauthProxyServiceConf{
-			SkipAuthRegex: nil,
+			SkipAuthRegex:        nil,
+			TokenValidationRegex: nil,
 		},
 		CredsRef: "kibana-creds",
 	},

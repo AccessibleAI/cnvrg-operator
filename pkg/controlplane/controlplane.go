@@ -174,6 +174,15 @@ func controlPlaneConfigState() []*desired.State {
 			Updatable:      true,
 		},
 		{
+			TemplatePath:   path + "/conf/cm/config-sso.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
 
 			TemplatePath:   path + "/conf/cm/secret-base.tpl",
 			Template:       nil,

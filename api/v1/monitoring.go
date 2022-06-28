@@ -92,7 +92,8 @@ var grafanaInfraDefault = Grafana{
 	Port:     8080,
 	NodePort: 30012,
 	OauthProxy: OauthProxyServiceConf{
-		SkipAuthRegex: []string{`\/api\/health`},
+		SkipAuthRegex:        []string{`\/api\/health`},
+		TokenValidationRegex: nil,
 	},
 	CredsRef: "grafana-creds",
 }
@@ -104,7 +105,8 @@ var grafanaAppDefault = Grafana{
 	Port:     8080,
 	NodePort: 30014,
 	OauthProxy: OauthProxyServiceConf{
-		SkipAuthRegex: []string{`\/api\/health`},
+		SkipAuthRegex:        []string{`\/api\/health`},
+		TokenValidationRegex: nil,
 	},
 	CredsRef: "grafana-creds",
 }

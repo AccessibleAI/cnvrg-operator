@@ -427,6 +427,10 @@ spec:
                             items:
                               type: string
                             type: array
+                          tokenValidationRegex:
+                            items:
+                              type: string
+                            type: array
                         type: object
                       passengerMaxPoolSize:
                         type: integer
@@ -888,6 +892,10 @@ spec:
                             items:
                               type: string
                             type: array
+                          tokenValidationRegex:
+                            items:
+                              type: string
+                            type: array
                         type: object
                       port:
                         type: integer
@@ -928,6 +936,10 @@ spec:
                       oauthProxy:
                         properties:
                           skipAuthRegex:
+                            items:
+                              type: string
+                            type: array
+                          tokenValidationRegex:
                             items:
                               type: string
                             type: array
@@ -1066,8 +1078,6 @@ spec:
                     type: string
                   clientSecret:
                     type: string
-                  cookieDomain:
-                    type: string
                   cookieSecret:
                     type: string
                   emailDomain:
@@ -1076,6 +1086,10 @@ spec:
                     type: array
                   enabled:
                     type: boolean
+                  extraJWTIssuers:
+                    items:
+                      type: string
+                    type: array
                   image:
                     type: string
                   insecureOidcAllowUnverifiedEmail:
@@ -1094,10 +1108,6 @@ spec:
                         type: array
                       enabled:
                         type: boolean
-                      extraJWTIssuers:
-                        items:
-                          type: string
-                        type: array
                     type: object
                   scope:
                     type: string

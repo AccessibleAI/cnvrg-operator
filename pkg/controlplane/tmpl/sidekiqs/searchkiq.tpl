@@ -82,6 +82,8 @@ spec:
               name: cp-base-config
           - configMapRef:
               name: cp-networking-config
+          - configMapRef:
+              name: cp-sso
           - secretRef:
               name: cp-base-secret
           - secretRef:
