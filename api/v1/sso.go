@@ -31,7 +31,7 @@ type OauthProxyServiceConf struct {
 
 var ssoDefault = SSO{
 	Enabled:                          false,
-	Image:                            "oauth2-proxy:v7.3.0-legacy-support-4",
+	Image:                            "oauth2-proxy:v7.3.0-legacy-support-5",
 	AdminUser:                        "",
 	Provider:                         "",
 	Scope:                            "openid",
