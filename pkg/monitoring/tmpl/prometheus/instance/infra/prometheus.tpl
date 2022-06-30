@@ -46,7 +46,7 @@ spec:
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
-      {{- if and (.Spec.Networking.Istio.EastWest.Enabled) (not .Spec.Networking.Istio.EastWest.Primary) }}
+      {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
       sidecar.istio.io/inject: "true"
       {{- end }}
   ruleSelector:

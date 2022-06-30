@@ -190,13 +190,13 @@ networking:
     ingressSvcAnnotations: { }
     ingressSvcExtraPorts: [ ]
     lbSourceRanges: [ ]
-    eastWest:
-      enabled: false
-      primary: false
-      clusterName: ""
-      network: "network1"
-      meshId: "mesh1"
-      remoteClusters: []
+  eastWest:
+    enabled: false
+    primary: false
+    clusterName: ""
+    network: "network1"
+    meshId: "mesh1"
+    remoteClusters: []
 sso:
   enabled: false
   adminUser: ""

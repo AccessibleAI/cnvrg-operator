@@ -378,6 +378,23 @@ spec:
               type: object
             networking:
               properties:
+                eastWest:
+                  properties:
+                    clusterName:
+                      type: string
+                    enabled:
+                      type: boolean
+                    meshId:
+                      type: string
+                    network:
+                      type: string
+                    primary:
+                      type: boolean
+                    remoteClusters:
+                      items:
+                        type: string
+                      type: array
+                  type: object
                 https:
                   properties:
                     cert:
@@ -411,23 +428,6 @@ spec:
                   type: object
                 istio:
                   properties:
-                    eastWest:
-                      properties:
-                        clusterName:
-                          type: string
-                        enabled:
-                          type: boolean
-                        meshId:
-                          type: string
-                        network:
-                          type: string
-                        primary:
-                          type: boolean
-                        remoteClusters:
-                          items:
-                            type: string
-                          type: array
-                      type: object
                     enabled:
                       type: boolean
                     externalIp:

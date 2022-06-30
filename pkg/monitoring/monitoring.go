@@ -775,10 +775,10 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 
 		switch infra.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			if infra.Spec.Networking.Istio.EastWest.Enabled {
-				if infra.Spec.Networking.Istio.EastWest.Primary {
+			if infra.Spec.Networking.EastWest.Enabled {
+				if infra.Spec.Networking.EastWest.Primary {
 					state = append(state, promIstioVs(nil)...)
-					for _, value := range infra.Spec.Networking.Istio.EastWest.RemoteClusters {
+					for _, value := range infra.Spec.Networking.EastWest.RemoteClusters {
 						data := *infra
 						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
 						state = append(state, promIstioVs(&data)...)
@@ -808,10 +808,10 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 		}
 		switch infra.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			if infra.Spec.Networking.Istio.EastWest.Enabled {
-				if infra.Spec.Networking.Istio.EastWest.Primary {
+			if infra.Spec.Networking.EastWest.Enabled {
+				if infra.Spec.Networking.EastWest.Primary {
 					state = append(state, grafanaIstioVs(nil)...)
-					for _, value := range infra.Spec.Networking.Istio.EastWest.RemoteClusters {
+					for _, value := range infra.Spec.Networking.EastWest.RemoteClusters {
 						data := *infra
 						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, value)
 						state = append(state, grafanaIstioVs(&data)...)

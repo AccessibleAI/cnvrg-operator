@@ -33,10 +33,10 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     {{- end }}
     {{- end }}
-    eastWest:
-      enabled: {{ .Values.networking.istio.eastWest.enabled }}
-      primary: {{ .Values.networking.istio.eastWest.primary }}
-      clusterName: {{ .Values.networking.istio.eastWest.clusterName }}
-      network: {{ .Values.networking.istio.eastWest.network }}
-      meshId: {{ .Values.networking.istio.eastWest.meshId }}
+  eastWest:
+    enabled: {{ .Values.networking.eastWest.enabled }}
+    primary: {{ .Values.networking.eastWest.primary }}
+    clusterName: {{ .Values.networking.eastWest.clusterName }}
+    network: {{ .Values.networking.eastWest.network }}
+    meshId: {{ .Values.networking.eastWest.meshId }}
 {{- end }}

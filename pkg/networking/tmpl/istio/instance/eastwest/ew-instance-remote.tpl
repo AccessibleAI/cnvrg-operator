@@ -29,14 +29,14 @@ spec:
       label:
         istio: cnvrg-eastwestgateway
         app: cnvrg-eastwestgateway
-        topology.istio.io/network: {{ .Spec.Networking.Istio.EastWest.Network }}
+        topology.istio.io/network: {{ .Spec.Networking.EastWest.Network }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
       k8s:
         env:
         - name: ISTIO_META_REQUESTED_NETWORK_VIEW
-          value: {{ .Spec.Networking.Istio.EastWest.Network }}
+          value: {{ .Spec.Networking.EastWest.Network }}
         priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
         podAnnotations:
           {{- range $k, $v := .Spec.Annotations }}
@@ -126,10 +126,10 @@ spec:
       istioNamespace:  {{ ns . }}
       imagePullSecrets:
         - {{ .Spec.Registry.Name }}
-      meshID: {{ .Spec.Networking.Istio.EastWest.MeshId }}
+      meshID: {{ .Spec.Networking.EastWest.MeshId }}
       multiCluster:
-        clusterName: {{ .Spec.Networking.Istio.EastWest.ClusterName }}
-      network: {{ .Spec.Networking.Istio.EastWest.Network }}
+        clusterName: {{ .Spec.Networking.EastWest.ClusterName }}
+      network: {{ .Spec.Networking.EastWest.Network }}
     gateways:
       istio-ingressgateway:
         # Enable gateway injection

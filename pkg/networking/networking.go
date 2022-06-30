@@ -153,8 +153,8 @@ func InfraNetworkingState(cnvrgInfra *mlopsv1.CnvrgInfra) []*desired.State {
 	if cnvrgInfra.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgInfra.Spec.Networking.Istio.Enabled {
 		state = append(state, istioInstanceState()...)
 
-		if cnvrgInfra.Spec.Networking.Istio.EastWest.Enabled {
-			if cnvrgInfra.Spec.Networking.Istio.EastWest.Primary {
+		if cnvrgInfra.Spec.Networking.EastWest.Enabled {
+			if cnvrgInfra.Spec.Networking.EastWest.Primary {
 				state = append(state, istioEastWestStatePrimary()...)
 				if cnvrgInfra.Spec.Networking.Ingress.IstioGwEnabled {
 					state = append(state, ingressState()...)

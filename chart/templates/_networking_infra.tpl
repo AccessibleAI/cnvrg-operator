@@ -56,17 +56,17 @@ networking:
       - {{$value}}
     {{- end }}
     {{- end }}
-    eastWest:
-      enabled: {{ .Values.networking.istio.eastWest.enabled }}
-      primary: {{ .Values.networking.istio.eastWest.primary }}
-      clusterName: {{ .Values.networking.istio.eastWest.clusterName }}
-      network: {{ .Values.networking.istio.eastWest.network }}
-      meshId: {{ .Values.networking.istio.eastWest.meshId }}
-    {{- if (gt (len .Values.networking.istio.eastWest.remoteClusters) 0) }}
-      remoteClusters:
-    {{- range $idx, $value := .Values.networking.istio.eastWest.remoteClusters }}
-        - {{$value}}
     {{- end }}
-    {{- end }}
-    {{- end }}
+  eastWest:
+    enabled: {{ .Values.networking.eastWest.enabled }}
+    primary: {{ .Values.networking.eastWest.primary }}
+    clusterName: {{ .Values.networking.eastWest.clusterName }}
+    network: {{ .Values.networking.eastWest.network }}
+    meshId: {{ .Values.networking.eastWest.meshId }}
+  {{- if (gt (len .Values.networking.eastWest.remoteClusters) 0) }}
+    remoteClusters:
+  {{- range $idx, $value := .Values.networking.eastWest.remoteClusters }}
+      - {{$value}}
+  {{- end }}
+  {{- end }}
 {{- end }}

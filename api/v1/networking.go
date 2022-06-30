@@ -21,7 +21,6 @@ type Istio struct {
 	ExternalIP            []string          `json:"externalIp,omitempty"`
 	LBSourceRanges        []string          `json:"lbSourceRanges,omitempty"`
 	IngressSvcAnnotations map[string]string `json:"ingressSvcAnnotations,omitempty"`
-	EastWest              EastWest          `json:"eastWest,omitempty"`
 }
 
 type EastWest struct {
@@ -57,10 +56,11 @@ type CnvrgAppNetworking struct {
 }
 
 type CnvrgInfraNetworking struct {
-	Ingress Ingress `json:"ingress,omitempty"`
-	HTTPS   HTTPS   `json:"https,omitempty"`
-	Istio   Istio   `json:"istio,omitempty"`
-	Proxy   Proxy   `json:"proxy,omitempty"`
+	Ingress  Ingress  `json:"ingress,omitempty"`
+	HTTPS    HTTPS    `json:"https,omitempty"`
+	Istio    Istio    `json:"istio,omitempty"`
+	Proxy    Proxy    `json:"proxy,omitempty"`
+	EastWest EastWest `json:"eastWest,omitempty"`
 }
 
 type Proxy struct {
@@ -104,7 +104,6 @@ var istioDefault = Istio{
 	IngressSvcAnnotations: nil,
 	IngressSvcExtraPorts:  nil,
 	LBSourceRanges:        nil,
-	EastWest:              EastWestDefault,
 }
 
 var httpsDefault = HTTPS{
@@ -140,8 +139,9 @@ var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
 }
 
 var cnvrgInfraNetworkingDefault = CnvrgInfraNetworking{
-	Ingress: ingressInfraDefault,
-	Istio:   istioDefault,
-	HTTPS:   httpsDefault,
-	Proxy:   defaultInfraProxy,
+	Ingress:  ingressInfraDefault,
+	Istio:    istioDefault,
+	HTTPS:    httpsDefault,
+	Proxy:    defaultInfraProxy,
+	EastWest: EastWestDefault,
 }
