@@ -20,16 +20,16 @@ type Capsule struct {
 
 var capsuleDefault = Capsule{
 	Enabled: false,
-	Image:   "cnvrg-capsule:1.0.2",
+	Image:   "cnvrg-capsule:1.0.3",
 	Requests: Requests{
 		Cpu:    "200m",
 		Memory: "500Mi",
 	},
 	Limits: Limits{
-		Cpu:    "1",
-		Memory: "1Gi",
+		Cpu:    "2",
+		Memory: "4Gi",
 	},
 	SvcName:      "capsule",
-	StorageSize:  "100Gi",
+	StorageSize:  "200Gi",
 	StorageClass: "",
 }
