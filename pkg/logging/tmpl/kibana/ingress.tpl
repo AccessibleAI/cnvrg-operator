@@ -6,20 +6,23 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: 18000s
     nginx.ingress.kubernetes.io/proxy-body-size: 5G
     {{- range $k, $v := .Spec.Annotations }}
-    {{$k}}: "{{$v}}"
+    {{ $k }}: "{{ $v }}"
     {{- end }}
   name: {{ .Spec.Logging.Kibana.SvcName }}
   namespace: {{ ns . }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
-    {{$k}}: "{{$v}}"
+    {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
   rules:
-    - host: "{{.Spec.Logging.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}"
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: {{ .Spec.Logging.Kibana.SvcName }}
-              servicePort: {{ .Spec.Logging.Kibana.Port }}
+  - host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ .Spec.ClusterDomain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Spec.Logging.Kibana.SvcName }}
+            port:
+              number: {{ .Spec.Logging.Kibana.Port }}
