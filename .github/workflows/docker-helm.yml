@@ -162,6 +162,12 @@ jobs:
         generate_release_notes: true
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
+    - name: Change Chart Version
+      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
+      run: |
+        sed -i 's#1.0.0#${{ steps.tag_bump.outputs.new_tag }}#g' chart/Chart.yaml
+        cat chart/Chart.yaml
+
     - name: Package and release helm
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
       env:
