@@ -105,7 +105,7 @@ func getSSORedirectUrl(obj interface{}, svc string) string {
 		if infra.Spec.Networking.HTTPS.Enabled {
 			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
 		} else {
-			return "http://app.*.cicd.cnvrg.me/oauth2/callback"
+			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
 		}
 
 	}
