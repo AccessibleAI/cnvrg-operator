@@ -167,7 +167,7 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 	},
 	PodDisruptionBudgetGVK: schema.GroupVersionKind{
 		Group:   "policy",
-		Version: "v1beta1",
+		Version: "v1",
 		Kind:    "PodDisruptionBudget",
 	},
 	HpaGVK: schema.GroupVersionKind{

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/capsule"
@@ -21,6 +20,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
+	"github.com/opentracing/opentracing-go/log"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"gopkg.in/d4l3k/messagediff.v1"
@@ -43,12 +43,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sort"
 	"strings"
 	"time"
 )
-
-const CnvrginfraFinalizer = "cnvrginfra.mlops.cnvrg.io/finalizer"
 
 type CnvrgInfraReconciler struct {
 	client.Client
@@ -83,42 +80,6 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	}
 	if cnvrgInfra == nil {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
-	}
-
-	// setup finalizer
-	if cnvrgInfra.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
-			cnvrgInfra.ObjectMeta.Finalizers = append(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
-			if err := r.Update(ctx, cnvrgInfra); err != nil {
-				infraLog.Error(err, "failed to add finalizer")
-				return ctrl.Result{}, err
-			}
-		}
-	} else {
-		if containsString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer) {
-			r.updateStatusMessage(mlopsv1.StatusRemoving, "removing cnvrg spec", cnvrgInfra)
-			if err := r.cleanup(cnvrgInfra); err != nil {
-				return ctrl.Result{}, err
-			}
-			cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
-			err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-				if err := r.Update(ctx, cnvrgInfra); err != nil {
-					cnvrgInfra, err := r.getCnvrgInfraSpec(req.NamespacedName)
-					if err != nil {
-						infraLog.Error(err, "error getting cnvrginfra for finalizer cleanup")
-						return err
-					}
-					cnvrgInfra.ObjectMeta.Finalizers = removeString(cnvrgInfra.ObjectMeta.Finalizers, CnvrginfraFinalizer)
-					return r.Update(ctx, cnvrgInfra)
-				}
-				return err
-			})
-			if err != nil {
-				infraLog.Info("error in removing finalizer")
-				return ctrl.Result{}, err
-			}
-		}
-		return ctrl.Result{}, nil
 	}
 
 	r.updateStatusMessage(mlopsv1.StatusReconciling, "reconciling", cnvrgInfra)
@@ -203,7 +164,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// logging
 	infraLog.Info("applying logging")
-	cnvrgApps, err := r.getCnvrgAppInstances(cnvrgInfra)
+	cnvrgApps, err := r.getCnvrgAppInstances()
 	if err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
@@ -321,33 +282,56 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 	return reconcileResult
 }
 
-func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
+func (r *CnvrgInfraReconciler) getCnvrgAppInstances() ([]*mlopsv1.AppInstance, error) {
 
-	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: mlopsv1.InfraReconcilerCm}
-
-	cnvrgAppCm := &v1.ConfigMap{}
-	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
-		return nil, nil
-	} else if err != nil {
+	var appInstances []*mlopsv1.AppInstance
+	apps := &mlopsv1.CnvrgAppList{}
+	var opts []client.ListOption
+	if err := r.List(context.Background(), apps, opts...); err != nil {
 		return nil, err
 	}
 
-	var cmKeys []string
-	var apps []mlopsv1.AppInstance
-	for key, _ := range cnvrgAppCm.Data {
-		cmKeys = append(cmKeys, key)
-	}
-	sort.Strings(cmKeys)
-	for _, key := range cmKeys {
-		var app mlopsv1.AppInstance
-		if err := json.Unmarshal([]byte(cnvrgAppCm.Data[key]), &app); err != nil {
-			infraLog.Error(err, "error decoding AppInstance")
-			return nil, err
+	for _, app := range apps.Items {
+		esUser, esPass, err := getAppEsCredsSecret(r.Client, &app)
+		if err != nil {
+			log.Error(err)
+			continue
 		}
-		apps = append(apps, app)
+		appInstances = append(appInstances, &mlopsv1.AppInstance{
+			SpecName: app.Name, SpecNs: app.Namespace, EsUser: esUser, EsPass: esPass,
+		})
 	}
-	return apps, nil
+
+	return appInstances, nil
 }
+
+//func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
+//
+//	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: mlopsv1.InfraReconcilerCm}
+//
+//	cnvrgAppCm := &v1.ConfigMap{}
+//	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
+//		return nil, nil
+//	} else if err != nil {
+//		return nil, err
+//	}
+//
+//	var cmKeys []string
+//	var apps []mlopsv1.AppInstance
+//	for key, _ := range cnvrgAppCm.Data {
+//		cmKeys = append(cmKeys, key)
+//	}
+//	sort.Strings(cmKeys)
+//	for _, key := range cmKeys {
+//		var app mlopsv1.AppInstance
+//		if err := json.Unmarshal([]byte(cnvrgAppCm.Data[key]), &app); err != nil {
+//			infraLog.Error(err, "error decoding AppInstance")
+//			return nil, err
+//		}
+//		apps = append(apps, app)
+//	}
+//	return apps, nil
+//}
 
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
@@ -529,48 +513,6 @@ func (r *CnvrgInfraReconciler) getCnvrgInfraSpec(namespacedName types.Namespaced
 	return &cnvrgInfra, nil
 }
 
-func (r *CnvrgInfraReconciler) cleanup(cnvrgInfra *mlopsv1.CnvrgInfra) error {
-
-	infraLog.Info("running finalizer cleanup")
-
-	// cleanup pvc
-	if err := r.cleanupPVCs(cnvrgInfra); err != nil {
-		return err
-	}
-
-	infraLog.Info("cleanup has been finished")
-	return nil
-}
-
-func (r *CnvrgInfraReconciler) cleanupPVCs(infra *mlopsv1.CnvrgInfra) error {
-	if !viper.GetBool("cleanup-pvc") {
-		infraLog.Info("cleanup-pvc is false, skipping pvc deletion!")
-		return nil
-	}
-	infraLog.Info("running pvc cleanup")
-	ctx := context.Background()
-	pvcList := v1core.PersistentVolumeClaimList{}
-	if err := r.List(ctx, &pvcList); err != nil {
-		infraLog.Error(err, "failed cleanup pvcs")
-		return err
-	}
-	for _, pvc := range pvcList.Items {
-		if pvc.Namespace == infra.Spec.InfraNamespace {
-			if _, ok := pvc.ObjectMeta.Labels["app"]; ok {
-				if pvc.ObjectMeta.Labels["app"] == "prometheus" {
-					if err := r.Delete(ctx, &pvc); err != nil && errors.IsNotFound(err) {
-						infraLog.Info("prometheus pvc already deleted")
-					} else if err != nil {
-						infraLog.Error(err, "error deleting prometheus pvc")
-						return err
-					}
-				}
-			}
-		}
-	}
-	return nil
-}
-
 func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) error {
 	infraLog.Info("running istio cleanup")
 	ctx := context.Background()
@@ -633,7 +575,7 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 }
 
 func (r *CnvrgInfraReconciler) setMetagpuPresence(infra *mlopsv1.CnvrgInfra) error {
-	apps, err := r.getCnvrgAppInstances(infra)
+	apps, err := r.getCnvrgAppInstances()
 	if err != nil {
 		return err
 	}
