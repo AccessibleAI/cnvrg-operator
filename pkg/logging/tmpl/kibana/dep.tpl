@@ -82,7 +82,7 @@ spec:
             - |
               #!/bin/bash
               {
-                cnvrgIndexPattern=cnvrg
+                cnvrgIndexPattern=cnvrg*
                 ready=notready
                 while [[ "$ready" != "200" ]]; do
                   ready=$(curl -s http://localhost:$SERVER_PORT/api/status -o /dev/null -w '%{http_code}')
