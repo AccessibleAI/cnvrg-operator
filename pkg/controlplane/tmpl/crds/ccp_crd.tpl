@@ -145,6 +145,13 @@ spec:
                     type: array
                   vpc:
                     properties:
+                      clusterEndpoints:
+                        properties:
+                          privateAccess:
+                            type: boolean
+                          publicAccess:
+                            type: boolean
+                        type: object
                       id:
                         type: string
                       privateSubnets:
