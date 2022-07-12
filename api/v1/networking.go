@@ -23,13 +23,38 @@ type Istio struct {
 	IngressSvcAnnotations map[string]string `json:"ingressSvcAnnotations,omitempty"`
 }
 
+//type EastWestCnvrgAppPrimary struct {
+//	Enabled           bool     `json:"enabled,omitempty"`
+//	ClusterName       string   `json:"clusterName,omitempty"`
+//	Primary           bool     `json:"primary,omitempty"`
+//	RemoteTenantNames []string `json:"remoteTenantNames,omitempty"`
+//}
+//type EastWestCnvrgAppRemote struct {
+//	Enabled    bool   `json:"enabled,omitempty"`
+//	Primary    bool   `json:"primary,omitempty"`
+//	TenantName string `json:"tenantName,omitempty"`
+//}
+//type EastWestInfraPrimary struct {
+//	Enabled        bool                `json:"enabled,omitempty"`
+//	ClusterName    string              `json:"clusterName,omitempty"`
+//	Primary        bool                `json:"primary,omitempty"`
+//	RemoteClusters map[string][]string `json:"remoteClusters,omitempty"`
+//}
+//type EastWestInfraRemote struct {
+//	Enabled                bool     `json:"enabled,omitempty"`
+//	ClusterName            string   `json:"clusterName,omitempty"`
+//	Primary                bool     `json:"primary,omitempty"`
+//	RemoteClustersCustomIp []string `json:"remoteClustersCustomIp,omitempty"`
+//}
+
 type EastWest struct {
-	Enabled        bool     `json:"enabled,omitempty"`
-	ClusterName    string   `json:"clusterName,omitempty"`
-	Network        string   `json:"network,omitempty"`
-	MeshId         string   `json:"meshId,omitempty"`
-	Primary        bool     `json:"primary,omitempty"`
-	RemoteClusters []string `json:"remoteClusters,omitempty"`
+	Enabled                bool                `json:"enabled,omitempty"`
+	ClusterName            string              `json:"clusterName,omitempty"`
+	Network                string              `json:"network,omitempty"`
+	MeshId                 string              `json:"meshId,omitempty"`
+	Primary                bool                `json:"primary,omitempty"`
+	RemoteClusters         map[string][]string `json:"remoteClusters,omitempty"`
+	RemoteClustersCustomIp []string            `json:"remoteClustersCustomIp,omitempty"`
 }
 
 type Ingress struct {
