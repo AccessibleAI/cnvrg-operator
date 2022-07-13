@@ -25,6 +25,7 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/d4l3k/messagediff.v1"
 	"io/ioutil"
+	v1apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -261,7 +262,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// istio
 	infraLog.Info("applying infra networking")
-	if err := desired.Apply(networking.InfraNetworkingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+	if err := r.infraNetworkingState(cnvrgInfra); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -387,6 +388,17 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 		return err
 	}
 	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) infraNetworkingState(infra *mlopsv1.CnvrgInfra) error {
+
+	if err := desired.Apply(networking.InfraNetworkingState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+		return err
+	}
+	if err := r.RecreateIstioEWDeployment(infra); err != nil {
 		return err
 	}
 	return nil
@@ -638,6 +650,31 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 				time.Sleep(1 * time.Second)
 			}
 		}
+	}
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) RecreateIstioEWDeployment(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+	if cnvrgInfra.Spec.Networking.EastWest.Enabled && cnvrgInfra.Spec.Networking.EastWest.Primary == false &&
+		cnvrgInfra.Spec.Networking.EastWest.ClusterIpsEnabled {
+		infraLog.Info("Recreating istio deployment if there is immutable error caused by a label change from ClusterIpsEnabled")
+		ctx := context.Background()
+		istio := &unstructured.Unstructured{}
+		istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
+		if err := r.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: cnvrgInfra.Spec.InfraNamespace}, istio); err == nil {
+			istioError := istio.Object["status"].(map[string]interface{})["componentStatus"].(map[string]interface{})["IngressGateways"].(map[string]interface{})
+			if _, ok := istioError["error"]; ok {
+				if strings.Contains(istioError["error"].(string), "field is immutable") {
+					eastwestDeployment := &v1apps.Deployment{}
+					if err := r.Get(ctx, types.NamespacedName{Name: "cnvrg-eastwestgateway", Namespace: cnvrgInfra.Spec.InfraNamespace}, eastwestDeployment); err == nil {
+						if err := r.Delete(ctx, eastwestDeployment); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+		return nil
 	}
 	return nil
 }

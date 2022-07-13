@@ -360,9 +360,9 @@ func CnvrgAppElastAlertState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		if cnvrgApp.Spec.Networking.EastWest.Enabled {
 			if cnvrgApp.Spec.Networking.EastWest.Primary {
 				state = append(state, elastAlertIstioVs(nil)...)
-				for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+				for key, _ := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
 					data := *cnvrgApp
-					data.Spec.Logging.Elastalert.SvcName = fmt.Sprintf("%s-%s", data.Spec.Logging.Elastalert.SvcName, value)
+					data.Spec.Logging.Elastalert.SvcName = fmt.Sprintf("%s-%s", data.Spec.Logging.Elastalert.SvcName, key)
 					state = append(state, elastAlertIstioVs(&data)...)
 					state = append(state, elastAlertSvc(&data)...)
 				}
@@ -394,9 +394,9 @@ func CnvrgAppKibanaState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 		if cnvrgApp.Spec.Networking.EastWest.Enabled {
 			if cnvrgApp.Spec.Networking.EastWest.Primary {
 				state = append(state, kibanaIstioVs(nil)...)
-				for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+				for key, _ := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
 					data := *cnvrgApp
-					data.Spec.Logging.Kibana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Logging.Kibana.SvcName, value)
+					data.Spec.Logging.Kibana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Logging.Kibana.SvcName, key)
 					state = append(state, kibanaIstioVs(&data)...)
 					state = append(state, kibanaSvc(&data)...)
 				}

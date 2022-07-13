@@ -643,9 +643,9 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 			if cnvrgApp.Spec.Networking.EastWest.Enabled {
 				if cnvrgApp.Spec.Networking.EastWest.Primary {
 					state = append(state, esIstioVs(nil)...)
-					for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+					for key, _ := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
 						data := *cnvrgApp
-						data.Spec.Dbs.Es.SvcName = fmt.Sprintf("%s-%s", data.Spec.Dbs.Es.SvcName, value)
+						data.Spec.Dbs.Es.SvcName = fmt.Sprintf("%s-%s", data.Spec.Dbs.Es.SvcName, key)
 						state = append(state, esIstioVs(&data)...)
 						state = append(state, esSvc(&data)...)
 					}

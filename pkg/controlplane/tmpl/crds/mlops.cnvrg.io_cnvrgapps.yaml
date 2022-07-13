@@ -997,6 +997,8 @@ spec:
                 properties:
                   eastWest:
                     properties:
+                      clusterIpsEnabled:
+                        type: boolean
                       clusterName:
                         type: string
                       enabled:
@@ -1008,9 +1010,11 @@ spec:
                       primary:
                         type: boolean
                       remoteClusters:
-                        items:
-                          type: string
-                        type: array
+                        additionalProperties:
+                          items:
+                            type: string
+                          type: array
+                        type: object
                     type: object
                   https:
                     properties:

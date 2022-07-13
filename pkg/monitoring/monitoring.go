@@ -709,9 +709,9 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 			if cnvrgApp.Spec.Networking.EastWest.Enabled {
 				if cnvrgApp.Spec.Networking.EastWest.Primary {
 					state = append(state, promIstioVs(nil)...)
-					for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+					for key, _ := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
 						data := *cnvrgApp
-						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
+						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, key)
 						state = append(state, promIstioVs(&data)...)
 						state = append(state, promSvc(&data)...)
 					}
@@ -737,9 +737,9 @@ func AppMonitoringState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 			if cnvrgApp.Spec.Networking.EastWest.Enabled {
 				if cnvrgApp.Spec.Networking.EastWest.Primary {
 					state = append(state, grafanaIstioVs(nil)...)
-					for _, value := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+					for key, _ := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
 						data := *cnvrgApp
-						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, value)
+						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, key)
 						state = append(state, grafanaIstioVs(&data)...)
 						state = append(state, grafanaSvc(&data)...)
 					}
@@ -778,9 +778,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 			if infra.Spec.Networking.EastWest.Enabled {
 				if infra.Spec.Networking.EastWest.Primary {
 					state = append(state, promIstioVs(nil)...)
-					for _, value := range infra.Spec.Networking.EastWest.RemoteClusters {
+					for key, _ := range infra.Spec.Networking.EastWest.RemoteClusters {
 						data := *infra
-						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, value)
+						data.Spec.Monitoring.Prometheus.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Prometheus.SvcName, key)
 						state = append(state, promIstioVs(&data)...)
 						state = append(state, promSvc(&data)...)
 					}
@@ -811,9 +811,9 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 			if infra.Spec.Networking.EastWest.Enabled {
 				if infra.Spec.Networking.EastWest.Primary {
 					state = append(state, grafanaIstioVs(nil)...)
-					for _, value := range infra.Spec.Networking.EastWest.RemoteClusters {
+					for key, _ := range infra.Spec.Networking.EastWest.RemoteClusters {
 						data := *infra
-						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, value)
+						data.Spec.Monitoring.Grafana.SvcName = fmt.Sprintf("%s-%s", data.Spec.Monitoring.Grafana.SvcName, key)
 						state = append(state, grafanaIstioVs(&data)...)
 						state = append(state, grafanaSvc(&data)...)
 					}
