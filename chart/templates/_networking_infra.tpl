@@ -63,10 +63,4 @@ networking:
     clusterName: {{ .Values.networking.eastWest.clusterName }}
     network: {{ .Values.networking.eastWest.network }}
     meshId: {{ .Values.networking.eastWest.meshId }}
-  {{- if (gt (len .Values.networking.eastWest.remoteClusters) 0) }}
-    remoteClusters:
-  {{- range $idx, $value := .Values.networking.eastWest.remoteClusters }}
-      - {{$value}}
-  {{- end }}
-  {{- end }}
 {{- end }}

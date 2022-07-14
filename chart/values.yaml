@@ -196,7 +196,6 @@ networking:
     clusterName: ""
     network: "network1"
     meshId: "mesh1"
-    remoteClusters: []
 sso:
   enabled: false
   adminUser: ""
