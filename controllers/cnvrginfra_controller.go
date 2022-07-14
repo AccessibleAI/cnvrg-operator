@@ -661,7 +661,8 @@ func (r *CnvrgInfraReconciler) RecreateIstioEWDeployment(cnvrgInfra *mlopsv1.Cnv
 		ctx := context.Background()
 		istio := &unstructured.Unstructured{}
 		istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
-		if err := r.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: cnvrgInfra.Spec.InfraNamespace}, istio); err == nil {
+		if err := r.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: cnvrgInfra.Spec.InfraNamespace}, istio); err == nil &&
+			istio.Object["status"].(map[string]interface{})["status"] == "ERROR" {
 			istioError := istio.Object["status"].(map[string]interface{})["componentStatus"].(map[string]interface{})["IngressGateways"].(map[string]interface{})
 			if _, ok := istioError["error"]; ok {
 				if strings.Contains(istioError["error"].(string), "field is immutable") {
