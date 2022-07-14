@@ -774,6 +774,10 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 
 func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
 	infra, err := r.getCnvrgInfra()
+	if errors.IsNotFound(err) {
+		appLog.Info("cnvrginfra not found, skipping fluentbit configuration")
+		return nil
+	}
 	if err != nil {
 		return err
 	}
@@ -887,7 +891,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
 
 	infra, err := r.getCnvrgInfra()
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		appLog.Error(err, "can't get cnvrg infra")
 		//return false, err
 	}
