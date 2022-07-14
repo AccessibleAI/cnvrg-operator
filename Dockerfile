@@ -27,6 +27,7 @@ LABEL name="cnvrg-operator" \
       release="4.3.16" \
       summary="Cnvrg K8s Operator" \
       description="cnvrg.io AIOS patform"
+USER 1000
 WORKDIR /opt/app-root
 COPY license /licenses
 COPY --from=builder /workspace/cnvrg-operator .
