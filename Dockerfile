@@ -20,6 +20,15 @@ COPY pkg/ pkg/
 RUN go get github.com/markbates/pkger/cmd/pkger
 RUN pkger && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator main.go pkged.go
 
-FROM ubuntu:20.04
+FROM registry.access.redhat.com/ubi8/ubi:latest
+LABEL name="cnvrg-operator" \
+      vendor="cnvrg.io" \
+      version="4.3.16" \
+      release="4.3.16" \
+      summary="Cnvrg K8s Operator" \
+      description="cnvrg.io AIOS patform"
 WORKDIR /opt/app-root
+COPY license /licenses
 COPY --from=builder /workspace/cnvrg-operator .
+
+
