@@ -6,20 +6,23 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: 18000s
     nginx.ingress.kubernetes.io/proxy-body-size: 5G
     {{- range $k, $v := .Spec.Annotations }}
-    {{$k}}: "{{$v}}"
+    {{ $k }}: "{{ $v }}"
     {{- end }}
   name: {{ .Spec.Monitoring.Grafana.SvcName }}
   namespace: {{ ns . }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
-    {{$k}}: "{{$v}}"
+    {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
   rules:
-    - host: "{{.Spec.Monitoring.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}"
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: {{ .Spec.Monitoring.Grafana.SvcName }}
-              servicePort: {{ .Spec.Monitoring.Grafana.Port }}
+  - host: "{{ .Spec.Monitoring.Grafana.SvcName }}.{{ .Spec.ClusterDomain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Spec.Monitoring.Grafana.SvcName }}
+            port:
+              number: {{ .Spec.Monitoring.Grafana.Port }}
