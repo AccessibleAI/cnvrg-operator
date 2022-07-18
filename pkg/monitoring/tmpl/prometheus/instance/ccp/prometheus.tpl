@@ -12,6 +12,15 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: cnvrg
+          operator: In
+          values:
+          - {{ .Spec.Monitoring.Prometheus.SvcName }}
+      topologyKey: kubernetes.io/hostname
   storage:
     disableMountSubPath: true
     volumeClaimTemplate:
@@ -35,6 +44,7 @@ spec:
     {{- end }}
     {{- if .Spec.Labels}}
     labels:
+      cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
