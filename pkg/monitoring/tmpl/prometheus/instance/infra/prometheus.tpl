@@ -50,13 +50,11 @@ spec:
       {{$k}}: "{{$v}}"
       {{- end }}
     {{- end }}
-    {{- if .Spec.Labels}}
     labels:
       cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
-    {{- end }}
   ruleSelector:
     matchLabels:
       app: cnvrg-infra-prometheus
