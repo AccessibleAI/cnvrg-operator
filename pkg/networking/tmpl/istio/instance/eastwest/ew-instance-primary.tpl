@@ -19,7 +19,7 @@ spec:
     base:
       enabled: true
     cni:
-      enabled: true
+      enabled: false
     egressGateways:
     - enabled: false
       name: istio-egressgateway
