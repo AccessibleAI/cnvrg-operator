@@ -1,3 +1,5 @@
+
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -172,6 +174,11 @@ spec:
                 type: object
               clusterSlug:
                 type: string
+              cnvrgDedicatedNodeGroup:
+                properties:
+                  spotInstances:
+                    type: boolean
+                type: object
               metadata:
                 additionalProperties:
                   type: string
