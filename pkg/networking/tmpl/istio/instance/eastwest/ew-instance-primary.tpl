@@ -48,7 +48,7 @@ spec:
           {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
-          maxReplicas: 5
+          maxReplicas: 20
           metrics:
             - resource:
                 name: cpu
@@ -61,8 +61,8 @@ spec:
             name: cnvrg-ingressgateway
         resources:
           limits:
-            cpu: 2000m
-            memory: 1024Mi
+            cpu: "2"
+            memory: 4G
           requests:
             cpu: 100m
             memory: 128Mi
@@ -110,6 +110,25 @@ spec:
             value: "{{ .Spec.Tenancy.Value }}"
             effect: "NoSchedule"
         {{- end }}
+        hpaSpec:
+          maxReplicas: 20
+          metrics:
+            - resource:
+                name: cpu
+                targetAverageUtilization: 80
+              type: Resource
+          minReplicas: 1
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: istiod
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 100m
+            memory: 128Mi
   values:
     global:
       {{- if (gt (len .Spec.Networking.EastWest.RemoteClusters) 0) }}
