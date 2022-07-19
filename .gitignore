@@ -1,4 +1,5 @@
-
+.DS_Store
+hack/test-manifests
 # Binaries for programs and plugins
 *.exe
 *.exe~

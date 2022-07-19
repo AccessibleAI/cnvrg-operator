@@ -19,6 +19,9 @@ all: manager
 unfocus:
 	ginkgo unfocus controllers/
 
+bundle:
+	kustomize build config/manifests | operator-sdk generate bundle -q --overwrite --version 4.3.16
+
 # Run tests
 test: pack generate fmt vet manifests
 	rm -f ./controllers/test-report.html ./controllers/junit.xml

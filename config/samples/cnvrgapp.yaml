@@ -1,0 +1,41 @@
+apiVersion: mlops.cnvrg.io/v1
+kind: CnvrgApp
+metadata:
+  name: cnvrg-app
+  namespace: cnvrg
+spec:
+  clusterDomain: apps.k8rttdeq.eastus.aroapp.io
+  imageHub: docker.io/cnvrg
+  controlPlane:
+    image: docker.io/cnvrg/core:v4.7.14
+    baseConfig:
+      cnvrgJobRbacStrict: true
+      cnvrgPrivilegedJob: false
+      featureFlags:
+        CNVRG_MOUNT_HOST_FOLDERS: "false"
+        CNVRG_ENABLE_MOUNT_FOLDERS: "false"
+    cnvrgScheduler:
+      enabled: true
+    hyper:
+      enabled: true
+    searchkiq:
+      enabled: true
+    sidekiq:
+      enabled: true
+      split: true
+    systemkiq:
+      enabled: true
+    webapp:
+      enabled: true
+  dbs:
+    es:
+      enabled: true
+    minio:
+      enabled: true
+    pg:
+      enabled: true
+    redis:
+      enabled: true
+  networking:
+    ingress:
+      type: openshift
