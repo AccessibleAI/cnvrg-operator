@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/controlplane"
@@ -37,6 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"strconv"
@@ -82,36 +82,21 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
-	// setup finalizer
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+		// add finalizer
+		if !controllerutil.ContainsFinalizer(cnvrgApp, CnvrgappFinalizer) {
+			controllerutil.AddFinalizer(cnvrgApp, CnvrgappFinalizer)
 			if err := r.Update(ctx, cnvrgApp); err != nil {
-				appLog.Error(err, "failed to add finalizer")
 				return ctrl.Result{}, err
 			}
 		}
-	} else {
-		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
-			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusRemoving, Message: "removing cnvrg spec"}, cnvrgApp)
+	} else { // run finalizer on delete
+		if controllerutil.ContainsFinalizer(cnvrgApp, CnvrgappFinalizer) {
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
-			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-			err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-				if err := r.Update(ctx, cnvrgApp); err != nil {
-					cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
-					if err != nil {
-						appLog.Error(err, "error getting cnvrgapp for finalizer cleanup")
-						return err
-					}
-					cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
-					return r.Update(ctx, cnvrgApp)
-				}
-				return err
-			})
-			if err != nil {
-				appLog.Info("error in removing finalizer")
+			controllerutil.RemoveFinalizer(cnvrgApp, CnvrgappFinalizer)
+			if err := r.Update(ctx, cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -167,30 +152,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 }
 
 func (r *CnvrgAppReconciler) getEsCredsSecret(app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
-	user = "cnvrg"
-	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Es.CredsRef, Namespace: app.Namespace}
-	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
-	if err := r.Get(context.Background(), namespacedName, &creds); err != nil && errors.IsNotFound(err) {
-		appLog.Error(err, "es-creds secret not found!")
-		return "", "", err
-	} else if err != nil {
-		appLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
-		return "", "", err
-	}
-
-	if _, ok := creds.Data["CNVRG_ES_USER"]; !ok {
-		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_USER", namespacedName.Name)
-		appLog.Error(err, "missing required field")
-		return "", "", err
-	}
-
-	if _, ok := creds.Data["CNVRG_ES_PASS"]; !ok {
-		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_PASS", namespacedName.Name)
-		appLog.Error(err, "missing required field")
-		return "", "", err
-	}
-
-	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
+	return getAppEsCredsSecret(r.Client, app)
 }
 
 func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.CnvrgApp) (bool, int, map[string]bool, error) {
@@ -773,39 +735,39 @@ func (r *CnvrgAppReconciler) createGrafanaDashboards(cnvrgApp *mlopsv1.CnvrgApp)
 }
 
 func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgApp) error {
+
+	// get cnvrg infra -> required for detecting
+	// the name and the namespace of the
+	// infra reconciler config map
 	infra, err := r.getCnvrgInfra()
 	if err != nil {
 		return err
 	}
-
+	// get the infra reconciler config map
 	name := types.NamespacedName{Name: mlopsv1.InfraReconcilerCm, Namespace: infra.Spec.InfraNamespace}
 	infraReconcilerCm := &v1core.ConfigMap{}
-
-	esUser, esPass, err := r.getEsCredsSecret(cnvrgApp)
-	if err != nil {
-		appLog.Error(err, "failed to fetch es creds")
-		return err
-	}
-
-	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass}
-	appInstanceBytes, err := json.Marshal(appInstance)
-	if err != nil {
-		appLog.Error(err, "failed to marshal app instance ")
-		return err
-	}
 	if err := r.Get(context.Background(), name, infraReconcilerCm); err != nil {
 		appLog.Error(err, "can't get reconciler cm", "name", name)
 		return err
 	}
-	if infraReconcilerCm.Data == nil {
-		infraReconcilerCm.Data = map[string]string{cnvrgApp.Namespace: string(appInstanceBytes)}
-	} else {
-		infraReconcilerCm.Data[cnvrgApp.Namespace] = string(appInstanceBytes)
+	// update the reconciler cm with
+	// app namespace and app name
+	// the update should happen only
+	// for a new CnvrgApps
+	if _, ok := infraReconcilerCm.Data[cnvrgApp.Namespace]; !ok {
+
+		if infraReconcilerCm.Data == nil {
+			infraReconcilerCm.Data = make(map[string]string)
+		}
+
+		infraReconcilerCm.Data[cnvrgApp.Namespace] = cnvrgApp.Name
+
+		if err := r.Update(context.Background(), infraReconcilerCm); err != nil {
+			appLog.Error(err, "can't update cm", "cm", name)
+			return err
+		}
 	}
-	if err := r.Update(context.Background(), infraReconcilerCm); err != nil {
-		appLog.Error(err, "can't update cm", "cm", name)
-		return err
-	}
+
 	return nil
 }
 
@@ -939,13 +901,13 @@ func (r *CnvrgAppReconciler) getCnvrgAppSpec(namespacedName types.NamespacedName
 	var app mlopsv1.CnvrgApp
 	if err := r.Get(ctx, namespacedName, &app); err != nil {
 		if errors.IsNotFound(err) {
-			appLog.Info("unable to fetch CnvrgApp, probably cr was deleted")
+			appLog.V(1).Info("unable to fetch CnvrgApp, probably cr was deleted")
 			return nil, nil
+		} else {
+			appLog.Error(err, "unable to fetch CnvrgApp")
+			return nil, err
 		}
-		appLog.Error(err, "unable to fetch CnvrgApp")
-		return nil, err
 	}
-
 	return &app, nil
 }
 
@@ -1006,13 +968,16 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 	appLog.Info("running cnvrg-db-init cleanup")
 	ctx := context.Background()
 	dbInitCm := &v1core.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "cnvrg-db-init", Namespace: desiredSpec.Namespace}}
-	err := r.Delete(ctx, dbInitCm)
-	if err != nil && errors.IsNotFound(err) {
+	if err := r.Delete(ctx, dbInitCm); err == nil {
+		return nil
+	} else if errors.IsNotFound(err) {
 		appLog.Info("no need to delete cnvrg-db-init, cm not found")
-	} else {
+		return nil
+	} else if err != nil {
 		appLog.Error(err, "error deleting cnvrg-db-init")
 		return err
 	}
+
 	return nil
 }
 

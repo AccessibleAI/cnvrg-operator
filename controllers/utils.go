@@ -9,6 +9,10 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	v1 "k8s.io/api/core/v1"
+	v1core "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
@@ -168,4 +172,31 @@ func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec 
 	}
 
 	return nil
+}
+
+func getAppEsCredsSecret(c client.Client, app *mlopsv1.CnvrgApp) (user string, pass string, err error) {
+	user = "cnvrg"
+	namespacedName := types.NamespacedName{Name: app.Spec.Dbs.Es.CredsRef, Namespace: app.Namespace}
+	creds := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := c.Get(context.Background(), namespacedName, &creds); err != nil && kerrors.IsNotFound(err) {
+		appLog.Error(err, "es-creds secret not found!")
+		return "", "", err
+	} else if err != nil {
+		appLog.Error(err, "can't check if es creds secret exists", "name", namespacedName.Name)
+		return "", "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_ES_USER"]; !ok {
+		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_USER", namespacedName.Name)
+		appLog.Error(err, "missing required field")
+		return "", "", err
+	}
+
+	if _, ok := creds.Data["CNVRG_ES_PASS"]; !ok {
+		err := fmt.Errorf("es creds secret %s missing require field CNVRG_ES_PASS", namespacedName.Name)
+		appLog.Error(err, "missing required field")
+		return "", "", err
+	}
+
+	return string(creds.Data["CNVRG_ES_USER"]), string(creds.Data["CNVRG_ES_PASS"]), nil
 }
