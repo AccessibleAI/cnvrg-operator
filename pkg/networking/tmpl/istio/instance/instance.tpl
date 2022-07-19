@@ -48,7 +48,7 @@ spec:
           {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
-          maxReplicas: 20
+          maxReplicas: 5
           metrics:
             - resource:
                 name: cpu
@@ -61,11 +61,11 @@ spec:
             name: cnvrg-ingressgateway
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: "3"
+            memory: 6G
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 150m
+            memory: 450Mi
         service:
           loadBalancerSourceRanges:
           {{- range $idx, $range := .Spec.Networking.Istio.LBSourceRanges }}
@@ -110,25 +110,6 @@ spec:
             value: "{{ .Spec.Tenancy.Value }}"
             effect: "NoSchedule"
         {{- end }}
-        hpaSpec:
-          maxReplicas: 20
-          metrics:
-            - resource:
-                name: cpu
-                targetAverageUtilization: 80
-              type: Resource
-          minReplicas: 1
-          scaleTargetRef:
-            apiVersion: apps/v1
-            kind: Deployment
-            name: istiod
-        resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 100m
-            memory: 128Mi
   values:
     global:
       istioNamespace:  {{ ns . }}

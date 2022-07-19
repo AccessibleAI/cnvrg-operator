@@ -64,8 +64,8 @@ spec:
             cpu: "2"
             memory: 4G
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 500m
+            memory: 1Gi
         service:
           loadBalancerSourceRanges:
           {{- range $idx, $range := .Spec.Networking.Istio.LBSourceRanges }}
@@ -111,7 +111,7 @@ spec:
             effect: "NoSchedule"
         {{- end }}
         hpaSpec:
-          maxReplicas: 20
+          maxReplicas: 10
           metrics:
             - resource:
                 name: cpu
@@ -124,11 +124,11 @@ spec:
             name: istiod
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: "3"
+            memory: 6G
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 500m
+            memory: 1Gi
   values:
     global:
       {{- if (gt (len .Spec.Networking.EastWest.RemoteClusters) 0) }}

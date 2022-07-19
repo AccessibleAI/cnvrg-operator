@@ -55,7 +55,7 @@ spec:
           {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
-          maxReplicas: 20
+          maxReplicas: 10
           metrics:
             - resource:
                 name: cpu
@@ -71,8 +71,8 @@ spec:
             cpu: "2"
             memory: 4G
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 500m
+            memory: 1Gi
         service:
           loadBalancerSourceRanges:
           {{- range $idx, $range := .Spec.Networking.Istio.LBSourceRanges }}
@@ -140,8 +140,8 @@ spec:
             cpu: "2"
             memory: 4G
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 500m
+            memory: 1Gi
   values:
     global:
       istioNamespace:  {{ ns . }}
