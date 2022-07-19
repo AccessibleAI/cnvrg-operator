@@ -305,34 +305,6 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances() ([]*mlopsv1.AppInstance, e
 	return appInstances, nil
 }
 
-//func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) ([]mlopsv1.AppInstance, error) {
-//
-//	cmName := types.NamespacedName{Namespace: infra.Spec.InfraNamespace, Name: mlopsv1.InfraReconcilerCm}
-//
-//	cnvrgAppCm := &v1.ConfigMap{}
-//	if err := r.Get(context.Background(), cmName, cnvrgAppCm); err != nil && errors.IsNotFound(err) {
-//		return nil, nil
-//	} else if err != nil {
-//		return nil, err
-//	}
-//
-//	var cmKeys []string
-//	var apps []mlopsv1.AppInstance
-//	for key, _ := range cnvrgAppCm.Data {
-//		cmKeys = append(cmKeys, key)
-//	}
-//	sort.Strings(cmKeys)
-//	for _, key := range cmKeys {
-//		var app mlopsv1.AppInstance
-//		if err := json.Unmarshal([]byte(cnvrgAppCm.Data[key]), &app); err != nil {
-//			infraLog.Error(err, "error decoding AppInstance")
-//			return nil, err
-//		}
-//		apps = append(apps, app)
-//	}
-//	return apps, nil
-//}
-
 func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error {
 
 	if err := r.generateMonitoringSecrets(infra); err != nil {
