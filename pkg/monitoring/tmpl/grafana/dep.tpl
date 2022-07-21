@@ -90,6 +90,10 @@ spec:
         - containerPort: 8080
           name: http
         readinessProbe:
+          periodSeconds: 20
+          failureThreshold: 5
+          successThreshold: 1
+          timeoutSeconds: 5
           httpGet:
             path: /api/health
             port: http

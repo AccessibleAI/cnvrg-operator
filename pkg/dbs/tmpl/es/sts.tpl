@@ -89,6 +89,10 @@ spec:
           value: "{{ .Spec.Dbs.Es.JavaOpts }}"
         - name: "ES_SECURITY_ENABLED"
           value: "true"
+        - name: ES_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
@@ -109,7 +113,7 @@ spec:
               - /bin/bash
               - -c
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_POD_IP:9200/_cluster/health -o /dev/null -w '%{http_code}')
                 if [ "$ready" == "200" ]; then
                   exit 0
                 else
@@ -118,13 +122,15 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 20
           failureThreshold: 5
+          successThreshold: 1
+          timeoutSeconds: 5
         livenessProbe:
           exec:
             command:
               - /bin/bash
               - -c
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_POD_IP:9200/_cluster/health -o /dev/null -w '%{http_code}')
                 if [ "$ready" == "200" ]; then
                   exit 0;
                 else
@@ -133,6 +139,8 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 20
           failureThreshold: 5
+          successThreshold: 1
+          timeoutSeconds: 5
         volumeMounts:
         - name: es-storage
           mountPath: "/usr/share/elasticsearch/data"
