@@ -355,6 +355,8 @@ spec:
                           memory:
                             type: string
                         type: object
+                      retention:
+                        type: string
                       storageClass:
                         type: string
                       storageSize:

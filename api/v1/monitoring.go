@@ -17,6 +17,7 @@ type Prometheus struct {
 	SvcName             string            `json:"svcName,omitempty"`
 	Port                int               `json:"port,omitempty"`
 	NodePort            int               `json:"nodePort,omitempty"`
+	Retention           string            `json:"retention,omitempty"`
 	StorageSize         string            `json:"storageSize,omitempty"`
 	StorageClass        string            `json:"storageClass,omitempty"`
 	CredsRef            string            `json:"credsRef,omitempty"`
@@ -127,6 +128,7 @@ var prometheusInfraDefault = Prometheus{
 	SvcName:      "prometheus",
 	Port:         9091, // basic auth nginx proxy is enabled by default
 	NodePort:     30910,
+	Retention:    "8w",
 	StorageSize:  "50Gi",
 	StorageClass: "",
 	CredsRef:     "infra-prom-creds",
@@ -150,6 +152,7 @@ var prometheusAppDefault = Prometheus{
 	SvcName:      "prometheus",
 	Port:         9091, // basic auth nginx proxy is enabled by default
 	NodePort:     30909,
+	Retention:    "8w",
 	StorageSize:  "50Gi",
 	StorageClass: "",
 	CredsRef:     "prom-creds",
