@@ -160,6 +160,7 @@ monitoring:
 
   prometheus:
     enabled: true
+    retention: "8w"
     storageSize: "50Gi"
     storageClass: ""
     nodeSelector: { }
