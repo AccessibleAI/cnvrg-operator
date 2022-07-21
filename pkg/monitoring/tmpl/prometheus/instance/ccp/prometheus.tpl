@@ -36,7 +36,7 @@ spec:
         {{- end }}
   image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.Image }}
   replicas: {{ .Spec.Monitoring.Prometheus.Replicas }}
-  retention: 8w # 2 months
+  retention: 2d #
   retentionSize: {{ promRetentionSize .Spec.Monitoring.Prometheus.StorageSize }} # total PVC size - 2 Gi
   podMetadata:
     {{- if .Spec.Annotations }}
