@@ -68,6 +68,7 @@ spec:
       cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   version: v2.22.1
   listenLocal: true
+  enableServiceLinks: false
   containers:
   - name: "prom-auth-proxy"
     image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}

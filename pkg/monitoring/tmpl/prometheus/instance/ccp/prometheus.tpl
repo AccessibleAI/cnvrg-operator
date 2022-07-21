@@ -70,6 +70,7 @@ spec:
     name: {{ .Spec.Monitoring.Prometheus.UpstreamRef }}
     key: prometheus-additional.yaml
   listenLocal: true
+  enableServiceLinks: false
   containers:
     - name: "prom-auth-proxy"
       image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}

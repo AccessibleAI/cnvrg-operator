@@ -57,6 +57,7 @@ spec:
           secret:
             secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
         {{- end }}
+      enableServiceLinks: false
       containers:
         {{- if isTrue .Spec.SSO.Enabled }}
         - name: "cnvrg-oauth-proxy"

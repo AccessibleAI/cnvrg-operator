@@ -47,6 +47,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: {{ .Spec.Monitoring.Grafana.SvcName }}
+      enableServiceLinks: false
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"

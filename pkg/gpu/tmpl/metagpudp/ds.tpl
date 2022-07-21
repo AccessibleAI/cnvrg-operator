@@ -38,6 +38,7 @@ spec:
       serviceAccountName: metagpu-device-plugin
       nodeSelector:
         accelerator: nvidia
+      enableServiceLinks: false
       containers:
         - name: metagpu-device-plugin
           image: {{ image .Data.ImageHub .Data.MetaGpuDp.Image }}

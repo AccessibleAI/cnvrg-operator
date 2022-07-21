@@ -51,6 +51,7 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      enableServiceLinks: false
       containers:
       - image: {{ image .Spec.ImageHub .Spec.Logging.Elastalert.Image }}
         name: {{ .Spec.Logging.Elastalert.SvcName }}

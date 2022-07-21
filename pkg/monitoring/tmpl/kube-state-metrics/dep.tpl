@@ -38,6 +38,7 @@ spec:
       tolerations:
         - operator: "Exists"
       {{- end }}
+      enableServiceLinks: false
       containers:
       - args:
         - --host=127.0.0.1

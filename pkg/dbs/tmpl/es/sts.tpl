@@ -68,6 +68,7 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      enableServiceLinks: false
       containers:
       - name: elastic
         image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}

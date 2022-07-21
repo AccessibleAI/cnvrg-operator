@@ -31,6 +31,7 @@ spec:
         {{- end }}
     spec:
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      enableServiceLinks: false
       containers:
       - args:
         - --web.listen-address=127.0.0.1:9100
