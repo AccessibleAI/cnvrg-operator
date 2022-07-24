@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
       app: {{ .Spec.Dbs.Es.SvcName }}
-  replicas: 1
+  replicas: {{ .Spec.Dbs.Es.Replicas }}
   template:
     metadata:
       annotations:
@@ -29,6 +29,18 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Spec.Dbs.Es.SvcName }}
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
@@ -79,8 +91,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: "ES_DISCOVERY_TYPE"
-          value: "single-node"
         - name: "ES_PATH_DATA"
           value: "/usr/share/elasticsearch/data/data"
         - name: "ES_PATH_LOGS"

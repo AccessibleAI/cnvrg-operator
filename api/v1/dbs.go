@@ -62,6 +62,7 @@ type Redis struct {
 type Es struct {
 	Enabled        bool              `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
+	Replicas       int               `json:"replicas,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`
@@ -191,6 +192,7 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
+	Replicas:       1,
 	Image:          "cnvrg-es:v7.8.1.a1-dynamic-indices",
 	Port:           9200,
 	StorageSize:    "80Gi",
@@ -210,9 +212,9 @@ var esDefault = Es{
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
 	CleanupPolicy: CleanupPolicy{
-		All: "3d",
-		App: "30d",
-		Jobs: "14d",
+		All:       "3d",
+		App:       "30d",
+		Jobs:      "14d",
 		Endpoints: "1825d",
 	},
 }
