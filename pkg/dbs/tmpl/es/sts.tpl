@@ -1,3 +1,9 @@
+{{- define "endpoints" -}}
+{{- $replicas := int (toString ( .Spec.Dbs.Es.Replicas)) }}
+  {{- range $i, $e := untilStep 0 $replicas 1 -}}
+{{ $.Spec.Dbs.Es.SvcName }}-{{ $i }},
+  {{- end -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -88,9 +94,11 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: "ES_NETWORK_HOST"
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
+          value: "0.0.0.0"
+        - name: ES_INITIAL_MASTER_NODES
+          value: "{{ template "endpoints" . }}"
+        - name: ES_SEED_HOSTS
+          value: "{{ .Spec.Dbs.Es.SvcName }}-headless"
         - name: "ES_PATH_DATA"
           value: "/usr/share/elasticsearch/data/data"
         - name: "ES_PATH_LOGS"
@@ -119,7 +127,7 @@ spec:
               - /bin/bash
               - -c
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://127.0.0.1:9200/_cluster/health -o /dev/null -w '%{http_code}')
                 if [ "$ready" == "200" ]; then
                   exit 0
                 else
@@ -134,7 +142,7 @@ spec:
               - /bin/bash
               - -c
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://127.0.0.1:9200/_cluster/health -o /dev/null -w '%{http_code}')
                 if [ "$ready" == "200" ]; then
                   exit 0;
                 else

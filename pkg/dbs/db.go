@@ -79,6 +79,15 @@ func esState() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+		{
+			TemplatePath:   path + "/es/svc-headless.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 
