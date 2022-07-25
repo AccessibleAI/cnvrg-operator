@@ -214,45 +214,16 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 		"oauthProxyConfig": func(obj interface{}, svc string, skipAuthRegex []string, provider string, proxyPort, upstreamPort int, tokenValidationRegex []string) string {
 			sso := getSSOConfig(obj)
 
-			skipAuthUrls := fmt.Sprintf(`["%v", `, `^\/opstatic/`)
-			for i, url := range skipAuthRegex {
-				if i == (len(skipAuthRegex) - 1) {
-					skipAuthUrls += fmt.Sprintf(`"%v"`, url)
-				} else {
-					skipAuthUrls += fmt.Sprintf(`"%v", `, url)
-				}
-			}
-			skipAuthUrls += "]"
+			skipAuthRegex = append(skipAuthRegex, `^\/opstatic/`)
+			skipAuthUrls := `["` + strings.Join(skipAuthRegex, `", "`) + `"]`
 
-			emailsDomains := "["
-			for i, email := range sso.EmailDomain {
-				if i == (len(sso.EmailDomain) - 1) {
-					emailsDomains += fmt.Sprintf(`"%v"`, email)
-				} else {
-					emailsDomains += fmt.Sprintf(`"%v", `, email)
-				}
-			}
-			emailsDomains += "]"
+			emailsDomains := `["` + strings.Join(sso.EmailDomain, `", "`) + `"]`
 
-			tokenValidationRegexes := "["
-			for i, regex := range tokenValidationRegex {
-				if i == (len(tokenValidationRegex) - 1) {
-					tokenValidationRegexes += fmt.Sprintf(`"%v"`, regex)
-				} else {
-					tokenValidationRegexes += fmt.Sprintf(`"%v", `, regex)
-				}
-			}
-			tokenValidationRegexes += "]"
+			tokenValidationRegexes := `["` + strings.Join(tokenValidationRegex, `", "`) + `"]`
 
-			extraJWTIssuers := "["
-			for i, issuer := range sso.ExtraJWTIssuers {
-				if i == len(sso.SaaSSSO.AllowedGroups)-1 {
-					extraJWTIssuers += fmt.Sprintf(`"%s"`, issuer)
-				} else {
-					extraJWTIssuers += fmt.Sprintf(`"%s", `, issuer)
-				}
-			}
-			extraJWTIssuers += "]"
+			extraJWTIssuers := `["` + strings.Join(sso.ExtraJWTIssuers, `", "`) + `"]`
+
+			whitelist := `["` + strings.Join(sso.ExtraJWTIssuers, `", "`) + `"]`
 
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
@@ -269,6 +240,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 				fmt.Sprintf(`scope = "%s"`, sso.Scope),
 				fmt.Sprintf(`extra_jwt_issuers = %s`, extraJWTIssuers),
+				fmt.Sprintf(`whitelist_domains = %v`, whitelist),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/cnvrg-static"`,
@@ -282,18 +254,8 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 
 			if sso.SaaSSSO.Enabled {
-				allowedGroups := "["
-				for i, group := range sso.SaaSSSO.AllowedGroups {
-					if i == len(sso.SaaSSSO.AllowedGroups)-1 {
-						allowedGroups += fmt.Sprintf(`"%s"`, group)
-					} else {
-						allowedGroups += fmt.Sprintf(`"%s", `, group)
-					}
-				}
-				allowedGroups += "]"
-
+				allowedGroups := `["` + strings.Join(sso.SaaSSSO.AllowedGroups, `", "`) + `"]`
 				proxyConf = append(proxyConf, fmt.Sprintf(`allowed_groups = %s`, allowedGroups))
-
 			}
 
 			proxyConfigStr := strings.Join(proxyConf, "\n")

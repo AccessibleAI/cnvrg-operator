@@ -22,6 +22,7 @@ type SSO struct {
 	InsecureOidcAllowUnverifiedEmail bool     `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
 	ExtraJWTIssuers                  []string `json:"extraJWTIssuers,omitempty"`
 	SaaSSSO                          SaaSSSO  `json:"saaSSSO,omitempty"`
+	WhitelistDomain                  []string `json:"whitelistDomain,omitempty"`
 }
 
 type OauthProxyServiceConf struct {
