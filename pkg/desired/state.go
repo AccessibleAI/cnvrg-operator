@@ -223,7 +223,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 
 			extraJWTIssuers := `["` + strings.Join(sso.ExtraJWTIssuers, `", "`) + `"]`
 
-			whitelist := `["` + strings.Join(sso.ExtraJWTIssuers, `", "`) + `"]`
+			whitelist := `["` + strings.Join(sso.WhitelistDomain, `", "`) + `"]`
 
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
@@ -240,7 +240,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 				fmt.Sprintf(`scope = "%s"`, sso.Scope),
 				fmt.Sprintf(`extra_jwt_issuers = %s`, extraJWTIssuers),
-				fmt.Sprintf(`whitelist_domains = %v`, whitelist),
+				fmt.Sprintf(`whitelist_domain = %v`, whitelist),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
 				`custom_templates_dir = "/cnvrg-static"`,
