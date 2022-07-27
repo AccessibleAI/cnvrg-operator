@@ -3,16 +3,16 @@
 {{- if .Values.labels }}
 labels:
   {{- range $key, $value := .Values.labels }}
-  {{$key}}: {{$value}}
+  {{ $key }}: {{ $value | quote }}
   {{- end }}
 {{- else }}
 labels: { }
 {{- end }}
 
-{{- if .Values.annotations}}
+{{- if .Values.annotations }}
 annotations:
   {{- range $key, $value := .Values.annotations }}
-  {{$key}}: {{$value}}
+  {{ $key }}: {{ $value }}
   {{- end }}
 {{- else }}
 annotations: { }
