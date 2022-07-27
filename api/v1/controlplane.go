@@ -387,7 +387,7 @@ var controlPlaneDefault = ControlPlane{
 		SentryURL:          "",
 		AgentCustomTag:     "latest",
 		Intercom:           "true",
-		CnvrgJobUID:        "1000",
+		CnvrgJobUID:        "0", // by default cnvrg job is running as root
 		CnvrgJobRbacStrict: false,
 		CnvrgPrivilegedJob: true,
 	},
