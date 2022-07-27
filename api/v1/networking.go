@@ -30,6 +30,7 @@ type Ingress struct {
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
 	IstioGwEnabled  bool        `json:"istioGwEnabled,omitempty"`
 	IstioGwName     string      `json:"istioGwName,omitempty"`
+	ClassName       string      `json:"className,omitempty"`
 }
 
 type HTTPS struct {
@@ -37,6 +38,7 @@ type HTTPS struct {
 	Cert       string `json:"cert,omitempty"`
 	Key        string `json:"key,omitempty"`
 	CertSecret string `json:"certSecret,omitempty"`
+	AcmeCert   bool   `json:"acmeCert,omitempty"`
 }
 
 type CnvrgAppNetworking struct {
@@ -92,6 +94,7 @@ var httpsDefault = HTTPS{
 	Cert:       "",
 	Key:        "",
 	CertSecret: "",
+	AcmeCert:   "",
 }
 
 var ingressAppDefault = Ingress{
@@ -101,6 +104,7 @@ var ingressAppDefault = Ingress{
 	PerTryTimeout:   "3600s",
 	IstioGwEnabled:  false,
 	IstioGwName:     "",
+	ClassName:       "",
 }
 
 var ingressInfraDefault = Ingress{
@@ -110,6 +114,7 @@ var ingressInfraDefault = Ingress{
 	PerTryTimeout:   "3600s",
 	IstioGwEnabled:  false,
 	IstioGwName:     "",
+	ClassName:       "",
 }
 
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{

@@ -386,6 +386,8 @@ spec:
                         type: string
                       enabled:
                         type: boolean
+                      acmeCert:
+                        type: boolean
                       key:
                         type: string
                     type: object
@@ -394,6 +396,8 @@ spec:
                       istioGwEnabled:
                         type: boolean
                       istioGwName:
+                        type: string
+                      className:
                         type: string
                       perTryTimeout:
                         type: string

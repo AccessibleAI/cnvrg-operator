@@ -15,6 +15,9 @@ metadata:
     {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
+{{- if ne .Spec.Networking.Ingress.ClassName "" }}
+  ingressClassName: {{ .Spec.Networking.Ingress.ClassName }}
+{{- end }}
   rules:
   - host: "{{ .Spec.Dbs.Es.SvcName }}.{{ .Spec.ClusterDomain }}"
     http:
@@ -26,3 +29,13 @@ spec:
             name: {{ .Spec.Dbs.Es.SvcName }}
             port:
               number: {{ .Spec.Dbs.Es.Port }}
+{{- if isTrue .Spec.Networking.HTTPS.Enabled }}
+  tls:
+  - hosts:
+    - {{ .Spec.Dbs.Es.SvcName }}.{{ .Spec.ClusterDomain }}
+{{- if isTrue .Spec.Networking.HTTPS.AcmeCert }}
+    secretName: es-tls-cert
+{{- else if ne .Spec.Networking.HTTPS.CertSecret "" }}
+    secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+{{- end }}
+{{- end }}

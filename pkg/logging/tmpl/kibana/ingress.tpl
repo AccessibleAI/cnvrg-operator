@@ -15,6 +15,9 @@ metadata:
     {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
+{{- if ne .Spec.Networking.Ingress.ClassName "" }}
+  ingressClassName: {{ .Spec.Networking.Ingress.ClassName }}
+{{- end }}
   rules:
   - host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ .Spec.ClusterDomain }}"
     http:
@@ -26,3 +29,13 @@ spec:
             name: {{ .Spec.Logging.Kibana.SvcName }}
             port:
               number: {{ .Spec.Logging.Kibana.Port }}
+{{- if isTrue .Spec.Networking.HTTPS.Enabled }}
+  tls:
+  - hosts:
+    - {{ .Spec.Logging.Kibana.SvcName }}.{{ .Spec.ClusterDomain }}
+{{- if isTrue .Spec.Networking.HTTPS.AcmeCert }}
+    secretName: kibana-tls-cert
+{{- else if ne .Spec.Networking.HTTPS.CertSecret "" }}
+    secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+{{- end }}
+{{- end }}
