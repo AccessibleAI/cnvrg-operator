@@ -94,7 +94,7 @@ var httpsDefault = HTTPS{
 	Cert:       "",
 	Key:        "",
 	CertSecret: "",
-	AcmeCert:   "",
+	AcmeCert:   false,
 }
 
 var ingressAppDefault = Ingress{

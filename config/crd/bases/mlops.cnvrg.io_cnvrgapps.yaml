@@ -1,10 +1,9 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.2.5
+    controller-gen.kubebuilder.io/version: v0.9.0
   creationTimestamp: null
   name: cnvrgapps.mlops.cnvrg.io
 spec:
@@ -997,23 +996,23 @@ spec:
                 properties:
                   https:
                     properties:
+                      acmeCert:
+                        type: boolean
                       cert:
                         type: string
                       certSecret:
                         type: string
                       enabled:
                         type: boolean
-                      acmeCert:
-                        type: boolean
                       key:
                         type: string
                     type: object
                   ingress:
                     properties:
-                      istioGwEnabled:
-                        type: boolean
                       className:
                         type: string
+                      istioGwEnabled:
+                        type: boolean
                       istioGwName:
                         type: string
                       perTryTimeout:
@@ -1120,9 +1119,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
