@@ -34,7 +34,7 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     {{- end }}
     {{- end }}
-    {{- if and (eq .Values.networking.ingress.type "ingress") (ne .Values.networking.ingress.className "")
+    {{- if and (eq .Values.networking.ingress.type "ingress") (ne .Values.networking.ingress.className "") }}
     className: {{ .Values.networking.ingress.className }}
     {{- end }}
 {{- end }}

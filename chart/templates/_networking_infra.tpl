@@ -10,7 +10,7 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     istioGwName: "{{.Values.networking.ingress.istioGwName}}"
     {{- end }}
-    {{- if and (eq .Values.networking.ingress.type "ingress") (ne .Values.networking.ingress.className "")
+    {{- if and (eq .Values.networking.ingress.type "ingress") (ne .Values.networking.ingress.className "") }}
     className: {{ .Values.networking.ingress.className }}
     {{- end }}
   proxy:
