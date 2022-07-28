@@ -8,7 +8,7 @@ dbs:
       enabled: {{ .Values.dbs.cvat.enabled }}
   es:
     enabled: {{ .Values.dbs.es.enabled }}
-    replicas: "{{ .Values.dbs.es.replicas }}"
+    replicas: {{ .Values.dbs.es.replicas }}
     storageSize: {{ .Values.dbs.es.storageSize }}
     storageClass: "{{ .Values.dbs.es.storageClass }}"
     patchEsNodes: {{ .Values.dbs.es.patchEsNodes }}

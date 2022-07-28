@@ -87,13 +87,13 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
-      {{- if isTrue .Spec.Dbs.Es.PatchEsNodes }}
       enableServiceLinks: false
       initContainers:
+      {{- if isTrue .Spec.Dbs.Es.PatchEsNodes }}
       - name: "maxmap"
         image: cnvrg/cnvrg-es:7.17.3
-        imagePullPolicy: "Always"
-        command: [ "/bin/bash","-c","sysctl -w vm.max_map_count=262144"]
+        imagePullPolicy: "IfNotPresent"
+        command: ["/bin/bash","-c","sysctl -w vm.max_map_count=262144"]
         securityContext:
           privileged: true
           runAsUser: 0
@@ -107,7 +107,7 @@ spec:
       {{- end }}
       containers:
       - name: elastic
-        imagePullPolicy: "Always"
+        imagePullPolicy: "IfNotPresent"
         image: cnvrg/cnvrg-es:7.17.3
         env:
         - name: cluster.name
@@ -139,6 +139,8 @@ spec:
           value: "true"
         - name: xpack.security.authc.realms.native.native1.order
           value: "0"
+        - name: xpack.security.authc.realms.file.file1.order
+          value: "1"
         - name: xpack.security.transport.ssl.enabled
           value: "true"
         - name: xpack.security.transport.ssl.verification_mode
@@ -190,8 +192,8 @@ spec:
                     set -- "$@" $args
                   fi
 
-                  if [ -n "${ELASTIC_PASSWORD}" ]; then
-                    set -- "$@" -u "elastic:${ELASTIC_PASSWORD}"
+                  if [ -n "${CNVRG_ES_PASS}" ]; then
+                    set -- "$@" -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}"
                   fi
 
                   curl --output /dev/null -k "$@" "http://127.0.0.1:9200${path}"
@@ -238,9 +240,9 @@ spec:
               - -c
               - |
                 #!/bin/bash
-                CNVRG_ES_USER=elastic
                 ES_URL=http://localhost:9200
-                while [[ "$(curl -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" -s -o /dev/null -w '%{http_code}\n' $ES_URL)" != "200" ]]; do sleep 2; done
+                while [[ "$(curl -u "elastic:${CNVRG_ES_PASS}" -s -o /dev/null -w '%{http_code}\n' $ES_URL)" != "200" ]]; do sleep 2; done
+                curl -X PUT -u "elastic:${CNVRG_ES_PASS}" "${ES_URL}/_security/user/${CNVRG_ES_USER}?pretty"  -H 'Content-Type: application/json'  -d "{ \"password\" : \"${CNVRG_ES_PASS}\", \"roles\" : [ \"superuser\" ] }"
                 curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "${ES_URL}/_ilm/policy/cleanup_policy_app?pretty"  -H 'Content-Type: application/json'  -d '{ "policy": { "phases": { "hot": { "actions": {} }, "delete": { "min_age": "30d", "actions": { "delete": {} } } } } }'
                 curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "${ES_URL}/_ilm/policy/cleanup_policy_jobs?pretty"  -H 'Content-Type: application/json'  -d '{ "policy": { "phases": { "hot": { "actions": {} }, "delete": { "min_age": "14d", "actions": { "delete": {} } } } } }'
                 curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "${ES_URL}/_ilm/policy/cleanup_policy_all?pretty"  -H 'Content-Type: application/json'  -d '{ "policy": { "phases": { "hot": { "actions": {} }, "delete": { "min_age": "3d", "actions": { "delete": {} } } } } }'
