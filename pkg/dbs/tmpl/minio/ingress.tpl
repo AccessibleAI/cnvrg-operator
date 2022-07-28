@@ -35,7 +35,7 @@ spec:
     - {{ .Spec.Dbs.Minio.SvcName }}.{{ .Spec.ClusterDomain }}
 {{- if isTrue .Spec.Networking.HTTPS.AcmeCert }}
     secretName: minio-tls-cert
-{{- else if not .Spec.Networking.HTTPS.CertSecret "" }}
+{{- else if ne .Spec.Networking.HTTPS.CertSecret "" }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
 {{- end }}
 {{- end }}
