@@ -82,6 +82,10 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
 	}
 
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+		discoverOcpDefaultRouteHost(r.Client)
+	}
+
 	// setup finalizer
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {

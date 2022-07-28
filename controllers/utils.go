@@ -4,11 +4,17 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/networking"
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/types"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
@@ -60,7 +66,7 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
-func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
+func discoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 	nodeList := &v1.NodeList{}
 	if err := clientset.List(context.Background(), nodeList, client.Limit(1)); err != nil {
 		return "", err
@@ -81,9 +87,87 @@ func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 	}
 }
 
+func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost string, err error) {
+	routeCfg := &unstructured.Unstructured{}
+	routeCfg.SetGroupVersionKind(desired.Kinds["OcpIngressCfg"])
+	routeCfg.SetName("cluster")
+	err = clientset.Get(context.Background(), types.NamespacedName{Name: "cluster"}, routeCfg)
+	if err != nil {
+		return "", err
+	}
+
+	if _, ok := routeCfg.Object["spec"]; !ok {
+		return "", fmt.Errorf("unable to parse OCP Ingress config, can't set default route host")
+	}
+
+	if domain, ok := routeCfg.Object["spec"].(map[string]interface{})["domain"]; !ok {
+		return "", fmt.Errorf("unable to parse OCP Ingress config, can't set default route host")
+	} else {
+		return domain.(string), nil
+
+	}
+}
+
+func discoverOcpPromCreds(clientset client.Client, ns string) {
+	promCreds := &v1.Secret{ObjectMeta: metav1.ObjectMeta{
+		Name:      "prom-creds",
+		Namespace: ns,
+	}}
+	err := clientset.Get(context.Background(), types.NamespacedName{Name: promCreds.Name, Namespace: promCreds.Namespace}, promCreds)
+	if k8serrors.IsNotFound(err) {
+		dataSourceSecret := &v1.Secret{}
+		name := types.NamespacedName{Name: "grafana-datasources-v2", Namespace: "openshift-monitoring"}
+		err := clientset.Get(context.Background(), name, dataSourceSecret)
+		if err != nil {
+			appLog.Error(err, "failed to discover prom creds")
+			return
+
+		}
+		if _, ok := dataSourceSecret.Data["prometheus.yaml"]; !ok {
+			appLog.Error(err, "failed to discover prom creds")
+			return
+		}
+		promData := &struct {
+			Datasources []struct {
+				Url            string
+				Name           string
+				SecureJsonData struct {
+					BasicAuthPassword string
+				}
+			}
+		}{}
+
+		err = json.Unmarshal(dataSourceSecret.Data["prometheus.yaml"], &promData)
+
+		if err != nil {
+			appLog.Error(err, "error unmarshal prometheus.yaml")
+			return
+		}
+
+		if len(promData.Datasources) < 1 {
+			appLog.Error(err, "unexpected prom data")
+			return
+		}
+
+		promCreds.Data = make(map[string][]byte)
+		promCreds.Data["CNVRG_PROMETHEUS_URL"] = []byte(promData.Datasources[0].Url)
+		promCreds.Data["CNVRG_PROMETHEUS_USER"] = []byte(promData.Datasources[0].Name)
+		promCreds.Data["CNVRG_PROMETHEUS_PASS"] = []byte(promData.Datasources[0].SecureJsonData.BasicAuthPassword)
+
+		err = clientset.Create(context.Background(), promCreds)
+		if err != nil {
+			appLog.Error(err, "error creating promCreds for OCP setup")
+		}
+
+	} else if err != nil {
+		appLog.Error(err, "failed to discover prom creds")
+	}
+	return
+}
+
 func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) error {
 	if app.Spec.Cri == "" {
-		cri, err := DiscoverCri(clientset)
+		cri, err := discoverCri(clientset)
 		if err != nil {
 			return err
 		}
@@ -136,12 +220,25 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.CnvrgJobPriorityClass = infra.Spec.CnvrgJobPriorityClass
 	}
 
+	if app.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+		if app.Spec.ClusterDomain == "" {
+			clusterDomain, err := discoverOcpDefaultRouteHost(clientset)
+			if err != nil {
+				appLog.Error(err, "unable discover cluster domain, set clusterDomain manually under spec.clusterDomain")
+
+			} else {
+				desiredAppSpec.ClusterDomain = clusterDomain
+			}
+		}
+		discoverOcpPromCreds(clientset, app.Namespace)
+	}
+
 	return nil
 }
 
 func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {
 	if infra.Spec.Cri == "" {
-		cri, err := DiscoverCri(clientset)
+		cri, err := discoverCri(clientset)
 		if err != nil {
 			return err
 		}
