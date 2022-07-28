@@ -26,4 +26,3 @@ spec:
       {{- end }}
   selector:
     cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
-

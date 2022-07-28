@@ -1,3 +1,5 @@
+
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -145,6 +147,13 @@ spec:
                     type: array
                   vpc:
                     properties:
+                      clusterEndpoints:
+                        properties:
+                          privateAccess:
+                            type: boolean
+                          publicAccess:
+                            type: boolean
+                        type: object
                       id:
                         type: string
                       privateSubnets:
@@ -165,6 +174,11 @@ spec:
                 type: object
               clusterSlug:
                 type: string
+              cnvrgDedicatedNodeGroup:
+                properties:
+                  spotInstances:
+                    type: boolean
+                type: object
               metadata:
                 additionalProperties:
                   type: string
