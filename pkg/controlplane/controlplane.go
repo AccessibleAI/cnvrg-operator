@@ -11,6 +11,20 @@ import (
 
 const path = "/pkg/controlplane/tmpl"
 
+func ocpSccState() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/conf/rbac/ocp-scc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.OcpSccGVK],
+			Own:            false,
+			Updatable:      true,
+		},
+	}
+}
+
 func rbacState() []*desired.State {
 	return []*desired.State{
 		{
@@ -707,6 +721,10 @@ func mpiInfraState() []*desired.State {
 func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	var state []*desired.State
 	state = append(state, rbacState()...)
+
+	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+		state = append(state, ocpSccState()...)
+	}
 
 	if cnvrgApp.Spec.ControlPlane.BaseConfig.CnvrgPrivilegedJob {
 		state = append(state, privilegedRbacState()...)

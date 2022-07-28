@@ -89,7 +89,7 @@ func discoverCri(clientset client.Client) (mlopsv1.CriType, error) {
 
 func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost string, err error) {
 	routeCfg := &unstructured.Unstructured{}
-	routeCfg.SetGroupVersionKind(desired.Kinds["OcpIngressCfg"])
+	routeCfg.SetGroupVersionKind(desired.Kinds["OcpIngressCfgGVK"])
 	routeCfg.SetName("cluster")
 	err = clientset.Get(context.Background(), types.NamespacedName{Name: "cluster"}, routeCfg)
 	if err != nil {
