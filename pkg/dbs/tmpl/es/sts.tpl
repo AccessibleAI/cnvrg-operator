@@ -1,9 +1,3 @@
-{{- define "endpoints" -}}
-{{- $replicas := int (toString ( .Spec.Dbs.Es.Replicas)) }}
-  {{- range $i, $e := untilStep 0 $replicas 1 -}}
-{{ $.Spec.Dbs.Es.SvcName }}-{{ $i }},
-  {{- end -}}
-{{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -22,7 +16,7 @@ spec:
   selector:
     matchLabels:
       app: {{ .Spec.Dbs.Es.SvcName }}
-  replicas: {{ .Spec.Dbs.Es.Replicas }}
+  replicas: 1
   template:
     metadata:
       annotations:
@@ -35,18 +29,6 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - {{ .Spec.Dbs.Es.SvcName }}
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
@@ -94,11 +76,11 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: "ES_NETWORK_HOST"
-          value: "0.0.0.0"
-        - name: ES_INITIAL_MASTER_NODES
-          value: "{{ template "endpoints" . }}"
-        - name: ES_SEED_HOSTS
-          value: "{{ .Spec.Dbs.Es.SvcName }}-headless"
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: "ES_DISCOVERY_TYPE"
+          value: "single-node"
         - name: "ES_PATH_DATA"
           value: "/usr/share/elasticsearch/data/data"
         - name: "ES_PATH_LOGS"
@@ -127,7 +109,7 @@ spec:
               - /bin/bash
               - -c
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://127.0.0.1:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
                 if [ "$ready" == "200" ]; then
                   exit 0
                 else
@@ -142,7 +124,7 @@ spec:
               - /bin/bash
               - -c
               - |
-                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://127.0.0.1:9200/_cluster/health -o /dev/null -w '%{http_code}')
+                ready=$(curl -s -u$CNVRG_ES_USER:$CNVRG_ES_PASS http://$ES_NETWORK_HOST:9200/_cluster/health -o /dev/null -w '%{http_code}')
                 if [ "$ready" == "200" ]; then
                   exit 0;
                 else
@@ -152,7 +134,7 @@ spec:
           periodSeconds: 20
           failureThreshold: 5
         volumeMounts:
-        - name: es-storage
+        - name: {{ .Spec.Dbs.Es.PvcName }}
           mountPath: "/usr/share/elasticsearch/data"
   volumeClaimTemplates:
   - metadata:

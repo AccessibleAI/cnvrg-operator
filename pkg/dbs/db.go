@@ -22,7 +22,55 @@ func EsCreds(data interface{}) []*desired.State {
 		},
 	}
 }
+func EsCerts() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/secret-cert.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
 
+func esCluster() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/sts-cluster.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.StatefulSetGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/es/svc-headless.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+func esSingleNode() []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/sts.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.StatefulSetGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
 func esState() []*desired.State {
 	return []*desired.State{
 		{
@@ -62,25 +110,7 @@ func esState() []*desired.State {
 			Updatable:      true,
 		},
 		{
-			TemplatePath:   path + "/es/sts.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.StatefulSetGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
 			TemplatePath:   path + "/es/svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SvcGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/es/svc-headless.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
@@ -638,6 +668,11 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	// elasticsearch
 	if cnvrgApp.Spec.Dbs.Es.Enabled {
 		state = append(state, esState()...)
+		if cnvrgApp.Spec.Dbs.Es.Replicas == 1 {
+			state = append(state, esSingleNode()...)
+		} else if cnvrgApp.Spec.Dbs.Es.Replicas > 1 {
+			state = append(state, esCluster()...)
+		}
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
 			state = append(state, esIstioVs()...)

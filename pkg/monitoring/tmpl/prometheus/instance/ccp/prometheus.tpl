@@ -114,9 +114,9 @@ spec:
     {{- end }}
   tolerations:
     - operator: "Exists"
-  {{- else if (gt (len .Spec.Dbs.Es.NodeSelector) 0) }}
+  {{- else if (gt (len .Spec.Monitoring.Prometheus.NodeSelector) 0) }}
   nodeSelector:
-    {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
+    {{- range $key, $val := .Spec.Monitoring.Prometheus.NodeSelector }}
     {{ $key }}: {{ $val }}
     {{- end }}
   {{- end }}
