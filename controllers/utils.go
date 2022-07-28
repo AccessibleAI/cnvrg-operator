@@ -130,7 +130,7 @@ func discoverOcpPromCreds(clientset client.Client, ns string) {
 		promData := &struct {
 			Datasources []struct {
 				Url            string
-				Name           string
+				BasicAuthUser  string
 				SecureJsonData struct {
 					BasicAuthPassword string
 				}
@@ -151,7 +151,7 @@ func discoverOcpPromCreds(clientset client.Client, ns string) {
 
 		promCreds.Data = make(map[string][]byte)
 		promCreds.Data["CNVRG_PROMETHEUS_URL"] = []byte(promData.Datasources[0].Url)
-		promCreds.Data["CNVRG_PROMETHEUS_USER"] = []byte(promData.Datasources[0].Name)
+		promCreds.Data["CNVRG_PROMETHEUS_USER"] = []byte(promData.Datasources[0].BasicAuthUser)
 		promCreds.Data["CNVRG_PROMETHEUS_PASS"] = []byte(promData.Datasources[0].SecureJsonData.BasicAuthPassword)
 
 		err = clientset.Create(context.Background(), promCreds)

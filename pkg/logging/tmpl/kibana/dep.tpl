@@ -82,7 +82,6 @@ spec:
             - |
               #!/bin/bash
               {
-                cnvrgIndexPattern=cnvrg-*
                 ready=notready
                 while [[ "$ready" != "200" ]]; do
                   ready=$(curl -s http://localhost:$SERVER_PORT/api/status -o /dev/null -w '%{http_code}')
@@ -90,18 +89,20 @@ spec:
                   sleep 1
                 done
                 echo "[$(date)][cnvrg-init] kibana is ready!"
-                cnvrgIndexPatternExists=$(curl -s http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern -o /dev/null -w '%{http_code}')
-                if [[ "$cnvrgIndexPatternExists" == "200" ]]; then
-                  echo "[$(date)][cnvrg-init] cnvrg index pattern found, skip index creation!"
-                fi
-                if [[ "$cnvrgIndexPatternExists" == "404" ]]; then
-                  echo "[$(date)][cnvrg-init] cnvrg index pattern not found, going to create one"
-                  curl -XPOST "http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern" \
-                     -H 'kbn-xsrf: true' \
-                     -H 'Content-Type: application/json' \
-                     -d '{"attributes":{"title": "cnvrg","timeFieldName": "@timestamp"}}'
-                  echo "[$(date)][cnvrg-init] Index created!"
-                fi
+                for cnvrgIndexPattern in "cnvrg*" "cnvrg-endpoints*"; do
+                  cnvrgIndexPatternExists=$(curl -s http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern -o /dev/null -w '%{http_code}')
+                  if [[ "$cnvrgIndexPatternExists" == "200" ]]; then
+                    echo "[$(date)][cnvrg-init] cnvrg index pattern found, skip index creation!"
+                  fi
+                  if [[ "$cnvrgIndexPatternExists" == "404" ]]; then
+                    echo "[$(date)][cnvrg-init] cnvrg index pattern not found, going to create one"
+                    curl -XPOST "http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern" \
+                       -H 'kbn-xsrf: true' \
+                       -H 'Content-Type: application/json' \
+                       -d '{"attributes":{"title": "'$cnvrgIndexPattern'","timeFieldName": "@timestamp"}}'
+                    echo "[$(date)][cnvrg-init] Index $cnvrgIndexPattern created!"
+                  fi
+                done
               } &
               /usr/local/bin/kibana-docker
           volumeMounts:
