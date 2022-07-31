@@ -16,10 +16,13 @@ metadata:
   namespace: {{ ns . }}
 spec:
   rules:
-    - host: "{{.Spec.ControlPlane.CnvrgRouter.SvcName}}.{{ .Spec.ClusterDomain }}"
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: {{ .Spec.ControlPlane.CnvrgRouter.SvcName }}
-              servicePort:  {{ .Spec.ControlPlane.CnvrgRouter.Port }}
+  - host: "{{.Spec.ControlPlane.CnvrgRouter.SvcName}}.{{ .Spec.ClusterDomain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Spec.ControlPlane.CnvrgRouter.SvcName }}
+            port:
+              number: {{ .Spec.ControlPlane.CnvrgRouter.Port }}
