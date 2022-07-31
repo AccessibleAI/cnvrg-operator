@@ -372,14 +372,15 @@ func (r *CnvrgInfraReconciler) generateMonitoringSecrets(infra *mlopsv1.CnvrgInf
 		}
 		promSecretData := desired.TemplateData{
 			Data: map[string]interface{}{
-				"Namespace":   infra.Spec.InfraNamespace,
-				"Annotations": infra.Spec.Annotations,
-				"Labels":      infra.Spec.Labels,
-				"CredsRef":    infra.Spec.Monitoring.Prometheus.CredsRef,
-				"User":        user,
-				"Pass":        pass,
-				"PassHash":    fmt.Sprintf("%s:%s", user, passHash),
-				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
+				"Namespace":       infra.Spec.InfraNamespace,
+				"Annotations":     infra.Spec.Annotations,
+				"Labels":          infra.Spec.Labels,
+				"CredsRef":        infra.Spec.Monitoring.Prometheus.CredsRef,
+				"User":            user,
+				"Pass":            pass,
+				"PassHash":        fmt.Sprintf("%s:%s", user, passHash),
+				"PromUrl":         fmt.Sprintf("http://%s.%s.svc:%d", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.InfraNamespace, infra.Spec.Monitoring.Prometheus.Port),
+				"ExternalPromUrl": fmt.Sprintf("%s.%s", infra.Spec.Monitoring.Prometheus.SvcName, infra.Spec.ClusterDomain),
 			},
 		}
 		infraLog.Info("trying to generate prometheus creds (if still doesn't exists...)")

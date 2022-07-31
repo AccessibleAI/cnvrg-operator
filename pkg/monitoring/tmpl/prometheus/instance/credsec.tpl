@@ -13,7 +13,8 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 data:
-  CNVRG_PROMETHEUS_USER: {{ .Data.User | b64enc }}
-  CNVRG_PROMETHEUS_PASS: {{ .Data.Pass | b64enc }}
-  CNVRG_PROMETHEUS_URL:  {{ .Data.PromUrl | b64enc}}
-  htpasswd:              {{ .Data.PassHash | b64enc }}
+  CNVRG_PROMETHEUS_USER:         {{ .Data.User | b64enc }}
+  CNVRG_PROMETHEUS_PASS:         {{ .Data.Pass | b64enc }}
+  CNVRG_PROMETHEUS_URL:          {{ .Data.PromUrl | b64enc }}
+  CNVRG_PROMETHEUS_EXTERNAL_URL: {{ .Data.ExternalPromUrl | b64enc }}
+  htpasswd:                      {{ .Data.PassHash | b64enc }}
