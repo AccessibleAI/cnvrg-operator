@@ -53,6 +53,7 @@ spec:
         ports:
           - containerPort: 8080
         livenessProbe:
+          timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
           initialDelaySeconds: 5
@@ -65,6 +66,7 @@ spec:
           failureThreshold: 5
           initialDelaySeconds: 5
           periodSeconds: 10
+          timeoutSeconds: 5
           httpGet:
             port: 8080
             path: /healthz
