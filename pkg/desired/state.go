@@ -215,15 +215,35 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			sso := getSSOConfig(obj)
 
 			skipAuthRegex = append(skipAuthRegex, `^\/opstatic/`)
-			skipAuthUrls := `["` + strings.Join(skipAuthRegex, `", "`) + `"]`
+			skipAuthUrls := `[`
+			if len(skipAuthRegex) > 0 {
+				skipAuthUrls += `"` + strings.Join(skipAuthRegex, `", "`) + `"`
+			}
+			skipAuthUrls += `]`
 
-			emailsDomains := `["` + strings.Join(sso.EmailDomain, `", "`) + `"]`
+			emailsDomains := `[`
+			if len(sso.EmailDomain) > 0 {
+				emailsDomains += `"` + strings.Join(sso.EmailDomain, `", "`) + `"`
+			}
+			emailsDomains += `]`
 
-			tokenValidationRegexes := `["` + strings.Join(tokenValidationRegex, `", "`) + `"]`
+			tokenValidationRegexes := `[`
+			if len(tokenValidationRegex) > 0 {
+				tokenValidationRegexes += `"` + strings.Join(tokenValidationRegex, `", "`) + `"`
+			}
+			tokenValidationRegexes += `]`
 
-			extraJWTIssuers := `["` + strings.Join(sso.ExtraJWTIssuers, `", "`) + `"]`
+			extraJWTIssuers := `[`
+			if len(sso.ExtraJWTIssuers) > 0 {
+				extraJWTIssuers += `"` + strings.Join(sso.ExtraJWTIssuers, `", "`) + `"`
+			}
+			extraJWTIssuers += `]`
 
-			whitelist := `["` + strings.Join(sso.WhitelistDomain, `", "`) + `"]`
+			whitelist := `[`
+			if len(sso.WhitelistDomain) > 0 {
+				whitelist += `"` + strings.Join(sso.WhitelistDomain, `", "`) + `"`
+			}
+			whitelist += `]`
 
 			proxyConf := []string{
 				fmt.Sprintf(`provider = "%v"`, provider),
@@ -254,7 +274,11 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			}
 
 			if sso.SaaSSSO.Enabled {
-				allowedGroups := `["` + strings.Join(sso.SaaSSSO.AllowedGroups, `", "`) + `"]`
+				allowedGroups := `[`
+				if len(sso.SaaSSSO.AllowedGroups) > 0 {
+					allowedGroups += `"` + strings.Join(sso.SaaSSSO.AllowedGroups, `", "`) + `"`
+				}
+				allowedGroups += `]`
 				proxyConf = append(proxyConf, fmt.Sprintf(`allowed_groups = %s`, allowedGroups))
 			}
 
