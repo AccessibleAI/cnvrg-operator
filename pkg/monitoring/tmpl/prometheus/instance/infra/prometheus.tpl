@@ -58,6 +58,9 @@ spec:
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
+      {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+      sidecar.istio.io/inject: "true"
+      {{- end }}
   ruleSelector:
     matchLabels:
       app: cnvrg-infra-prometheus
@@ -77,6 +80,7 @@ spec:
       cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
   version: v2.22.1
   listenLocal: true
+  enableServiceLinks: false
   containers:
   - name: "prom-auth-proxy"
     image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}

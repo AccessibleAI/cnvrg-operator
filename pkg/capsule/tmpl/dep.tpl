@@ -33,6 +33,7 @@ spec:
       tolerations:
         - operator: "Exists"
       {{- end }}
+      enableServiceLinks: false
       containers:
         - name: capsule
           command:

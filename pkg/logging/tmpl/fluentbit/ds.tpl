@@ -34,6 +34,7 @@ spec:
         {{- range $key, $val := .Spec.Logging.Fluentbit.NodeSelector }}
         {{ $key }}: {{ $val }}
         {{- end }}
+      enableServiceLinks: false
       containers:
         - name: fluentbit
           image: {{ image .Spec.ImageHub .Spec.Logging.Fluentbit.Image }}

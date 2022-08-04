@@ -38,6 +38,7 @@ spec:
         - operator: Exists
       nodeSelector:
         accelerator: nvidia
+      enableServiceLinks: false
       containers:
         - name: exporter
           securityContext:

@@ -46,6 +46,7 @@ spec:
         - operator: Exists
       nodeSelector:
         node.kubernetes.io/instance-type: dl1.24xlarge
+      enableServiceLinks: false
       containers:
         - name: exporter
           securityContext:

@@ -19,19 +19,26 @@ spec:
     base:
       enabled: true
     cni:
-      enabled: false
+      enabled: true
     egressGateways:
     - enabled: false
       name: istio-egressgateway
     ingressGateways:
     - enabled: true
-      name: cnvrg-ingressgateway
+      name: cnvrg-eastwestgateway
       label:
-        istio: cnvrg-ingressgateway
+        istio: cnvrg-eastwestgateway
+        app: cnvrg-eastwestgateway
+        {{- if not .Spec.Networking.EastWest.ClusterIpsEnabled }}
+        topology.istio.io/network: {{ .Spec.Networking.EastWest.Network }}
+        {{- end }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
       k8s:
+        env:
+        - name: ISTIO_META_REQUESTED_NETWORK_VIEW
+          value: {{ .Spec.Networking.EastWest.Network }}
         priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
         podAnnotations:
           {{- range $k, $v := .Spec.Annotations }}
@@ -48,7 +55,7 @@ spec:
           {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
-          maxReplicas: 5
+          maxReplicas: 10
           metrics:
             - resource:
                 name: cpu
@@ -58,14 +65,14 @@ spec:
           scaleTargetRef:
             apiVersion: apps/v1
             kind: Deployment
-            name: cnvrg-ingressgateway
+            name: cnvrg-eastwestgateway
         resources:
           limits:
-            cpu: "3"
-            memory: 6G
+            cpu: "2"
+            memory: 4G
           requests:
-            cpu: 150m
-            memory: 450Mi
+            cpu: 500m
+            memory: 1Gi
         service:
           loadBalancerSourceRanges:
           {{- range $idx, $range := .Spec.Networking.Istio.LBSourceRanges }}
@@ -79,17 +86,23 @@ spec:
           {{- end }}
           {{- end }}
           ports:
-          - name: http2
-            port: 80
-            targetPort: 8080
-          - name: https
-            port: 443
-            targetPort: 8443
+          - name: status-port
+            port: 15021
+            targetPort: 15021
+          - name: tls
+            port: 15443
+            targetPort: 15443
+          - name: tls-istiod
+            port: 15012
+            targetPort: 15012
+          - name: tls-webhook
+            port: 15017
+            targetPort: 15017
           {{- if gt (len .Spec.Networking.Istio.IngressSvcExtraPorts) 0 }}
           {{- range $idx, $port := .Spec.Networking.Istio.IngressSvcExtraPorts }}
           - name: port{{ $port}}
             port: {{ $port}}
-            {{- end }}
+          {{- end }}
           {{- end }}
     istiodRemote:
       enabled: false
@@ -110,10 +123,37 @@ spec:
             value: "{{ .Spec.Tenancy.Value }}"
             effect: "NoSchedule"
         {{- end }}
+        hpaSpec:
+          maxReplicas: 20
+          metrics:
+            - resource:
+                name: cpu
+                targetAverageUtilization: 80
+              type: Resource
+          minReplicas: 1
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: istiod
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 1Gi
   values:
     global:
       istioNamespace:  {{ ns . }}
       imagePullSecrets:
         - {{ .Spec.Registry.Name }}
+      meshID: {{ .Spec.Networking.EastWest.MeshId }}
+      multiCluster:
+        clusterName: {{ .Spec.Networking.EastWest.ClusterName }}
+      network: {{ .Spec.Networking.EastWest.Network }}
+    gateways:
+      istio-ingressgateway:
+        # Enable gateway injection
+        injectionTemplate: gateway
     meshConfig:
       rootNamespace: {{ ns . }}

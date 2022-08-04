@@ -42,6 +42,7 @@ spec:
           effect: "NoSchedule"
       {{- end }}
       serviceAccountName: nfs-client-provisioner
+      enableServiceLinks: false
       containers:
         - name: nfs-client-provisioner
           image: {{image .Spec.ImageHub .Spec.Storage.Nfs.Image }}
