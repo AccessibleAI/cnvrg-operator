@@ -12,7 +12,7 @@ labels: { }
 {{- if .Values.annotations }}
 annotations:
   {{- range $key, $value := .Values.annotations }}
-  {{ $key }}: {{ $value }}
+  {{ $key }}: {{ $value | quote }}
   {{- end }}
 {{- else }}
 annotations: { }
