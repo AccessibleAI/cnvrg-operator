@@ -38,6 +38,7 @@ spec:
         - operator: Exists
       nodeSelector:
         node.kubernetes.io/instance-type: dl1.24xlarge
+      enableServiceLinks: false
       containers:
         - image: {{ image .Data.ImageHub .Data.HabanaDp.Image }}
           name: habanalabs-device-plugin-ctr

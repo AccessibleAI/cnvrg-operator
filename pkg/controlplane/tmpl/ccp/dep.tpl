@@ -25,6 +25,7 @@ spec:
           value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
+      enableServiceLinks: false
       containers:
         - args:
             - --health-probe-bind-address=:8081

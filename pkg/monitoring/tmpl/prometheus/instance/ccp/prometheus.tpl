@@ -12,6 +12,18 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchExpressions:
+            - key: cnvrg
+              operator: In
+              values:
+              - {{ .Spec.Monitoring.Prometheus.SvcName }}
   storage:
     disableMountSubPath: true
     volumeClaimTemplate:
@@ -24,7 +36,7 @@ spec:
         {{- end }}
   image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.Image }}
   replicas: {{ .Spec.Monitoring.Prometheus.Replicas }}
-  retention: 8w # 2 months
+  retention: {{ .Spec.Monitoring.Prometheus.Retention }}
   retentionSize: {{ promRetentionSize .Spec.Monitoring.Prometheus.StorageSize }} # total PVC size - 2 Gi
   podMetadata:
     {{- if .Spec.Annotations }}
@@ -33,12 +45,14 @@ spec:
       {{$k}}: "{{$v}}"
       {{- end }}
     {{- end }}
-    {{- if .Spec.Labels}}
     labels:
+      cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
-    {{- end }}
+      {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+      sidecar.istio.io/inject: "true"
+      {{- end }}
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}
@@ -68,6 +82,7 @@ spec:
     name: {{ .Spec.Monitoring.Prometheus.UpstreamRef }}
     key: prometheus-additional.yaml
   listenLocal: true
+  enableServiceLinks: false
   containers:
     - name: "prom-auth-proxy"
       image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}

@@ -48,7 +48,7 @@ spec:
           {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
-          maxReplicas: 5
+          maxReplicas: 20
           metrics:
             - resource:
                 name: cpu
@@ -61,11 +61,11 @@ spec:
             name: cnvrg-ingressgateway
         resources:
           limits:
-            cpu: "3"
-            memory: 6G
+            cpu: "2"
+            memory: 4G
           requests:
-            cpu: 150m
-            memory: 450Mi
+            cpu: 500m
+            memory: 1Gi
         service:
           loadBalancerSourceRanges:
           {{- range $idx, $range := .Spec.Networking.Istio.LBSourceRanges }}
@@ -89,7 +89,7 @@ spec:
           {{- range $idx, $port := .Spec.Networking.Istio.IngressSvcExtraPorts }}
           - name: port{{ $port}}
             port: {{ $port}}
-            {{- end }}
+          {{- end }}
           {{- end }}
     istiodRemote:
       enabled: false
@@ -110,10 +110,48 @@ spec:
             value: "{{ .Spec.Tenancy.Value }}"
             effect: "NoSchedule"
         {{- end }}
+        hpaSpec:
+          maxReplicas: 10
+          metrics:
+            - resource:
+                name: cpu
+                targetAverageUtilization: 80
+              type: Resource
+          minReplicas: 1
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: istiod
+        resources:
+          limits:
+            cpu: "3"
+            memory: 6G
+          requests:
+            cpu: 500m
+            memory: 1Gi
   values:
     global:
+      {{- if (gt (len .Spec.Networking.EastWest.RemoteClusters) 0) }}
+      meshNetworks:
+      {{- range $cluster, $ips := .Spec.Networking.EastWest.RemoteClusters }}
+      {{- if (gt (len $ips) 0) }}
+        {{$cluster}}:
+          endpoints:
+            - fromRegistry: {{$cluster}}
+          gateways:
+        {{- range $ips }}
+            - address: {{ . }}
+              port: 15443
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
       istioNamespace:  {{ ns . }}
       imagePullSecrets:
         - {{ .Spec.Registry.Name }}
+      meshID: {{ .Spec.Networking.EastWest.MeshId }}
+      multiCluster:
+        clusterName: {{ .Spec.Networking.EastWest.ClusterName }}
+      network: {{ .Spec.Networking.EastWest.Network }}
     meshConfig:
       rootNamespace: {{ ns . }}

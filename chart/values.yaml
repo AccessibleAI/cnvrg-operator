@@ -160,6 +160,7 @@ monitoring:
 
   prometheus:
     enabled: true
+    retention: "8w"
     storageSize: "50Gi"
     storageClass: ""
     nodeSelector: { }
@@ -192,7 +193,12 @@ networking:
     ingressSvcAnnotations: { }
     ingressSvcExtraPorts: [ ]
     lbSourceRanges: [ ]
-
+  eastWest:
+    enabled: false
+    primary: false
+    clusterName: ""
+    network: "network1"
+    meshId: "mesh1"
 sso:
   enabled: false
   adminUser: ""

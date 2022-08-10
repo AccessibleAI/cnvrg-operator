@@ -25,6 +25,9 @@ spec:
         {{- end }}
       labels:
         app: {{ .Spec.Logging.Elastalert.SvcName }}
+        {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
@@ -48,6 +51,7 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      enableServiceLinks: false
       containers:
       - image: {{ image .Spec.ImageHub .Spec.Logging.Elastalert.Image }}
         name: {{ .Spec.Logging.Elastalert.SvcName }}

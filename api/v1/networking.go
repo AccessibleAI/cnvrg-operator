@@ -23,6 +23,16 @@ type Istio struct {
 	IngressSvcAnnotations map[string]string `json:"ingressSvcAnnotations,omitempty"`
 }
 
+type EastWest struct {
+	Enabled           bool                `json:"enabled,omitempty"`
+	ClusterName       string              `json:"clusterName,omitempty"`
+	Network           string              `json:"network,omitempty"`
+	MeshId            string              `json:"meshId,omitempty"`
+	Primary           bool                `json:"primary,omitempty"`
+	RemoteClusters    map[string][]string `json:"remoteClusters,omitempty"`
+	ClusterIpsEnabled bool                `json:"clusterIpsEnabled,omitempty"`
+}
+
 type Ingress struct {
 	Type            IngressType `json:"type,omitempty"`
 	Timeout         string      `json:"timeout,omitempty"`
@@ -42,16 +52,18 @@ type HTTPS struct {
 }
 
 type CnvrgAppNetworking struct {
-	Ingress Ingress `json:"ingress,omitempty"`
-	HTTPS   HTTPS   `json:"https,omitempty"`
-	Proxy   Proxy   `json:"proxy,omitempty"`
+	Ingress  Ingress  `json:"ingress,omitempty"`
+	HTTPS    HTTPS    `json:"https,omitempty"`
+	Proxy    Proxy    `json:"proxy,omitempty"`
+	EastWest EastWest `json:"eastWest,omitempty"`
 }
 
 type CnvrgInfraNetworking struct {
-	Ingress Ingress `json:"ingress,omitempty"`
-	HTTPS   HTTPS   `json:"https,omitempty"`
-	Istio   Istio   `json:"istio,omitempty"`
-	Proxy   Proxy   `json:"proxy,omitempty"`
+	Ingress  Ingress  `json:"ingress,omitempty"`
+	HTTPS    HTTPS    `json:"https,omitempty"`
+	Istio    Istio    `json:"istio,omitempty"`
+	Proxy    Proxy    `json:"proxy,omitempty"`
+	EastWest EastWest `json:"eastWest,omitempty"`
 }
 
 type Proxy struct {
@@ -78,11 +90,19 @@ var defaultAppProxy = Proxy{
 	NoProxy:    nil,
 }
 
+var EastWestDefault = EastWest{
+	Enabled:        false,
+	ClusterName:    "",
+	Network:        "network1",
+	MeshId:         "mesh1",
+	Primary:        false,
+	RemoteClusters: nil,
+}
+
 var istioDefault = Istio{
 	Enabled:               false,
-	OperatorImage:         "istio-operator:1.10.2",
-	PilotImage:            "pilot:1.10.2",
-	ProxyImage:            "proxyv2:1.10.2",
+	OperatorImage:         "istio-operator:1.13.5",
+	PilotImage:            "pilot:1.13.5",
 	ExternalIP:            nil,
 	IngressSvcAnnotations: nil,
 	IngressSvcExtraPorts:  nil,
@@ -118,14 +138,16 @@ var ingressInfraDefault = Ingress{
 }
 
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
-	Ingress: ingressAppDefault,
-	HTTPS:   httpsDefault,
-	Proxy:   defaultAppProxy,
+	Ingress:  ingressAppDefault,
+	HTTPS:    httpsDefault,
+	Proxy:    defaultAppProxy,
+	EastWest: EastWestDefault,
 }
 
 var cnvrgInfraNetworkingDefault = CnvrgInfraNetworking{
-	Ingress: ingressInfraDefault,
-	Istio:   istioDefault,
-	HTTPS:   httpsDefault,
-	Proxy:   defaultInfraProxy,
+	Ingress:  ingressInfraDefault,
+	Istio:    istioDefault,
+	HTTPS:    httpsDefault,
+	Proxy:    defaultInfraProxy,
+	EastWest: EastWestDefault,
 }

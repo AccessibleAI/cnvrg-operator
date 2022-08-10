@@ -437,7 +437,7 @@ func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
 			return err
 		}
 
-		if err := desired.Apply(logging.ElastAlert(), app, r.Client, r.Scheme, appLog); err != nil {
+		if err := desired.Apply(logging.CnvrgAppElastAlertState(app), app, r.Client, r.Scheme, appLog); err != nil {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
@@ -470,7 +470,7 @@ func generateElastalertCreds(app *mlopsv1.CnvrgApp) (*desired.TemplateData, erro
 			"User":          user,
 			"Pass":          pass,
 			"Htpasswd":      fmt.Sprintf("%s:%s", user, passwordHash),
-			"ElastAlertUrl": fmt.Sprintf("%s%s.%s", httpSchema, app.Spec.Logging.Elastalert.SvcName, app.Spec.ClusterDomain),
+			"ElastAlertUrl": fmt.Sprintf("%s%s.%s", httpSchema, app.Spec.Logging.Elastalert.SvcName, strings.ReplaceAll(app.Spec.ClusterDomain, "eastwest.", "")),
 		},
 	}
 
@@ -787,7 +787,7 @@ func (r *CnvrgAppReconciler) addFluentbitConfiguration(cnvrgApp *mlopsv1.CnvrgAp
 		return err
 	}
 
-	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass}
+	appInstance := mlopsv1.AppInstance{SpecName: cnvrgApp.Name, SpecNs: cnvrgApp.Namespace, EsUser: esUser, EsPass: esPass, SvcName: cnvrgApp.Spec.Dbs.Es.SvcName}
 	appInstanceBytes, err := json.Marshal(appInstance)
 	if err != nil {
 		appLog.Error(err, "failed to marshal app instance ")

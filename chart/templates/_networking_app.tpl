@@ -37,4 +37,10 @@ networking:
     {{- if and (eq .Values.networking.ingress.type "ingress") (ne .Values.networking.ingress.className "") }}
     className: {{ .Values.networking.ingress.className }}
     {{- end }}
+  eastWest:
+    enabled: {{ .Values.networking.eastWest.enabled }}
+    primary: {{ .Values.networking.eastWest.primary }}
+    clusterName: {{ .Values.networking.eastWest.clusterName }}
+    network: {{ .Values.networking.eastWest.network }}
+    meshId: {{ .Values.networking.eastWest.meshId }}
 {{- end }}

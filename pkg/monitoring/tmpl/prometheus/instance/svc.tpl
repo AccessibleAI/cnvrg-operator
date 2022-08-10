@@ -25,5 +25,4 @@ spec:
       nodePort: {{ .Spec.Monitoring.Prometheus.NodePort }}
       {{- end }}
   selector:
-    app: prometheus
-
+    cnvrg: {{ .Spec.Monitoring.Prometheus.SvcName }}
