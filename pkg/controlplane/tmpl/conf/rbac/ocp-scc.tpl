@@ -20,4 +20,4 @@ fsGroup:
 supplementalGroups:
   type: RunAsAny
 groups:
-- system:serviceaccount:cnvrg
+- "system:serviceaccounts:{{ ns . }}"
