@@ -61,8 +61,8 @@ spec:
             name: cnvrg-ingressgateway
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: "3"
+            memory: 6G
           requests:
             cpu: 500m
             memory: 1Gi

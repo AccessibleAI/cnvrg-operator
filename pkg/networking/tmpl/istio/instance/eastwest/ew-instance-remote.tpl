@@ -68,8 +68,8 @@ spec:
             name: cnvrg-eastwestgateway
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: "3"
+            memory: 6G
           requests:
             cpu: 500m
             memory: 1Gi
@@ -137,8 +137,8 @@ spec:
             name: istiod
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: "3"
+            memory: 6G
           requests:
             cpu: 500m
             memory: 1Gi

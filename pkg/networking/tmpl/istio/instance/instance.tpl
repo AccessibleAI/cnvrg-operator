@@ -48,7 +48,7 @@ spec:
           {{ $name }}: "{{ $value }}"
         {{- end }}
         hpaSpec:
-          maxReplicas: 5
+          maxReplicas: 10
           metrics:
             - resource:
                 name: cpu
