@@ -26,6 +26,9 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
+        {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         app: {{ .Spec.Logging.Kibana.SvcName }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
@@ -54,6 +57,7 @@ spec:
           secret:
             secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
         {{- end }}
+      enableServiceLinks: false
       containers:
         {{- if isTrue .Spec.SSO.Enabled }}
         - name: "cnvrg-oauth-proxy"
@@ -82,7 +86,7 @@ spec:
             - |
               #!/bin/bash
               {
-                cnvrgIndexPattern=cnvrg
+                cnvrgIndexPattern=cnvrg*
                 ready=notready
                 while [[ "$ready" != "200" ]]; do
                   ready=$(curl -s http://localhost:$SERVER_PORT/api/status -o /dev/null -w '%{http_code}')

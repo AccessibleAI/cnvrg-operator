@@ -44,6 +44,7 @@ spec:
       securityContext:
         runAsUser: 26
         fsGroup: 26
+      enableServiceLinks: false
       containers:
         - name: postgresql
           envFrom:

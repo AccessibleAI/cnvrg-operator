@@ -371,6 +371,8 @@ spec:
                           memory:
                             type: string
                         type: object
+                      retention:
+                        type: string
                       storageClass:
                         type: string
                       storageSize:
@@ -394,6 +396,27 @@ spec:
                 type: object
               networking:
                 properties:
+                  eastWest:
+                    properties:
+                      clusterIpsEnabled:
+                        type: boolean
+                      clusterName:
+                        type: string
+                      enabled:
+                        type: boolean
+                      meshId:
+                        type: string
+                      network:
+                        type: string
+                      primary:
+                        type: boolean
+                      remoteClusters:
+                        additionalProperties:
+                          items:
+                            type: string
+                          type: array
+                        type: object
+                    type: object
                   https:
                     properties:
                       cert:

@@ -26,6 +26,7 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/d4l3k/messagediff.v1"
 	"io/ioutil"
+	v1apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -124,6 +125,10 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	r.updateStatusMessage(mlopsv1.StatusReconciling, "reconciling", cnvrgInfra)
 
+	if err := r.addIstioNetworkLabel(cnvrgInfra); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// apply manifests
 	if err := r.applyManifests(cnvrgInfra); err != nil {
 		return ctrl.Result{}, err
@@ -132,6 +137,34 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	r.updateStatusMessage(mlopsv1.StatusHealthy, "successfully reconciled", cnvrgInfra)
 	infraLog.Info("successfully reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+	namespaceNamespacedName := types.NamespacedName{Name: cnvrgInfra.Spec.InfraNamespace}
+	namespaceObj := v1core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceNamespacedName.Name}}
+	if err := r.Get(context.Background(), namespaceNamespacedName, &namespaceObj); err != nil && errors.IsNotFound(err) {
+		return err
+	} else if err != nil {
+		return err
+	} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.EastWest.Network) {
+		appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.EastWest.Network)
+		return nil
+	}
+	mergePatch, err := json.Marshal(map[string]interface{}{
+		"metadata": map[string]interface{}{
+			"labels": map[string]interface{}{
+				"topology.istio.io/network": cnvrgInfra.Spec.Networking.EastWest.Network,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	if err := r.Patch(context.Background(), &namespaceObj, client.RawPatch(types.MergePatchType, mergePatch)); err != nil {
+		return err
+	}
+	appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.EastWest.Network)
+	return nil
 }
 
 func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) error {
@@ -230,7 +263,7 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 
 	// istio
 	infraLog.Info("applying infra networking")
-	if err := desired.Apply(networking.InfraNetworkingState(cnvrgInfra), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
+	if err := r.infraNetworkingState(cnvrgInfra); err != nil {
 		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 		reconcileResult = err
 	}
@@ -299,10 +332,17 @@ func (r *CnvrgInfraReconciler) applyManifests(cnvrgInfra *mlopsv1.CnvrgInfra) er
 				"ImageHub":    cnvrgInfra.Spec.ImageHub,
 			},
 		}
+		// apply metagpu infra state
 		if err := desired.Apply(gpu.MetagpudpState(metagpuDpData), cnvrgInfra, r.Client, r.Scheme, infraLog); err != nil {
 			r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
 			reconcileResult = err
 		}
+
+	}
+	// turn on/off metagpu presence cm in each app ns based on the infra state
+	if err := r.setMetagpuPresence(cnvrgInfra); err != nil {
+		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgInfra)
+		reconcileResult = err
 	}
 
 	// capsule backup service
@@ -364,6 +404,17 @@ func (r *CnvrgInfraReconciler) monitoringState(infra *mlopsv1.CnvrgInfra) error 
 		return err
 	}
 	if err := desired.Apply(monitoring.InfraMonitoringState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *CnvrgInfraReconciler) infraNetworkingState(infra *mlopsv1.CnvrgInfra) error {
+
+	if err := desired.Apply(networking.InfraNetworkingState(infra), infra, r.Client, r.Scheme, infraLog); err != nil {
+		return err
+	}
+	if err := r.RecreateIstioEWDeployment(infra); err != nil {
 		return err
 	}
 	return nil
@@ -619,6 +670,32 @@ func (r *CnvrgInfraReconciler) cleanupIstio(cnvrgInfra *mlopsv1.CnvrgInfra) erro
 	return nil
 }
 
+func (r *CnvrgInfraReconciler) RecreateIstioEWDeployment(cnvrgInfra *mlopsv1.CnvrgInfra) error {
+	if cnvrgInfra.Spec.Networking.EastWest.Enabled && cnvrgInfra.Spec.Networking.EastWest.Primary == false &&
+		cnvrgInfra.Spec.Networking.EastWest.ClusterIpsEnabled {
+		infraLog.Info("Recreating istio deployment if there is immutable error caused by a label change from ClusterIpsEnabled")
+		ctx := context.Background()
+		istio := &unstructured.Unstructured{}
+		istio.SetGroupVersionKind(desired.Kinds[desired.IstioGVK])
+		if err := r.Get(ctx, types.NamespacedName{Name: "cnvrg-istio", Namespace: cnvrgInfra.Spec.InfraNamespace}, istio); err == nil &&
+			istio.Object["status"].(map[string]interface{})["status"] == "ERROR" {
+			istioError := istio.Object["status"].(map[string]interface{})["componentStatus"].(map[string]interface{})["IngressGateways"].(map[string]interface{})
+			if _, ok := istioError["error"]; ok {
+				if strings.Contains(istioError["error"].(string), "field is immutable") {
+					eastwestDeployment := &v1apps.Deployment{}
+					if err := r.Get(ctx, types.NamespacedName{Name: "cnvrg-eastwestgateway", Namespace: cnvrgInfra.Spec.InfraNamespace}, eastwestDeployment); err == nil {
+						if err := r.Delete(ctx, eastwestDeployment); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+		return nil
+	}
+	return nil
+}
+
 func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus, message string, cnvrgInfra *mlopsv1.CnvrgInfra) {
 	if cnvrgInfra.Status.Status == mlopsv1.StatusRemoving {
 		infraLog.Info("skipping status update, current cnvrg spec under removing status...")
@@ -639,6 +716,27 @@ func (r *CnvrgInfraReconciler) updateStatusMessage(status mlopsv1.OperatorStatus
 	if err != nil {
 		infraLog.Error(err, "can't update status")
 	}
+}
+
+func (r *CnvrgInfraReconciler) setMetagpuPresence(infra *mlopsv1.CnvrgInfra) error {
+	apps, err := r.getCnvrgAppInstances(infra)
+	if err != nil {
+		return err
+	}
+	for _, app := range apps {
+		mgDpPresence := desired.TemplateData{
+			Namespace: app.SpecNs,
+			Data: map[string]interface{}{
+				"Annotations": infra.Spec.Annotations,
+				"Labels":      infra.Spec.Labels,
+				"Enabled":     infra.Spec.Gpu.MetaGpuDp.Enabled,
+			},
+		}
+		if err := desired.Apply(gpu.MetagpudpPresenceState(mgDpPresence), infra, r.Client, r.Scheme, infraLog); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *CnvrgInfraReconciler) createInfraReconcilerTriggerCm(cnvrgInfra *mlopsv1.CnvrgInfra) error {

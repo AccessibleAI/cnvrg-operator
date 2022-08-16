@@ -21,8 +21,13 @@ spec:
       app.kubernetes.io/name: habana-exporter
   endpoints:
   - port: habana-metrics
+    relabelings:
+    - action: replace
+      sourceLabels:
+      - exported_namespace
+      targetLabel: namespace
     interval: 30s
     scrapeTimeout: 20s
   namespaceSelector:
     matchNames:
-    - cnvrg
+      - {{ ns . }}

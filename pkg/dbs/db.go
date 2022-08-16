@@ -1,6 +1,7 @@
 package dbs
 
 import (
+	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -67,15 +68,6 @@ func esState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.StatefulSetGVK],
-			Own:            true,
-			Updatable:      true,
-		},
-		{
-			TemplatePath:   path + "/es/svc.tpl",
-			Template:       nil,
-			ParsedTemplate: "",
-			Obj:            &unstructured.Unstructured{},
-			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -386,7 +378,7 @@ func sharedBackendMinio() []*desired.State {
 	}
 }
 
-func esIstioVs() []*desired.State {
+func esIstioVs(data interface{}) []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/es/vs.tpl",
@@ -396,6 +388,22 @@ func esIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			TemplateData:   data,
+		},
+	}
+}
+
+func esSvc(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/es/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+			TemplateData:   data,
 		},
 	}
 }
@@ -629,9 +637,22 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	// elasticsearch
 	if cnvrgApp.Spec.Dbs.Es.Enabled {
 		state = append(state, esState()...)
+		state = append(state, esSvc(nil)...)
 		switch cnvrgApp.Spec.Networking.Ingress.Type {
 		case mlopsv1.IstioIngress:
-			state = append(state, esIstioVs()...)
+			if cnvrgApp.Spec.Networking.EastWest.Enabled {
+				if cnvrgApp.Spec.Networking.EastWest.Primary {
+					state = append(state, esIstioVs(nil)...)
+					for key, _ := range cnvrgApp.Spec.Networking.EastWest.RemoteClusters {
+						data := *cnvrgApp
+						data.Spec.Dbs.Es.SvcName = fmt.Sprintf("%s-%s", data.Spec.Dbs.Es.SvcName, key)
+						state = append(state, esIstioVs(&data)...)
+						state = append(state, esSvc(&data)...)
+					}
+				}
+			} else {
+				state = append(state, esIstioVs(nil)...)
+			}
 		case mlopsv1.NginxIngress:
 			state = append(state, esIngress()...)
 		case mlopsv1.OpenShiftIngress:

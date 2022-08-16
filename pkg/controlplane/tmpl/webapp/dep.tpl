@@ -66,6 +66,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      enableServiceLinks: false
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "cnvrg-oauth-proxy"

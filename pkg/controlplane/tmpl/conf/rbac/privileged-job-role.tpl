@@ -18,5 +18,6 @@ rules:
   - pods
   - services
   - configmaps
+  - persistentvolumeclaims
   verbs:
   - '*'

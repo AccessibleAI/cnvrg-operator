@@ -48,6 +48,7 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       serviceAccountName: {{ .Spec.Dbs.Minio.ServiceAccount }}
+      enableServiceLinks: false
       containers:
         - name: minio
           image: {{ image .Spec.ImageHub .Spec.Dbs.Minio.Image }}

@@ -40,6 +40,7 @@ spec:
       tolerations:
         - operator: "Exists"
       {{- end }}
+      enableServiceLinks: false
       containers:
         - name: config-reloader
           image: {{image .Spec.ImageHub .Spec.ConfigReloader.Image}}

@@ -36,6 +36,14 @@ func (t cnvrgSpecBoolTransformer) Transformer(typ reflect.Type) func(dst, src re
 	return nil
 }
 
+func mapContainsKeyValue(m map[string]string, k string, v string) bool {
+	_, ok := m[k]
+	if ok && m[k] == v {
+		return true
+	}
+	return false
+}
+
 func containsString(slice []string, s string) bool {
 	for _, item := range slice {
 		if item == s {

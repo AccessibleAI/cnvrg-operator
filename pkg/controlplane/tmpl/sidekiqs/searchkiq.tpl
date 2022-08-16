@@ -62,6 +62,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
       terminationGracePeriodSeconds: 60
+      enableServiceLinks: false
       containers:
       - name: sidekiq
         image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image}}
