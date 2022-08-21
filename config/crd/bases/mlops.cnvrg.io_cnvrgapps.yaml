@@ -762,6 +762,11 @@ spec:
                       svcName:
                         type: string
                     type: object
+                  prom:
+                    properties:
+                      enabled:
+                        type: boolean
+                    type: object
                   redis:
                     properties:
                       backup:

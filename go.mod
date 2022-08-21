@@ -23,6 +23,7 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 	go.uber.org/zap v1.18.1
+	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 	gopkg.in/d4l3k/messagediff.v1 v1.2.1
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2

@@ -18,6 +18,7 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/d4l3k/messagediff.v1"
 	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
@@ -540,6 +541,36 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 		}
 	}
 
+	if app.Spec.Dbs.Prom.Enabled {
+		if err := r.createPromDBCreds(app); err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		}
+
+		if _, _, passHash, err := desired.GetPromCredsSecret("prom-creds", app.Namespace, r.Client, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		} else {
+			promData := desired.TemplateData{
+				Data: map[string]interface{}{
+					"Namespace":     app.Namespace,
+					"Annotations":   app.Spec.Annotations,
+					"Labels":        app.Spec.Labels,
+					"PassHash":      passHash,
+					"ClusterDomain": app.Spec.ClusterDomain,
+					"HttpsEnabled":  app.Spec.Networking.HTTPS.Enabled,
+					"RegistryName":  app.Spec.Registry.Name,
+				},
+			}
+			if err := desired.Apply(dbs.ApplyAppPrometheus(app, promData), app, r.Client, r.Scheme, appLog); err != nil {
+				r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+				return err
+			}
+
+		}
+
+	}
+
 	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 		return err
@@ -590,6 +621,35 @@ func (r *CnvrgAppReconciler) monitoringState(app *mlopsv1.CnvrgApp) error {
 	return nil
 }
 
+func (r *CnvrgAppReconciler) createPromDBCreds(app *mlopsv1.CnvrgApp) error {
+	if app.Spec.Dbs.Prom.Enabled {
+		user := "cnvrg"
+		pass := desired.RandomString()
+		passHash, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
+		if err != nil {
+			appLog.Error(err, "error generating prometheus hash")
+			return err
+		}
+		promSecretData := desired.TemplateData{
+			Data: map[string]interface{}{
+				"Namespace":   app.Namespace,
+				"Annotations": app.Spec.Annotations,
+				"Labels":      app.Spec.Labels,
+				"CredsRef":    "prom-creds",
+				"User":        user,
+				"Pass":        pass,
+				"PassHash":    string(passHash),
+				"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", "prom", app.Namespace, 9090),
+			},
+		}
+		if err := desired.Apply(dbs.PromDBCreds(promSecretData), app, r.Client, r.Scheme, appLog); err != nil {
+			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) error {
 
 	if app.Spec.Monitoring.Prometheus.Enabled {
@@ -628,7 +688,7 @@ func (r *CnvrgAppReconciler) generateMonitoringSecrets(app *mlopsv1.CnvrgApp) er
 
 	if app.Spec.Monitoring.Grafana.Enabled {
 		// grafana dashboards
-		appLog.Info("applying grafana dashboards ")
+		appLog.Info("applying grafana dashboards")
 		if err := r.createGrafanaDashboards(app); err != nil {
 			return err
 		}

@@ -23,6 +23,106 @@ func EsCreds(data interface{}) []*desired.State {
 	}
 }
 
+func PromDBCreds(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prom/creds.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SecretGVK],
+			TemplateData:   data,
+			Own:            true,
+			Updatable:      false,
+		},
+	}
+}
+
+func prometheusState(data interface{}) []*desired.State {
+	return []*desired.State{
+		{
+			TemplatePath:   path + "/prom/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/prom/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/prom/rolebinding.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/prom/cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/prom/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.DeploymentGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/prom/pvc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.PvcGVK],
+			Own:            true,
+			Updatable:      false,
+		},
+		{
+			TemplatePath:   path + "/prom/route.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.OcpRouteGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/prom/svc.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			TemplateData:   data,
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func esState() []*desired.State {
 	return []*desired.State{
 		{
@@ -640,6 +740,13 @@ func AppDbsState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	}
 
 	return state
+}
+
+func ApplyAppPrometheus(app *mlopsv1.CnvrgApp, data interface{}) []*desired.State {
+	if app.Spec.Dbs.Prom.Enabled {
+		return prometheusState(data)
+	}
+	return nil
 }
 
 func InfraDbsState(infra *mlopsv1.CnvrgInfra) []*desired.State {

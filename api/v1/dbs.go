@@ -6,6 +6,10 @@ type HugePages struct {
 	Memory  string `json:"memory,omitempty"`
 }
 
+type Prom struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
 type Pg struct {
 	Enabled            bool              `json:"enabled,omitempty"`
 	ServiceAccount     string            `json:"serviceAccount,omitempty"`
@@ -91,6 +95,7 @@ type AppDbs struct {
 	Minio Minio `json:"minio,omitempty"`
 	Es    Es    `json:"es,omitempty"`
 	Cvat  Cvat  `json:"cvat,omitempty"`
+	Prom  Prom  `json:"prom,omitempty"`
 }
 
 type Cvat struct {
@@ -210,9 +215,9 @@ var esDefault = Es{
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
 	CleanupPolicy: CleanupPolicy{
-		All: "3d",
-		App: "30d",
-		Jobs: "14d",
+		All:       "3d",
+		App:       "30d",
+		Jobs:      "14d",
 		Endpoints: "1825d",
 	},
 }
@@ -223,6 +228,7 @@ var appDbsDefaults = AppDbs{
 	Minio: minioDefaults,
 	Es:    esDefault,
 	Cvat:  cvatDefault,
+	Prom:  promDefaults,
 }
 
 var cvatDefault = Cvat{
@@ -230,6 +236,8 @@ var cvatDefault = Cvat{
 	Pg:      cvatPgDefault,
 	Redis:   cvatRedisDefault,
 }
+
+var promDefaults = Prom{Enabled: false}
 
 var cvatPgDefault = Pg{
 	Enabled:        false,
