@@ -66,7 +66,11 @@ func generateSecureToken(length int) string {
 	return hex.EncodeToString(b)
 }
 
-func discoverCri(clientset client.Client) (mlopsv1.CriType, error) {
+func DiscoverCri(clientset client.Client) (mlopsv1.CriType, error) {
+	if clientset == nil { // if clientset nil, probably running as copctl
+		return "", nil
+	}
+
 	nodeList := &v1.NodeList{}
 	if err := clientset.List(context.Background(), nodeList, client.Limit(1)); err != nil {
 		return "", err
@@ -165,9 +169,9 @@ func discoverOcpPromCreds(clientset client.Client, ns string) {
 	return
 }
 
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) error {
-	if app.Spec.Cri == "" {
-		cri, err := discoverCri(clientset)
+func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, infra *mlopsv1.CnvrgInfra, clientset client.Client) error {
+	if app.Spec.Cri == "" && clientset != nil {
+		cri, err := DiscoverCri(clientset)
 		if err != nil {
 			return err
 		}
@@ -238,9 +242,9 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	return nil
 }
 
-func calculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {
+func CalculateAndApplyInfraDefaults(infra *mlopsv1.CnvrgInfra, desiredInfraSpec *mlopsv1.CnvrgInfraSpec, clientset client.Client) error {
 	if infra.Spec.Cri == "" {
-		cri, err := discoverCri(clientset)
+		cri, err := DiscoverCri(clientset)
 		if err != nil {
 			return err
 		}

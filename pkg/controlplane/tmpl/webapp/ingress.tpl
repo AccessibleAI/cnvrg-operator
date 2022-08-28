@@ -15,11 +15,15 @@ metadata:
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ ns . }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: {{ .Spec.ControlPlane.WebApp.SvcName }}
-              servicePort:  {{ .Spec.ControlPlane.WebApp.Port }}
+              service:
+                name: {{ .Spec.ControlPlane.WebApp.SvcName }}
+                port:
+                  number: {{ .Spec.ControlPlane.WebApp.Port }}

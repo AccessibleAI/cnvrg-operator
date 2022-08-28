@@ -8,13 +8,12 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
+	yamlgh "github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
 	"github.com/golang-jwt/jwt"
 	"github.com/imdario/mergo"
-	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"io/ioutil"
 	appv1 "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -25,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	mathrand "math/rand"
 	"os"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -379,12 +379,11 @@ timeout 15
 
 func (s *State) GenerateDeployable() error {
 	var tpl bytes.Buffer
-	f, err := pkger.Open(s.TemplatePath)
+	b, err := s.Fs.ReadFile(s.TemplatePath)
 	if err != nil {
 		zap.S().Error(err, "error reading path", "path", s.TemplatePath)
 		return err
 	}
-	b, err := ioutil.ReadAll(f)
 
 	if err != nil {
 		zap.S().Errorf("%v, error reading file: %v", err, s.TemplatePath)
@@ -410,10 +409,6 @@ func (s *State) GenerateDeployable() error {
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
 		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
-		return err
-	}
-	if err := s.dumpTemplateToFile(); err != nil {
-		zap.S().Error(err, "dumping template file", "file", s.TemplatePath)
 		return err
 	}
 	return nil
@@ -612,7 +607,7 @@ func (s *State) mergeMetadata(actualObject *unstructured.Unstructured, log logr.
 
 }
 
-func (s *State) dumpTemplateToFile() error {
+func (s *State) DumpTemplateToFile(preserveTmplDirs bool) error {
 	templatesDumpDir := viper.GetString("templates-dump-dir")
 	if templatesDumpDir != "" {
 		if _, err := os.Stat(templatesDumpDir); os.IsNotExist(err) {
@@ -622,13 +617,32 @@ func (s *State) dumpTemplateToFile() error {
 			}
 		}
 
-		filePath := templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
-		templateFile, err := os.Create(filePath)
+		filePath := ""
+		if preserveTmplDirs {
+			filePath = templatesDumpDir + "/" + s.TemplatePath
+			if err := os.MkdirAll(filepath.Dir(filePath), 0775); err != nil {
+				return err
+			}
+		} else {
+			filePath = templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
+		}
+
+		templateFile, err := os.Create(strings.ReplaceAll(filePath, "tpl", "yaml"))
 		if err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
 		}
-		if _, err = templateFile.Write([]byte(s.ParsedTemplate)); err != nil {
+		b, err := s.Obj.MarshalJSON()
+		if err != nil {
+			return err
+		}
+
+		res, err := yamlgh.JSONToYAML(b)
+		if err != nil {
+			return err
+		}
+
+		if _, err = templateFile.Write(res); err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
 		}

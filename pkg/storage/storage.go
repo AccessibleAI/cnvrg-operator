@@ -1,12 +1,16 @@
 package storage
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/storage/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func hostPathState() []*desired.State {
 	return []*desired.State{
@@ -18,6 +22,7 @@ func hostPathState() []*desired.State {
 			GVK:            desired.Kinds[desired.StorageClassGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -28,6 +33,7 @@ func hostPathState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -38,6 +44,7 @@ func hostPathState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -48,6 +55,7 @@ func hostPathState() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -58,6 +66,7 @@ func hostPathState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -73,6 +82,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.StorageClassGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -83,6 +93,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -93,6 +104,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -103,6 +115,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -113,6 +126,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -123,6 +137,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -133,6 +148,7 @@ func nfsClientState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }

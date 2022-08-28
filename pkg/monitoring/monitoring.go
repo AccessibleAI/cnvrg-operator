@@ -1,15 +1,17 @@
 package monitoring
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-	"github.com/markbates/pkger"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"os"
 )
 
-const path = "/pkg/monitoring/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS // TODO: this is bat, but I've to hurry up
 
 func PromCreds(data interface{}) []*desired.State {
 	return []*desired.State{
@@ -22,6 +24,7 @@ func PromCreds(data interface{}) []*desired.State {
 			TemplateData:   data,
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -37,6 +40,7 @@ func PromUpstreamCreds(data interface{}) []*desired.State {
 			TemplateData:   data,
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -51,6 +55,7 @@ func prometheusOperatorState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/clusterrolebinding.tpl",
@@ -60,6 +65,7 @@ func prometheusOperatorState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/sa.tpl",
@@ -69,6 +75,7 @@ func prometheusOperatorState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/dep.tpl",
@@ -78,6 +85,7 @@ func prometheusOperatorState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/operator/svc.tpl",
@@ -87,6 +95,7 @@ func prometheusOperatorState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -101,6 +110,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/clusterrolebinding.tpl",
@@ -110,6 +120,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/sa.tpl",
@@ -119,6 +130,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/prometheus.tpl",
@@ -128,6 +140,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.PrometheusGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/svc.tpl",
@@ -137,6 +150,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/infra/rules.tpl",
@@ -146,6 +160,7 @@ func infraPrometheusInstanceState() []*desired.State {
 			GVK:            desired.Kinds[desired.PrometheusRuleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -160,6 +175,7 @@ func kubeStateMetricsState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/clusterrolebinding.tpl",
@@ -169,6 +185,7 @@ func kubeStateMetricsState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/dep.tpl",
@@ -178,6 +195,7 @@ func kubeStateMetricsState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/sa.tpl",
@@ -187,6 +205,7 @@ func kubeStateMetricsState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/servicemonitor.tpl",
@@ -196,6 +215,7 @@ func kubeStateMetricsState() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/kube-state-metrics/svc.tpl",
@@ -205,6 +225,7 @@ func kubeStateMetricsState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -220,6 +241,7 @@ func GrafanaDSState(data interface{}) []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -234,6 +256,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/grafana/role.tpl",
@@ -243,6 +266,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/grafana/rolebinding.tpl",
@@ -252,6 +276,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/grafana/svc.tpl",
@@ -261,6 +286,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/grafana/dep.tpl",
@@ -270,6 +296,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/grafana/dashboards.tpl",
@@ -279,6 +306,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/grafana/credsec.tpl",
@@ -288,6 +316,7 @@ func grafanaState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 
@@ -303,6 +332,7 @@ func nodeExporterState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -313,6 +343,7 @@ func nodeExporterState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -323,6 +354,7 @@ func nodeExporterState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -333,6 +365,7 @@ func nodeExporterState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -343,6 +376,7 @@ func nodeExporterState() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -353,6 +387,7 @@ func nodeExporterState() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -368,6 +403,7 @@ func ccpPrometheusInstance() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/rolebinding.tpl",
@@ -377,6 +413,7 @@ func ccpPrometheusInstance() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            false,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/sa.tpl",
@@ -386,6 +423,7 @@ func ccpPrometheusInstance() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/ccp/prometheus.tpl",
@@ -395,6 +433,7 @@ func ccpPrometheusInstance() []*desired.State {
 			GVK:            desired.Kinds[desired.PrometheusGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/prometheus/instance/svc.tpl",
@@ -404,6 +443,7 @@ func ccpPrometheusInstance() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -418,6 +458,7 @@ func promOauthProxy() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -432,6 +473,7 @@ func promIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -446,6 +488,7 @@ func promIngress() []*desired.State {
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -460,6 +503,7 @@ func promOcpRoute() []*desired.State {
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -474,6 +518,7 @@ func grafanaIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -488,6 +533,7 @@ func grafanaIngress() []*desired.State {
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -502,6 +548,7 @@ func grafanaOcpRoute() []*desired.State {
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -516,6 +563,7 @@ func defaultServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/controller-manager.tpl",
@@ -525,6 +573,7 @@ func defaultServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/coredns.tpl",
@@ -534,6 +583,7 @@ func defaultServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/kubelet.tpl",
@@ -543,6 +593,7 @@ func defaultServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/scheduler.tpl",
@@ -552,6 +603,7 @@ func defaultServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/default-servicemonitors/metagpu.tpl",
@@ -561,6 +613,7 @@ func defaultServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -575,6 +628,7 @@ func dcgmExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -585,6 +639,7 @@ func dcgmExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -595,6 +650,7 @@ func dcgmExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -605,6 +661,7 @@ func dcgmExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -619,6 +676,7 @@ func habanaExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.DaemonSetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -629,6 +687,7 @@ func habanaExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -639,6 +698,7 @@ func habanaExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 
 		{
@@ -649,6 +709,7 @@ func habanaExporter() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -663,6 +724,7 @@ func grafanaOauthProxy() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -677,6 +739,7 @@ func cnvrgIdleMetricsServiceMonitors() []*desired.State {
 			GVK:            desired.Kinds[desired.ServiceMonitorGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -783,25 +846,23 @@ func InfraMonitoringState(infra *mlopsv1.CnvrgInfra) []*desired.State {
 }
 
 func Crds() (crds []*desired.State) {
-	err := pkger.Walk(path+"/crds", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
+	d, err := templatesContent.ReadDir(path + "/crds")
+	if err != nil {
+		zap.S().Error(err, "error loading prometheus crds")
+	}
+	for _, f := range d {
 		crd := &desired.State{
 
-			TemplatePath:   path,
+			TemplatePath:   path + "/crds/" + f.Name(),
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.CrdGVK],
 			Own:            false,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		}
 		crds = append(crds, crd)
-		return nil
-	})
-	if err != nil {
-		zap.S().Error(err, "error loading prometheus crds")
 	}
 	return
 }

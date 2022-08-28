@@ -1,15 +1,17 @@
 package controlplane
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-	"github.com/markbates/pkger"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"os"
 )
 
-const path = "/pkg/controlplane/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func ocpSccState() []*desired.State {
 	return []*desired.State{
@@ -36,6 +38,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -46,6 +49,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -56,6 +60,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -66,6 +71,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -76,6 +82,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -86,6 +93,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -96,6 +104,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -106,6 +115,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -116,6 +126,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -126,6 +137,7 @@ func rbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -141,6 +153,7 @@ func privilegedRbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -151,6 +164,7 @@ func privilegedRbacState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -166,6 +180,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -176,6 +191,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -186,6 +202,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -196,6 +213,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -206,6 +224,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/conf/cm/secret-object-storage.tpl",
@@ -215,6 +234,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/conf/cm/secret-smtp.tpl",
@@ -224,6 +244,7 @@ func controlPlaneConfigState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -238,6 +259,7 @@ func webAppHpaState() []*desired.State {
 			GVK:            desired.Kinds[desired.HpaGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -252,6 +274,7 @@ func sidekiqHpaState() []*desired.State {
 			GVK:            desired.Kinds[desired.HpaGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -266,6 +289,7 @@ func searchkiqHpaState() []*desired.State {
 			GVK:            desired.Kinds[desired.HpaGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -280,6 +304,7 @@ func systemkiqHpaState() []*desired.State {
 			GVK:            desired.Kinds[desired.HpaGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -294,6 +319,7 @@ func webAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/webapp/svc.tpl",
@@ -303,6 +329,7 @@ func webAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/webapp/oauth.tpl",
@@ -312,6 +339,7 @@ func webAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -322,6 +350,7 @@ func webAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/webapp/pdb.tpl",
@@ -331,6 +360,7 @@ func webAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -345,6 +375,7 @@ func webAppIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -359,6 +390,7 @@ func webAppOcpRoute() []*desired.State {
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -373,6 +405,7 @@ func webAppIngress() []*desired.State {
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -388,6 +421,7 @@ func sidekiqState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/sidekiqs/sidekiq-pdb.tpl",
@@ -397,6 +431,7 @@ func sidekiqState() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -412,6 +447,7 @@ func cnvrgRouter() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/router/dep.tpl",
@@ -421,6 +457,7 @@ func cnvrgRouter() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/router/svc.tpl",
@@ -430,6 +467,7 @@ func cnvrgRouter() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -444,6 +482,7 @@ func cnvrgRouterIstioVs() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -458,6 +497,7 @@ func cnvrgRouterOcpRoute() []*desired.State {
 			GVK:            desired.Kinds[desired.OcpRouteGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -472,6 +512,7 @@ func cnvrgRouterIngress() []*desired.State {
 			GVK:            desired.Kinds[desired.IngressGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -487,6 +528,7 @@ func searchkiqState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/sidekiqs/searchkiq-pdb.tpl",
@@ -496,6 +538,7 @@ func searchkiqState() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -510,6 +553,7 @@ func systemkiqState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/sidekiqs/systemkiq-pdb.tpl",
@@ -519,6 +563,7 @@ func systemkiqState() []*desired.State {
 			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -534,6 +579,7 @@ func hyperState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -544,6 +590,7 @@ func hyperState() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -559,6 +606,7 @@ func cnvrgScheduler() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -574,6 +622,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -584,6 +633,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -594,6 +644,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -604,6 +655,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -614,6 +666,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -624,6 +677,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -634,6 +688,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.ConfigMapGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 
@@ -644,6 +699,7 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -658,6 +714,7 @@ func ssoState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -673,6 +730,7 @@ func mpiAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/mpi/rolebinding.tpl",
@@ -682,6 +740,7 @@ func mpiAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.RoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/mpi/secret.tpl",
@@ -691,6 +750,7 @@ func mpiAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.SecretGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/mpi/dep.tpl",
@@ -700,6 +760,7 @@ func mpiAppState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -714,6 +775,7 @@ func mpiInfraState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }
@@ -821,30 +883,25 @@ func MpiInfraState() []*desired.State {
 }
 
 func Crds() (crds []*desired.State) {
-	err := pkger.Walk(path+"/crds", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		updatable := true
-		// mpi crds can't be updatable, b/c of the crd version (v1beta1)
-		// do not change the mpi crd file name!
-		if info.Name() == "mpijobs.yaml" {
-			updatable = false
-		}
+	d, err := templatesContent.ReadDir(path + "/crds")
+	if err != nil {
+		zap.S().Error(err, "error loading control plane crds")
+	}
+	for _, f := range d {
 		crd := &desired.State{
-			TemplatePath:   path,
+
+			TemplatePath:   path + "/crds/" + f.Name(),
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.CrdGVK],
 			Own:            false,
-			Updatable:      updatable,
+			Updatable:      false,
+			Fs:             &templatesContent,
 		}
 		crds = append(crds, crd)
-		return nil
-	})
-	if err != nil {
-		zap.S().Error(err, "error loading control plane crds")
 	}
+
 	return
+
 }

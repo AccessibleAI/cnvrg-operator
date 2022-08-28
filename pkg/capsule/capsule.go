@@ -1,12 +1,16 @@
 package capsule
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/capsule/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS // TODO: this is bat, but I've to hurry up (as usual :( )
 
 func capsuleState() []*desired.State {
 	return []*desired.State{
@@ -18,6 +22,7 @@ func capsuleState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent, // TODO: this is bat, but I've to hurry up (as usual :( )
 		},
 		{
 			TemplatePath:   path + "/clusterrolebinding.tpl",
@@ -27,6 +32,7 @@ func capsuleState() []*desired.State {
 			GVK:            desired.Kinds[desired.ClusterRoleBindingGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/sa.tpl",
@@ -36,6 +42,7 @@ func capsuleState() []*desired.State {
 			GVK:            desired.Kinds[desired.SaGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/pvc.tpl",
@@ -45,6 +52,7 @@ func capsuleState() []*desired.State {
 			GVK:            desired.Kinds[desired.PvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/dep.tpl",
@@ -54,6 +62,7 @@ func capsuleState() []*desired.State {
 			GVK:            desired.Kinds[desired.DeploymentGVK],
 			Own:            true,
 			Updatable:      true,
+			Fs:             &templatesContent,
 		},
 	}
 }

@@ -1,12 +1,16 @@
 package ingresscheck
 
 import (
+	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-const path = "/pkg/ingresscheck/tmpl"
+const path = "tmpl"
+
+//go:embed  tmpl/*
+var templatesContent embed.FS
 
 func ingressCheck() []*desired.State {
 	return []*desired.State{
@@ -18,6 +22,7 @@ func ingressCheck() []*desired.State {
 			GVK:            desired.Kinds[desired.SvcGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/vs.tpl",
@@ -27,6 +32,7 @@ func ingressCheck() []*desired.State {
 			GVK:            desired.Kinds[desired.IstioVsGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 		{
 			TemplatePath:   path + "/job.tpl",
@@ -36,6 +42,7 @@ func ingressCheck() []*desired.State {
 			GVK:            desired.Kinds[desired.JobGVK],
 			Own:            true,
 			Updatable:      false,
+			Fs:             &templatesContent,
 		},
 	}
 }
