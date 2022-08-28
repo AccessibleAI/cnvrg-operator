@@ -1,0 +1,14 @@
+apiVersion: mlops.cnvrg.io/v1
+kind: CnvrgThirdParty
+metadata:
+  name: cnvrg-tp
+  namespace: cnvrg-tp
+spec:
+  imageHub: docker.io/cnvrg
+  registry:
+    name: cnvrg-app-registry
+    password: 3c21c46d-8eea-4906-9445-c9cc9e41718d
+    url: docker.io
+    user: dimssss
+  istio:
+    enabled: true

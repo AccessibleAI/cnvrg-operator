@@ -4,7 +4,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type CnvrgInfraSpec struct {
+type CnvrgThirdPartySpec struct {
 	ImageHub string   `json:"imageHub,omitempty"`
 	Gpu      Gpu      `json:"gpu,omitempty"`
 	Istio    Istio    `json:"istio,omitempty"`
@@ -15,32 +15,32 @@ type CnvrgInfraSpec struct {
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:scope=Cluster
-type CnvrgInfra struct {
+
+type CnvrgThirdParty struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   CnvrgInfraSpec `json:"spec,omitempty"`
-	Status Status         `json:"status,omitempty"`
+	Spec   CnvrgThirdPartySpec `json:"spec,omitempty"`
+	Status Status              `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-type CnvrgInfraList struct {
+
+type CnvrgThirdPartyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []CnvrgInfra `json:"items"`
+	Items           []CnvrgThirdParty `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&CnvrgInfra{}, &CnvrgInfraList{})
+	SchemeBuilder.Register(&CnvrgThirdParty{}, &CnvrgThirdPartyList{})
 }
 
-func DefaultCnvrgInfraSpec() CnvrgInfraSpec {
-	infraDefault := CnvrgInfraSpec{
+func DefaultCnvrgThirdPartySpec() CnvrgThirdPartySpec {
+	return CnvrgThirdPartySpec{
 		ImageHub: "docker.io/cnvrg",
 		Istio:    istioDefault,
-		Registry: infraRegistryDefault,
+		Registry: registryDefault,
 		Gpu:      gpuDefaults,
 	}
-	return infraDefault
 }

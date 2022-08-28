@@ -553,6 +553,47 @@ spec:
                             type: string
                         type: object
                     type: object
+                  elastalert:
+                    properties:
+                      authProxyImage:
+                        type: string
+                      credsRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodePort:
+                        type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      pvcName:
+                        type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
                   es:
                     properties:
                       cleanupPolicy:
@@ -574,6 +615,48 @@ spec:
                         type: string
                       javaOpts:
                         type: string
+                      kibana:
+                        properties:
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          limits:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          nodePort:
+                            type: integer
+                          oauthProxy:
+                            properties:
+                              skipAuthRegex:
+                                items:
+                                  type: string
+                                type: array
+                              tokenValidationRegex:
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                          port:
+                            type: integer
+                          requests:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          serviceAccount:
+                            type: string
+                          svcName:
+                            type: string
+                        type: object
                       limits:
                         properties:
                           cpu:
@@ -608,6 +691,8 @@ spec:
                         type: string
                       svcName:
                         type: string
+                    required:
+                    - kibana
                     type: object
                   minio:
                     properties:

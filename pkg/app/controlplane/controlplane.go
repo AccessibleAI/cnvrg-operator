@@ -896,7 +896,7 @@ func Crds() (crds []*desired.State) {
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.CrdGVK],
 			Own:            false,
-			Updatable:      false,
+			Updatable:      true,
 			Fs:             &templatesContent,
 		}
 		crds = append(crds, crd)

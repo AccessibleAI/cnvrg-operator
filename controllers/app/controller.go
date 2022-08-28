@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/controllers"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/controlplane"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
@@ -22,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/retry"
+	"os"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -77,7 +79,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	// setup finalizer
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
-		if !containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+		if !controllers.ContainsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			cnvrgApp.ObjectMeta.Finalizers = append(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			if err := r.Update(ctx, cnvrgApp); err != nil {
 				log.Error(err, "failed to add finalizer")
@@ -85,12 +87,12 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			}
 		}
 	} else {
-		if containsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
+		if controllers.ContainsString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer) {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusRemoving, Message: "removing cnvrg spec"}, cnvrgApp)
 			if err := r.cleanup(cnvrgApp); err != nil {
 				return ctrl.Result{}, err
 			}
-			cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+			cnvrgApp.ObjectMeta.Finalizers = controllers.RemoveString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
 			err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 				if err := r.Update(ctx, cnvrgApp); err != nil {
 					cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
@@ -98,7 +100,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 						log.Error(err, "error getting cnvrgapp for finalizer cleanup")
 						return err
 					}
-					cnvrgApp.ObjectMeta.Finalizers = removeString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
+					cnvrgApp.ObjectMeta.Finalizers = controllers.RemoveString(cnvrgApp.ObjectMeta.Finalizers, CnvrgappFinalizer)
 					return r.Update(ctx, cnvrgApp)
 				}
 				return err
@@ -256,7 +258,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	}
 
 	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
-	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride, mergo.WithTransformers(cnvrgSpecBoolTransformer{})); err != nil {
+	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride, mergo.WithTransformers(controllers.CnvrgSpecBoolTransformer{})); err != nil {
 		log.Error(err, "can't merge")
 		return false, err
 	}
@@ -368,6 +370,12 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log = r.Log.WithValues("initializing", "crds")
 
+	err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}, r.Client, r.Scheme, r.Log)
+	if err != nil {
+		log.Error(err, "can't apply control plane crds")
+		os.Exit(1)
+	}
+
 	appPredicate := predicate.Funcs{
 
 		CreateFunc: func(createEvent event.CreateEvent) bool {
@@ -411,7 +419,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				app.Dbs.Es.SvcName,
 			}
 			if gvk == desired.Kinds[desired.DeploymentGVK] || gvk == desired.Kinds[desired.StatefulSetGVK] || gvk == desired.Kinds[desired.JobGVK] {
-				if containsString(healthCheckWorkloads, e.ObjectNew.GetName()) {
+				if controllers.ContainsString(healthCheckWorkloads, e.ObjectNew.GetName()) {
 					return true
 				}
 			}
@@ -431,13 +439,13 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	for _, v := range desired.Kinds {
 
-		if strings.Contains(v.Group, "istio.io") && viper.GetBool("own-istio-resources") == false {
+		if strings.Contains(v.Group, "istio.io") {
 			continue
 		}
-		if strings.Contains(v.Group, "openshift.io") && viper.GetBool("own-openshift-resources") == false {
+		if strings.Contains(v.Group, "openshift.io") {
 			continue
 		}
-		if strings.Contains(v.Group, "coreos.com") && viper.GetBool("own-prometheus-resources") == false {
+		if strings.Contains(v.Group, "coreos.com") {
 			continue
 		}
 		u := &unstructured.Unstructured{}

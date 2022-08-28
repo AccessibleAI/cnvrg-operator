@@ -1,16 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   name: istio-operator
-  annotations:
-    {{- range $k, $v := .Spec.Annotations }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
-  labels:
-    {{- range $k, $v := .Spec.Labels }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
 spec:
   replicas: 1
   selector:
@@ -18,29 +10,15 @@ spec:
       name: istio-operator
   template:
     metadata:
-      annotations:
-        {{- range $k, $v := .Spec.Annotations }}
-        {{$k}}: "{{$v}}"
-        {{- end }}
       labels:
         name: istio-operator
-        {{- range $k, $v := .Spec.Labels }}
-        {{$k}}: "{{$v}}"
-        {{- end }}
     spec:
       imagePullSecrets:
         - name: {{ .Spec.Registry.Name }}
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       serviceAccountName: istio-operator
-      {{- if isTrue .Spec.Tenancy.Enabled }}
-      nodeSelector:
-        {{ .Spec.Tenancy.Key }}: "{{ .Spec.Tenancy.Value }}"
-      tolerations:
-        - operator: "Exists"
-      {{- end }}
       containers:
         - name: istio-operator
-          image: {{ image .Spec.ImageHub .Spec.Networking.Istio.OperatorImage }}
+          image: {{ image .Spec.ImageHub .Spec.Istio.OperatorImage }}
           command:
             - operator
             - server
@@ -64,9 +42,9 @@ spec:
               memory: 128Mi
           env:
             - name: WATCH_NAMESPACE
-              value:  {{ ns . }}
+              value:  {{ .Namespace }}
             - name: LEADER_ELECTION_NAMESPACE
-              value:  {{ ns . }}
+              value:  {{ .Namespace }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:

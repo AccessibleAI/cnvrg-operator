@@ -6,15 +6,15 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: cnvrginfras.mlops.cnvrg.io
+  name: cnvrgthirdparties.mlops.cnvrg.io
 spec:
   group: mlops.cnvrg.io
   names:
-    kind: CnvrgInfra
-    listKind: CnvrgInfraList
-    plural: cnvrginfras
-    singular: cnvrginfra
-  scope: Cluster
+    kind: CnvrgThirdParty
+    listKind: CnvrgThirdPartyList
+    plural: cnvrgthirdparties
+    singular: cnvrgthirdparty
+  scope: Namespaced
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.status
@@ -41,8 +41,6 @@ spec:
             type: object
           spec:
             properties:
-              clusterInternalDomain:
-                type: string
               gpu:
                 properties:
                   habanaDp:
@@ -68,8 +66,6 @@ spec:
                     type: object
                 type: object
               imageHub:
-                type: string
-              infraNamespace:
                 type: string
               istio:
                 properties:

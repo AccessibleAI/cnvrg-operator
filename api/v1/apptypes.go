@@ -41,6 +41,7 @@ type CnvrgAppSpec struct {
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
 // +kubebuilder:subresource:status
+
 type CnvrgApp struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -50,6 +51,7 @@ type CnvrgApp struct {
 }
 
 // +kubebuilder:object:root=true
+
 type CnvrgAppList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

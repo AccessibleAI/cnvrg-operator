@@ -68,9 +68,9 @@ var GrafanaInfraDashboards = append([]string{
 }, GrafanaAppDashboards...)
 
 func getNs(obj interface{}) string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-		return cnvrgInfra.Spec.InfraNamespace
+	if reflect.TypeOf(&mlopsv1.CnvrgThirdParty{}) == reflect.TypeOf(obj) {
+		cnvrgInfra := obj.(*mlopsv1.CnvrgThirdParty)
+		return cnvrgInfra.Namespace
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
@@ -80,7 +80,7 @@ func getNs(obj interface{}) string {
 }
 
 func getGrafanaDashboards(obj interface{}) []string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+	if reflect.TypeOf(&mlopsv1.CnvrgThirdParty{}) == reflect.TypeOf(obj) {
 		return GrafanaInfraDashboards
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
@@ -90,9 +90,7 @@ func getGrafanaDashboards(obj interface{}) []string {
 }
 
 func getSSOConfig(obj interface{}) *mlopsv1.SSO {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		return &obj.(*mlopsv1.CnvrgInfra).Spec.SSO
-	}
+
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		return &obj.(*mlopsv1.CnvrgApp).Spec.SSO
 	}
@@ -100,15 +98,6 @@ func getSSOConfig(obj interface{}) *mlopsv1.SSO {
 }
 
 func getSSORedirectUrl(obj interface{}, svc string) string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		infra := obj.(*mlopsv1.CnvrgInfra)
-		if infra.Spec.Networking.HTTPS.Enabled {
-			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
-		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, infra.Spec.ClusterDomain)
-		}
-
-	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		app := obj.(*mlopsv1.CnvrgApp)
 		if app.Spec.Networking.HTTPS.Enabled {
@@ -311,7 +300,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return getGrafanaDashboards(obj)
 		},
 		"isAppSpec": func(obj interface{}) bool {
-			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+			if reflect.TypeOf(&mlopsv1.CnvrgThirdParty{}) == reflect.TypeOf(obj) {
 				return false
 			}
 			return true

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/AccessibleAI/cnvrg-operator/controllers/app"
+	"github.com/AccessibleAI/cnvrg-operator/controllers/thirdparty"
 	"github.com/go-logr/zapr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -15,7 +17,6 @@ import (
 	"strings"
 
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
-	"github.com/AccessibleAI/cnvrg-operator/controllers"
 )
 
 type param struct {
@@ -41,13 +42,8 @@ var (
 		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
 		{name: "templates-dump-dir", shorthand: "", value: "", usage: "destination dir for rendering templates for debugging"},
 		{name: "verbose", shorthand: "v", value: false, usage: "Verbose output"},
-		{name: "deploy-depended-crds", shorthand: "", value: true, usage: "Deploy depended (external) CRDs automatically"},
-		{name: "own-istio-resources", shorthand: "", value: true, usage: "Watch for istio resources"},
-		{name: "own-openshift-resources", shorthand: "", value: false, usage: "Watch for OpenShift resources"},
-		{name: "own-prometheus-resources", shorthand: "", value: true, usage: "Watch for Prometheus resources"},
 		{name: "max-concurrent-reconciles", shorthand: "", value: 1, usage: "Max concurrent reconciles"},
 		{name: "cleanup-pvc", shorthand: "", value: false, usage: "set to true to delete PVCs on CR delete"},
-		{name: "disable-infra", shorthand: "", value: false, usage: "set true to not start CnvrgInfra controller"},
 	}
 )
 
@@ -126,7 +122,16 @@ func runOperator() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.CnvrgAppReconciler{
+	if err = (&thirdparty.CnvrgThirdPartyReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("CnvrgThirdParty"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "CnvrgThirdParty")
+		os.Exit(1)
+	}
+
+	if err = (&app.CnvrgAppReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("CnvrgApp"),
 		Scheme: mgr.GetScheme(),
@@ -134,19 +139,8 @@ func runOperator() {
 		setupLog.Error(err, "unable to create controller", "controller", "CnvrgApp")
 		os.Exit(1)
 	}
-	if viper.GetBool("disable-infra") {
 
-		if err = (&controllers.CnvrgInfraReconciler{
-			Client: mgr.GetClient(),
-			Log:    ctrl.Log.WithName("controllers").WithName("CnvrgInfra"),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "CnvrgInfra")
-			os.Exit(1)
-		}
-	}
 	// +kubebuilder:scaffold:builder
-
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)

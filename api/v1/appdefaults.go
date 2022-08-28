@@ -43,9 +43,9 @@ var appRegistryDefault = Registry{
 	Password: "",
 }
 
-var infraRegistryDefault = Registry{
+var registryDefault = Registry{
 
-	Name:     "cnvrg-infra-registry",
+	Name:     "cnvrg-third-parity-registry",
 	URL:      "docker.io",
 	User:     "",
 	Password: "",

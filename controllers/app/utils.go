@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/controllers"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	v1 "k8s.io/api/core/v1"
@@ -18,42 +19,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-type cnvrgSpecBoolTransformer struct{}
-
-func (t cnvrgSpecBoolTransformer) Transformer(typ reflect.Type) func(dst, src reflect.Value) error {
-	if typ == reflect.TypeOf(true) {
-		return func(dst, src reflect.Value) error {
-			if dst.CanSet() {
-				// always set boolean value
-				// e.g always do the WithOverwriteWithEmptyValue
-				// but only for booleans
-				dst.Set(src)
-			}
-			return nil
-		}
-	}
-	return nil
-}
-
-func containsString(slice []string, s string) bool {
-	for _, item := range slice {
-		if item == s {
-			return true
-		}
-	}
-	return false
-}
-
-func removeString(slice []string, s string) (result []string) {
-	for _, item := range slice {
-		if item == s {
-			continue
-		}
-		result = append(result, item)
-	}
-	return
-}
 
 func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost string, err error) {
 	routeCfg := &unstructured.Unstructured{}
@@ -160,7 +125,7 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		desiredAppSpec.Networking.Proxy.NoProxy = app.Spec.Networking.Proxy.NoProxy
 		// make sure no_proxy includes all default values
 		for _, defaultNoProxy := range networking.DefaultNoProxy(app.Spec.ClusterInternalDomain) {
-			if !containsString(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
+			if !controllers.ContainsString(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy) {
 				desiredAppSpec.Networking.Proxy.NoProxy = append(desiredAppSpec.Networking.Proxy.NoProxy, defaultNoProxy)
 			}
 		}
