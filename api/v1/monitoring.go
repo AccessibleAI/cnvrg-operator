@@ -122,8 +122,8 @@ var prometheusInfraDefault = Prometheus{
 		Memory: "500Mi",
 	},
 	Limits: Limits{
-		Cpu:    "2000m",
-		Memory: "4Gi",
+		Cpu:    "4",
+		Memory: "12Gi",
 	},
 	SvcName:      "prometheus",
 	Port:         9091, // basic auth nginx proxy is enabled by default
@@ -146,8 +146,8 @@ var prometheusAppDefault = Prometheus{
 		Memory: "500Mi",
 	},
 	Limits: Limits{
-		Cpu:    "2000m",
-		Memory: "4Gi",
+		Cpu:    "4",
+		Memory: "12Gi",
 	},
 	SvcName:      "prometheus",
 	Port:         9091, // basic auth nginx proxy is enabled by default
