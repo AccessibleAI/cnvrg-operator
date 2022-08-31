@@ -2,9 +2,7 @@ package main
 
 import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dumper"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type dump struct {
@@ -42,24 +40,24 @@ var (
 		Short:   "dump cnvrg control plane as raw K8s manifests",
 		Aliases: []string{"cp"},
 		Run: func(cmd *cobra.Command, args []string) {
-			cp := dumper.NewControlPlane(
-				viper.GetString("control-plane-image"),
-				viper.GetString("wildcard-domain"),
-				viper.GetString("cri"),
-				viper.GetString("registry-user"),
-				viper.GetString("registry-password"),
-				viper.GetString("ingress"),
-				viper.GetString("namespace"),
-				viper.GetBool("https"),
-				viper.GetBool("proxy"),
-			)
-			d := dump{cp}
-			if err := d.BuildState(); err != nil {
-				log.Fatal(err)
-			}
-			if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
-				log.Fatal(err)
-			}
+			//cp := dumper.NewControlPlane(
+			//	viper.GetString("control-plane-image"),
+			//	viper.GetString("wildcard-domain"),
+			//	viper.GetString("cri"),
+			//	viper.GetString("registry-user"),
+			//	viper.GetString("registry-password"),
+			//	viper.GetString("ingress"),
+			//	viper.GetString("namespace"),
+			//	viper.GetBool("https"),
+			//	viper.GetBool("proxy"),
+			//)
+			//d := dump{cp}
+			//if err := d.BuildState(); err != nil {
+			//	log.Fatal(err)
+			//}
+			//if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
+			//	log.Fatal(err)
+			//}
 		},
 	}
 
@@ -68,14 +66,14 @@ var (
 		Use:   "network",
 		Short: "dump cnvrg control plane as raw K8s manifests",
 		Run: func(cmd *cobra.Command, args []string) {
-			network := dumper.NewNetworking(viper.GetString("namespace"))
-			d := dump{network}
-			if err := d.BuildState(); err != nil {
-				log.Fatal(err)
-			}
-			if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
-				log.Fatal(err)
-			}
+			//network := dumper.NewNetworking(viper.GetString("namespace"))
+			//d := dump{network}
+			//if err := d.BuildState(); err != nil {
+			//	log.Fatal(err)
+			//}
+			//if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
+			//	log.Fatal(err)
+			//}
 		},
 	}
 )
