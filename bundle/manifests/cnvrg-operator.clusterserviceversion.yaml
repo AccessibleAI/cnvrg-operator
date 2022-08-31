@@ -1,0 +1,163 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "mlops.cnvrg.io/v1",
+          "kind": "CnvrgApp",
+          "metadata": {
+            "name": "cnvrg-app",
+            "namespace": "cnvrg"
+          },
+          "spec": {
+            "clusterDomain": "apps.k8rttdeq.eastus.aroapp.io",
+            "controlPlane": {
+              "baseConfig": {
+                "cnvrgJobRbacStrict": true,
+                "cnvrgPrivilegedJob": false,
+                "featureFlags": {
+                  "CNVRG_ENABLE_MOUNT_FOLDERS": "false",
+                  "CNVRG_MOUNT_HOST_FOLDERS": "false"
+                }
+              },
+              "cnvrgScheduler": {
+                "enabled": true
+              },
+              "hyper": {
+                "enabled": true
+              },
+              "image": "docker.io/cnvrg/core:v4.7.14",
+              "searchkiq": {
+                "enabled": true
+              },
+              "sidekiq": {
+                "enabled": true,
+                "split": true
+              },
+              "systemkiq": {
+                "enabled": true
+              },
+              "webapp": {
+                "enabled": true
+              }
+            },
+            "dbs": {
+              "es": {
+                "enabled": true
+              },
+              "minio": {
+                "enabled": true
+              },
+              "pg": {
+                "enabled": true
+              },
+              "redis": {
+                "enabled": true
+              }
+            },
+            "imageHub": "docker.io/cnvrg",
+            "networking": {
+              "ingress": {
+                "type": "openshift"
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    operators.operatorframework.io/builder: operator-sdk-v1.22.1
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
+  name: cnvrg-operator.v4.3.16
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - displayName: Cnvrg App
+      kind: CnvrgApp
+      name: cnvrgapps.mlops.cnvrg.io
+      version: v1
+    - displayName: Cnvrg Infra
+      kind: CnvrgInfra
+      name: cnvrginfras.mlops.cnvrg.io
+      version: v1
+  description: Cnvrg Operator
+  displayName: Cnvrg Operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - '*'
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - mlops.cnvrg.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        serviceAccountName: cnvrg-operator
+      deployments:
+      - label:
+          control-plane: cnvrg-operator
+        name: cnvrg-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: cnvrg-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                control-plane: cnvrg-operator
+            spec:
+              containers:
+              - command:
+                - /opt/app-root/cnvrg-operator
+                - run
+                - --max-concurrent-reconciles
+                - "3"
+                - --deploy-depended-crds
+                - "true"
+                image: docker.io/cnvrg/cnvrg-operator:3.0.27
+                imagePullPolicy: Always
+                name: cnvrg-operator
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 1000Mi
+                  requests:
+                    cpu: 500m
+                    memory: 200Mi
+              serviceAccountName: cnvrg-operator
+              terminationGracePeriodSeconds: 10
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - ai
+  - ml
+  links:
+  - name: Cnvrg Operator
+    url: https://cnvrg-operator.domain
+  maturity: alpha
+  provider:
+    name: cnvrg.io
+    url: https://cnvrg.io
+  version: 4.3.16

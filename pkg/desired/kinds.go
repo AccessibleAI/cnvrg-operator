@@ -22,6 +22,8 @@ const (
 	RoleGVK                 GVKName = "RoleGVK"
 	RoleBindingGVK          GVKName = "RoleBindingGVK"
 	OcpRouteGVK             GVKName = "OcpRouteGVK"
+	OcpIngressCfgGVK        GVKName = "OcpIngressCfgGVK"
+	OcpSccGVK               GVKName = "OcpSccGVK"
 	IngressGVK              GVKName = "IngressGVK"
 	IstioVsGVK              GVKName = "IstioVsGVK"
 	IstioGVK                GVKName = "IstioGVK"
@@ -127,6 +129,18 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 	OcpRouteGVK: schema.GroupVersionKind{
 		Kind:    "Route",
 		Group:   "route.openshift.io",
+		Version: "v1",
+	},
+
+	OcpIngressCfgGVK: schema.GroupVersionKind{
+		Kind:    "Ingress",
+		Group:   "config.openshift.io",
+		Version: "v1",
+	},
+
+	OcpSccGVK: schema.GroupVersionKind{
+		Kind:    "SecurityContextConstraints",
+		Group:   "security.openshift.io",
 		Version: "v1",
 	},
 

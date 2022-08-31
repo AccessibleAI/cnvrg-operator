@@ -453,13 +453,6 @@ spec:
                         type: string
                     type: object
                 type: object
-              cri:
-                enum:
-                - docker
-                - containerd
-                - cri-o
-                - ""
-                type: string
               dbs:
                 properties:
                   cvat:
@@ -468,19 +461,6 @@ spec:
                         type: boolean
                       pg:
                         properties:
-                          backup:
-                            properties:
-                              bucketRef:
-                                type: string
-                              credsRef:
-                                type: string
-                              enabled:
-                                type: boolean
-                              period:
-                                type: string
-                              rotation:
-                                type: integer
-                            type: object
                           credsRef:
                             type: string
                           effectiveCacheSize:
@@ -535,19 +515,6 @@ spec:
                         type: object
                       redis:
                         properties:
-                          backup:
-                            properties:
-                              bucketRef:
-                                type: string
-                              credsRef:
-                                type: string
-                              enabled:
-                                type: boolean
-                              period:
-                                type: string
-                              rotation:
-                                type: integer
-                            type: object
                           credsRef:
                             type: string
                           enabled:
@@ -601,12 +568,95 @@ spec:
                         type: object
                       credsRef:
                         type: string
+                      elastalert:
+                        properties:
+                          authProxyImage:
+                            type: string
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          limits:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          nodePort:
+                            type: integer
+                          nodeSelector:
+                            additionalProperties:
+                              type: string
+                            type: object
+                          port:
+                            type: integer
+                          pvcName:
+                            type: string
+                          requests:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          storageClass:
+                            type: string
+                          storageSize:
+                            type: string
+                          svcName:
+                            type: string
+                        type: object
                       enabled:
                         type: boolean
                       image:
                         type: string
                       javaOpts:
                         type: string
+                      kibana:
+                        properties:
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          limits:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          nodePort:
+                            type: integer
+                          oauthProxy:
+                            properties:
+                              skipAuthRegex:
+                                items:
+                                  type: string
+                                type: array
+                              tokenValidationRegex:
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                          port:
+                            type: integer
+                          requests:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          serviceAccount:
+                            type: string
+                          svcName:
+                            type: string
+                        type: object
                       limits:
                         properties:
                           cpu:
@@ -697,19 +747,6 @@ spec:
                     type: object
                   pg:
                     properties:
-                      backup:
-                        properties:
-                          bucketRef:
-                            type: string
-                          credsRef:
-                            type: string
-                          enabled:
-                            type: boolean
-                          period:
-                            type: string
-                          rotation:
-                            type: integer
-                        type: object
                       credsRef:
                         type: string
                       effectiveCacheSize:
@@ -762,21 +799,15 @@ spec:
                       svcName:
                         type: string
                     type: object
+                  prom:
+                    properties:
+                      credsRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                    type: object
                   redis:
                     properties:
-                      backup:
-                        properties:
-                          bucketRef:
-                            type: string
-                          credsRef:
-                            type: string
-                          enabled:
-                            type: boolean
-                          period:
-                            type: string
-                          rotation:
-                            type: integer
-                        type: object
                       credsRef:
                         type: string
                       enabled:
@@ -817,207 +848,12 @@ spec:
                 type: object
               imageHub:
                 type: string
-              ingressCheck:
-                properties:
-                  enabled:
-                    type: boolean
-                type: object
               labels:
                 additionalProperties:
                   type: string
                 type: object
-              logging:
-                properties:
-                  elastalert:
-                    properties:
-                      authProxyImage:
-                        type: string
-                      credsRef:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      limits:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      nodePort:
-                        type: integer
-                      nodeSelector:
-                        additionalProperties:
-                          type: string
-                        type: object
-                      port:
-                        type: integer
-                      pvcName:
-                        type: string
-                      requests:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
-                  kibana:
-                    properties:
-                      credsRef:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      limits:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      nodePort:
-                        type: integer
-                      oauthProxy:
-                        properties:
-                          skipAuthRegex:
-                            items:
-                              type: string
-                            type: array
-                          tokenValidationRegex:
-                            items:
-                              type: string
-                            type: array
-                        type: object
-                      port:
-                        type: integer
-                      requests:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      serviceAccount:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
-                type: object
-              monitoring:
-                properties:
-                  cnvrgIdleMetricsExporter:
-                    properties:
-                      enabled:
-                        type: boolean
-                      labels:
-                        additionalProperties:
-                          type: string
-                        type: object
-                    type: object
-                  grafana:
-                    properties:
-                      credsRef:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      nodePort:
-                        type: integer
-                      oauthProxy:
-                        properties:
-                          skipAuthRegex:
-                            items:
-                              type: string
-                            type: array
-                          tokenValidationRegex:
-                            items:
-                              type: string
-                            type: array
-                        type: object
-                      port:
-                        type: integer
-                      svcName:
-                        type: string
-                    type: object
-                  prometheus:
-                    properties:
-                      basicAuthProxyImage:
-                        type: string
-                      credsRef:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      limits:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      nodePort:
-                        type: integer
-                      nodeSelector:
-                        additionalProperties:
-                          type: string
-                        type: object
-                      port:
-                        type: integer
-                      replicas:
-                        type: integer
-                      requests:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      retention:
-                        type: string
-                      storageClass:
-                        type: string
-                      storageSize:
-                        type: string
-                      svcName:
-                        type: string
-                      upstreamRef:
-                        type: string
-                    type: object
-                type: object
               networking:
                 properties:
-                  eastWest:
-                    properties:
-                      clusterIpsEnabled:
-                        type: boolean
-                      clusterName:
-                        type: string
-                      enabled:
-                        type: boolean
-                      meshId:
-                        type: string
-                      network:
-                        type: string
-                      primary:
-                        type: boolean
-                      remoteClusters:
-                        additionalProperties:
-                          items:
-                            type: string
-                          type: array
-                        type: object
-                    type: object
                   https:
                     properties:
                       cert:
@@ -1042,11 +878,6 @@ spec:
                       timeout:
                         type: string
                       type:
-                        enum:
-                        - istio
-                        - ingress
-                        - openshift
-                        - nodeport
                         type: string
                     type: object
                   proxy:

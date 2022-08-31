@@ -35,7 +35,7 @@ rules:
 - apiGroups:
   - mlops.cnvrg.io
   resources:
-  - cnvrginfras
+  - cnvrgthirdparties
   verbs:
   - create
   - delete
@@ -47,7 +47,7 @@ rules:
 - apiGroups:
   - mlops.cnvrg.io
   resources:
-  - cnvrginfras/status
+  - cnvrgthirdparties/status
   verbs:
   - get
   - patch

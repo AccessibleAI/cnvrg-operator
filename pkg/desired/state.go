@@ -8,13 +8,12 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/Dimss/crypt/apr1_crypt"
 	"github.com/Masterminds/sprig"
+	yamlgh "github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
 	"github.com/golang-jwt/jwt"
 	"github.com/imdario/mergo"
-	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"io/ioutil"
 	appv1 "k8s.io/api/apps/v1"
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -25,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	mathrand "math/rand"
 	"os"
+	"path/filepath"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -68,9 +68,9 @@ var GrafanaInfraDashboards = append([]string{
 }, GrafanaAppDashboards...)
 
 func getNs(obj interface{}) string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		cnvrgInfra := obj.(*mlopsv1.CnvrgInfra)
-		return cnvrgInfra.Spec.InfraNamespace
+	if reflect.TypeOf(&mlopsv1.CnvrgThirdParty{}) == reflect.TypeOf(obj) {
+		cnvrgInfra := obj.(*mlopsv1.CnvrgThirdParty)
+		return cnvrgInfra.Namespace
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		cnvrgApp := obj.(*mlopsv1.CnvrgApp)
@@ -80,7 +80,7 @@ func getNs(obj interface{}) string {
 }
 
 func getGrafanaDashboards(obj interface{}) []string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+	if reflect.TypeOf(&mlopsv1.CnvrgThirdParty{}) == reflect.TypeOf(obj) {
 		return GrafanaInfraDashboards
 	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
@@ -90,9 +90,7 @@ func getGrafanaDashboards(obj interface{}) []string {
 }
 
 func getSSOConfig(obj interface{}) *mlopsv1.SSO {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		return &obj.(*mlopsv1.CnvrgInfra).Spec.SSO
-	}
+
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		return &obj.(*mlopsv1.CnvrgApp).Spec.SSO
 	}
@@ -100,21 +98,12 @@ func getSSOConfig(obj interface{}) *mlopsv1.SSO {
 }
 
 func getSSORedirectUrl(obj interface{}, svc string) string {
-	if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
-		infra := obj.(*mlopsv1.CnvrgInfra)
-		if infra.Spec.Networking.HTTPS.Enabled {
-			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, strings.ReplaceAll(infra.Spec.ClusterDomain, "eastwest.", ""))
-		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, strings.ReplaceAll(infra.Spec.ClusterDomain, "eastwest.", ""))
-		}
-
-	}
 	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
 		app := obj.(*mlopsv1.CnvrgApp)
 		if app.Spec.Networking.HTTPS.Enabled {
-			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, strings.ReplaceAll(app.Spec.ClusterDomain, "eastwest.", ""))
+			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
 		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, strings.ReplaceAll(app.Spec.ClusterDomain, "eastwest.", ""))
+			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
 		}
 	}
 	return ""
@@ -311,7 +300,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 			return getGrafanaDashboards(obj)
 		},
 		"isAppSpec": func(obj interface{}) bool {
-			if reflect.TypeOf(&mlopsv1.CnvrgInfra{}) == reflect.TypeOf(obj) {
+			if reflect.TypeOf(&mlopsv1.CnvrgThirdParty{}) == reflect.TypeOf(obj) {
 				return false
 			}
 			return true
@@ -379,12 +368,11 @@ timeout 15
 
 func (s *State) GenerateDeployable() error {
 	var tpl bytes.Buffer
-	f, err := pkger.Open(s.TemplatePath)
+	b, err := s.Fs.ReadFile(s.TemplatePath)
 	if err != nil {
 		zap.S().Error(err, "error reading path", "path", s.TemplatePath)
 		return err
 	}
-	b, err := ioutil.ReadAll(f)
 
 	if err != nil {
 		zap.S().Errorf("%v, error reading file: %v", err, s.TemplatePath)
@@ -410,10 +398,6 @@ func (s *State) GenerateDeployable() error {
 	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
 		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
-		return err
-	}
-	if err := s.dumpTemplateToFile(); err != nil {
-		zap.S().Error(err, "dumping template file", "file", s.TemplatePath)
 		return err
 	}
 	return nil
@@ -612,7 +596,7 @@ func (s *State) mergeMetadata(actualObject *unstructured.Unstructured, log logr.
 
 }
 
-func (s *State) dumpTemplateToFile() error {
+func (s *State) DumpTemplateToFile(preserveTmplDirs bool) error {
 	templatesDumpDir := viper.GetString("templates-dump-dir")
 	if templatesDumpDir != "" {
 		if _, err := os.Stat(templatesDumpDir); os.IsNotExist(err) {
@@ -622,13 +606,32 @@ func (s *State) dumpTemplateToFile() error {
 			}
 		}
 
-		filePath := templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
-		templateFile, err := os.Create(filePath)
+		filePath := ""
+		if preserveTmplDirs {
+			filePath = templatesDumpDir + "/" + s.TemplatePath
+			if err := os.MkdirAll(filepath.Dir(filePath), 0775); err != nil {
+				return err
+			}
+		} else {
+			filePath = templatesDumpDir + "/" + s.Obj.GetName() + strings.ReplaceAll(s.TemplatePath, "/", "-")
+		}
+
+		templateFile, err := os.Create(strings.ReplaceAll(filePath, "tpl", "yaml"))
 		if err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
 		}
-		if _, err = templateFile.Write([]byte(s.ParsedTemplate)); err != nil {
+		b, err := s.Obj.MarshalJSON()
+		if err != nil {
+			return err
+		}
+
+		res, err := yamlgh.JSONToYAML(b)
+		if err != nil {
+			return err
+		}
+
+		if _, err = templateFile.Write(res); err != nil {
 			zap.S().Errorf("%v can't create file for rendered template, %v", err, s.Obj.GetName())
 			return err
 		}
@@ -709,7 +712,7 @@ func GetPromCredsSecret(secretName string, secretNs string, client client.Client
 		return "", "", "", err
 	}
 
-	return string(creds.Data["CNVRG_PROMETHEUS_URL"]), string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_PASS"]), nil
+	return string(creds.Data["CNVRG_PROMETHEUS_URL"]), string(creds.Data["CNVRG_PROMETHEUS_USER"]), string(creds.Data["CNVRG_PROMETHEUS_HASHED_PASS"]), nil
 }
 
 func CreatePromCredsSecret(obj v1.Object, secretName, secretNs, promUrl string, client client.Client, schema *runtime.Scheme, log logr.Logger) error {

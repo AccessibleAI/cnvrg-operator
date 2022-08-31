@@ -7,7 +7,6 @@ monitoring:
   prometheus:
     enabled: {{ .Values.monitoring.prometheus.enabled }}
     storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"
-    retention: {{ .Values.monitoring.prometheus.retention }}
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}
     {{- if .Values.monitoring.prometheus.nodeSelector }}
     nodeSelector:
