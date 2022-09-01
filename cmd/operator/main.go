@@ -47,6 +47,7 @@ var (
 		{name: "verbose", shorthand: "v", value: false, usage: "Verbose output"},
 		{name: "max-concurrent-reconciles", shorthand: "", value: 1, usage: "Max concurrent reconciles"},
 		{name: "cleanup-pvc", shorthand: "", value: false, usage: "set to true to delete PVCs on CR delete"},
+		{name: "create-crds", shorthand: "", value: false, usage: "automatically apply Operator CRDs on each start"},
 	}
 )
 

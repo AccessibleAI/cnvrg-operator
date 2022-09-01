@@ -1,10 +1,10 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: sidekiq
   namespace: {{ ns . }}
   annotations:
-    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:

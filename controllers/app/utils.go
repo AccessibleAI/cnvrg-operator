@@ -151,9 +151,10 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 				desiredAppSpec.ClusterDomain = clusterDomain
 			}
 		}
-		if !app.Spec.Dbs.Prom.Enabled {
-			discoverOcpPromCreds(clientset, app.Namespace)
-		}
+		// Never do that!
+		//if !app.Spec.Dbs.Prom.Enabled {
+		//	discoverOcpPromCreds(clientset, app.Namespace)
+		//}
 	}
 
 	return nil

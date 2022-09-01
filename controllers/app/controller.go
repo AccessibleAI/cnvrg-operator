@@ -45,8 +45,6 @@ type CnvrgAppReconciler struct {
 	Scheme   *runtime.Scheme
 }
 
-//var log logr.Logger
-
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=*,resources=*,verbs=*
@@ -72,10 +70,6 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 	if cnvrgApp == nil {
 		return ctrl.Result{}, nil // probably spec was deleted, no need to reconcile
-	}
-
-	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		discoverOcpDefaultRouteHost(r.Client)
 	}
 
 	if cnvrgApp.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -116,7 +110,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	r.updateStatusMessage(s, cnvrgApp)
 
 	// apply spec manifests
-	if err := r.applyManifests(cnvrgApp); err != nil {
+	if err := r.apply(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
 		return ctrl.Result{}, err
 	}
@@ -147,20 +141,16 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 }
 
-func (r *CnvrgAppReconciler) applyManifests(app *mlopsv1.CnvrgApp) error {
-
-	if app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
-		if err := networking.NewIstioGwState(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
-			return err
-		}
-	}
+func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 
 	if err := registry.NewRegistryStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 		return err
 	}
 
-	if err := controlplane.NewControlPlaneStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
-		return err
+	if app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+		if err := networking.NewIstioGwState(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			return err
+		}
 	}
 
 	if app.Spec.Dbs.Pg.Enabled {
@@ -179,8 +169,15 @@ func (r *CnvrgAppReconciler) applyManifests(app *mlopsv1.CnvrgApp) error {
 		if err := dbs.NewElasticStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			return err
 		}
-		if err := dbs.NewKibanaStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
-			return err
+		if app.Spec.Dbs.Es.Kibana.Enabled {
+			if err := dbs.NewKibanaStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
+		if app.Spec.Dbs.Es.Elastalert.Enabled {
+			if err := dbs.NewElastAlertStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -196,65 +193,9 @@ func (r *CnvrgAppReconciler) applyManifests(app *mlopsv1.CnvrgApp) error {
 		}
 	}
 
-	if app.Spec.Dbs.Es.Elastalert.Enabled {
-		if err := dbs.NewElastAlertStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
-			return err
-		}
+	if err := controlplane.NewControlPlaneStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+		return err
 	}
-
-	//r.Kibana.Apply()
-	//
-	//kibana := es.KibanaStateManager{Log: r.Log, App: cnvrgApp, C: &r.Client, S: r.Scheme}
-	//kibana.Apply()
-	//
-	//if cnvrgApp.Spec.Dbs.Es.Kibana.Enabled {
-	//	if ag, err := es.KibanaDefaultAssets(r.Log); err == nil {
-	//		if err := ag.Render(cnvrgApp); err != nil {
-	//			return err
-	//		}
-	//		if err := ag.Apply(cnvrgApp, r.Client, r.Scheme, r.Log); err != nil {
-	//			return err
-	//		}
-	//	} else {
-	//		return err
-	//	}
-	//}
-
-	// registry
-	r.Log.Info("applying registry")
-	//registryData := desired.TemplateData{
-	//	Namespace: cnvrgApp.Namespace,
-	//	Data: map[string]interface{}{
-	//		"Registry":    cnvrgApp.Spec.Registry,
-	//		"Annotations": cnvrgApp.Spec.Annotations,
-	//		"Labels":      cnvrgApp.Spec.Labels,
-	//	},
-	//}
-	//// registry
-	//if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, log); err != nil {
-	//	r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-	//	return err
-	//}
-	//
-	//// dbs
-	//if err := r.dbsState(cnvrgApp); err != nil {
-	//	r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-	//	return err
-	//}
-	//
-	//// networking
-	//r.Log.Info("applying networking")
-	//if err := desired.Apply(networking.AppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, log); err != nil {
-	//	r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-	//	return err
-	//}
-	//
-	//// controlplane
-	//r.Log.Info("applying controlplane")
-	//if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, log); err != nil {
-	//	r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-	//	return err
-	//}
 
 	return nil
 }
@@ -271,11 +212,11 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 	}
 	ctx := context.Background()
 	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		name := types.NamespacedName{Namespace: app.Namespace, Name: app.Name}
-		app, err := r.getCnvrgAppSpec(name)
-		if err != nil {
-			return err
-		}
+		//name := types.NamespacedName{Namespace: app.Namespace, Name: app.Name}
+		//app, err := r.getCnvrgAppSpec(name)
+		//if err != nil {
+		//	return err
+		//}
 		app.Status.Status = status.Status
 		app.Status.Message = status.Message
 		if status.Progress >= 0 {
@@ -284,8 +225,7 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 		if status.StackReadiness != nil {
 			app.Status.StackReadiness = status.StackReadiness
 		}
-		err = r.Status().Update(ctx, app)
-		return err
+		return r.Status().Update(ctx, app)
 	})
 	if err != nil {
 		r.Log.Error(err, "can't update status")
@@ -295,52 +235,52 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 
 func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, error) {
 
-	r.Log.Info("synchronizing cnvrgApp spec")
+	r.Log.Info("synchronizing app spec")
 
-	// Fetch current cnvrgApp spec
-	cnvrgApp, err := r.getCnvrgAppSpec(name)
+	// Fetch current app spec
+	app, err := r.getCnvrgAppSpec(name)
 	if err != nil {
 		return false, err
 	}
-	if cnvrgApp == nil {
+	if app == nil {
 		return false, nil // probably cnvrgapp was removed
 	}
-	r.Log.WithValues("name", name, "ns", cnvrgApp.Namespace)
+	r.Log.WithValues("name", name, "ns", app.Namespace)
 
-	// Get default cnvrgApp spec
+	// Get default app spec
 	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
 
-	if err := calculateAndApplyAppDefaults(cnvrgApp, &desiredSpec, r.Client); err != nil {
+	if err := calculateAndApplyAppDefaults(app, &desiredSpec, r.Client); err != nil {
 		r.Log.Error(err, "can't calculate defaults")
 		return false, err
 	}
 
-	// Merge current cnvrgApp spec into default spec ( make it indeed desiredSpec )
-	if err := mergo.Merge(&desiredSpec, cnvrgApp.Spec, mergo.WithOverride, mergo.WithTransformers(controllers.CnvrgSpecBoolTransformer{})); err != nil {
+	// Merge current app spec into default spec ( make it indeed desiredSpec )
+	if err := mergo.Merge(&desiredSpec, app.Spec, mergo.WithOverride, mergo.WithTransformers(controllers.CnvrgSpecBoolTransformer{})); err != nil {
 		r.Log.Error(err, "can't merge")
 		return false, err
 	}
 
 	if viper.GetBool("verbose") {
 
-		if diff, equal := messagediff.PrettyDiff(desiredSpec, cnvrgApp.Spec); !equal {
+		if diff, equal := messagediff.PrettyDiff(desiredSpec, app.Spec); !equal {
 			r.Log.Info("diff between desiredSpec and actual")
 			r.Log.Info(diff)
 		}
 
-		if diff, equal := messagediff.PrettyDiff(cnvrgApp.Spec, desiredSpec); !equal {
+		if diff, equal := messagediff.PrettyDiff(app.Spec, desiredSpec); !equal {
 			r.Log.Info("diff between actual and desired")
 			r.Log.Info(diff)
 		}
 
 	}
 
-	equal := reflect.DeepEqual(desiredSpec, cnvrgApp.Spec)
+	equal := reflect.DeepEqual(desiredSpec, app.Spec)
 	if !equal {
 		r.Log.Info("states are not equals, syncing and requeuing")
-		cnvrgApp.Spec = desiredSpec
-		if err := r.Update(context.Background(), cnvrgApp); err != nil && errors.IsConflict(err) {
-			r.Log.Info("conflict updating cnvrgApp object, requeue for reconciliations...")
+		app.Spec = desiredSpec
+		if err := r.Update(context.Background(), app); err != nil && errors.IsConflict(err) {
+			r.Log.Info("conflict updating app object, requeue for reconciliations...")
 			return true, nil
 		} else if err != nil {
 			return false, err
@@ -426,16 +366,11 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 }
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	if err := controlplane.NewControlPlaneCredsStateManager(r.Client, r.Scheme, r.Log).Apply(); err != nil {
-		return err
+	if viper.GetBool("create-crds") {
+		if err := controlplane.NewControlPlaneCredsStateManager(r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			return err
+		}
 	}
-	//log := r.Log.WithValues("initializing", "crds")
-
-	//err := desired.Apply(controlplane.Crds(), &mlopsv1.CnvrgApp{Spec: mlopsv1.DefaultCnvrgAppSpec()}, r.Client, r.Scheme, r.Log)
-	//if err != nil {
-	//	log.Error(err, "can't apply control plane crds")
-	//	os.Exit(1)
-	//}
 
 	appPredicate := predicate.Funcs{
 

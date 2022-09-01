@@ -10,27 +10,21 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/d4l3k/messagediff v1.2.1 // indirect
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-logr/logr v0.4.0
-	github.com/go-logr/zapr v0.4.0
+	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/zapr v1.2.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12
-	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/copystructure v1.1.1 // indirect
-	github.com/onsi/ginkgo v1.14.1
-	github.com/onsi/gomega v1.10.2
-	github.com/sirupsen/logrus v1.6.0
-	github.com/spf13/cobra v1.1.1
+	github.com/sirupsen/logrus v1.8.1
+	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.7.0
-	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
-	go.uber.org/zap v1.18.1
-	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
-	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2 // indirect
-	golang.org/x/text v0.3.6 // indirect
+	go.uber.org/zap v1.19.1
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 	gopkg.in/d4l3k/messagediff.v1 v1.2.1
-	k8s.io/api v0.20.2
-	k8s.io/apimachinery v0.20.2
-	k8s.io/client-go v0.20.2
-	sigs.k8s.io/controller-runtime v0.8.3
+	k8s.io/api v0.25.0
+	k8s.io/apimachinery v0.25.0
+	k8s.io/client-go v0.25.0
+	sigs.k8s.io/controller-runtime v0.12.3
 )
