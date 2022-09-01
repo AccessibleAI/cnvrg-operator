@@ -19,9 +19,6 @@ import (
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 )
 
-type FooBar struct {
-}
-
 type param struct {
 	name      string
 	shorthand string
