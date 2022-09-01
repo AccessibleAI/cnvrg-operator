@@ -6,7 +6,9 @@ import (
 
 type CnvrgThirdPartySpec struct {
 	ImageHub string   `json:"imageHub,omitempty"`
-	Gpu      Gpu      `json:"gpu,omitempty"`
+	Nvidia   Nvidia   `json:"nvidia,omitempty"`
+	Habana   Habana   `json:"habana,omitempty"`
+	Metagpu  Metagpu  `json:"metagpu,omitempty"`
 	Istio    Istio    `json:"istio,omitempty"`
 	Registry Registry `json:"registry,omitempty"`
 }
@@ -41,6 +43,8 @@ func DefaultCnvrgThirdPartySpec() CnvrgThirdPartySpec {
 		ImageHub: "docker.io/cnvrg",
 		Istio:    istioDefault,
 		Registry: thirdPartyRegistryDefault,
-		Gpu:      gpuDefaults,
+		Nvidia:   nvidiaDefaults,
+		Habana:   habanaDefaults,
+		Metagpu:  metagpuDefaults,
 	}
 }

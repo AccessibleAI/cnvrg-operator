@@ -11,23 +11,37 @@ type Istio struct {
 	IngressSvcAnnotations map[string]string `json:"ingressSvcAnnotations,omitempty"`
 }
 
-type NvidiaDp struct {
+type DcgmExporter struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 
-type HabanaDp struct {
+type NvidiaDevicePlugin struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 
-type MetaGpuDp struct {
+type Nvidia struct {
+	DevicePlugin    NvidiaDevicePlugin `json:"devicePlugin,omitempty"`
+	MetricsExporter DcgmExporter       `json:"metricsExporter,omitempty"`
+}
+
+type HabanaDevicePlugin struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 }
 
-type Gpu struct {
-	NvidiaDp  NvidiaDp  `json:"nvidiaDp,omitempty"`
-	HabanaDp  HabanaDp  `json:"habanaDp,omitempty"`
-	MetaGpuDp MetaGpuDp `json:"metaGpuDp,omitempty"`
+type HabanaMetricsExporter struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+type Habana struct {
+	DevicePlugin    HabanaDevicePlugin    `json:"devicePlugin,omitempty"`
+	MetricsExporter HabanaMetricsExporter `json:"metricsExporter,omitempty"`
+}
+
+type Metagpu struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
 }

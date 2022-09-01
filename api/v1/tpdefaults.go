@@ -1,24 +1,24 @@
 package v1
 
-var nvidiaDpDefault = NvidiaDp{
-	Enabled: false,
-	Image:   "k8s-device-plugin:v0.9.0",
+var nvidiaDefaults = Nvidia{
+	DevicePlugin: NvidiaDevicePlugin{
+		Enabled: false,
+		Image:   "k8s-device-plugin:v0.9.0",
+	},
+	MetricsExporter: DcgmExporter{},
 }
 
-var habanaDpDefault = HabanaDp{
-	Enabled: true,
-	Image:   "vault.habana.ai/docker-k8s-device-plugin/docker-k8s-device-plugin:latest",
+var habanaDefaults = Habana{
+	DevicePlugin: HabanaDevicePlugin{
+		Enabled: true,
+		Image:   "vault.habana.ai/docker-k8s-device-plugin/docker-k8s-device-plugin:latest",
+	},
+	MetricsExporter: HabanaMetricsExporter{},
 }
 
-var metagpuDpDefaults = MetaGpuDp{
+var metagpuDefaults = Metagpu{
 	Enabled: false,
 	Image:   "metagpu-device-plugin:main",
-}
-
-var gpuDefaults = Gpu{
-	NvidiaDp:  nvidiaDpDefault,
-	HabanaDp:  habanaDpDefault,
-	MetaGpuDp: metagpuDpDefaults,
 }
 
 var istioDefault = Istio{
@@ -33,7 +33,6 @@ var istioDefault = Istio{
 }
 
 var thirdPartyRegistryDefault = Registry{
-
 	Name:     "cnvrg-third-party-registry",
 	URL:      "docker.io",
 	User:     "",

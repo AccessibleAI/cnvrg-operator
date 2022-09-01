@@ -7,6 +7,7 @@ import (
 	controllers "github.com/AccessibleAI/cnvrg-operator/controllers"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/istio"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/nvidia"
 	ctpregistry "github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/registry"
 
 	"github.com/go-logr/logr"
@@ -97,82 +98,15 @@ func (r *CnvrgThirdPartyReconciler) applyManifests(ctp *mlopsv1.CnvrgThirdParty)
 		}
 	}
 
-	//registryData := desired.TemplateData{
-	//	Namespace: cnvrgTp.Namespace,
-	//	Data: map[string]interface{}{
-	//		"Registry": cnvrgTp.Spec.Registry,
-	//	},
-	//}
-	//if err := desired.Apply(registry.State(registryData), cnvrgTp, r.Client, r.Scheme, log); err != nil {
-	//	r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgTp)
-	//	reconcileResult = err
-	//}
+	if ctp.Spec.Nvidia.DevicePlugin.Enabled {
+		if err := nvidia.NewNvidiaStateManager(ctp, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			reconcileResult = err
+		}
+	}
 
-	// istio
+	if ctp.Spec.Nvidia.MetricsExporter.Enabled {
 
-	//log.Info("applying cnvrgTp networking")
-	//if ctp.Spec.Istio.Enabled {
-	//	if err := desired.Apply(istio.Crds(), &mlopsv1.CnvrgThirdParty{Spec: mlopsv1.DefaultCnvrgThirdPartySpec()}, r.Client, r.Scheme, r.Log); err != nil {
-	//		reconcileResult = err
-	//	}
-	//	if err := desired.Apply(istio.ApplyState(), cnvrgTp, r.Client, r.Scheme, log); err != nil {
-	//		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgTp)
-	//		reconcileResult = err
-	//	}
-	//}
-
-	//
-	//// nvidia device plugin
-	//if ctp.Spec.Gpu.NvidiaDp.Enabled {
-	//	log.Info("nvidia device plugin")
-	//	nvidiaDpData := desired.TemplateData{
-	//		Namespace: ctp.Namespace,
-	//		Data: map[string]interface{}{
-	//			"NvidiaDp": cnvrgTp.Spec.Gpu.NvidiaDp,
-	//			"Registry": cnvrgTp.Spec.Registry,
-	//			"ImageHub": cnvrgTp.Spec.ImageHub,
-	//		},
-	//	}
-	//	if err := desired.Apply(gpu.NvidiaDpState(nvidiaDpData), cnvrgTp, r.Client, r.Scheme, log); err != nil {
-	//		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgTp)
-	//		reconcileResult = err
-	//	}
-	//}
-	//
-	//// habana device plugin
-	//if cnvrgTp.Spec.Gpu.HabanaDp.Enabled {
-	//	log.Info("habana device plugin")
-	//	habanaDpData := desired.TemplateData{
-	//		Namespace: cnvrgTp.Namespace,
-	//		Data: map[string]interface{}{
-	//			"HabanaDp": cnvrgTp.Spec.Gpu.HabanaDp,
-	//			"Registry": cnvrgTp.Spec.Registry,
-	//			"ImageHub": cnvrgTp.Spec.ImageHub,
-	//		},
-	//	}
-	//	if err := desired.Apply(gpu.HabanaDpState(habanaDpData), cnvrgTp, r.Client, r.Scheme, log); err != nil {
-	//		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgTp)
-	//		reconcileResult = err
-	//	}
-	//}
-	//
-	//// metagpu device plugin
-	//if cnvrgTp.Spec.Gpu.MetaGpuDp.Enabled {
-	//	log.Info("metagpu device plugin")
-	//	metagpuDpData := desired.TemplateData{
-	//		Namespace: cnvrgTp.Namespace,
-	//		Data: map[string]interface{}{
-	//			"MetaGpuDp": cnvrgTp.Spec.Gpu.MetaGpuDp,
-	//			"ImageHub":  cnvrgTp.Spec.ImageHub,
-	//		},
-	//	}
-	//	// apply metagpu cnvrgTp state
-	//	if err := desired.Apply(gpu.MetagpudpState(metagpuDpData), cnvrgTp, r.Client, r.Scheme, log); err != nil {
-	//		r.updateStatusMessage(mlopsv1.StatusError, err.Error(), cnvrgTp)
-	//		reconcileResult = err
-	//	}
-	//
-	//}
+	}
 
 	return reconcileResult
 }

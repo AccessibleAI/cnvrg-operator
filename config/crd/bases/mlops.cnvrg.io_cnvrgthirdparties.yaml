@@ -41,23 +41,16 @@ spec:
             type: object
           spec:
             properties:
-              gpu:
+              habana:
                 properties:
-                  habanaDp:
+                  devicePlugin:
                     properties:
                       enabled:
                         type: boolean
                       image:
                         type: string
                     type: object
-                  metaGpuDp:
-                    properties:
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                    type: object
-                  nvidiaDp:
+                  metricsExporter:
                     properties:
                       enabled:
                         type: boolean
@@ -93,6 +86,30 @@ spec:
                     type: string
                   proxyImage:
                     type: string
+                type: object
+              metagpu:
+                properties:
+                  enabled:
+                    type: boolean
+                  image:
+                    type: string
+                type: object
+              nvidia:
+                properties:
+                  devicePlugin:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                    type: object
+                  metricsExporter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                    type: object
                 type: object
               registry:
                 properties:
