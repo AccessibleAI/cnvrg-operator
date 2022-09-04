@@ -5,8 +5,8 @@ metadata:
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
-    mlops.cnvrg.io/own: "true"
-    mlops.cnvrg.io/updatable: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
 spec:
   selector:
     matchLabels:
@@ -16,17 +16,14 @@ spec:
       labels:
         name: nvidia-device-plugin-ds
     spec:
-      serviceAccountName: nvidia-device-plugin
+      serviceAccountName: nvidia
       tolerations:
         - operator: Exists
-        - key: nvidia.com/gpu
-          operator: Exists
-          effect: NoSchedule
       priorityClassName: "system-node-critical"
       nodeSelector:
-        accelerator: nvidia
+        {{.Spec.Nvidia.NodeSelector.Key}}: {{.Spec.Nvidia.NodeSelector.Value}}
       containers:
-        - image: {{ image .Spec.ImageHub .Spec.Nvidia.DevicePlugin.Image }}
+        - image: {{ image .Spec.ImageHub .Spec.Nvidia.MetricsExporter.Image }}
           name: nvidia-device-plugin-ctr
           args: ["--fail-on-init-error=true"]
           resources:

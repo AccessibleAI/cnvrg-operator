@@ -17,6 +17,7 @@ type CnvrgThirdPartySpec struct {
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:shortName=ctp
 
 type CnvrgThirdParty struct {
 	metav1.TypeMeta   `json:",inline"`

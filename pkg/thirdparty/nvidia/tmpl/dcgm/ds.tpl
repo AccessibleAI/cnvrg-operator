@@ -4,32 +4,21 @@ metadata:
   name: dcgm-exporter
   namespace: {{ ns . }}
   annotations:
-    {{- range $k, $v := .Spec.Annotations }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
   labels:
     app: "dcgm-exporter"
-    {{- range $k, $v := .Spec.Labels }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
 spec:
   selector:
     matchLabels:
       app: "dcgm-exporter"
   template:
     metadata:
-      annotations:
-        {{- range $k, $v := .Spec.Annotations }}
-        {{$k}}: "{{$v}}"
-        {{- end }}
       labels:
         app: "dcgm-exporter"
-        {{- range $k, $v := .Spec.Labels }}
-        {{$k}}: "{{$v}}"
-        {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
-      serviceAccountName: dcgm-exporter
+      serviceAccountName: nvidia
       volumes:
         - name: "pod-gpu-resources"
           hostPath:
@@ -37,7 +26,7 @@ spec:
       tolerations:
         - operator: Exists
       nodeSelector:
-        accelerator: nvidia
+        {{.Spec.Nvidia.NodeSelector.Key}}: {{.Spec.Nvidia.NodeSelector.Value}}
       containers:
         - name: exporter
           securityContext:
@@ -46,7 +35,7 @@ spec:
                 - SYS_ADMIN
             runAsNonRoot: false
             runAsUser: 0
-          image: {{ .Spec.Monitoring.DcgmExporter.Image }}
+          image: {{ image .Spec.ImageHub .Spec.Nvidia.DevicePlugin.Image }}
           imagePullPolicy: "IfNotPresent"
           args:
             - -f

@@ -4,14 +4,11 @@ metadata:
   name: dcgm-exporter
   namespace: {{ ns . }}
   annotations:
-    {{- range $k, $v := .Spec.Annotations }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
   labels:
     app: dcgm-exporter
-    {{- range $k, $v := .Spec.Labels }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
 spec:
   type: ClusterIP
   ports:

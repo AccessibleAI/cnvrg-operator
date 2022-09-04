@@ -98,6 +98,13 @@ func (r *CnvrgThirdPartyReconciler) applyManifests(ctp *mlopsv1.CnvrgThirdParty)
 		}
 	}
 
+	// nvidia
+	if ctp.Spec.Nvidia.DevicePlugin.Enabled || ctp.Spec.Nvidia.MetricsExporter.Enabled {
+		if err := nvidia.NewNvidiaRbacState(ctp, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			reconcileResult = err
+		}
+	}
+
 	if ctp.Spec.Nvidia.DevicePlugin.Enabled {
 		if err := nvidia.NewNvidiaStateManager(ctp, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			reconcileResult = err
@@ -105,7 +112,9 @@ func (r *CnvrgThirdPartyReconciler) applyManifests(ctp *mlopsv1.CnvrgThirdParty)
 	}
 
 	if ctp.Spec.Nvidia.MetricsExporter.Enabled {
-
+		if err := nvidia.NewMetricsExporterState(ctp, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			reconcileResult = err
+		}
 	}
 
 	return reconcileResult

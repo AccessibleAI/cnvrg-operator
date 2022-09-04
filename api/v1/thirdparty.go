@@ -11,6 +11,11 @@ type Istio struct {
 	IngressSvcAnnotations map[string]string `json:"ingressSvcAnnotations,omitempty"`
 }
 
+type NodeSelector struct {
+	Key   string `json:"key,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+
 type DcgmExporter struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
@@ -22,6 +27,7 @@ type NvidiaDevicePlugin struct {
 }
 
 type Nvidia struct {
+	NodeSelector    NodeSelector       `json:"nodeSelector,omitempty"`
 	DevicePlugin    NvidiaDevicePlugin `json:"devicePlugin,omitempty"`
 	MetricsExporter DcgmExporter       `json:"metricsExporter,omitempty"`
 }
