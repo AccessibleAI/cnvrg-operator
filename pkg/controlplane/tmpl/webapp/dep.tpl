@@ -174,7 +174,7 @@ spec:
         volumeMounts:
         {{- if isTrue .Spec.SSO.Enabled }}
         - name: "oauth-proxy-webapp"
-          mountPath: "/opt/app-root/src/proxy-config/conf"
+          mountPath: "/opt/app-root/src/proxy-config"
           readOnly: true
         {{- end }}
         {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
