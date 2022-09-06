@@ -171,8 +171,13 @@ spec:
           limits:
             cpu: "{{.Spec.ControlPlane.WebApp.Limits.Cpu}}"
             memory: "{{.Spec.ControlPlane.WebApp.Limits.Memory}}"
-        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         volumeMounts:
+        {{- if isTrue .Spec.SSO.Enabled }}
+        - name: "oauth-proxy-webapp"
+          mountPath: "/opt/app-root/src/proxy-config"
+          readOnly: true
+        {{- end }}
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           mountPath: /opt/app-root/conf/gcp-keyfile
           readOnly: true
