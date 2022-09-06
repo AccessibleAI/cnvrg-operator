@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: prom
+  name: cnvrg-prom
   namespace: {{ .Namespace }}
   annotations:
-    mlops.cnvrg.io/default-loader: "true"
-    mlops.cnvrg.io/own: "true"
-    mlops.cnvrg.io/updatable: "true"
+    mlops.cnvrg.io/default-loader: "false"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -17,7 +17,8 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: prom
+  name: cnvrg-prom
 subjects:
   - kind: ServiceAccount
-    name: prom
+    name: cnvrg-prom
+    namespace: {{ .CnvrgNamespace }}

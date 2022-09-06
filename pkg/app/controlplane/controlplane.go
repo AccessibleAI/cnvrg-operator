@@ -37,9 +37,9 @@ func NewControlPlaneStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runt
 }
 
 func (m *CpStateManager) LoadKiqs(kiqName string, hpa bool) error {
-	kiqAsset := fmt.Sprintf("%s.tpl", kiqName)
+	kiqAsset := []string{fmt.Sprintf("%s.tpl", kiqName)}
 
-	kiq := desired.NewAssetsGroup(fs, m.RootPath()+"/sidekiqs", m.Log(), &desired.LoadFilter{AssetName: &kiqAsset})
+	kiq := desired.NewAssetsGroup(fs, m.RootPath()+"/sidekiqs", m.Log(), &desired.LoadFilter{AssetName: kiqAsset})
 	if err := kiq.LoadAssets(); err != nil {
 		return err
 	}
@@ -47,8 +47,8 @@ func (m *CpStateManager) LoadKiqs(kiqName string, hpa bool) error {
 	m.AddToAssets(kiq)
 
 	if hpa {
-		hpaAsset := fmt.Sprintf("%s-hpa.tpl", kiqName)
-		kiqHpa := desired.NewAssetsGroup(fs, m.RootPath()+"/sidekiqs", m.Log(), &desired.LoadFilter{AssetName: &hpaAsset})
+		hpaAsset := []string{fmt.Sprintf("%s-hpa.tpl", kiqName)}
+		kiqHpa := desired.NewAssetsGroup(fs, m.RootPath()+"/sidekiqs", m.Log(), &desired.LoadFilter{AssetName: hpaAsset})
 		if err := kiqHpa.LoadAssets(); err != nil {
 			return err
 		}
@@ -73,8 +73,8 @@ func (m *CpStateManager) Load() error {
 	m.AddToAssets(rbac)
 
 	if m.app.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		assetName := "ocp-scc.tpl"
-		ocpScc := desired.NewAssetsGroup(fs, fsRoot+"/conf/rbac", m.Log(), &desired.LoadFilter{AssetName: &assetName})
+		assetName := []string{"ocp-scc.tpl"}
+		ocpScc := desired.NewAssetsGroup(fs, fsRoot+"/conf/rbac", m.Log(), &desired.LoadFilter{AssetName: assetName})
 		if err := ocpScc.LoadAssets(); err != nil {
 			return err
 		}

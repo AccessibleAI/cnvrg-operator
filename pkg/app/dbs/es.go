@@ -57,8 +57,8 @@ func NewElastAlertStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtim
 
 func (m *ElasticStateManager) Load() error {
 
-	assetName := "secret.tpl"
-	f := &desired.LoadFilter{AssetName: &assetName}
+	assetName := []string{"secret.tpl"}
+	f := &desired.LoadFilter{AssetName: assetName}
 	m.esSecret = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
 	if err := m.esSecret.LoadAssets(); err != nil {
 		return err
@@ -102,8 +102,8 @@ func (m *ElasticStateManager) Apply() error {
 }
 
 func (m *KibanaStateManager) Load() error {
-	assetName := "secret.tpl"
-	f := &desired.LoadFilter{AssetName: &assetName}
+	assetName := []string{"secret.tpl"}
+	f := &desired.LoadFilter{AssetName: assetName}
 	m.kibanaConf = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
 	if err := m.kibanaConf.LoadAssets(); err != nil {
 		return err
@@ -188,8 +188,8 @@ func (m *KibanaStateManager) Apply() error {
 }
 
 func (m *ElastAlertStateManager) Load() error {
-	assetName := "credsec.tpl"
-	f := &desired.LoadFilter{AssetName: &assetName}
+	assetName := []string{"credsec.tpl"}
+	f := &desired.LoadFilter{AssetName: assetName}
 	m.eaConf = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
 	if err := m.eaConf.LoadAssets(); err != nil {
 		return err

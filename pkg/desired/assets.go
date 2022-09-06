@@ -29,7 +29,7 @@ var istioVsRegex, _ = regexp.Compile(`kind:.*VirtualService`)
 
 type LoadFilter struct {
 	Ingress       *v1mlops.IngressType
-	AssetName     *string
+	AssetName     []string
 	DefaultLoader bool
 }
 
@@ -154,12 +154,13 @@ func (g *AssetsGroup) pass(a *Asset) bool {
 		return true
 	}
 
-	if g.Filter.AssetName != nil {
-		if a.Name == *g.Filter.AssetName {
-			return true
-		} else {
-			return false
+	if len(g.Filter.AssetName) > 0 {
+		for _, asset := range g.Filter.AssetName {
+			if asset == a.Name {
+				return true
+			}
 		}
+		return false
 	}
 
 	if a.Default() != g.Filter.DefaultLoader {
@@ -236,37 +237,6 @@ func (g *AssetsGroup) Apply(spec v1.Object, c client.Client, s *runtime.Scheme, 
 			log.Info("error updating object")
 		}
 
-		//if err := c.Create(context.Background(), a.Obj); err != nil {
-		//	if errors.IsAlreadyExists(err) {
-		//		if !a.Updatable {
-		//			log.Info("asset is not updatable", "assetName", a.Name)
-		//			continue
-		//		}
-		//
-		//		existingObject := &unstructured.Unstructured{}
-		//		objectName := types.NamespacedName{Namespace: a.Obj.GetNamespace(), Name: a.Obj.GetName()}
-		//		existingObject.SetKind(a.Obj.GetKind())
-		//		existingObject.SetGroupVersionKind(a.Obj.GroupVersionKind())
-		//		if err := c.Get(context.Background(), objectName, existingObject); err != nil {
-		//			a.Error = err
-		//			e = err
-		//		}
-		//
-		//		if !reflect.DeepEqual(existingObject.Object["spec"], a.Obj.Object["spec"]) {
-		//			if viper.GetBool("verbose") {
-		//				diff, _ := messagediff.PrettyDiff(existingObject.Object["spec"], a.Obj.Object["spec"])
-		//				log.Info(diff)
-		//			}
-		//			a.Obj.SetResourceVersion(existingObject.GetResourceVersion())
-		//			if err := c.Update(context.Background(), a.Obj); err != nil {
-		//				e = err
-		//			}
-		//		}
-		//
-		//	} else if err != nil {
-		//		e = err
-		//	}
-		//}
 	}
 	return
 }

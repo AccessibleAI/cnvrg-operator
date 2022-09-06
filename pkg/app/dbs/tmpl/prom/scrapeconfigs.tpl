@@ -31,11 +31,11 @@ data:
                 label: "component=cnvrg-workload"
             namespaces:
               own_namespace: true
-          {{- range $_, $cfg := .ExtraPodsScrapeConfigs }}
+          {{- range $_, $cfg := .Spec.Dbs.Prom.ExtraPodsScrapeConfigs }}
           - role: pod
             selectors:
               - role: pod
-                label: "{{cfg.LabelSelector}}"
+                label: "{{$cfg.LabelSelector}}"
             namespaces:
               names:
                 - {{ $cfg.Namespace }}

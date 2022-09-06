@@ -52,8 +52,7 @@ func NewNvidiaRbacState(ctp *mlopsv1.CnvrgThirdParty, c client.Client, s *runtim
 
 func (m *RbacState) Load() error {
 	if m.isOpenshift() {
-		assetName := "scc.tpl"
-		f := &desired.LoadFilter{AssetName: &assetName}
+		f := &desired.LoadFilter{AssetName: []string{"scc.tpl"}}
 		scc := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
 		if err := scc.LoadAssets(); err != nil {
 			return err

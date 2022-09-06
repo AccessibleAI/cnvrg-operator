@@ -22,8 +22,8 @@ func NewPgStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme
 }
 
 func (m *PgStateManager) Load() error {
-	assetName := "secret.tpl"
-	f := &desired.LoadFilter{AssetName: &assetName}
+	assetName := []string{"secret.tpl"}
+	f := &desired.LoadFilter{AssetName: assetName}
 	m.pgSecret = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
 	if err := m.pgSecret.LoadAssets(); err != nil {
 		return err

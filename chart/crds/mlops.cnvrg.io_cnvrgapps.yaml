@@ -807,9 +807,14 @@ spec:
                         type: string
                       enabled:
                         type: boolean
-                      watchNamespaces:
+                      extraPodsScrapeConfigs:
                         items:
-                          type: string
+                          properties:
+                            labelSelector:
+                              type: string
+                            namespace:
+                              type: string
+                          type: object
                         type: array
                     type: object
                   redis:

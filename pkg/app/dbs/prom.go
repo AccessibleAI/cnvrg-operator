@@ -26,37 +26,81 @@ func NewPromStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Sche
 	}
 }
 
-func (m *PromStateManager) Load() error {
-	credsAsset := "creds.tpl"
-	m.promCreds = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: &credsAsset})
-	if err := m.promCreds.LoadAssets(); err != nil {
-		return err
-	}
-	configMapAsset := "webconfigs.tpl"
-	m.promWebConfigs = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: &configMapAsset})
-	if err := m.promWebConfigs.LoadAssets(); err != nil {
-		return err
-	}
-	return nil
-}
+func (m *PromStateManager) promCredsAssets() error {
+	assets := []string{"creds.tpl", "webconfigs.tpl"}
 
-func (m *PromStateManager) Render() error {
+	credsAssets := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: assets})
+
+	if err := credsAssets.LoadAssets(); err != nil {
+		return err
+	}
+
 	data, err := m.promCredsData()
 	if err != nil {
 		return err
 	}
 
-	if err := m.promCreds.Render(data); err != nil {
+	if err := credsAssets.Render(data); err != nil {
 		return err
 	}
-	m.AssetsStateManager.AddToState(m.promCreds)
 
-	if err := m.promWebConfigs.Render(data); err != nil {
-		return err
-	}
-	m.AssetsStateManager.AddToState(m.promWebConfigs)
+	m.AddToState(credsAssets)
 
 	return nil
+}
+
+func (m *PromStateManager) defaultRoleBinding() error {
+	assets := []string{"rolebinding.tpl"}
+
+	roleBinding := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: assets})
+	if err := roleBinding.LoadAssets(); err != nil {
+		return nil
+	}
+	data := map[string]interface{}{
+		"Namespace": m.app.Namespace,
+		"Spec": map[string]interface{}{
+			"Annotations": m.app.Spec.Annotations,
+			"Labels":      m.app.Spec.Labels,
+		},
+		"CnvrgNamespace": m.app.Namespace,
+	}
+
+	if err := roleBinding.Render(data); err != nil {
+		return err
+	}
+
+	m.AddToAssets(roleBinding)
+
+	return nil
+}
+
+func (m *PromStateManager) extraPodsScrapeConfigs() {
+	if len(m.app.Spec.Dbs.Prom.ExtraPodsScrapeConfigs) > 0 {
+
+		for _, podScrapeConfig := range m.app.Spec.Dbs.Prom.ExtraPodsScrapeConfigs {
+			if podScrapeConfig.Namespace != m.app.Namespace {
+				assets := []string{"role.tpl", "rolebinding.tpl"}
+				extraRbac := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: assets})
+				if err := extraRbac.LoadAssets(); err != nil {
+					m.Log().Error(err, "unable to setup RBAC for extra pods scrape configs")
+					continue
+				}
+				rbacData := map[string]interface{}{
+					"Namespace": podScrapeConfig.Namespace,
+					"Spec": map[string]interface{}{
+						"Annotations": map[string]string{},
+						"Labels":      map[string]string{},
+					},
+					"CnvrgNamespace": m.app.Namespace,
+				}
+				if err := extraRbac.Render(rbacData); err != nil {
+					m.Log().Error(err, "failed to render RBAC for extra pods scrape configs")
+					continue
+				}
+				m.AddToState(extraRbac)
+			}
+		}
+	}
 }
 
 func (m *PromStateManager) promCredsData() (map[string]interface{}, error) {
@@ -67,27 +111,24 @@ func (m *PromStateManager) promCredsData() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return map[string]interface{}{
-		"Namespace":              m.app.Namespace,
-		"Annotations":            m.app.Spec.Annotations,
-		"Labels":                 m.app.Spec.Labels,
-		"CredsRef":               m.app.Spec.Dbs.Prom.CredsRef,
-		"User":                   user,
-		"Pass":                   pass,
-		"PassHash":               string(passHash),
-		"PromUrl":                fmt.Sprintf("http://%s.%s.svc:%d", "prom", m.app.Namespace, 9090),
-		"ExtraPodsScrapeConfigs": m.app.Spec.Dbs.Prom.ExtraPodsScrapeConfigs,
+		"Namespace":   m.app.Namespace,
+		"Annotations": m.app.Spec.Annotations,
+		"Labels":      m.app.Spec.Labels,
+		"CredsRef":    m.app.Spec.Dbs.Prom.CredsRef,
+		"User":        user,
+		"Pass":        pass,
+		"PassHash":    string(passHash),
+		"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", "prom", m.app.Namespace, 9090),
 	}, nil
 }
 
 func (m *PromStateManager) Apply() error {
 
-	if err := m.Load(); err != nil {
+	if err := m.promCredsAssets(); err != nil {
 		return err
 	}
 
-	if err := m.Render(); err != nil {
-		return err
-	}
+	m.extraPodsScrapeConfigs()
 
 	if err := m.AssetsStateManager.Apply(); err != nil {
 		return nil

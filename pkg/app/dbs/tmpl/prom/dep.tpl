@@ -16,7 +16,7 @@ spec:
       labels:
         app: prom
     spec:
-      serviceAccountName: prom
+      serviceAccountName: cnvrg-prom
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
