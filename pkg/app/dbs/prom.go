@@ -12,9 +12,9 @@ import (
 
 type PromStateManager struct {
 	*desired.AssetsStateManager
-	app       *mlopsv1.CnvrgApp
-	promCreds *desired.AssetsGroup
-	promCm    *desired.AssetsGroup
+	app            *mlopsv1.CnvrgApp
+	promCreds      *desired.AssetsGroup
+	promWebConfigs *desired.AssetsGroup
 }
 
 func NewPromStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
@@ -32,9 +32,9 @@ func (m *PromStateManager) Load() error {
 	if err := m.promCreds.LoadAssets(); err != nil {
 		return err
 	}
-	configMapAsset := "cm.tpl"
-	m.promCm = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: &configMapAsset})
-	if err := m.promCm.LoadAssets(); err != nil {
+	configMapAsset := "webconfigs.tpl"
+	m.promWebConfigs = desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: &configMapAsset})
+	if err := m.promWebConfigs.LoadAssets(); err != nil {
 		return err
 	}
 	return nil
@@ -51,10 +51,10 @@ func (m *PromStateManager) Render() error {
 	}
 	m.AssetsStateManager.AddToState(m.promCreds)
 
-	if err := m.promCm.Render(data); err != nil {
+	if err := m.promWebConfigs.Render(data); err != nil {
 		return err
 	}
-	m.AssetsStateManager.AddToState(m.promCm)
+	m.AssetsStateManager.AddToState(m.promWebConfigs)
 
 	return nil
 }
@@ -67,14 +67,15 @@ func (m *PromStateManager) promCredsData() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return map[string]interface{}{
-		"Namespace":   m.app.Namespace,
-		"Annotations": m.app.Spec.Annotations,
-		"Labels":      m.app.Spec.Labels,
-		"CredsRef":    m.app.Spec.Dbs.Prom.CredsRef,
-		"User":        user,
-		"Pass":        pass,
-		"PassHash":    string(passHash),
-		"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", "prom", m.app.Namespace, 9090),
+		"Namespace":              m.app.Namespace,
+		"Annotations":            m.app.Spec.Annotations,
+		"Labels":                 m.app.Spec.Labels,
+		"CredsRef":               m.app.Spec.Dbs.Prom.CredsRef,
+		"User":                   user,
+		"Pass":                   pass,
+		"PassHash":               string(passHash),
+		"PromUrl":                fmt.Sprintf("http://%s.%s.svc:%d", "prom", m.app.Namespace, 9090),
+		"ExtraPodsScrapeConfigs": m.app.Spec.Dbs.Prom.ExtraPodsScrapeConfigs,
 	}, nil
 }
 

@@ -807,6 +807,10 @@ spec:
                         type: string
                       enabled:
                         type: boolean
+                      watchNamespaces:
+                        items:
+                          type: string
+                        type: array
                     type: object
                   redis:
                     properties:

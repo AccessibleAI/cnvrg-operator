@@ -227,7 +227,9 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 		}
 		return r.Status().Update(ctx, app)
 	})
-	if err != nil {
+	if err != nil && errors.IsConflict(err) {
+		r.Log.V(1).Error(err, "can't update status")
+	} else if err != nil {
 		r.Log.Error(err, "can't update status")
 	}
 

@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: prom-config
+  name: prom-scrape-configs
   namespace: {{ .Namespace }}
   annotations:
-    mlops.cnvrg.io/default-loader: "false"
+    mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
-    mlops.cnvrg.io/updatable: "false"
+    mlops.cnvrg.io/updatable: "true"
 data:
   prometheus.yml: |
     global:
@@ -14,7 +14,6 @@ data:
       evaluation_interval: 10s
     scrape_configs:
       - job_name: cnvrg-metrics
-        honor_labels: false
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
@@ -32,6 +31,12 @@ data:
                 label: "component=cnvrg-workload"
             namespaces:
               own_namespace: true
-  web-config.yml: |
-    basic_auth_users:
-      cnvrg: {{ .PassHash }}
+          {{- range $_, $cfg := .ExtraPodsScrapeConfigs }}
+          - role: pod
+            selectors:
+              - role: pod
+                label: "{{cfg.LabelSelector}}"
+            namespaces:
+              names:
+                - {{ $cfg.Namespace }}
+          {{- end }}

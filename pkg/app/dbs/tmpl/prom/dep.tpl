@@ -24,21 +24,26 @@ spec:
       - name: prometheus
         image: prom/prometheus
         volumeMounts:
-          - mountPath: /prometheus/config
-            name: config
+          - mountPath: /prometheus/config/scrape
+            name: prom-scrape-configs
+          - mountPath: /prometheus/config/web
+            name: prom-web-configs
           - mountPath: /data
             name: prom-data
         command:
         - prometheus
         - --storage.tsdb.path=/data
-        - --config.file=/prometheus/config/prometheus.yml
-        - --web.config.file=/prometheus/config/web-config.yml
+        - --config.file=/prometheus/config/scrape/prometheus.yml
+        - --web.config.file=/prometheus/config/web/web-config.yml
         ports:
           - containerPort: 9090
       volumes:
-        - name: config
+        - name: prom-scrape-configs
           configMap:
-            name: prom-config
+            name: prom-scrape-configs
+        - name: prom-web-configs
+          configMap:
+            name: prom-web-configs
         - name: prom-data
           persistentVolumeClaim:
             claimName: prom
