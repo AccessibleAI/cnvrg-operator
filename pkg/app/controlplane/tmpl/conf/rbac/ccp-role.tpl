@@ -221,12 +221,22 @@ rules:
   - list
   - watch
 - apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+- apiGroups:
   - istio.io
   - config.istio.io
   - networking.istio.io
   - rbac.istio.io
   - authentication.istio.io
-  - networking.k8s.io
   resources:
   -  "*"
   verbs:
