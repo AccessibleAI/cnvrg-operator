@@ -23,4 +23,10 @@ rules:
   - configmaps
   - persistentvolumeclaims
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - use
+  - delete

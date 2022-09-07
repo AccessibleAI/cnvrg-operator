@@ -23,5 +23,11 @@ rules:
   - services
   - configmaps
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - use
+  - delete
 {{- end }}
