@@ -21,7 +21,12 @@ rules:
   - routes
   - routes/custom-host
   verbs:
-  - "*"
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
 - apiGroups:
     - security.openshift.io
   resourceNames:
