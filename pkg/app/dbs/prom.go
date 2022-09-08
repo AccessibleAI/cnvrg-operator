@@ -26,7 +26,7 @@ func NewPromStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Sche
 	}
 }
 
-func (m *PromStateManager) promCredsAssets() error {
+func (m *PromStateManager) promCredsAssetsToState() error {
 	assets := []string{"creds.tpl", "webconfigs.tpl"}
 
 	credsAssets := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: assets})
@@ -69,7 +69,7 @@ func (m *PromStateManager) defaultRoleBinding() error {
 		return err
 	}
 
-	m.AddToAssets(roleBinding)
+	m.AddToState(roleBinding)
 
 	return nil
 }
@@ -124,15 +124,19 @@ func (m *PromStateManager) promCredsData() (map[string]interface{}, error) {
 
 func (m *PromStateManager) Apply() error {
 
-	if err := m.promCredsAssets(); err != nil {
+	// create default role binding for prometheus
+	if err := m.defaultRoleBinding(); err != nil {
 		return err
 	}
-
+	// parse & render prom creds
+	if err := m.promCredsAssetsToState(); err != nil {
+		return err
+	}
+	// try to apply extra pods scrape configs
 	m.extraPodsScrapeConfigs()
-
+	// apply the final state
 	if err := m.AssetsStateManager.Apply(); err != nil {
 		return nil
 	}
-
 	return nil
 }
