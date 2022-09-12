@@ -140,6 +140,12 @@ func (m *CpStateManager) Load() error {
 		m.AddToAssets(webapp)
 	}
 
+	nomex := desired.NewAssetsGroup(fs, m.RootPath()+"/nomex", m.Log(), &desired.LoadFilter{DefaultLoader: true})
+	if err := nomex.LoadAssets(); err != nil {
+		return err
+	}
+	m.AddToAssets(nomex)
+
 	return nil
 }
 

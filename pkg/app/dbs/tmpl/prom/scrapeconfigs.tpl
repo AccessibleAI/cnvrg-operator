@@ -31,6 +31,12 @@ data:
                 label: "component=cnvrg-workload"
             namespaces:
               own_namespace: true
+          - role: pod
+            selectors:
+              - role: pod
+                label: "component=nomex"
+            namespaces:
+              own_namespace: true
           {{- range $_, $cfg := .Spec.Dbs.Prom.ExtraPodsScrapeConfigs }}
           - role: pod
             selectors:
