@@ -102,6 +102,8 @@ spec:
                         type: string
                       jobsStorageClass:
                         type: string
+                      metagpuEnabled:
+                        type: boolean
                       runJobsOnSelfCluster:
                         type: string
                       sentryUrl:

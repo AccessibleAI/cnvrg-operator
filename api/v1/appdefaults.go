@@ -192,6 +192,7 @@ var controlPlaneDefault = ControlPlane{
 		CnvrgJobUID:        "0", // by default cnvrg job is running as root
 		CnvrgJobRbacStrict: false,
 		CnvrgPrivilegedJob: true,
+		MetagpuEnabled:     false,
 	},
 
 	ObjectStorage: ObjectStorage{

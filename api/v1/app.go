@@ -172,6 +172,7 @@ type BaseConfig struct {
 	CnvrgJobUID          string            `json:"cnvrgJobUid,omitempty"`
 	CnvrgJobRbacStrict   bool              `json:"cnvrgJobRbacStrict,omitempty"`
 	CnvrgPrivilegedJob   bool              `json:"cnvrgPrivilegedJob,omitempty"`
+	MetagpuEnabled       bool              `json:"metagpuEnabled,omitempty"`
 }
 
 type ControlPlane struct {
