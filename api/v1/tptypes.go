@@ -38,14 +38,3 @@ type CnvrgThirdPartyList struct {
 func init() {
 	SchemeBuilder.Register(&CnvrgThirdParty{}, &CnvrgThirdPartyList{})
 }
-
-func DefaultCnvrgThirdPartySpec() CnvrgThirdPartySpec {
-	return CnvrgThirdPartySpec{
-		ImageHub: "docker.io/cnvrg",
-		Istio:    istioDefault,
-		Registry: thirdPartyRegistryDefault,
-		Nvidia:   nvidiaDefaults,
-		Habana:   habanaDefaults,
-		Metagpu:  metagpuDefaults,
-	}
-}

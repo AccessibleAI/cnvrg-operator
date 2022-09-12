@@ -133,37 +133,42 @@ func (r *CnvrgThirdPartyReconciler) syncCnvrgThirdPartySpec(name types.Namespace
 	log.Info("synchronizing cnvrgThirdParty spec")
 
 	// Fetch current cnvrgThirdParty spec
-	cnvrgTp, err := r.getCnvrgThirdPartySpec(name)
+	ctp, err := r.getCnvrgThirdPartySpec(name)
 	if err != nil {
 		return false, err
 	}
-	if cnvrgTp == nil {
-		return true, nil // all (probably) good, cnvrgTp was removed
+	if ctp == nil {
+		return true, nil // all (probably) good, ctp was removed
 	}
-	log = r.Log.WithValues("name", name, "ns", cnvrgTp.Namespace)
+	log = r.Log.WithValues("name", name, "ns", ctp.Namespace)
 
-	// Get default cnvrgTp spec
+	// Get default ctp spec
 	desiredSpec := mlopsv1.DefaultCnvrgThirdPartySpec()
 
-	// Merge current cnvrgTp spec into default spec ( make it indeed desiredSpec )
-	if err := mergo.Merge(&desiredSpec, cnvrgTp.Spec, mergo.WithOverride, mergo.WithTransformers(controllers.CnvrgSpecBoolTransformer{})); err != nil {
+	if err := applyCtpDefaults(ctp, &desiredSpec, r.Client); err != nil {
+		r.Log.Error(err, "failed to apply ctp defaults ")
+		return false, err
+	}
+
+	// Merge current ctp spec into default spec ( make it indeed desiredSpec )
+	if err := mergo.Merge(&desiredSpec, ctp.Spec, mergo.WithOverride, mergo.WithTransformers(controllers.CnvrgSpecBoolTransformer{})); err != nil {
 		log.Error(err, "can't merge")
 		return false, err
 	}
 
 	log.V(1).Info("printing the diff between desiredSpec and actual")
-	diff, _ := messagediff.PrettyDiff(desiredSpec, cnvrgTp.Spec)
+	diff, _ := messagediff.PrettyDiff(desiredSpec, ctp.Spec)
 	log.V(1).Info(diff)
 
-	// Compare desiredSpec and current cnvrgTp spec,
-	// if they are not equal, update the cnvrgTp spec with desiredSpec,
+	// Compare desiredSpec and current ctp spec,
+	// if they are not equal, update the ctp spec with desiredSpec,
 	// and return true for triggering new reconciliation
-	equal := reflect.DeepEqual(desiredSpec, cnvrgTp.Spec)
+	equal := reflect.DeepEqual(desiredSpec, ctp.Spec)
 	if !equal {
 		log.Info("states are not equals, syncing and requeuing")
-		cnvrgTp.Spec = desiredSpec
-		if err := r.Update(context.Background(), cnvrgTp); err != nil && errors.IsConflict(err) {
-			log.Error(err, "conflict updating cnvrgTp object, requeue for reconciliations...")
+		ctp.Spec = desiredSpec
+		if err := r.Update(context.Background(), ctp); err != nil && errors.IsConflict(err) {
+			log.Error(err, "conflict updating ctp object, requeue for reconciliations...")
 			return true, nil
 		} else if err != nil {
 			return false, err

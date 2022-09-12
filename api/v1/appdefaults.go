@@ -1,46 +1,5 @@
 package v1
 
-var tenancyDefault = Tenancy{
-	Enabled: false,
-	Key:     "purpose",
-	Value:   "cnvrg-control-plane",
-}
-
-var mpiDefault = Mpi{
-	Enabled:              false,
-	Image:                "mpioperator/mpi-operator:v0.2.3",
-	KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
-	ExtraArgs:            nil,
-	Requests: Requests{
-		Cpu:    "100m",
-		Memory: "100Mi",
-	},
-	Limits: Limits{
-		Cpu:    "1000m",
-		Memory: "1Gi",
-	},
-	Registry: Registry{
-		Name:     "mpi-private-registry",
-		URL:      "docker.io",
-		User:     "",
-		Password: "",
-	},
-}
-
-var hpa = Hpa{
-	Enabled:     false,
-	Utilization: 85,
-	MaxReplicas: 5,
-}
-
-var appRegistryDefault = Registry{
-
-	Name:     "cnvrg-app-registry",
-	URL:      "docker.io",
-	User:     "",
-	Password: "",
-}
-
 var controlPlaneDefault = ControlPlane{
 	Image: "core:3.6.99",
 
@@ -81,7 +40,11 @@ var controlPlaneDefault = ControlPlane{
 				`^\/api`,
 			},
 		},
-		Hpa: hpa,
+		Hpa: Hpa{
+			Enabled:     false,
+			Utilization: 85,
+			MaxReplicas: 5,
+		},
 	},
 
 	Sidekiq: Sidekiq{
@@ -96,7 +59,11 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "8Gi",
 		},
 		Replicas: 2,
-		Hpa:      hpa,
+		Hpa: Hpa{
+			Enabled:     false,
+			Utilization: 85,
+			MaxReplicas: 5,
+		},
 	},
 
 	Searchkiq: Searchkiq{
@@ -110,7 +77,11 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "8Gi",
 		},
 		Replicas: 1,
-		Hpa:      hpa,
+		Hpa: Hpa{
+			Enabled:     false,
+			Utilization: 85,
+			MaxReplicas: 5,
+		},
 	},
 
 	Systemkiq: Systemkiq{
@@ -124,7 +95,11 @@ var controlPlaneDefault = ControlPlane{
 			Memory: "8Gi",
 		},
 		Replicas: 1,
-		Hpa:      hpa,
+		Hpa: Hpa{
+			Enabled:     false,
+			Utilization: 85,
+			MaxReplicas: 5,
+		},
 	},
 
 	Hyper: Hyper{
@@ -181,7 +156,26 @@ var controlPlaneDefault = ControlPlane{
 		NodePort: 30081,
 	},
 
-	Mpi: mpiDefault,
+	Mpi: Mpi{
+		Enabled:              false,
+		Image:                "mpioperator/mpi-operator:v0.2.3",
+		KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
+		ExtraArgs:            nil,
+		Requests: Requests{
+			Cpu:    "100m",
+			Memory: "100Mi",
+		},
+		Limits: Limits{
+			Cpu:    "1000m",
+			Memory: "1Gi",
+		},
+		Registry: Registry{
+			Name:     "mpi-private-registry",
+			URL:      "docker.io",
+			User:     "",
+			Password: "",
+		},
+	},
 
 	BaseConfig: BaseConfig{
 		JobsStorageClass:   "",
