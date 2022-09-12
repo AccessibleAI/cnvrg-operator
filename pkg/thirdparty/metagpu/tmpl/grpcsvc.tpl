@@ -3,8 +3,12 @@ apiVersion: v1
 metadata:
   name: metagpu-device-plugin
   namespace: {{ .Namespace }}
+  annotations:
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
   labels:
-    app: "metagpu-exporter"
+    app: "metagpu-device-plugin"
 spec:
   selector:
     name: metagpu-device-plugin
@@ -12,6 +16,3 @@ spec:
     - protocol: TCP
       port: 50052
       name: grcp
-    - protocol: TCP
-      port: 2112
-      name: metrics

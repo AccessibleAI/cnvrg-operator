@@ -4,13 +4,9 @@ metadata:
   name: metagpu-device-plugin-config
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Data.Annotations }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
-  labels:
-    {{- range $k, $v := .Data.Labels }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
 data:
   {{- $secret := randAlphaNum 20 | b64enc }}
   {{- $deviceToken := generateMetagpuToken $secret "l0" }}

@@ -75,9 +75,9 @@ func (m *PromStateManager) defaultRoleBinding() error {
 }
 
 func (m *PromStateManager) extraPodsScrapeConfigs() {
-	if len(m.app.Spec.Dbs.Prom.ExtraPodsScrapeConfigs) > 0 {
+	if len(m.app.Spec.Dbs.Prom.ExtraScrapeConfigs) > 0 {
 
-		for _, podScrapeConfig := range m.app.Spec.Dbs.Prom.ExtraPodsScrapeConfigs {
+		for _, podScrapeConfig := range m.app.Spec.Dbs.Prom.ExtraScrapeConfigs {
 			if podScrapeConfig.Namespace != m.app.Namespace {
 				assets := []string{"role.tpl", "rolebinding.tpl"}
 				extraRbac := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: assets})

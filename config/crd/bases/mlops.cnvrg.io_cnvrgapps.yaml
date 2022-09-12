@@ -814,12 +814,14 @@ spec:
                         type: string
                       enabled:
                         type: boolean
-                      extraPodsScrapeConfigs:
+                      extraScrapeConfigs:
                         items:
                           properties:
                             labelSelector:
                               type: string
                             namespace:
+                              type: string
+                            role:
                               type: string
                           type: object
                         type: array

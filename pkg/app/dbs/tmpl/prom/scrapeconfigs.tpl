@@ -37,10 +37,16 @@ data:
                 label: "component=nomex"
             namespaces:
               own_namespace: true
-          {{- range $_, $cfg := .Spec.Dbs.Prom.ExtraPodsScrapeConfigs }}
-          - role: pod
+          - role: endpoints
             selectors:
-              - role: pod
+              - role: endpoints
+                label: "exporter=cnvrg-job"
+            namespaces:
+              own_namespace: true
+          {{- range $_, $cfg := .Spec.Dbs.Prom.ExtraScrapeConfigs }}
+          - role: "{{$cfg.Role}}"
+            selectors:
+              - role: "{{$cfg.Role}}"
                 label: "{{$cfg.LabelSelector}}"
             namespaces:
               names:

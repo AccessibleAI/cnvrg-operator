@@ -24,8 +24,9 @@ var habanaDefaults = Habana{
 }
 
 var metagpuDefaults = Metagpu{
-	Enabled: false,
-	Image:   "metagpu-device-plugin:main",
+	Enabled:      false,
+	Image:        "metagpu-device-plugin:main",
+	NodeSelector: map[string]string{"accelerator": "nvidia"},
 }
 
 var istioDefault = Istio{

@@ -4,13 +4,9 @@ metadata:
   name: metagpu-device-plugin
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Data.Annotations }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
-  labels:
-    {{- range $k, $v := .Data.Labels }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

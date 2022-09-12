@@ -7,6 +7,7 @@ import (
 	controllers "github.com/AccessibleAI/cnvrg-operator/controllers"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/istio"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/metagpu"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/nvidia"
 	ctpregistry "github.com/AccessibleAI/cnvrg-operator/pkg/thirdparty/registry"
 
@@ -113,6 +114,13 @@ func (r *CnvrgThirdPartyReconciler) applyManifests(ctp *mlopsv1.CnvrgThirdParty)
 
 	if ctp.Spec.Nvidia.MetricsExporter.Enabled {
 		if err := nvidia.NewMetricsExporterState(ctp, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			reconcileResult = err
+		}
+	}
+
+	// metagpu
+	if ctp.Spec.Metagpu.Enabled {
+		if err := metagpu.NewDevicePluginState(ctp, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			reconcileResult = err
 		}
 	}

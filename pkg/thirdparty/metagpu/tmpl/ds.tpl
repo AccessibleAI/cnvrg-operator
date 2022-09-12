@@ -4,13 +4,9 @@ metadata:
   name: metagpu-device-plugin
   namespace: {{ .Namespace }}
   annotations:
-    {{- range $k, $v := .Data.Annotations }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
-  labels:
-    {{- range $k, $v := .Data.Labels }}
-    {{$k}}: "{{$v}}"
-    {{- end }}
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "false"
 spec:
   selector:
     matchLabels:
@@ -19,14 +15,8 @@ spec:
     metadata:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ""
-        {{- range $k, $v := .Data.Annotations }}
-        {{$k}}: "{{$v}}"
-        {{- end }}
       labels:
         name: metagpu-device-plugin
-        {{- range $k, $v := .Data.Labels }}
-        {{$k}}: "{{$v}}"
-        {{- end }}
     spec:
       tolerations:
         - operator: Exists
@@ -37,18 +27,18 @@ spec:
       hostNetwork: true
       serviceAccountName: metagpu-device-plugin
       nodeSelector:
-        accelerator: nvidia
+        {{- range $k, $v := .Spec.Metagpu.NodeSelector }}
+        {{$k}}: "{{$v}}"
+        {{- end }}
       containers:
         - name: metagpu-device-plugin
-          image: {{ image .Data.ImageHub .Data.MetaGpuDp.Image }}
+          image: {{ image .Spec.ImageHub .Spec.Metagpu.Image }}
           imagePullPolicy: Always
           command:
             - /usr/bin/mgdp
             - start
             - -c
             - /etc/metagpu-device-plugin
-          ports:
-            - containerPort: 50052
           securityContext:
             privileged: true
           envFrom:
@@ -69,13 +59,11 @@ spec:
               name: proc
               readOnly: true
         - name: metagpu-exporter
-          image: {{ image .Data.ImageHub .Data.MetaGpuDp.Image }}
+          image: {{ image .Spec.ImageHub .Spec.Metagpu.Image }}
           imagePullPolicy: Always
           command:
             - /usr/bin/mgex
             - start
-          ports:
-            - containerPort: 2112
           envFrom:
             - configMapRef:
                 name: metagpu-device-plugin-config

@@ -19,6 +19,8 @@ rules:
   - ""
   resources:
   - pods
+  - endpoints
+  - services
   verbs:
   - list
   - watch

@@ -48,6 +48,7 @@ type Habana struct {
 }
 
 type Metagpu struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Enabled      bool              `json:"enabled,omitempty"`
+	Image        string            `json:"image,omitempty"`
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 }

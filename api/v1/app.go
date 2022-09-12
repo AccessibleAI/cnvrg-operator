@@ -236,15 +236,16 @@ type HugePages struct {
 	Memory  string `json:"memory,omitempty"`
 }
 
-type ExtraPodsScrapeConfigs struct {
+type ExtraScrapeConfigs struct {
+	Role          string `json:"role,omitempty"`
 	Namespace     string `json:"namespace,omitempty"`
 	LabelSelector string `json:"labelSelector,omitempty"`
 }
 
 type Prom struct {
-	Enabled                bool                      `json:"enabled,omitempty"`
-	CredsRef               string                    `json:"credsRef,omitempty"`
-	ExtraPodsScrapeConfigs []*ExtraPodsScrapeConfigs `json:"extraPodsScrapeConfigs,omitempty"`
+	Enabled            bool                  `json:"enabled,omitempty"`
+	CredsRef           string                `json:"credsRef,omitempty"`
+	ExtraScrapeConfigs []*ExtraScrapeConfigs `json:"extraScrapeConfigs,omitempty"`
 }
 
 type Pg struct {

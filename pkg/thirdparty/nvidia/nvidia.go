@@ -1,12 +1,11 @@
 package nvidia
 
 import (
-	"context"
 	"embed"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/utils"
 	"github.com/go-logr/logr"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -51,7 +50,7 @@ func NewNvidiaRbacState(ctp *mlopsv1.CnvrgThirdParty, c client.Client, s *runtim
 }
 
 func (m *RbacState) Load() error {
-	if m.isOpenshift() {
+	if utils.IsOpenShift(m.C) {
 		f := &desired.LoadFilter{AssetName: []string{"scc.tpl"}}
 		scc := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
 		if err := scc.LoadAssets(); err != nil {
@@ -60,15 +59,6 @@ func (m *RbacState) Load() error {
 		m.AddToAssets(scc)
 	}
 	return nil
-}
-
-func (m *RbacState) isOpenshift() bool {
-	routes := &unstructured.UnstructuredList{}
-	routes.SetGroupVersionKind(desired.Kinds["OcpRouteGVK"])
-	if err := m.C.List(context.Background(), routes); err != nil {
-		return false
-	}
-	return true
 }
 
 func (m *RbacState) Apply() error {
