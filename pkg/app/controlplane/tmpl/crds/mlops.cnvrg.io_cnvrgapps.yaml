@@ -260,6 +260,13 @@ spec:
                             type: string
                         type: object
                     type: object
+                  nomex:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                    type: object
                   objectStorage:
                     properties:
                       accessKey:

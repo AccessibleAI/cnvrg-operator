@@ -11,19 +11,20 @@ metadata:
     app: nomex
     component: nomex
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: nomex
+      component: nomex
   template:
     metadata:
       labels:
         app: nomex
+        component: nomex
     spec:
       serviceAccountName: cnvrg-nomex
       containers:
       - name: nomex
-        image: docker.io/cnvrg/nomex:v1.0.0
+        image: {{ .Spec.ControlPlane.Nomex.Image }}
         command:
           - /opt/app-root/nomex
         ports:

@@ -228,6 +228,7 @@ var controlPlaneDefault = ControlPlane{
 		OpensslVerifyMode: "",
 		Sender:            "info@cnvrg.io",
 	},
+	Nomex: defaultNomex,
 }
 
 var minioDefaults = Minio{
@@ -397,6 +398,11 @@ var cvatDefault = Cvat{
 var promDefaults = Prom{
 	Enabled:  false,
 	CredsRef: "prom-creds",
+}
+
+var defaultNomex = Nomex{
+	Enabled: true,
+	Image:   "docker.io/cnvrg/nomex:v1.0.0",
 }
 
 var cvatPgDefault = Pg{

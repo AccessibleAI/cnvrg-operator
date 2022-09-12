@@ -116,6 +116,11 @@ type CnvrgClusterProvisionerOperator struct {
 	AwsCredsRef string   `json:"awsCredsRef,omitempty"`
 }
 
+type Nomex struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
 type Registry struct {
 	Name     string `json:"name,omitempty"`
 	URL      string `json:"url,omitempty"`
@@ -184,6 +189,7 @@ type ControlPlane struct {
 	SMTP                            SMTP                            `json:"smtp,omitempty"`
 	ObjectStorage                   ObjectStorage                   `json:"objectStorage,omitempty"`
 	Mpi                             Mpi                             `json:"mpi,omitempty"`
+	Nomex                           Nomex                           `json:"nomex,omitempty"`
 }
 
 type Mpi struct {
