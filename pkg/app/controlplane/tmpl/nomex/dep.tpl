@@ -24,6 +24,7 @@ spec:
       serviceAccountName: cnvrg-nomex
       containers:
       - name: nomex
+        imagePullPolicy: Always
         image: {{ .Spec.ControlPlane.Nomex.Image }}
         command:
           - /opt/app-root/nomex

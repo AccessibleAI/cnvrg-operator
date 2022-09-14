@@ -43,6 +43,8 @@ type CnvrgAppSpec struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=cap
 
+// CnvrgApp represent the cnvrg.io AI/MLOps control plane stack,
+// which includes frontend and backend services & persistent workloads (DBs).
 type CnvrgApp struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

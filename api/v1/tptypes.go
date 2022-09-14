@@ -19,6 +19,8 @@ type CnvrgThirdPartySpec struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=ctp
 
+// CnvrgThirdParty represent third party components, which might be optionally deployed
+// by the cnvrg operator.
 type CnvrgThirdParty struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

@@ -31,6 +31,8 @@ spec:
     name: v1
     schema:
       openAPIV3Schema:
+        description: CnvrgApp represent the cnvrg.io AI/MLOps control plane stack,
+          which includes frontend and backend services & persistent workloads (DBs).
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
