@@ -245,13 +245,6 @@ var minioDefaults = Minio{
 		Memory: "20Gi",
 	},
 	PvcName: "minio-storage",
-	SharedStorage: SharedStorage{
-		Enabled: false,
-		ConsistentHash: ConsistentHash{
-			Key:   "httpQueryParameterName",
-			Value: "uploadId",
-		},
-	},
 }
 
 var pgDefault = Pg{
@@ -478,7 +471,7 @@ var networkingDefault = Networking{
 
 var ssoDefault = SSO{
 	Enabled:                          false,
-	Image:                            "saas-oauth2-proxy:latest",
+	Image:                            "oauth2-proxy:v7.3.0-legacy-support-5",
 	AdminUser:                        "",
 	Provider:                         "",
 	EmailDomain:                      nil,

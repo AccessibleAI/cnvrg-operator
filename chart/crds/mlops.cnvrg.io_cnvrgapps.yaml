@@ -739,18 +739,6 @@ spec:
                         type: object
                       serviceAccount:
                         type: string
-                      sharedStorage:
-                        properties:
-                          consistentHash:
-                            properties:
-                              key:
-                                type: string
-                              value:
-                                type: string
-                            type: object
-                          enabled:
-                            type: boolean
-                        type: object
                       storageClass:
                         type: string
                       storageSize:

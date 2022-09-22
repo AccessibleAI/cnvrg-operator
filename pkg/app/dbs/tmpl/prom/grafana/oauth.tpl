@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: oauth-proxy-grafana
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
-    mlops.cnvrg.io/updatable: "false"
+    mlops.cnvrg.io/updatable: "true"
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}

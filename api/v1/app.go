@@ -10,16 +10,6 @@ const (
 	GcpObjectStorageType   ObjectStorageType = "gcp"
 )
 
-type ConsistentHash struct {
-	Key   string `json:"key,omitempty"`
-	Value string `json:"value,omitempty"`
-}
-
-type SharedStorage struct {
-	Enabled        bool           `json:"enabled,omitempty"`
-	ConsistentHash ConsistentHash `json:"consistentHash,omitempty"`
-}
-
 type Limits struct {
 	Cpu    string `json:"cpu,omitempty"`
 	Memory string `json:"memory,omitempty"`
@@ -292,7 +282,6 @@ type Minio struct {
 	StorageClass   string            `json:"storageClass,omitempty"`
 	Requests       Requests          `json:"requests,omitempty"`
 	Limits         Limits            `json:"limits,omitempty"`
-	SharedStorage  SharedStorage     `json:"sharedStorage,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`
 }

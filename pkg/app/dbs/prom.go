@@ -301,6 +301,24 @@ func (m *GrafanaStateManager) dashboardsToList() (dashboards []string) {
 	return
 }
 
+func (m *GrafanaStateManager) oauthProxy() error {
+
+	cm := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), &desired.LoadFilter{AssetName: []string{"oauth.tpl"}})
+
+	if err := cm.LoadAssets(); err != nil {
+		return err
+	}
+
+	if err := cm.Render(m.app); err != nil {
+		return err
+	}
+
+	m.AddToState(cm)
+
+	return nil
+
+}
+
 func (m *GrafanaStateManager) Apply() error {
 
 	// create grafana dashboards as config maps
@@ -314,6 +332,12 @@ func (m *GrafanaStateManager) Apply() error {
 	// create grafana deployment
 	if err := m.deployment(); err != nil {
 		return err
+	}
+	// create oauth2-proxy configs if sso enabled
+	if m.app.Spec.SSO.Enabled {
+		if err := m.oauthProxy(); err != nil {
+			return err
+		}
 	}
 	// apply all the default assets
 	if err := m.AssetsStateManager.Apply(); err != nil {

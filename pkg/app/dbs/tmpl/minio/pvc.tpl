@@ -16,11 +16,7 @@ metadata:
     {{- end }}
 spec:
   accessModes:
-    {{- if isTrue .Spec.Dbs.Minio.SharedStorage.Enabled }}
-    - ReadWriteMany
-    {{- else }}
     - ReadWriteOnce
-    {{- end }}
   resources:
     requests:
       storage: {{ .Spec.Dbs.Minio.StorageSize}}
