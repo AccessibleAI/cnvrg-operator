@@ -845,8 +845,6 @@ spec:
                         type: object
                       image:
                         type: string
-                    required:
-                    - grafana
                     type: object
                   redis:
                     properties:
