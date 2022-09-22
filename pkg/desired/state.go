@@ -238,7 +238,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`insecure_oidc_allow_unverified_email = %v`, sso.InsecureOidcAllowUnverifiedEmail),
 				`session_store_type = "redis"`,
 				`skip_jwt_bearer_tokens = true`,
-				`custom_templates_dir = "/saas/templates"`,
+				`custom_templates_dir = "/cnvrg-static"`,
 				"ssl_insecure_skip_verify = true",
 				`cookie_name = "_oauth2_proxy"`,
 				`cookie_expire = "168h"`,
