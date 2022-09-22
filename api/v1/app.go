@@ -248,7 +248,7 @@ type Prom struct {
 	CredsRef           string                `json:"credsRef,omitempty"`
 	ExtraScrapeConfigs []*ExtraScrapeConfigs `json:"extraScrapeConfigs,omitempty"`
 	Image              string                `json:"image,omitempty"`
-	Grafana            Grafana               `json:"grafana"`
+	Grafana            Grafana               `json:"grafana,omitempty"`
 }
 
 type Pg struct {
