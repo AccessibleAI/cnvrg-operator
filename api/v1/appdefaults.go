@@ -393,6 +393,19 @@ var cvatDefault = Cvat{
 var promDefaults = Prom{
 	Enabled:  false,
 	CredsRef: "prom-creds",
+	Image:    "prom/prometheus:v2.37.1",
+	Grafana: Grafana{
+		Enabled:  false,
+		Image:    "grafana/grafana-oss:9.1.6",
+		SvcName:  "grafana",
+		Port:     8080,
+		NodePort: 30012,
+		OauthProxy: OauthProxyServiceConf{
+			SkipAuthRegex:        []string{`\/api\/health`},
+			TokenValidationRegex: nil,
+		},
+		CredsRef: "grafana-creds",
+	},
 }
 
 var defaultNomex = Nomex{

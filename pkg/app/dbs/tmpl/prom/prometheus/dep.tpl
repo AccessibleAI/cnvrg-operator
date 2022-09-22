@@ -22,7 +22,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: prometheus
-        image: prom/prometheus
+        image: {{ .Spec.Dbs.Prom.Image }}
         volumeMounts:
           - mountPath: /prometheus/config/scrape
             name: prom-scrape-configs

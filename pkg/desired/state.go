@@ -35,17 +35,7 @@ import (
 )
 
 var GrafanaAppDashboards = []string{
-	"grafana-k8s-resources-namespace.json",
-	"grafana-k8s-resources-pod.json",
-	"grafana-k8s-resources-workload.json",
-	"grafana-k8s-resources-workloads-namespace.json",
-	"grafana-namespace-by-pod.json",
-	"grafana-namespace-by-workload.json",
-	"grafana-persistentvolumesusage.json",
-	"grafana-pod-total.json",
-	"grafana-statefulset.json",
-	"grafana-workload-total.json",
-	"grafana-idle-metrics.json",
+	"grafana-apiserver.json",
 }
 
 var GrafanaInfraDashboards = append([]string{
@@ -285,13 +275,12 @@ func cnvrgTemplateFuncs() map[string]interface{} {
             "version": 1,
             "basicAuth": true,
             "basicAuthUser": "%s",
-            "basicAuthPassword": "%s",
-            "secureJsonFields": {
-              "basicAuthPassword": true
+            "secureJsonData": {
+			  "basicAuthPassword": "%s"
             },
             "jsonData": {
                 "tlsSkipVerify": true
-            },
+            }
         }
     ]
 }`, promUrl, user, pass)

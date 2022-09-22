@@ -829,6 +829,36 @@ spec:
                               type: string
                           type: object
                         type: array
+                      grafana:
+                        properties:
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          nodePort:
+                            type: integer
+                          oauthProxy:
+                            properties:
+                              skipAuthRegex:
+                                items:
+                                  type: string
+                                type: array
+                              tokenValidationRegex:
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                          port:
+                            type: integer
+                          svcName:
+                            type: string
+                        type: object
+                      image:
+                        type: string
+                    required:
+                    - grafana
                     type: object
                   redis:
                     properties:

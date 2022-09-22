@@ -243,10 +243,22 @@ type ExtraScrapeConfigs struct {
 	LabelSelector string `json:"labelSelector,omitempty"`
 }
 
+type Grafana struct {
+	Enabled    bool                  `json:"enabled,omitempty"`
+	Image      string                `json:"image,omitempty"`
+	SvcName    string                `json:"svcName,omitempty"`
+	Port       int                   `json:"port,omitempty"`
+	NodePort   int                   `json:"nodePort,omitempty"`
+	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
+	CredsRef   string                `json:"credsRef,omitempty"`
+}
+
 type Prom struct {
 	Enabled            bool                  `json:"enabled,omitempty"`
 	CredsRef           string                `json:"credsRef,omitempty"`
 	ExtraScrapeConfigs []*ExtraScrapeConfigs `json:"extraScrapeConfigs,omitempty"`
+	Image              string                `json:"image,omitempty"`
+	Grafana            Grafana               `json:"grafana"`
 }
 
 type Pg struct {

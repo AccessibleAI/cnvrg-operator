@@ -191,6 +191,11 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 		if err := dbs.NewPromStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			return err
 		}
+		if app.Spec.Dbs.Prom.Grafana.Enabled {
+			if err := dbs.NewGrafanaStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
 	}
 
 	if err := controlplane.NewControlPlaneStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
@@ -212,11 +217,7 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 	}
 	ctx := context.Background()
 	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		//name := types.NamespacedName{Namespace: app.Namespace, Name: app.Name}
-		//app, err := r.getCnvrgAppSpec(name)
-		//if err != nil {
-		//	return err
-		//}
+
 		app.Status.Status = status.Status
 		app.Status.Message = status.Message
 		if status.Progress >= 0 {
