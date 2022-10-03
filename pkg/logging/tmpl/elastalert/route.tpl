@@ -6,7 +6,7 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: {{ .Spec.Logging.ElastAlert.SvcName }}
+  name: {{ .Spec.Logging.Elastalert.SvcName }}
   namespace: {{ ns . }}
   labels:
     app: {{ ns . }}
@@ -14,12 +14,12 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{ .Spec.Logging.ElastAlert.SvcName }}.{{ .Spec.ClusterDomain }}"
+  host: "{{ .Spec.Logging.Elastalert.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:
-    targetPort: {{ .Spec.Logging.ElastAlert.Port }}
+    targetPort: {{ .Spec.Logging.Elastalert.Port }}
   to:
     kind: Service
-    name: {{ .Spec.Logging.ElastAlert.SvcName }}
+    name: {{ .Spec.Logging.Elastalert.SvcName }}
     weight: 100
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:
