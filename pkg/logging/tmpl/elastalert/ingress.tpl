@@ -8,7 +8,7 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: {{ .Spec.Logging.ElastAlert.SvcName }}
+  name: {{ .Spec.Logging.Elastalert.SvcName }}
   namespace: {{ ns . }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
@@ -16,10 +16,10 @@ metadata:
     {{- end }}
 spec:
   rules:
-    - host: "{{.Spec.Logging.ElastAlert.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - host: "{{.Spec.Logging.Elastalert.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
             backend:
-              serviceName: {{ .Spec.Logging.ElastAlert.SvcName }}
-              servicePort: {{ .Spec.Logging.ElastAlert.Port }}
+              serviceName: {{ .Spec.Logging.Elastalert.SvcName }}
+              servicePort: {{ .Spec.Logging.Elastalert.Port }}
