@@ -30,7 +30,6 @@ const (
 	IstioDestinationRuleGVK GVKName = "IstioDestinationRule"
 	IstioGwGVK              GVKName = "IstioGwGVK"
 	StorageClassGVK         GVKName = "StorageClassGVK"
-	PodDisruptionBudgetGVK  GVKName = "PodDisruptionBudget"
 	HpaGVK                  GVKName = "HpaGVK"
 	PriorityClassGVK        GVKName = "PriorityClassGVK"
 	JobGVK                  GVKName = "JobGvk"
@@ -179,14 +178,9 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 		Version: "v1",
 		Kind:    "Ingress",
 	},
-	PodDisruptionBudgetGVK: schema.GroupVersionKind{
-		Group:   "policy",
-		Version: "v1beta1",
-		Kind:    "PodDisruptionBudget",
-	},
 	HpaGVK: schema.GroupVersionKind{
 		Group:   "autoscaling",
-		Version: "v2beta2",
+		Version: "v2",
 		Kind:    "HorizontalPodAutoscaler",
 	},
 	PriorityClassGVK: schema.GroupVersionKind{

@@ -973,8 +973,35 @@ spec:
                     type: string
                   insecureOidcAllowUnverifiedEmail:
                     type: boolean
+                  jwks:
+                    properties:
+                      cache:
+                        properties:
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                        type: object
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                    type: object
                   oidcIssuerUrl:
                     type: string
+                  pki:
+                    properties:
+                      enabled:
+                        type: boolean
+                      privateKeySecret:
+                        type: string
+                      publicKeySecret:
+                        type: string
+                      rootCaSecret:
+                        type: string
+                    type: object
                   provider:
                     type: string
                   realmName:

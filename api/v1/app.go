@@ -401,9 +401,30 @@ type SSO struct {
 	RealmName                        string   `json:"realmName,omitempty"`
 	ServiceUrl                       string   `json:"serviceUrl,omitempty"`
 	InsecureOidcAllowUnverifiedEmail bool     `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
+	Pki                              Pki      `json:"pki,omitempty"`
+	Jwks                             Jwks     `json:"jwks,omitempty"`
 }
 
 type OauthProxyServiceConf struct {
 	SkipAuthRegex        []string `json:"skipAuthRegex,omitempty"`
 	TokenValidationRegex []string `json:"tokenValidationRegex,omitempty"`
+}
+
+type Pki struct {
+	Enabled          bool   `json:"enabled,omitempty"`
+	RootCaSecret     string `json:"rootCaSecret,omitempty"`
+	PrivateKeySecret string `json:"privateKeySecret,omitempty"`
+	PublicKeySecret  string `json:"publicKeySecret,omitempty"`
+}
+
+type JwksCache struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+type Jwks struct {
+	Enabled bool      `json:"enabled,omitempty"`
+	Name    string    `json:"name,omitempty"`
+	Image   string    `json:"image,omitempty"`
+	Cache   JwksCache `json:"cache,omitempty"`
 }

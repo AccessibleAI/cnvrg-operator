@@ -10,6 +10,7 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/registry"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/sso"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
@@ -193,6 +194,19 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 		}
 		if app.Spec.Dbs.Prom.Grafana.Enabled {
 			if err := dbs.NewGrafanaStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
+	}
+
+	if app.Spec.SSO.Enabled {
+		if app.Spec.SSO.Pki.Enabled {
+			if err := sso.NewPkiStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
+		if app.Spec.SSO.Jwks.Enabled {
+			if err := sso.NewJwksStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}

@@ -223,6 +223,7 @@ var controlPlaneDefault = ControlPlane{
 		OpensslVerifyMode: "",
 		Sender:            "info@cnvrg.io",
 	},
+
 	Nomex: defaultNomex,
 }
 
@@ -483,4 +484,19 @@ var ssoDefault = SSO{
 	RealmName:                        "",
 	ServiceUrl:                       "",
 	InsecureOidcAllowUnverifiedEmail: false,
+	Pki: Pki{
+		Enabled:          false,
+		RootCaSecret:     "sso-idp-root-ca",
+		PrivateKeySecret: "sso-idp-private-key",
+		PublicKeySecret:  "sso-idp-pki-public-key",
+	},
+	Jwks: Jwks{
+		Enabled: false,
+		Image:   "cnvrg/jwks:latest",
+		Name:    "cnvrg-jwks",
+		Cache: JwksCache{
+			Enabled: true,
+			Image:   "docker.io/redis",
+		},
+	},
 }
