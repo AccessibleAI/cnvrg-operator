@@ -31,7 +31,7 @@ func (m *PgStateManager) Load() error {
 	return nil
 }
 
-func (m *PgStateManager) Render() error {
+func (m *PgStateManager) RenderDeployment() error {
 	pgSecretData := map[string]interface{}{
 		"Namespace":          m.app.Namespace,
 		"CredsRef":           m.app.Spec.Dbs.Pg.CredsRef,
@@ -55,7 +55,7 @@ func (m *PgStateManager) Apply() error {
 		return err
 	}
 
-	if err := m.Render(); err != nil {
+	if err := m.RenderDeployment(); err != nil {
 		return err
 	}
 

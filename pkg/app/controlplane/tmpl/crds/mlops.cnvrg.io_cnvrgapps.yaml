@@ -1,10 +1,9 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.2.5
+    controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
   name: cnvrgapps.mlops.cnvrg.io
 spec:
@@ -953,26 +952,54 @@ spec:
                 type: object
               sso:
                 properties:
-                  adminUser:
-                    type: string
-                  azureTenant:
-                    type: string
-                  clientId:
-                    type: string
-                  clientSecret:
-                    type: string
-                  cookieSecret:
-                    type: string
-                  emailDomain:
+                  authz:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                    type: object
+                  central:
+                    properties:
+                      adminUser:
+                        type: string
+                      centralUiImage:
+                        type: string
+                      clientId:
+                        type: string
+                      clientSecret:
+                        type: string
+                      cookieDomain:
+                        type: string
+                      emailDomain:
+                        items:
+                          type: string
+                        type: array
+                      enabled:
+                        type: boolean
+                      groupsAuth:
+                        type: boolean
+                      insecureOidcAllowUnverifiedEmail:
+                        type: boolean
+                      oauthProxyImage:
+                        type: string
+                      oidcIssuerUrl:
+                        type: string
+                      provider:
+                        type: string
+                      scope:
+                        type: string
+                      serviceUrl:
+                        type: string
+                      whitelistDomain:
+                        type: string
+                    type: object
+                  enabled:
+                    type: boolean
+                  groups:
                     items:
                       type: string
                     type: array
-                  enabled:
-                    type: boolean
-                  image:
-                    type: string
-                  insecureOidcAllowUnverifiedEmail:
-                    type: boolean
                   jwks:
                     properties:
                       cache:
@@ -989,8 +1016,6 @@ spec:
                       name:
                         type: string
                     type: object
-                  oidcIssuerUrl:
-                    type: string
                   pki:
                     properties:
                       enabled:
@@ -1002,12 +1027,6 @@ spec:
                       rootCaSecret:
                         type: string
                     type: object
-                  provider:
-                    type: string
-                  realmName:
-                    type: string
-                  serviceUrl:
-                    type: string
                 type: object
               tenancy:
                 properties:
@@ -1037,9 +1056,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

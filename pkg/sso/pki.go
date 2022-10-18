@@ -59,7 +59,7 @@ func (p *PkiStateManager) generate() error {
 	return nil
 }
 
-func (p *PkiStateManager) Render() error {
+func (p *PkiStateManager) RenderDeployment() error {
 	assets := []string{"private-key-secret.tpl", "public-key-secret.tpl"}
 	f := &desired.LoadFilter{AssetName: assets}
 	pki := desired.NewAssetsGroup(fs, p.RootPath(), p.Log(), f)
@@ -91,7 +91,7 @@ func (p *PkiStateManager) Render() error {
 
 func (p *PkiStateManager) Apply() error {
 
-	if err := p.Render(); err != nil {
+	if err := p.RenderDeployment(); err != nil {
 		return err
 	}
 

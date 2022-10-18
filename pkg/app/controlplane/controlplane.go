@@ -156,6 +156,7 @@ func (m *CpStateManager) Apply() error {
 	if err := m.Load(); err != nil {
 		return err
 	}
+
 	if err := m.AssetsStateManager.Render(); err != nil {
 		return err
 	}

@@ -200,16 +200,31 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 	}
 
 	if app.Spec.SSO.Enabled {
+
 		if app.Spec.SSO.Pki.Enabled {
 			if err := sso.NewPkiStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}
+
 		if app.Spec.SSO.Jwks.Enabled {
 			if err := sso.NewJwksStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}
+
+		if app.Spec.SSO.Central.Enabled {
+			if err := sso.NewCentralStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
+
+		if app.Spec.SSO.Authz.Enabled {
+			if err := sso.NewAuthzStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	if err := controlplane.NewControlPlaneStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {

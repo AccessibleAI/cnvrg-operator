@@ -67,7 +67,7 @@ func (m *ElasticStateManager) Load() error {
 	return nil
 }
 
-func (m *ElasticStateManager) Render() error {
+func (m *ElasticStateManager) RenderDeployment() error {
 
 	esSecretData := map[string]interface{}{
 		"Namespace":   m.app.Namespace,
@@ -91,7 +91,7 @@ func (m *ElasticStateManager) Apply() error {
 		return err
 	}
 
-	if err := m.Render(); err != nil {
+	if err := m.RenderDeployment(); err != nil {
 		return err
 	}
 
@@ -112,7 +112,7 @@ func (m *KibanaStateManager) Load() error {
 
 }
 
-func (m *KibanaStateManager) Render() error {
+func (m *KibanaStateManager) RenderDeployment() error {
 	if data, err := m.getKibanaConfigSecretData(); err == nil {
 		if err := m.kibanaConf.Render(data); err != nil {
 			return err
@@ -177,7 +177,7 @@ func (m *KibanaStateManager) Apply() error {
 		return nil
 	}
 
-	if err := m.Render(); err != nil {
+	if err := m.RenderDeployment(); err != nil {
 		return nil
 	}
 
@@ -197,7 +197,7 @@ func (m *ElastAlertStateManager) Load() error {
 	return nil
 }
 
-func (m *ElastAlertStateManager) Render() error {
+func (m *ElastAlertStateManager) RenderDeployment() error {
 	eaConfig, err := m.getElastAlertConfigs()
 	if err != nil {
 		return err
@@ -241,7 +241,7 @@ func (m *ElastAlertStateManager) Apply() error {
 		return err
 	}
 
-	if err := m.Render(); err != nil {
+	if err := m.RenderDeployment(); err != nil {
 		return err
 	}
 

@@ -471,25 +471,16 @@ var networkingDefault = Networking{
 }
 
 var ssoDefault = SSO{
-	Enabled:                          false,
-	Image:                            "oauth2-proxy:v7.3.0-legacy-support-5",
-	AdminUser:                        "",
-	Provider:                         "",
-	EmailDomain:                      nil,
-	ClientID:                         "",
-	ClientSecret:                     "",
-	CookieSecret:                     "",
-	AzureTenant:                      "", // if IDP is Azure AD
-	OidcIssuerURL:                    "", // if IDP oidc
-	RealmName:                        "",
-	ServiceUrl:                       "",
-	InsecureOidcAllowUnverifiedEmail: false,
+
+	Enabled: false,
+
 	Pki: Pki{
 		Enabled:          false,
 		RootCaSecret:     "sso-idp-root-ca",
 		PrivateKeySecret: "sso-idp-private-key",
 		PublicKeySecret:  "sso-idp-pki-public-key",
 	},
+
 	Jwks: Jwks{
 		Enabled: false,
 		Image:   "cnvrg/jwks:latest",
@@ -498,5 +489,20 @@ var ssoDefault = SSO{
 			Enabled: true,
 			Image:   "docker.io/redis",
 		},
+	},
+
+	Central: CentralSSO{
+		Enabled:                          false,
+		OauthProxyImage:                  "cnvrg/oauth2-proxy:v7.3.x.ssov3.p2-01",
+		CentralUiImage:                   "docker.io/cnvrg/centralsso:latest",
+		EmailDomain:                      []string{"*"},
+		Scope:                            "openid email profile",
+		InsecureOidcAllowUnverifiedEmail: true,
+		GroupsAuth:                       true,
+	},
+
+	Authz: Authz{
+		Enabled: false,
+		Image:   "docker.io/cnvrg/proxy:v1.0.0",
 	},
 }

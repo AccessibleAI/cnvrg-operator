@@ -388,21 +388,12 @@ type Networking struct {
 }
 
 type SSO struct {
-	Enabled                          bool     `json:"enabled,omitempty"`
-	Image                            string   `json:"image,omitempty"`
-	AdminUser                        string   `json:"adminUser,omitempty"`
-	Provider                         string   `json:"provider,omitempty"`
-	EmailDomain                      []string `json:"emailDomain,omitempty"`
-	ClientID                         string   `json:"clientId,omitempty"`
-	ClientSecret                     string   `json:"clientSecret,omitempty"`
-	CookieSecret                     string   `json:"cookieSecret,omitempty"`
-	AzureTenant                      string   `json:"azureTenant,omitempty"`
-	OidcIssuerURL                    string   `json:"oidcIssuerUrl,omitempty"`
-	RealmName                        string   `json:"realmName,omitempty"`
-	ServiceUrl                       string   `json:"serviceUrl,omitempty"`
-	InsecureOidcAllowUnverifiedEmail bool     `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
-	Pki                              Pki      `json:"pki,omitempty"`
-	Jwks                             Jwks     `json:"jwks,omitempty"`
+	Enabled bool       `json:"enabled,omitempty"`
+	Groups  []string   `json:"groups,omitempty"`
+	Pki     Pki        `json:"pki,omitempty"`
+	Jwks    Jwks       `json:"jwks,omitempty"`
+	Central CentralSSO `json:"central,omitempty"`
+	Authz   Authz      `json:"authz,omitempty"`
 }
 
 type OauthProxyServiceConf struct {
@@ -427,4 +418,27 @@ type Jwks struct {
 	Name    string    `json:"name,omitempty"`
 	Image   string    `json:"image,omitempty"`
 	Cache   JwksCache `json:"cache,omitempty"`
+}
+
+type Authz struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+type CentralSSO struct {
+	Enabled                          bool     `json:"enabled,omitempty"`
+	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
+	CentralUiImage                   string   `json:"centralUiImage,omitempty"`
+	AdminUser                        string   `json:"adminUser,omitempty"`
+	Provider                         string   `json:"provider,omitempty"`
+	EmailDomain                      []string `json:"emailDomain,omitempty"`
+	ClientID                         string   `json:"clientId,omitempty"`
+	ClientSecret                     string   `json:"clientSecret,omitempty"`
+	OidcIssuerURL                    string   `json:"oidcIssuerUrl,omitempty"`
+	ServiceUrl                       string   `json:"serviceUrl,omitempty"`
+	Scope                            string   `json:"scope,omitempty"`
+	InsecureOidcAllowUnverifiedEmail bool     `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
+	WhitelistDomain                  string   `json:"whitelistDomain,omitempty"`
+	CookieDomain                     string   `json:"cookieDomain,omitempty"`
+	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
 }
