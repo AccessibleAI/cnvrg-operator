@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const CentralSsoSvcName = "sso-central"
+
 type CentralStateManager struct {
 	*desired.AssetsStateManager
 	app *mlopsv1.CnvrgApp
@@ -41,8 +43,8 @@ func (c *CentralStateManager) renderSsoConfigs() error {
 	return nil
 }
 
-func (c *CentralStateManager) renderDeployment() error {
-	assets := []string{"dep.tpl"}
+func (c *CentralStateManager) renderDeploymentAndSvc() error {
+	assets := []string{"dep.tpl", "svc.tpl"}
 	f := &desired.LoadFilter{AssetName: assets}
 	dep := desired.NewAssetsGroup(fs, c.RootPath(), c.Log(), f)
 
@@ -68,6 +70,7 @@ func (c *CentralStateManager) depData() map[string]string {
 		"CentralUIImage":   c.app.Spec.SSO.Central.CentralUiImage,
 		"OauthProxyImage":  c.app.Spec.SSO.Central.OauthProxyImage,
 		"RedisCredsRef":    c.app.Spec.Dbs.Redis.CredsRef,
+		"SvcName":          CentralSsoSvcName,
 	}
 }
 
@@ -82,7 +85,7 @@ func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
 		"Provider":                         c.app.Spec.SSO.Central.Provider,
 		"ClientId":                         c.app.Spec.SSO.Central.ClientID,
 		"ClientSecret":                     c.app.Spec.SSO.Central.ClientSecret,
-		"RedirectUrl":                      fmt.Sprintf("%s://sso-central.%s", c.schema(), c.app.Spec.ClusterDomain),
+		"RedirectUrl":                      fmt.Sprintf("%s://%s.%s", c.schema(), CentralSsoSvcName, c.app.Spec.ClusterDomain),
 		"OidcIssuerURL":                    c.app.Spec.SSO.Central.OidcIssuerURL,
 		"Scope":                            c.app.Spec.SSO.Central.Scope,
 		"InsecureOidcAllowUnverifiedEmail": c.app.Spec.SSO.Central.InsecureOidcAllowUnverifiedEmail,
@@ -123,7 +126,7 @@ func (c *CentralStateManager) jwksUrlWithAudience() string {
 }
 
 func (c *CentralStateManager) Apply() error {
-	if err := c.renderDeployment(); err != nil {
+	if err := c.renderDeploymentAndSvc(); err != nil {
 		return err
 	}
 

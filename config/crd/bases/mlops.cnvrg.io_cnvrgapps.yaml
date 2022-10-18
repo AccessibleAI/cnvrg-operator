@@ -433,17 +433,6 @@ spec:
                         type: object
                       nodePort:
                         type: integer
-                      oauthProxy:
-                        properties:
-                          skipAuthRegex:
-                            items:
-                              type: string
-                            type: array
-                          tokenValidationRegex:
-                            items:
-                              type: string
-                            type: array
-                        type: object
                       passengerMaxPoolSize:
                         type: integer
                       port:
@@ -644,17 +633,6 @@ spec:
                             type: object
                           nodePort:
                             type: integer
-                          oauthProxy:
-                            properties:
-                              skipAuthRegex:
-                                items:
-                                  type: string
-                                type: array
-                              tokenValidationRegex:
-                                items:
-                                  type: string
-                                type: array
-                            type: object
                           port:
                             type: integer
                           requests:
@@ -826,17 +804,6 @@ spec:
                             type: string
                           nodePort:
                             type: integer
-                          oauthProxy:
-                            properties:
-                              skipAuthRegex:
-                                items:
-                                  type: string
-                                type: array
-                              tokenValidationRegex:
-                                items:
-                                  type: string
-                                type: array
-                            type: object
                           port:
                             type: integer
                           svcName:
@@ -954,6 +921,8 @@ spec:
                 properties:
                   authz:
                     properties:
+                      address:
+                        type: string
                       enabled:
                         type: boolean
                       image:
@@ -968,6 +937,8 @@ spec:
                       clientId:
                         type: string
                       clientSecret:
+                        type: string
+                      cnvrgProxyImage:
                         type: string
                       cookieDomain:
                         type: string
@@ -986,6 +957,8 @@ spec:
                       oidcIssuerUrl:
                         type: string
                       provider:
+                        type: string
+                      publicUrl:
                         type: string
                       scope:
                         type: string

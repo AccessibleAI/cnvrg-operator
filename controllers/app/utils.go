@@ -8,6 +8,7 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/controllers"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/sso"
 	"github.com/go-logr/logr"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -155,6 +156,16 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 		//if !app.Spec.Dbs.Prom.Enabled {
 		//	discoverOcpPromCreds(clientset, app.Namespace)
 		//}
+	}
+
+	if app.Spec.SSO.Enabled {
+		if app.Spec.SSO.Central.PublicUrl == "" {
+			scheme := "http"
+			if app.Spec.Networking.HTTPS.Enabled {
+				scheme = "https"
+			}
+			desiredAppSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s.%s", scheme, sso.CentralSsoSvcName, app.Spec.ClusterDomain)
+		}
 	}
 
 	return nil

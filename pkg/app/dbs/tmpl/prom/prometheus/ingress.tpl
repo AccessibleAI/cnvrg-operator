@@ -18,6 +18,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "prom.{{ .Spec.ClusterDomain }}"
       http:

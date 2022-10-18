@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: sso-central
+  name: {{ .SvcName }}
   namespace: {{.Namespace }}
   annotations:
-    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:

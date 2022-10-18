@@ -27,20 +27,19 @@ type Requests struct {
 }
 
 type WebApp struct {
-	Replicas                int                   `json:"replicas,omitempty"`
-	Enabled                 bool                  `json:"enabled,omitempty"`
-	Port                    int                   `json:"port,omitempty"`
-	Requests                Requests              `json:"requests,omitempty"`
-	Limits                  Limits                `json:"limits,omitempty"`
-	SvcName                 string                `json:"svcName,omitempty"`
-	NodePort                int                   `json:"nodePort,omitempty"`
-	PassengerMaxPoolSize    int                   `json:"passengerMaxPoolSize,omitempty"`
-	InitialDelaySeconds     int                   `json:"initialDelaySeconds,omitempty"`
-	ReadinessPeriodSeconds  int                   `json:"readinessPeriodSeconds,omitempty"`
-	ReadinessTimeoutSeconds int                   `json:"readinessTimeoutSeconds,omitempty"`
-	FailureThreshold        int                   `json:"failureThreshold,omitempty"`
-	OauthProxy              OauthProxyServiceConf `json:"oauthProxy,omitempty"`
-	Hpa                     Hpa                   `json:"hpa,omitempty"`
+	Replicas                int      `json:"replicas,omitempty"`
+	Enabled                 bool     `json:"enabled,omitempty"`
+	Port                    int      `json:"port,omitempty"`
+	Requests                Requests `json:"requests,omitempty"`
+	Limits                  Limits   `json:"limits,omitempty"`
+	SvcName                 string   `json:"svcName,omitempty"`
+	NodePort                int      `json:"nodePort,omitempty"`
+	PassengerMaxPoolSize    int      `json:"passengerMaxPoolSize,omitempty"`
+	InitialDelaySeconds     int      `json:"initialDelaySeconds,omitempty"`
+	ReadinessPeriodSeconds  int      `json:"readinessPeriodSeconds,omitempty"`
+	ReadinessTimeoutSeconds int      `json:"readinessTimeoutSeconds,omitempty"`
+	FailureThreshold        int      `json:"failureThreshold,omitempty"`
+	Hpa                     Hpa      `json:"hpa,omitempty"`
 }
 
 type Sidekiq struct {
@@ -234,13 +233,12 @@ type ExtraScrapeConfigs struct {
 }
 
 type Grafana struct {
-	Enabled    bool                  `json:"enabled,omitempty"`
-	Image      string                `json:"image,omitempty"`
-	SvcName    string                `json:"svcName,omitempty"`
-	Port       int                   `json:"port,omitempty"`
-	NodePort   int                   `json:"nodePort,omitempty"`
-	OauthProxy OauthProxyServiceConf `json:"oauthProxy,omitempty"`
-	CredsRef   string                `json:"credsRef,omitempty"`
+	Enabled  bool   `json:"enabled,omitempty"`
+	Image    string `json:"image,omitempty"`
+	SvcName  string `json:"svcName,omitempty"`
+	Port     int    `json:"port,omitempty"`
+	NodePort int    `json:"nodePort,omitempty"`
+	CredsRef string `json:"credsRef,omitempty"`
 }
 
 type Prom struct {
@@ -302,16 +300,15 @@ type Redis struct {
 }
 
 type Kibana struct {
-	Enabled        bool                  `json:"enabled,omitempty"`
-	ServiceAccount string                `json:"serviceAccount,omitempty"`
-	SvcName        string                `json:"svcName,omitempty"`
-	Port           int                   `json:"port,omitempty"`
-	Image          string                `json:"image,omitempty"`
-	NodePort       int                   `json:"nodePort,omitempty"`
-	Requests       Requests              `json:"requests,omitempty"`
-	Limits         Limits                `json:"limits,omitempty"`
-	OauthProxy     OauthProxyServiceConf `json:"oauthProxy,omitempty"`
-	CredsRef       string                `json:"credsRef,omitempty"`
+	Enabled        bool     `json:"enabled,omitempty"`
+	ServiceAccount string   `json:"serviceAccount,omitempty"`
+	SvcName        string   `json:"svcName,omitempty"`
+	Port           int      `json:"port,omitempty"`
+	Image          string   `json:"image,omitempty"`
+	NodePort       int      `json:"nodePort,omitempty"`
+	Requests       Requests `json:"requests,omitempty"`
+	Limits         Limits   `json:"limits,omitempty"`
+	CredsRef       string   `json:"credsRef,omitempty"`
 }
 
 type Es struct {
@@ -396,11 +393,6 @@ type SSO struct {
 	Authz   Authz      `json:"authz,omitempty"`
 }
 
-type OauthProxyServiceConf struct {
-	SkipAuthRegex        []string `json:"skipAuthRegex,omitempty"`
-	TokenValidationRegex []string `json:"tokenValidationRegex,omitempty"`
-}
-
 type Pki struct {
 	Enabled          bool   `json:"enabled,omitempty"`
 	RootCaSecret     string `json:"rootCaSecret,omitempty"`
@@ -423,10 +415,13 @@ type Jwks struct {
 type Authz struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
+	Address string `json:"address,omitempty"`
 }
 
 type CentralSSO struct {
 	Enabled                          bool     `json:"enabled,omitempty"`
+	PublicUrl                        string   `json:"publicUrl,omitempty"`
+	CnvrgProxyImage                  string   `json:"cnvrgProxyImage,omitempty"`
 	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
 	CentralUiImage                   string   `json:"centralUiImage,omitempty"`
 	AdminUser                        string   `json:"adminUser,omitempty"`

@@ -34,15 +34,16 @@ spec:
           value: "{{ .Data.Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
       serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
       {{- if isTrue .Data.Spec.SSO.Enabled }}
-      - name: "cnvrg-oauth-proxy"
-        image: {{image .Data.Spec.ImageHub .Data.Spec.SSO.Image }}
-        command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+      - name: "cnvrg-proxy"
+        image: {{ image .Data.Spec.ImageHub .Data.Spec.SSO.Central.CnvrgProxyImage }}
+        command:
+        - /opt/app-root/proxy
+        - --listener-addr=0.0.0.0:8080
+        - --upstream-addr=127.0.0.1:3000
+        - --authz-addr={{ .Data.Spec.SSO.Authz.Address }}
         resources:
           requests:
             cpu: 100m
@@ -50,13 +51,6 @@ spec:
           limits:
             cpu: 500m
             memory: 1Gi
-        envFrom:
-        - secretRef:
-            name: {{ .Data.Spec.Dbs.Redis.CredsRef }}
-        volumeMounts:
-          - name: "oauth-proxy-config"
-            mountPath: "/opt/app-root/conf/proxy-config"
-            readOnly: true
       {{- end }}
       - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
@@ -110,11 +104,6 @@ spec:
           readOnly: false
         {{- end }}
       volumes:
-      {{- if isTrue .Data.Spec.SSO.Enabled }}
-      - name: "oauth-proxy-config"
-        secret:
-          secretName: "oauth-proxy-grafana"
-      {{- end }}
       - emptyDir: {}
         name: grafana-storage
       - name: grafana-datasources

@@ -8,6 +8,11 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: 18000s
     nginx.ingress.kubernetes.io/proxy-read-timeout: 18000s
     nginx.ingress.kubernetes.io/proxy-body-size: 5G
+    {{- if isTrue .Spec.SSO.Enabled }}
+    sso.cnvrg.io/enabled: "true"
+    sso.cnvrg.io/skipAuthRoutes: ""
+    sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
+    {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -18,6 +23,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "{{.Spec.Dbs.Es.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:

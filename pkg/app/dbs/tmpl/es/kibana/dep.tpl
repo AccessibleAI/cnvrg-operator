@@ -52,16 +52,15 @@ spec:
         - name: "kibana-config"
           secret:
             secretName: "kibana-config"
-        {{- if isTrue .Spec.SSO.Enabled }}
-        - name: "oauth-proxy-config"
-          secret:
-            secretName: "oauth-proxy-{{.Spec.Dbs.Es.Kibana.SvcName}}"
-        {{- end }}
       containers:
         {{- if isTrue .Spec.SSO.Enabled }}
-        - name: "cnvrg-oauth-proxy"
-          image: {{image .Spec.ImageHub .Spec.SSO.Image }}
-          command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+        - name: "cnvrg-proxy"
+          image: {{ image .Spec.ImageHub .Spec.SSO.Central.CnvrgProxyImage }}
+          command:
+          - /opt/app-root/proxy
+          - --listener-addr=0.0.0.0:8080
+          - --upstream-addr=127.0.0.1:3000
+          - --authz-addr={{ .Spec.SSO.Authz.Address }}
           resources:
             requests:
               cpu: 100m
@@ -69,13 +68,6 @@ spec:
             limits:
               cpu: 500m
               memory: 1Gi
-          envFrom:
-            - secretRef:
-                name: {{ .Spec.Dbs.Redis.CredsRef }}
-          volumeMounts:
-            - name: "oauth-proxy-config"
-              mountPath: "/opt/app-root/conf/proxy-config"
-              readOnly: true
         {{- end }}
         - name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
           image: {{image .Spec.ImageHub .Spec.Dbs.Es.Kibana.Image }}

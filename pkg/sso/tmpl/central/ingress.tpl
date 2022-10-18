@@ -18,6 +18,7 @@ metadata:
   name: sso-central
   namespace: {{.Namespace }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "sso-central.{{ .Spec.ClusterDomain }}"
       http:

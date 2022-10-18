@@ -22,24 +22,24 @@ var controlPlaneDefault = ControlPlane{
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
 		FailureThreshold:        5,
-		OauthProxy: OauthProxyServiceConf{
-			SkipAuthRegex: []string{
-				`\/assets`,
-				`\/healthz`,
-				`\/public`,
-				`\/pack`,
-				`\/vscode.tar.gz`,
-				`\/jupyter.vsix`,
-				`\/gitlens.vsix`,
-				`\/ms-python-release.vsix`,
-				`\/webhooks`,
-				`\/api/v2/metrics`,
-				`\/api/v1/events/endpoint_rule_alert`,
-			},
-			TokenValidationRegex: []string{
-				`^\/api`,
-			},
-		},
+		//OauthProxy: OauthProxyServiceConf{
+		//	SkipAuthRegex: []string{
+		//		`\/assets`,
+		//		`\/healthz`,
+		//		`\/public`,
+		//		`\/pack`,
+		//		`\/vscode.tar.gz`,
+		//		`\/jupyter.vsix`,
+		//		`\/gitlens.vsix`,
+		//		`\/ms-python-release.vsix`,
+		//		`\/webhooks`,
+		//		`\/api/v2/metrics`,
+		//		`\/api/v1/events/endpoint_rule_alert`,
+		//	},
+		//	TokenValidationRegex: []string{
+		//		`^\/api`,
+		//	},
+		//},
 		Hpa: Hpa{
 			Enabled:     false,
 			Utilization: 85,
@@ -340,10 +340,6 @@ var esDefault = Es{
 			Cpu:    "1000m",
 			Memory: "2Gi",
 		},
-		OauthProxy: OauthProxyServiceConf{
-			SkipAuthRegex:        nil,
-			TokenValidationRegex: nil,
-		},
 		CredsRef: "kibana-creds",
 	},
 	Elastalert: Elastalert{
@@ -394,10 +390,10 @@ var promDefaults = Prom{
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,
-		OauthProxy: OauthProxyServiceConf{
-			SkipAuthRegex:        []string{`\/api\/health`},
-			TokenValidationRegex: nil,
-		},
+		//OauthProxy: OauthProxyServiceConf{
+		//	SkipAuthRegex:        []string{`\/api\/health`},
+		//	TokenValidationRegex: nil,
+		//},
 		CredsRef: "grafana-creds",
 	},
 }
@@ -493,6 +489,7 @@ var ssoDefault = SSO{
 
 	Central: CentralSSO{
 		Enabled:                          false,
+		CnvrgProxyImage:                  "docker.io/cnvrg/proxy:v1.0.0",
 		OauthProxyImage:                  "cnvrg/oauth2-proxy:v7.3.x.ssov3.p2-01",
 		CentralUiImage:                   "docker.io/cnvrg/centralsso:latest",
 		EmailDomain:                      []string{"*"},
@@ -504,5 +501,6 @@ var ssoDefault = SSO{
 	Authz: Authz{
 		Enabled: false,
 		Image:   "docker.io/cnvrg/proxy:v1.0.0",
+		Address: "cnvrg-authz:50052",
 	},
 }

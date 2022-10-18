@@ -71,9 +71,13 @@ spec:
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       containers:
       {{- if isTrue .Spec.SSO.Enabled }}
-      - name: "cnvrg-oauth-proxy"
-        image: {{ image .Spec.ImageHub .Spec.SSO.Image }}
-        command: [ "oauth2-proxy","--config", "/opt/app-root/conf/proxy-config/conf" ]
+      - name: "cnvrg-proxy"
+        image: {{ image .Spec.ImageHub .Spec.SSO.Central.CnvrgProxyImage }}
+        command:
+        - /opt/app-root/proxy
+        - --listener-addr=0.0.0.0:8080
+        - --upstream-addr=127.0.0.1:3000
+        - --authz-addr={{ .Spec.SSO.Authz.Address }}
         resources:
           requests:
             cpu: 100m
@@ -81,24 +85,6 @@ spec:
           limits:
             cpu: 500m
             memory: 1Gi
-        envFrom:
-          - secretRef:
-              name: {{ .Spec.Dbs.Redis.CredsRef }}
-        env:
-          - name: OAUTH2_PROXY_TOKEN_VALIDATION_KEY
-            valueFrom:
-              secretKeyRef:
-                name: cp-oauth-proxy-tokens-secret
-                key: OAUTH_PROXY_API_KEY
-          - name: OAUTH2_PROXY_TOKEN_VALIDATION_AUTH_DATA
-            valueFrom:
-              secretKeyRef:
-                name: cp-oauth-proxy-tokens-secret
-                key: OAUTH_PROXY_API_AUTH_DATA
-        volumeMounts:
-          - name: "oauth-proxy-webapp"
-            mountPath: "/opt/app-root/conf/proxy-config"
-            readOnly: true
       {{- end }}
       - image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         env:
@@ -180,11 +166,6 @@ spec:
           readOnly: true
         {{- end }}
       volumes:
-      {{- if isTrue .Spec.SSO.Enabled }}
-      - name: "oauth-proxy-webapp"
-        secret:
-         secretName: "oauth-proxy-webapp"
-      {{- end }}
       {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
         secret:

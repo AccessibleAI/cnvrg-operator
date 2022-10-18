@@ -18,6 +18,7 @@ metadata:
   name: cnvrg-jwks
   namespace: {{.Namespace }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: "jwks.{{ .Spec.ClusterDomain }}"
       http:
