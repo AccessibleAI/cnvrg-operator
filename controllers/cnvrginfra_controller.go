@@ -139,30 +139,32 @@ func (r *CnvrgInfraReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 }
 
 func (r *CnvrgInfraReconciler) addIstioNetworkLabel(cnvrgInfra *mlopsv1.CnvrgInfra) error {
-	namespaceNamespacedName := types.NamespacedName{Name: cnvrgInfra.Spec.InfraNamespace}
-	namespaceObj := v1core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceNamespacedName.Name}}
-	if err := r.Get(context.Background(), namespaceNamespacedName, &namespaceObj); err != nil && errors.IsNotFound(err) {
-		return err
-	} else if err != nil {
-		return err
-	} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.EastWest.Network) {
-		appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.EastWest.Network)
-		return nil
-	}
-	mergePatch, err := json.Marshal(map[string]interface{}{
-		"metadata": map[string]interface{}{
-			"labels": map[string]interface{}{
-				"topology.istio.io/network": cnvrgInfra.Spec.Networking.EastWest.Network,
+	if cnvrgInfra.Spec.Networking.EastWest.Enabled {
+		namespaceNamespacedName := types.NamespacedName{Name: cnvrgInfra.Spec.InfraNamespace}
+		namespaceObj := v1core.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceNamespacedName.Name}}
+		if err := r.Get(context.Background(), namespaceNamespacedName, &namespaceObj); err != nil && errors.IsNotFound(err) {
+			return err
+		} else if err != nil {
+			return err
+		} else if mapContainsKeyValue(namespaceObj.ObjectMeta.Labels, "topology.istio.io/network", cnvrgInfra.Spec.Networking.EastWest.Network) {
+			appLog.Info("Network label already exists. No need to add label", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.EastWest.Network)
+			return nil
+		}
+		mergePatch, err := json.Marshal(map[string]interface{}{
+			"metadata": map[string]interface{}{
+				"labels": map[string]interface{}{
+					"topology.istio.io/network": cnvrgInfra.Spec.Networking.EastWest.Network,
+				},
 			},
-		},
-	})
-	if err != nil {
-		return err
+		})
+		if err != nil {
+			return err
+		}
+		if err := r.Patch(context.Background(), &namespaceObj, client.RawPatch(types.MergePatchType, mergePatch)); err != nil {
+			return err
+		}
+		appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.EastWest.Network)
 	}
-	if err := r.Patch(context.Background(), &namespaceObj, client.RawPatch(types.MergePatchType, mergePatch)); err != nil {
-		return err
-	}
-	appLog.Info("Applied istio Network label successfully", "key", "topology.istio.io/network", "value", cnvrgInfra.Spec.Networking.EastWest.Network)
 	return nil
 }
 
