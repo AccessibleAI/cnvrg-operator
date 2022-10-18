@@ -18,6 +18,7 @@ spec:
       labels:
         app: sso-central
     spec:
+      serviceAccountName: cnvrg-sso-central
       containers:
       - name: sso-central
         imagePullPolicy: Always

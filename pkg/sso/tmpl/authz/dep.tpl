@@ -18,6 +18,7 @@ spec:
       labels:
         app: cnvrg-authz
     spec:
+      serviceAccountName: cnvrg-authz
       containers:
       - name: authz
         imagePullPolicy: Always
