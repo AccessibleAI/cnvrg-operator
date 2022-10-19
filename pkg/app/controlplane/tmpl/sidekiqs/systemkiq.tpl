@@ -86,8 +86,10 @@ spec:
                 name: cp-networking-config
             - secretRef:
                 name: cp-base-secret
+            {{- if isTrue .Spec.SSO.Enabled }}
             - secretRef:
                 name: cp-oauth-proxy-tokens-secret
+            {{- end }}
             - secretRef:
                 name: cp-ldap
             - secretRef:

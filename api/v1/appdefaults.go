@@ -489,7 +489,7 @@ var ssoDefault = SSO{
 
 	Central: CentralSSO{
 		Enabled:                          false,
-		CnvrgProxyImage:                  "docker.io/cnvrg/proxy:v1.0.0",
+		CnvrgProxyImage:                  "docker.io/cnvrg/proxy:v1.0.1",
 		OauthProxyImage:                  "cnvrg/oauth2-proxy:v7.3.x.ssov3.p2-01",
 		CentralUiImage:                   "docker.io/cnvrg/centralsso:latest",
 		EmailDomain:                      []string{"*"},
