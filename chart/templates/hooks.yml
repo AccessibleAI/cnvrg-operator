@@ -4,7 +4,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: "cnvrg-bootstrap"
-  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -13,7 +12,6 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "cnvrg-bootstrap"
-  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -41,7 +39,6 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "cnvrg-bootstrap"
-  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -57,7 +54,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: post-install
-  namespace: {{ template "spec.cnvrgNs" . }}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -88,46 +84,3 @@ spec:
               kubectl delete job post-install -n {{ template "spec.cnvrgNs" . }}
               {{- end }}
       restartPolicy: Never
-
-####################################### Uninstall hooks #######################################
----
-{{- if or (eq .Values.spec "infra") (eq .Values.spec "allinone") }}
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: pre-cnvrg-cleanup
-  namespace: {{ template "spec.cnvrgNs" . }}
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-weight": "2"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-spec:
-  template:
-    spec:
-      serviceAccountName: cnvrg-operator
-      containers:
-        - name: delete-cnvrgapp
-          image: docker.io/cnvrg/cnvrg-tools:v0.3
-          args:
-            - /bin/bash
-            - -c
-            - |
-              echo "running cleanup"
-
-              kubectl delete job post-install -n {{ template "spec.cnvrgNs" . }}
-              kubectl delete cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} --ignore-not-found
-
-              while (( $(kubectl get cnvrgapp cnvrg-app -n {{ template "spec.cnvrgNs" . }} | grep cnvrg-app | wc -l ) != 0 )); do
-                echo "waiting for cnvrgapp will be deleted. . . ";
-                sleep 1
-              done
-              kubectl get pods -n {{ template "spec.cnvrgNs" . }} -oname | grep cnvrg-seeder | xargs kubectl delete -n {{ template "spec.cnvrgNs" . }}
-
-              kubectl delete cnvrginfra cnvrg-infra -n {{ template "spec.cnvrgNs" . }} --ignore-not-found
-              while (( $(kubectl get cnvrginfra cnvrg-infra -n {{ template "spec.cnvrgNs" . }} | grep cnvrg-infra | wc -l ) != 0 )); do
-                echo "waiting for cnvrginfra will be deleted. . . ";
-                sleep 1
-              done
-      restartPolicy: Never
-  backoffLimit: 4
-{{- end }}

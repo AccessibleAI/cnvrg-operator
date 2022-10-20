@@ -1,15 +1,12 @@
-{{- if or (eq .Values.spec "allinone") (eq .Values.spec "infra") }}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cnvrg-operator
-  namespace: {{ template "spec.cnvrgNs" . }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: cnvrg-operator-role
 rules:
   - apiGroups:
@@ -70,14 +67,12 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: cnvrg-operator
-    namespace: {{ template "spec.cnvrgNs" . }}
 ---
 apiVersion: v1
 kind: Secret
 type: kubernetes.io/dockerconfigjson
 metadata:
   name: operator-pull-secret
-  namespace: {{ template "spec.cnvrgNs" . }}
 data:
   .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .Values.registry.url .Values.registry.user .Values.registry.password (printf "%s:%s" .Values.registry.user .Values.registry.password | b64enc) | b64enc }}
 ---
@@ -87,7 +82,6 @@ metadata:
   labels:
     control-plane: cnvrg-operator
   name: cnvrg-operator
-  namespace: {{ template "spec.cnvrgNs" . }}
 spec:
   replicas: 1
   selector:
@@ -98,15 +92,6 @@ spec:
       labels:
         control-plane: cnvrg-operator
     spec:
-      {{- if .Values.tenancy.enabled }}
-      nodeSelector:
-        {{ .Values.tenancy.key }}: "{{ .Values.tenancy.value }}"
-      tolerations:
-        - key: "{{ .Values.tenancy.key }}"
-          operator: "Equal"
-          value: "{{ .Values.tenancy.value }}"
-          effect: "NoSchedule"
-      {{- end }}
       imagePullSecrets:
         - name: operator-pull-secret
       containers:
@@ -127,6 +112,3 @@ spec:
               memory: 200Mi
       serviceAccountName: cnvrg-operator
       terminationGracePeriodSeconds: 10
-
----
-{{- end }}

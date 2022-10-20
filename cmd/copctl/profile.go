@@ -1,8 +1,13 @@
 package main
 
 import (
+	"encoding/json"
+	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
+	"github.com/AccessibleAI/cnvrg-operator/controllers/app"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/dumper"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type dump struct {
@@ -40,24 +45,20 @@ var (
 		Short:   "dump cnvrg control plane as raw K8s manifests",
 		Aliases: []string{"cp"},
 		Run: func(cmd *cobra.Command, args []string) {
-			//cp := dumper.NewControlPlane(
-			//	viper.GetString("control-plane-image"),
-			//	viper.GetString("wildcard-domain"),
-			//	viper.GetString("cri"),
-			//	viper.GetString("registry-user"),
-			//	viper.GetString("registry-password"),
-			//	viper.GetString("ingress"),
-			//	viper.GetString("namespace"),
-			//	viper.GetBool("https"),
-			//	viper.GetBool("proxy"),
-			//)
-			//d := dump{cp}
-			//if err := d.BuildState(); err != nil {
-			//	log.Fatal(err)
-			//}
-			//if err := d.Dump(viper.GetBool("preserve-templates-dir")); err != nil {
-			//	log.Fatal(err)
-			//}
+			a := mlopsv1.DefaultCnvrgAppSpec()
+			spec := &mlopsv1.CnvrgApp{ObjectMeta: metav1.ObjectMeta{Name: "cnvrg-app", Namespace: "cnvrg"}}
+
+			if err := app.CalculateAndApplyAppDefaults(spec, &a, nil); err != nil {
+				log.Fatal(err)
+			}
+
+			spec.Spec = a
+
+			b, err := json.Marshal(spec)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Info(string(b))
 		},
 	}
 

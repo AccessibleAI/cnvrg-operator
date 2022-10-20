@@ -102,7 +102,7 @@ func discoverOcpPromCreds(clientset client.Client, ns string) {
 	return
 }
 
-func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, clientset client.Client) error {
+func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, clientset client.Client) error {
 
 	if app.Spec.Dbs.Cvat.Enabled {
 		desiredAppSpec.Dbs.Cvat.Pg.Enabled = true
@@ -143,7 +143,7 @@ func calculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	}
 
 	if app.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		if app.Spec.ClusterDomain == "" {
+		if app.Spec.ClusterDomain == "" && clientset != nil {
 			clusterDomain, err := discoverOcpDefaultRouteHost(clientset)
 			if err != nil {
 				log.Error(err, "unable discover cluster domain, set clusterDomain manually under spec.clusterDomain")

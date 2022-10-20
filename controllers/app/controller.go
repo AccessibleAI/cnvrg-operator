@@ -282,7 +282,7 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 	// Get default app spec
 	desiredSpec := mlopsv1.DefaultCnvrgAppSpec()
 
-	if err := calculateAndApplyAppDefaults(app, &desiredSpec, r.Client); err != nil {
+	if err := CalculateAndApplyAppDefaults(app, &desiredSpec, r.Client); err != nil {
 		r.Log.Error(err, "can't calculate defaults")
 		return false, err
 	}
