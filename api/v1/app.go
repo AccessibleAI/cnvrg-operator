@@ -243,6 +243,7 @@ type Grafana struct {
 
 type Prom struct {
 	Enabled            bool                  `json:"enabled,omitempty"`
+	SvcName            string                `json:"svcName,omitempty"`
 	CredsRef           string                `json:"credsRef,omitempty"`
 	ExtraScrapeConfigs []*ExtraScrapeConfigs `json:"extraScrapeConfigs,omitempty"`
 	Image              string                `json:"image,omitempty"`

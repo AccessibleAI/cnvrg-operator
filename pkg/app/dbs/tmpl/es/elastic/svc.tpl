@@ -21,7 +21,9 @@ spec:
   type: NodePort
   {{- end }}
   ports:
-  - port: {{ .Spec.Dbs.Es.Port }}
+  - name: http
+    port: {{ .Spec.Dbs.Es.Port }}
+    targetPort: http
     {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
     nodePort: {{ .Spec.Dbs.Es.NodePort }}
     {{- end }}

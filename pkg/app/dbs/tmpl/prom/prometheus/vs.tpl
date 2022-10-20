@@ -28,4 +28,4 @@ spec:
     - destination:
         port:
           number: 9090
-        host: "prom.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"
+        host: "{{ .Spec.Dbs.Prom.SvcName }}.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"

@@ -347,7 +347,7 @@ var esDefault = Es{
 		Image:          "elastalert:3.0.0-beta.1",
 		CredsRef:       "elastalert-creds",
 		AuthProxyImage: "nginx:1.20",
-		Port:           80,
+		Port:           8080,
 		NodePort:       32030,
 		StorageSize:    "30Gi",
 		SvcName:        "elastalert",
@@ -383,6 +383,7 @@ var cvatDefault = Cvat{
 var promDefaults = Prom{
 	Enabled:  false,
 	CredsRef: "prom-creds",
+	SvcName:  "prometheus",
 	Image:    "prom/prometheus:v2.37.1",
 	Grafana: Grafana{
 		Enabled:  false,

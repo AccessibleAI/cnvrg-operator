@@ -23,7 +23,8 @@ spec:
   selector:
     app: {{ .Spec.Dbs.Es.Kibana.SvcName }}
   ports:
-    - port: {{ .Spec.Dbs.Es.Kibana.Port }}
+    - name: http
+      port: {{ .Spec.Dbs.Es.Kibana.Port }}
       protocol: TCP
       {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
       nodePort: {{ .Spec.Dbs.Es.Kibana.NodePort }}
