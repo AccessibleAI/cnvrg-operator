@@ -30,6 +30,9 @@ spec:
         {{- end }}
       labels:
         app: {{ .Spec.Dbs.Es.Kibana.SvcName }}
+        {{- if contains "eastwest" .Spec.ClusterDomain }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}

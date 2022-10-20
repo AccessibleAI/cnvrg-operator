@@ -28,6 +28,9 @@ spec:
         {{- end }}
       labels:
         app: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
+        {{- if contains "eastwest" .Spec.ClusterDomain }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}

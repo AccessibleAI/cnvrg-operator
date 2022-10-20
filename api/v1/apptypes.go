@@ -18,6 +18,7 @@ const (
 	NginxIngress     IngressType = "ingress"
 	OpenShiftIngress IngressType = "openshift"
 	NodePortIngress  IngressType = "nodeport"
+	NoneIngress      IngressType = "none"
 )
 
 type CnvrgAppSpec struct {

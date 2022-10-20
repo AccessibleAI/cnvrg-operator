@@ -24,6 +24,9 @@ spec:
     metadata:
       labels:
         app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
+        {{- if contains "eastwest" .Spec.ClusterDomain }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
     spec:
       {{- if isTrue .Data.Spec.Tenancy.Enabled }}
       nodeSelector:

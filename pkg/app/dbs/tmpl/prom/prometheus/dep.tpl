@@ -15,6 +15,9 @@ spec:
     metadata:
       labels:
         app: prom
+        {{- if contains "eastwest" .Spec.ClusterDomain }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
     spec:
       serviceAccountName: cnvrg-prom
       securityContext:
