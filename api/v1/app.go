@@ -365,8 +365,6 @@ type Ingress struct {
 
 type HTTPS struct {
 	Enabled    bool   `json:"enabled,omitempty"`
-	Cert       string `json:"cert,omitempty"`
-	Key        string `json:"key,omitempty"`
 	CertSecret string `json:"certSecret,omitempty"`
 }
 
@@ -386,7 +384,6 @@ type Networking struct {
 
 type SSO struct {
 	Enabled bool       `json:"enabled,omitempty"`
-	Groups  []string   `json:"groups,omitempty"`
 	Pki     Pki        `json:"pki,omitempty"`
 	Jwks    Jwks       `json:"jwks,omitempty"`
 	Central CentralSSO `json:"central,omitempty"`

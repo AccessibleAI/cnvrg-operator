@@ -24,12 +24,10 @@ func init() {
 	setParams(profileDumpParams, profileDumpCmd)
 	setParams(dumpControlPlaneParams, dumpControlPlaneCmd)
 	setParams(dumpNetworkParams, dumpNetworkCmd)
-	setParams(chartCmdParams, chartCmd)
 
 	profileCmd.AddCommand(profileDumpCmd)
 	profileDumpCmd.AddCommand(dumpControlPlaneCmd)
 	profileDumpCmd.AddCommand(dumpNetworkCmd)
-	rootCmd.AddCommand(chartCmd)
 	rootCmd.AddCommand(profileCmd)
 }
 

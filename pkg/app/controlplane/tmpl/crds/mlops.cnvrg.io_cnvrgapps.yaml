@@ -862,14 +862,10 @@ spec:
                 properties:
                   https:
                     properties:
-                      cert:
-                        type: string
                       certSecret:
                         type: string
                       enabled:
                         type: boolean
-                      key:
-                        type: string
                     type: object
                   ingress:
                     properties:
@@ -969,10 +965,6 @@ spec:
                     type: object
                   enabled:
                     type: boolean
-                  groups:
-                    items:
-                      type: string
-                    type: array
                   jwks:
                     properties:
                       cache:
