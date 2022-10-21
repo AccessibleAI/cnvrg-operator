@@ -71,6 +71,7 @@ func (c *CentralStateManager) depData() map[string]string {
 		"OauthProxyImage":  c.app.Spec.SSO.Central.OauthProxyImage,
 		"RedisCredsRef":    c.app.Spec.Dbs.Redis.CredsRef,
 		"SvcName":          CentralSsoSvcName,
+		"ImageHub":         c.app.Spec.ImageHub,
 	}
 }
 

@@ -22,7 +22,7 @@ spec:
       containers:
       - name: authz
         imagePullPolicy: Always
-        image: {{ .Image }}
+        image: {{  image .ImageHub .Image }}
         command:
           - /opt/app-root/authz
           - --ingress-type={{ .IngressType }}

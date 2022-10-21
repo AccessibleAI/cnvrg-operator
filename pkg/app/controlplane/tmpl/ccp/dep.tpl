@@ -44,7 +44,7 @@ spec:
                 secretKeyRef:
                   key: secretkey
                   name: {{ .Spec.ControlPlane.CnvrgClusterProvisionerOperator.AwsCredsRef }}
-          image: {{ .Spec.ControlPlane.CnvrgClusterProvisionerOperator.Image }}
+          image: {{  image .Spec.ImageHub .Spec.ControlPlane.CnvrgClusterProvisionerOperator.Image }}
           imagePullPolicy: Always
           livenessProbe:
             httpGet:

@@ -38,7 +38,7 @@ spec:
       serviceAccountName: cnvrg-control-plane
       containers:
         - name: nginx
-          image: {{ .Spec.ControlPlane.CnvrgRouter.Image }}
+          image: {{  image .Spec.ImageHub .Spec.ControlPlane.CnvrgRouter.Image }}
           ports:
             - containerPort: 80
           volumeMounts:
