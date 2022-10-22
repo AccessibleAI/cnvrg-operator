@@ -108,8 +108,7 @@ kubectl create secret generic prom-creds -ncnvrg \
 Install with helm3
 ```bash
 
-helm install cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 1500s \
-  --create-namespace -n cnvrg  \
+helm install cnvrg cnvrgv3/cnvrg -n cnvrg --timeout 1500s \
   --set clusterDomain=<apps-openshift-route-domain> \
   --set controlPlane.baseConfig.featureFlags.OCP_ENABLED="true" \
   --set networking.ingress.type="openshift" \
@@ -118,7 +117,8 @@ helm install cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 1500s \
   --set monitoring.nodeExporter.enabled=false \
   --set monitoring.kubeStateMetrics.enabled=false \
   --set monitoring.defaultServiceMonitors.enabled=false \
-  --set monitoring.dcgmExporter.enabled=false 
+  --set monitoring.dcgmExporter.enabled=false \
+  --debug
 ```
 
 Install with raw ocp yamls (using OC command line)
