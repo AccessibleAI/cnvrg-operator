@@ -18,7 +18,7 @@ Finally: CCP is agnostic to how OCP admin diced to expose Prometheus Metrics, CC
 4. CCP Prometheus instance have to have metrics from `dcgm-exporter` ServiceMonitor
 5. CCP Prometheus instance have to have metrics from `cnvrg-jobs` ServiceMonitor
 
-> current OCP installation doesn't ship the `prometheus-node-exporter`
+> current OCP installation doesn't ship the `prometheus-node-exporter` ServiceMonitor.
 > 
 > these are the built in ServiceMonitors:
 > ```
@@ -39,6 +39,8 @@ Finally: CCP is agnostic to how OCP admin diced to expose Prometheus Metrics, CC
 > thanos-querier                15m
 > thanos-sidecar                15m
 > ```
+> 
+> need to check if the name changed or do we need to add manifest manually.
 
 While `prometheus-node-exporter`, `kube-state-metrics` and `kubelet` ServiceMonitors 
 are deployed by default with OCP Monitoring stack, 
