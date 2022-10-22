@@ -82,10 +82,15 @@ spec:
 At the following OCP based deployment, we'll keep as much as possible simple.
 We'll instruct CCP to use OCP's infrastructure prometheus instance to query the monitoring metrics. 
 1. Get access to OCP Infra Prometheus instance (please note, the bellow commands assume you've [jq](https://stedolan.github.io/jq/) installed on your local machine)
+
+> changed commands from `oc` to `kubectl` for convinience
+> 
+> changed secret name from obsolete `grafana-datasources` to new `grafana-datasources-v2`
+
 ```bash
-CNVRG_PROMETHEUS_USER=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthUser')
-CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthPassword')
-CNVRG_PROMETHEUS_URL=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
+CNVRG_PROMETHEUS_USER=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthUser')
+CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthPassword')
+CNVRG_PROMETHEUS_URL=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
 ```
 2. Create `prom-creds` secret to instruct CCP how to connect to Prometheus instance 
 ```bash
