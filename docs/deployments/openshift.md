@@ -97,7 +97,13 @@ CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-dataso
 CNVRG_PROMETHEUS_URL=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
 ```
 2. Create `prom-creds` secret to instruct CCP how to connect to Prometheus instance 
+
+> at this stage we havn't created cnvrg namespace yet, so i've added command to create it
+> 
+> + omitted `--create-namespace` from helm install command
 ```bash
+kubectl create namespace cnvrg
+
 kubectl create secret generic prom-creds -ncnvrg \
  --from-literal=CNVRG_PROMETHEUS_USER=$CNVRG_PROMETHEUS_USER \
  --from-literal=CNVRG_PROMETHEUS_PASS=$CNVRG_PROMETHEUS_PASS \
