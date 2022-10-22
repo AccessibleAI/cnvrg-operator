@@ -97,6 +97,7 @@ type Cvat struct {
 	Enabled bool  `json:"enabled,omitempty"`
 	Pg      Pg    `json:"pg,omitempty"`
 	Redis   Redis `json:"redis,omitempty"`
+	Nfs     Nfs   `json:"nfs,omitempty"`
 }
 
 type InfraDbs struct {
@@ -229,6 +230,7 @@ var cvatDefault = Cvat{
 	Enabled: false,
 	Pg:      cvatPgDefault,
 	Redis:   cvatRedisDefault,
+	Nfs:     cvatNfsDefault,
 }
 
 var cvatPgDefault = Pg{
@@ -286,6 +288,13 @@ var cvatRedisDefault = Redis{
 		Cpu:    "250m",
 		Memory: "500Mi",
 	},
+}
+
+var cvatNfsDefault = Nfs{
+	Enabled:        false,
+	StorageSize:    "50Gi",
+	StorageClass:   "",
+	PvcName:        "cvat-nfs",	
 }
 
 var infraDbsDefaults = InfraDbs{
