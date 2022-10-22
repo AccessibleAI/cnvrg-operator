@@ -88,10 +88,12 @@ We'll instruct CCP to use OCP's infrastructure prometheus instance to query the 
 > changed commands from `oc` to `kubectl` for convinience
 > 
 > changed secret name from obsolete `grafana-datasources` to new `grafana-datasources-v2`
+> 
+> password is now nested under `secureJsonData` dict, changed extraction command accordingly
 
 ```bash
 CNVRG_PROMETHEUS_USER=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthUser')
-CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthPassword')
+CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].secureJsonData.basicAuthPassword')
 CNVRG_PROMETHEUS_URL=$(kubectl get secret -nopenshift-monitoring grafana-datasources-v2 -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
 ```
 2. Create `prom-creds` secret to instruct CCP how to connect to Prometheus instance 
