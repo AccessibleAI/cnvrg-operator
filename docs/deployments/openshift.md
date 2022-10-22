@@ -18,6 +18,28 @@ Finally: CCP is agnostic to how OCP admin diced to expose Prometheus Metrics, CC
 4. CCP Prometheus instance have to have metrics from `dcgm-exporter` ServiceMonitor
 5. CCP Prometheus instance have to have metrics from `cnvrg-jobs` ServiceMonitor
 
+> current OCP installation doesn't ship the `prometheus-node-exporter`
+> 
+> these are the built in ServiceMonitors:
+> ```
+> k -n openshift-monitoring get servicemonitors
+> 
+> NAME                          AGE
+> alertmanager-main             15m
+> cluster-monitoring-operator   27m
+> etcd                          27m
+> grafana                       15m
+> kube-state-metrics            16m
+> kubelet                       27m
+> node-exporter                 27m
+> openshift-state-metrics       16m
+> prometheus-adapter            16m
+> prometheus-k8s                15m
+> prometheus-operator           27m
+> thanos-querier                15m
+> thanos-sidecar                15m
+> ```
+
 While `prometheus-node-exporter`, `kube-state-metrics` and `kubelet` ServiceMonitors 
 are deployed by default with OCP Monitoring stack, 
 the `dcgm-exporter` and `cnvrg-jobs` ServiceMonitors have to deployed manually on the OCP.
@@ -61,13 +83,13 @@ At the following OCP based deployment, we'll keep as much as possible simple.
 We'll instruct CCP to use OCP's infrastructure prometheus instance to query the monitoring metrics. 
 1. Get access to OCP Infra Prometheus instance (please note, the bellow commands assume you've [jq](https://stedolan.github.io/jq/) installed on your local machine)
 ```bash
-CNVRG_PROMETHEUS_USER=$(oc get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthUser')
-CNVRG_PROMETHEUS_PASS=$(oc get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthPassword')
-CNVRG_PROMETHEUS_URL=$(oc get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
+CNVRG_PROMETHEUS_USER=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthUser')
+CNVRG_PROMETHEUS_PASS=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].basicAuthPassword')
+CNVRG_PROMETHEUS_URL=$(kubectl get secret -nopenshift-monitoring grafana-datasources -ojson | jq -r '.data."prometheus.yaml"' | base64 -D | jq -r '.datasources[].url')
 ```
 2. Create `prom-creds` secret to instruct CCP how to connect to Prometheus instance 
 ```bash
-oc create secret generic prom-creds -ncnvrg \
+kubectl create secret generic prom-creds -ncnvrg \
  --from-literal=CNVRG_PROMETHEUS_USER=$CNVRG_PROMETHEUS_USER \
  --from-literal=CNVRG_PROMETHEUS_PASS=$CNVRG_PROMETHEUS_PASS \
  --from-literal=CNVRG_PROMETHEUS_URL=$CNVRG_PROMETHEUS_URL
@@ -90,7 +112,7 @@ helm install cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 1500s \
   --set monitoring.dcgmExporter.enabled=false 
 ```
 
-Install with raw ocp yamls
+Install with raw ocp yamls (using OC command line)
 ```bash
 oc new-project cnvrg
 helm template cnvrg cnvrgv3/cnvrg --create-namespace -n cnvrg --timeout 1500s \
