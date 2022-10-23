@@ -1,240 +1,400 @@
-clusterDomain: ""
-clusterInternalDomain: "cluster.local"
-spec: allinone # allinone|infra|ccp
+---
+clusterDomain: ''
+clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg
-
-labels: { }
-
-annotations: { }
-
-gpu:
-  nvidiaDp:
-    enabled: true
-  habanaDp:
-    enabled: true
-
 controlPlane:
-  image: core:3.9.13
-  baseConfig:
-    agentCustomTag: latest
-    intercom: "true"
-    featureFlags: { }
-    cnvrgPrivilegedJob: true
-  hyper:
+  image: core:3.6.99
+  webapp:
+    replicas: 1
     enabled: true
-  cnvrgScheduler:
-    enabled: true
-  cnvrgClusterProvisionerOperator:
-    enabled: false
-  objectStorage:
-    type: minio
-    bucket: cnvrg-storage
-    region: eastus
-    accessKey: ""
-    secretKey: ""
-    endpoint: ""
-    azureAccountName: ""
-    azureContainer: ""
-    gcpSecretRef: gcp-storage-secret
-    gcpProject: ""
-  searchkiq:
-    enabled: true
+    port: 8080
+    requests:
+      cpu: 500m
+      memory: 4Gi
+    limits:
+      cpu: '4'
+      memory: 8Gi
+    svcName: app
+    nodePort: 30080
+    passengerMaxPoolSize: 50
+    initialDelaySeconds: 10
+    readinessPeriodSeconds: 25
+    readinessTimeoutSeconds: 20
+    failureThreshold: 5
     hpa:
       enabled: true
+      utilization: 85
       maxReplicas: 5
   sidekiq:
     enabled: true
     split: true
+    requests:
+      cpu: 200m
+      memory: 3750Mi
+    limits:
+      cpu: '2'
+      memory: 8Gi
+    replicas: 2
     hpa:
       enabled: true
+      utilization: 85
       maxReplicas: 5
-  cnvrgRouter:
-    enabled: false
-    image: nginx:1.21.0
-  smtp:
-    server: ""
-    port: 587
-    username: ""
-    password: ""
-    domain: ""
-    opensslVerifyMode: ""
-    sender: "info@cnvrg.io"
-  systemkiq:
+  searchkiq:
     enabled: true
-    hpa:
-      enabled: true
-      maxReplicas: 5
-  webapp:
-    enabled: true
-    svcName: "app"
+    requests:
+      cpu: 200m
+      memory: 1Gi
+    limits:
+      cpu: '2'
+      memory: 8Gi
     replicas: 1
     hpa:
       enabled: true
+      utilization: 85
       maxReplicas: 5
-  mpi:
+  systemkiq:
     enabled: true
-    image: "mpioperator/mpi-operator:v0.2.3"
-    kubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3"
-    extraArgs: { }
-    registry:
-      url: "docker.io"
-      user: ""
-      password: ""
-
+    requests:
+      cpu: 300m
+      memory: 2Gi
+    limits:
+      cpu: '2'
+      memory: 8Gi
+    replicas: 1
+    hpa:
+      enabled: true
+      utilization: 85
+      maxReplicas: 5
+  hyper:
+    enabled: true
+    image: hyper-server:latest
+    port: 5050
+    replicas: 1
+    nodePort: 30050
+    svcName: hyper
+    token: token
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: '2'
+      memory: 4Gi
+    cpuLimit: ''
+    memoryLimit: ''
+    readinessPeriodSeconds: 100
+    readinessTimeoutSeconds: 60
+  cnvrgScheduler:
+    enabled: true
+    requests:
+      cpu: 200m
+      memory: 1000Mi
+    limits:
+      cpu: '2'
+      memory: 4Gi
+    replicas: 1
+  cnvrgRouter:
+    enabled: false
+    image: nginx:1.21.0
+    svcName: cnvrg-router
+    nodePort: 30081
+  baseConfig:
+    jobsStorageClass: ''
+    featureFlags:
+    sentryUrl: ''
+    runJobsOnSelfCluster: ''
+    agentCustomTag: latest
+    intercom: 'true'
+    cnvrgJobUid: '0'
+    cnvrgJobRbacStrict: false
+    cnvrgPrivilegedJob: true
+    metagpuEnabled: false
   ldap:
     enabled: false
-    host: ""
-    port: ""
-    account: "userPrincipalName"
-    base: ""
-    adminUser: ""
-    adminPassword: ""
-    ssl: "false"
-
-dbs:
-  cvat:
+    host: ''
+    port: ''
+    account: userPrincipalName
+    base: ''
+    adminUser: ''
+    adminPassword: ''
+    ssl: ''
+  smtp:
+    server: ''
+    port: 587
+    username: ''
+    password: ''
+    domain: ''
+    opensslVerifyMode: ''
+    sender: info@cnvrg.io
+  objectStorage:
+    type: minio
+    bucket: cnvrg-storage
+    region: eastus
+    accessKey: ''
+    secretKey: ''
+    endpoint: ''
+    azureAccountName: ''
+    azureContainer: ''
+    gcpProject: ''
+    gcpSecretRef: gcp-storage-secret
+  mpi:
     enabled: false
-  es:
+    image: mpioperator/mpi-operator:v0.2.3
+    kubectlDeliveryImage: mpioperator/kubectl-delivery:v0.2.3
+    extraArgs:
+    registry:
+      name: mpi-private-registry
+      url: docker.io
+      user: ''
+      password: ''
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  nomex:
     enabled: true
-    storageSize: 80Gi
-    storageClass: ""
-    patchEsNodes: true
-    nodeSelector: { }
-    cleanupPolicy:
-      all: "3d"
-      app: "30d"
-      jobs: "14d"
-      endpoints: "1825d"
-  minio:
-    enabled: true
-    storageSize: 100Gi
-    storageClass: ""
-    nodeSelector: { }
+    image: nomex:v1.0.0
+registry:
+  name: cnvrg-app-registry
+  url: docker.io
+  user: ''
+  password: ''
+dbs:
   pg:
     enabled: true
+    serviceAccount: pg
+    image: postgresql-12-centos7:latest
+    port: 5432
     storageSize: 80Gi
-    storageClass: ""
-    nodeSelector: { }
+    svcName: postgres
+    storageClass: ''
+    requests:
+      cpu: '1'
+      memory: 4Gi
+    limits:
+      cpu: '12'
+      memory: 32Gi
+    maxConnections: 500
+    sharedBuffers: 1024MB
+    effectiveCacheSize: 2048MB
     hugePages:
       enabled: false
       size: 2Mi
-      memory: ""
+      memory: ''
+    nodeSelector:
+    credsRef: pg-creds
+    pvcName: pg-storage
   redis:
     enabled: true
+    serviceAccount: redis
+    image: cnvrg-redis:v3.0.5.c2
+    svcName: redis
+    port: 6379
     storageSize: 10Gi
-    storageClass: ""
-    nodeSelector: { }
-
-logging:
-  fluentbit:
+    storageClass: ''
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    nodeSelector:
+    credsRef: redis-creds
+    pvcName: redis-storage
+  minio:
     enabled: true
-  elastalert:
+    serviceAccount: minio
+    replicas: 1
+    image: minio:RELEASE.2021-05-22T02-34-39Z
+    port: 9000
+    storageSize: 100Gi
+    svcName: minio
+    nodePort: 30090
+    storageClass: ''
+    requests:
+      cpu: 200m
+      memory: 2Gi
+    limits:
+      cpu: '8'
+      memory: 20Gi
+    nodeSelector:
+    pvcName: minio-storage
+  es:
     enabled: true
-    storageSize: "30Gi"
-    storageClass: ""
-    nodeSelector: { }
-  kibana:
-    svcName: "kibana"
+    serviceAccount: es
+    image: cnvrg-es:v7.8.1.a1-dynamic-indices
+    port: 9200
+    storageSize: 80Gi
+    svcName: elasticsearch
+    nodePort: 32200
+    storageClass: ''
+    requests:
+      cpu: 500m
+      memory: 4Gi
+    limits:
+      cpu: '4'
+      memory: 8Gi
+    javaOpts: ''
+    patchEsNodes: false
+    nodeSelector:
+    credsRef: es-creds
+    pvcName: es-storage
+    cleanupPolicy:
+      all: 3d
+      app: 30d
+      jobs: 14d
+      endpoints: 1825d
+    kibana:
+      enabled: true
+      serviceAccount: kibana
+      svcName: kibana
+      port: 8080
+      image: kibana-oss:7.8.1
+      nodePort: 30601
+      requests:
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      credsRef: kibana-creds
+    elastalert:
+      enabled: true
+      image: elastalert:3.0.0-beta.1
+      authProxyImage: nginx:1.20
+      credsRef: elastalert-creds
+      port: 80
+      nodePort: 32030
+      storageSize: 30Gi
+      svcName: elastalert
+      storageClass: ''
+      requests:
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        cpu: 400m
+        memory: 800Mi
+      nodeSelector:
+      pvcName: elastalert-storage
+  cvat:
+    enabled: false
+    pg:
+      enabled: false
+      serviceAccount: cvat-pg
+      image: postgresql-12-centos7:latest
+      port: 5432
+      storageSize: 100Gi
+      svcName: cvat-postgres
+      storageClass: ''
+      requests:
+        cpu: '1'
+        memory: 2Gi
+      limits:
+        cpu: '2'
+        memory: 4Gi
+      maxConnections: 500
+      sharedBuffers: 1024MB
+      effectiveCacheSize: 2048MB
+      hugePages:
+        enabled: false
+        size: 2Mi
+        memory: ''
+      nodeSelector:
+      credsRef: cvat-pg-secret
+      pvcName: cvat-pg-storage
+    redis:
+      enabled: false
+      serviceAccount: cvat-redis
+      image: redis:4.0.5-alpine
+      svcName: cvat-redis
+      port: 6379
+      storageSize: 10Gi
+      storageClass: ''
+      requests:
+        cpu: 250m
+        memory: 500Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      nodeSelector:
+      credsRef: cvat-redis-secret
+      pvcName: cvat-redis-storage
+  prom:
     enabled: true
-
-monitoring:
-
-  dcgmExporter:
-    enabled: true
-
-  habanaExporter:
-    enabled: true
-
-  nodeExporter:
-    enabled: true
-
-  kubeStateMetrics:
-    enabled: true
-
-  grafana:
-    enabled: true
-    svcName: "grafana"
-
-  prometheusOperator:
-    enabled: true
-
-  prometheus:
-    enabled: true
-    storageSize: "50Gi"
-    storageClass: ""
-    nodeSelector: { }
-
-  defaultServiceMonitors:
-    enabled: true
-
-  cnvrgIdleMetricsExporter:
-    enabled: true
-    labels: { }
-
+    credsRef: prom-creds
+    extraScrapeConfigs:
+    image: prometheus:v2.37.1
+    grafana:
+      enabled: true
+      image: grafana-oss:9.1.6
+      svcName: grafana
+      port: 8080
+      nodePort: 30012
+      credsRef: grafana-creds
 networking:
+  ingress:
+    type: istio
+    timeout: 18000s
+    retriesAttempts: 5
+    perTryTimeout: 3600s
+    istioGwEnabled: false
+    istioGwName: ''
   https:
     enabled: false
-    certSecret: ""
+    certSecret: ''
   proxy:
     enabled: false
-    httpProxy: [ ]
-    httpsProxy: [ ]
-    noProxy: [ ]
-  ingress:
-    type: "istio"
-    istioGwEnabled: true
-    istioGwName: ""
-  istio:
-    enabled: true
-    externalIp: [ ]
-    ingressSvcAnnotations: { }
-    ingressSvcExtraPorts: [ ]
-    lbSourceRanges: [ ]
-
+    configRef: cp-proxy
+    httpProxy: []
+    httpsProxy: []
+    noProxy: []
 sso:
   enabled: false
-  adminUser: ""
-  provider: ""
-  emailDomain: [ ]
-  clientId: ""
-  clientSecret: ""
-  azureTenant: ""
-  oidcIssuerUrl: ""
-
-storage:
-  hostpath:
+  pki:
     enabled: false
-    defaultSc: false
-    path: /cnvrg-hostpath-storage
-    reclaimPolicy: Retain
-    nodeSelector: { }
-  nfs:
+    rootCaSecret: sso-idp-root-ca
+    privateKeySecret: sso-idp-private-key
+    publicKeySecret: sso-idp-pki-public-key
+  jwks:
     enabled: false
-    server: ""
-    path: ""
-    defaultSc: false
-    reclaimPolicy: Retain
-
+    name: cnvrg-jwks
+    image: jwks:latest
+    cache:
+      enabled: true
+      image: redis:4.0.5-alpine
+  central:
+    enabled: false
+    publicUrl: ''
+    cnvrgProxyImage: proxy:v1.0.1
+    oauthProxyImage: oauth2-proxy:v7.3.x.ssov3.p2-01
+    centralUiImage: centralsso:latest
+    adminUser: ''
+    provider: ''
+    emailDomain:
+    - "*"
+    clientId: ''
+    clientSecret: ''
+    oidcIssuerUrl: ''
+    serviceUrl: ''
+    scope: openid email profile
+    insecureOidcAllowUnverifiedEmail: true
+    whitelistDomain: []
+    cookieDomain: []
+    groupsAuth: false
+  authz:
+    enabled: false
+    image: proxy:v1.0.0
+    address: cnvrg-authz:50052
 tenancy:
   enabled: false
-  key: "purpose"
-  value: "cnvrg-control-plane"
-
-registry:
-  url: docker.io
-  user: ""
-  password: ""
-
-configReloader:
-  enabled: true
-
-capsule:
-  enabled: true
-  image: "cnvrg-capsule:1.0.2"
-
-backup:
-  enabled: true
-  rotation: 5
-  period: 24h
-
-cri: ""
+  key: purpose
+  value: cnvrg-control-plane
+cnvrgAppPriorityClass:
+  name: ''
+  value: 0
+  description: ''
+cnvrgJobPriorityClass:
+  name: ''
+  value: 0
+  description: ''

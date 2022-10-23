@@ -22,24 +22,6 @@ var controlPlaneDefault = ControlPlane{
 		ReadinessPeriodSeconds:  25,
 		ReadinessTimeoutSeconds: 20,
 		FailureThreshold:        5,
-		//OauthProxy: OauthProxyServiceConf{
-		//	SkipAuthRegex: []string{
-		//		`\/assets`,
-		//		`\/healthz`,
-		//		`\/public`,
-		//		`\/pack`,
-		//		`\/vscode.tar.gz`,
-		//		`\/jupyter.vsix`,
-		//		`\/gitlens.vsix`,
-		//		`\/ms-python-release.vsix`,
-		//		`\/webhooks`,
-		//		`\/api/v2/metrics`,
-		//		`\/api/v1/events/endpoint_rule_alert`,
-		//	},
-		//	TokenValidationRegex: []string{
-		//		`^\/api`,
-		//	},
-		//},
 		Hpa: Hpa{
 			Enabled:     false,
 			Utilization: 85,
@@ -387,7 +369,7 @@ var promDefaults = Prom{
 	Image:    "prom/prometheus:v2.37.1",
 	Grafana: Grafana{
 		Enabled:  false,
-		Image:    "grafana/grafana-oss:9.1.6",
+		Image:    "grafana-oss:9.1.6",
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,

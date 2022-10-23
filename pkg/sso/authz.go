@@ -47,6 +47,7 @@ func (a *AuthzStateManager) data() map[string]string {
 		"Namespace":   a.app.Namespace,
 		"Image":       a.app.Spec.SSO.Authz.Image,
 		"IngressType": a.ingressType(),
+		"ImageHub":    a.app.Spec.ImageHub,
 	}
 }
 

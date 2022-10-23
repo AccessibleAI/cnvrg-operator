@@ -25,7 +25,7 @@ spec:
       containers:
       - name: nomex
         imagePullPolicy: Always
-        image: {{ .Spec.ControlPlane.Nomex.Image }}
+        image: {{  image .Spec.ImageHub .Spec.ControlPlane.Nomex.Image }}
         command:
           - /opt/app-root/nomex
         ports:

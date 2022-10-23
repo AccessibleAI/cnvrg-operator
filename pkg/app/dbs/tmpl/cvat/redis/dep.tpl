@@ -37,7 +37,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Cvat.Redis.ServiceAccount }}
       containers:
-        - image: {{ .Spec.Dbs.Cvat.Redis.Image }}
+        - image: {{  image .Spec.ImageHub .Spec.Dbs.Cvat.Redis.Image }}
           name: redis
           ports:
             - containerPort: {{ .Spec.Dbs.Cvat.Redis.Port }}

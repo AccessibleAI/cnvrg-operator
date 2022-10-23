@@ -22,7 +22,7 @@ spec:
       containers:
       - name: sso-central
         imagePullPolicy: Always
-        image: {{ .CentralUIImage }}
+        image: {{ image .ImageHub  .CentralUIImage }}
         env:
           - name: CNVRG_CENTRAL_SSO_BIND_ADDR
             value: "127.0.0.1:8000"
@@ -37,7 +37,7 @@ spec:
             mountPath: "/opt/app-root/config"
             readOnly: true
       - name: oauth2-proxy
-        image: {{ .OauthProxyImage }}
+        image: {{  image .ImageHub  .OauthProxyImage }}
         command: [ "oauth2-proxy", "--config", "/opt/app-root/conf/proxy-config/conf" ]
         envFrom:
           - secretRef:
