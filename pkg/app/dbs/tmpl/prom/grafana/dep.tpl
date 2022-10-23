@@ -25,10 +25,6 @@ spec:
       labels:
         app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
     spec:
-      securityContext:
-        fsGroup: 472
-        supplementalGroups:
-          - 0
       {{- if isTrue .Data.Spec.Tenancy.Enabled }}
       nodeSelector:
         "{{ .Data.Spec.Tenancy.Key }}": "{{ .Data.Spec.Tenancy.Value }}"
@@ -38,6 +34,9 @@ spec:
           value: "{{ .Data.Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
       serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
       {{- if isTrue .Data.Spec.SSO.Enabled }}
@@ -58,6 +57,7 @@ spec:
       {{- end }}
       - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
+
         env:
           - name: GF_AUTH_BASIC_ENABLED
             value: "false"

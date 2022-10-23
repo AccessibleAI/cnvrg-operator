@@ -37,6 +37,7 @@ rules:
   - rbac.istio.io
   - authentication.istio.io
   - metrics.k8s.io
+  - install.istio.io
   resources:
   - bindings
   - cnvrgapps
@@ -118,6 +119,7 @@ rules:
   - storageclasses
   - controllerrevisions
   - nodes
+  - istiooperators
   verbs:
   - get
   - list

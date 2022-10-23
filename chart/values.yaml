@@ -1,3 +1,4 @@
+deployIstio: true
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg
@@ -98,7 +99,7 @@ controlPlane:
     nodePort: 30081
   baseConfig:
     jobsStorageClass: ''
-    featureFlags:
+    featureFlags: {}
     sentryUrl: ''
     runJobsOnSelfCluster: ''
     agentCustomTag: latest
@@ -326,7 +327,7 @@ dbs:
     image: prometheus:v2.37.1
     grafana:
       enabled: true
-      image: grafana-oss:9.1.6
+      image: grafana-oss:9.1.7
       svcName: grafana
       port: 8080
       nodePort: 30012

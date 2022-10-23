@@ -103,7 +103,7 @@ spec:
       nodePort: {{.Values.controlPlane.cnvrgRouter.nodePort}}
     baseConfig:
       jobsStorageClass: {{.Values.controlPlane.baseConfig.jobsStorageClass}}
-      featureFlags: null
+      featureFlags:  {{ toJson .Values.controlPlane.baseConfig.featureFlags }}
       sentryUrl: {{.Values.controlPlane.baseConfig.sentryUrl}}
       runJobsOnSelfCluster: {{.Values.controlPlane.baseConfig.runJobsOnSelfCluster}}
       agentCustomTag: {{.Values.controlPlane.baseConfig.agentCustomTag}}

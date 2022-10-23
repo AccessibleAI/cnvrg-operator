@@ -365,10 +365,10 @@ var cvatDefault = Cvat{
 var promDefaults = Prom{
 	Enabled:  false,
 	CredsRef: "prom-creds",
-	Image:    "prom/prometheus:v2.37.1",
+	Image:    "prometheus:v2.37.1",
 	Grafana: Grafana{
 		Enabled:  false,
-		Image:    "grafana-oss:9.1.6",
+		Image:    "grafana-oss:9.1.7",
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,
