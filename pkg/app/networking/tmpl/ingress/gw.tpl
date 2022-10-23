@@ -13,7 +13,7 @@ metadata:
     {{- end }}
 spec:
   selector:
-    istio: cnvrg-ingressgateway
+    {{ .Spec.Networking.Ingress.IstioIngressSelectorKey }}: "{{ .Spec.Networking.Ingress.IstioIngressSelectorValue }}"
   servers:
     - port:
         number: 80

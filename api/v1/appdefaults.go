@@ -433,12 +433,14 @@ var cvatRedisDefault = Redis{
 
 var networkingDefault = Networking{
 	Ingress: Ingress{
-		Type:            IstioIngress,
-		Timeout:         "18000s",
-		RetriesAttempts: 5,
-		PerTryTimeout:   "3600s",
-		IstioGwEnabled:  false,
-		IstioGwName:     "",
+		Type:                      IstioIngress,
+		Timeout:                   "18000s",
+		RetriesAttempts:           5,
+		PerTryTimeout:             "3600s",
+		IstioGwEnabled:            false,
+		IstioGwName:               "",
+		IstioIngressSelectorKey:   "istio",
+		IstioIngressSelectorValue: "ingressgateway",
 	},
 	HTTPS: HTTPS{Enabled: false},
 	Proxy: Proxy{Enabled: false, ConfigRef: "cp-proxy"},

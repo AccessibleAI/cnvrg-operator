@@ -865,6 +865,10 @@ spec:
                         type: boolean
                       istioGwName:
                         type: string
+                      istioIngressSelectorKey:
+                        type: string
+                      istioIngressSelectorValue:
+                        type: string
                       perTryTimeout:
                         type: string
                       retriesAttempts:

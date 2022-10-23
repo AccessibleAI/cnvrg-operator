@@ -1,4 +1,3 @@
-deployIstio: true
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg

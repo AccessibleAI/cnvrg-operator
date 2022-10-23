@@ -355,12 +355,14 @@ type Cvat struct {
 }
 
 type Ingress struct {
-	Type            IngressType `json:"type,omitempty"`
-	Timeout         string      `json:"timeout,omitempty"`
-	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
-	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
-	IstioGwEnabled  bool        `json:"istioGwEnabled,omitempty"`
-	IstioGwName     string      `json:"istioGwName,omitempty"`
+	Type                      IngressType `json:"type,omitempty"`
+	Timeout                   string      `json:"timeout,omitempty"`
+	RetriesAttempts           int         `json:"retriesAttempts,omitempty"`
+	PerTryTimeout             string      `json:"perTryTimeout,omitempty"`
+	IstioGwEnabled            bool        `json:"istioGwEnabled,omitempty"`
+	IstioGwName               string      `json:"istioGwName,omitempty"`
+	IstioIngressSelectorKey   string      `json:"istioIngressSelectorKey,omitempty"`
+	IstioIngressSelectorValue string      `json:"istioIngressSelectorValue,omitempty"`
 }
 
 type HTTPS struct {
