@@ -193,9 +193,9 @@ type Mpi struct {
 }
 
 type PriorityClass struct {
-	Name        string `json:"name"`
-	Value       int32  `json:"value"`
-	Description string `json:"description"`
+	Name        string `json:"name,omitempty"`
+	Value       int32  `json:"value,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 type Tenancy struct {

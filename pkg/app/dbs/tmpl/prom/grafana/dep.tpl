@@ -25,6 +25,10 @@ spec:
       labels:
         app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
     spec:
+      securityContext:
+        fsGroup: 472
+        supplementalGroups:
+          - 0
       {{- if isTrue .Data.Spec.Tenancy.Enabled }}
       nodeSelector:
         "{{ .Data.Spec.Tenancy.Key }}": "{{ .Data.Spec.Tenancy.Value }}"

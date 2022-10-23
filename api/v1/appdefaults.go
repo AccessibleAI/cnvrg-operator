@@ -372,17 +372,13 @@ var promDefaults = Prom{
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,
-		//OauthProxy: OauthProxyServiceConf{
-		//	SkipAuthRegex:        []string{`\/api\/health`},
-		//	TokenValidationRegex: nil,
-		//},
 		CredsRef: "grafana-creds",
 	},
 }
 
 var defaultNomex = Nomex{
 	Enabled: true,
-	Image:   "docker.io/cnvrg/nomex:v1.0.0",
+	Image:   "nomex:v1.0.0",
 }
 
 var cvatPgDefault = Pg{
@@ -465,15 +461,15 @@ var ssoDefault = SSO{
 		Name:    "cnvrg-jwks",
 		Cache: JwksCache{
 			Enabled: true,
-			Image:   "docker.io/redis",
+			Image:   "redis:7.0.5",
 		},
 	},
 
 	Central: CentralSSO{
 		Enabled:                          false,
-		CnvrgProxyImage:                  "docker.io/cnvrg/proxy:v1.0.1",
-		OauthProxyImage:                  "cnvrg/oauth2-proxy:v7.3.x.ssov3.p2-01",
-		CentralUiImage:                   "docker.io/cnvrg/centralsso:latest",
+		CnvrgProxyImage:                  "proxy:v1.0.1",
+		OauthProxyImage:                  "oauth2-proxy:v7.3.x.ssov3.p2-01",
+		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
 		Scope:                            "openid email profile",
 		InsecureOidcAllowUnverifiedEmail: true,
@@ -482,7 +478,7 @@ var ssoDefault = SSO{
 
 	Authz: Authz{
 		Enabled: false,
-		Image:   "docker.io/cnvrg/proxy:v1.0.0",
+		Image:   "proxy:v1.0.1",
 		Address: "cnvrg-authz:50052",
 	},
 }

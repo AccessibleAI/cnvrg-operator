@@ -1,4 +1,3 @@
----
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg
@@ -379,8 +378,8 @@ sso:
     serviceUrl: ''
     scope: openid email profile
     insecureOidcAllowUnverifiedEmail: true
-    whitelistDomain: []
-    cookieDomain: []
+    whitelistDomain: ''
+    cookieDomain: ''
     groupsAuth: false
   authz:
     enabled: false
