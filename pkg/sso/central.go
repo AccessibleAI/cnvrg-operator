@@ -112,16 +112,18 @@ func (c *CentralStateManager) schema() string {
 
 func (c *CentralStateManager) jwksUrl() string {
 
-	return fmt.Sprintf("%s://jwks.%s/v1/%s/.well-known/jwks.json?client_id",
+	return fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id",
 		c.schema(),
+		c.app.Spec.SSO.Jwks.Name,
 		c.app.Spec.ClusterDomain,
 		c.domainId())
 }
 
 func (c *CentralStateManager) jwksUrlWithAudience() string {
 
-	return fmt.Sprintf("%s://jwks.%s/v1/%s/.well-known/jwks.json?client_id=cnvrg-tenant",
+	return fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id=cnvrg-tenant",
 		c.schema(),
+		c.app.Spec.SSO.Jwks.Name,
 		c.app.Spec.ClusterDomain,
 		c.domainId())
 }
