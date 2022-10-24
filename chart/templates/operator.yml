@@ -120,6 +120,7 @@ rules:
   - controllerrevisions
   - nodes
   - istiooperators
+  - virtualservices
   verbs:
   - get
   - list

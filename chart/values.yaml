@@ -305,7 +305,7 @@ dbs:
     redis:
       enabled: false
       serviceAccount: cvat-redis
-      image: redis:4.0.5-alpine
+      image: redis:7.0.5
       svcName: cvat-redis
       port: 6379
       storageSize: 10Gi
@@ -361,7 +361,7 @@ sso:
     image: jwks:latest
     cache:
       enabled: true
-      image: redis:4.0.5-alpine
+      image: redis:7.0.5
   central:
     enabled: false
     publicUrl: ''
@@ -383,7 +383,7 @@ sso:
     groupsAuth: false
   authz:
     enabled: false
-    image: proxy:v1.0.0
+    image: proxy:v1.0.1
     address: cnvrg-authz:50052
 tenancy:
   enabled: false
