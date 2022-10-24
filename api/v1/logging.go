@@ -5,6 +5,7 @@ type AppInstance struct {
 	SpecNs   string
 	EsUser   string
 	EsPass   string
+	SvcName  string
 }
 
 type Fluentbit struct {

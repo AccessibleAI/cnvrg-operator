@@ -31,6 +31,7 @@ spec:
         {{- end }}
     spec:
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      enableServiceLinks: false
       containers:
       - args:
         - --web.listen-address=127.0.0.1:9100
@@ -44,8 +45,8 @@ spec:
         name: node-exporter
         resources:
           limits:
-            cpu: 250m
-            memory: 180Mi
+            cpu: 500m
+            memory: 1Gi
           requests:
             cpu: 102m
             memory: 180Mi

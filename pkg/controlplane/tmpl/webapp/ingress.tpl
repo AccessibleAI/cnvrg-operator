@@ -16,10 +16,13 @@ metadata:
   namespace: {{ ns . }}
 spec:
   rules:
-    - host: "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: {{ .Spec.ControlPlane.WebApp.SvcName }}
-              servicePort:  {{ .Spec.ControlPlane.WebApp.Port }}
+  - host: "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Spec.ControlPlane.WebApp.SvcName }}
+            port:
+              number: {{ .Spec.ControlPlane.WebApp.Port }}

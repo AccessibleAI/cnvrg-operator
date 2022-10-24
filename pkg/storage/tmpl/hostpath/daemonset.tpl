@@ -47,6 +47,7 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: hostpath-provisioner-admin
+      enableServiceLinks: false
       containers:
         - name: hostpath-provisioner
           image: {{image .Spec.ImageHub .Spec.Storage.Hostpath.Image }}

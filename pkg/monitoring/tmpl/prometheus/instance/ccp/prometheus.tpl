@@ -50,6 +50,9 @@ spec:
       {{- range $k, $v := .Spec.Labels }}
       {{$k}}: "{{$v}}"
       {{- end }}
+      {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+      sidecar.istio.io/inject: "true"
+      {{- end }}
   resources:
     requests:
       cpu: {{ .Spec.Monitoring.Prometheus.Requests.Cpu }}
@@ -79,6 +82,7 @@ spec:
     name: {{ .Spec.Monitoring.Prometheus.UpstreamRef }}
     key: prometheus-additional.yaml
   listenLocal: true
+  enableServiceLinks: false
   containers:
     - name: "prom-auth-proxy"
       image: {{ image .Spec.ImageHub .Spec.Monitoring.Prometheus.BasicAuthProxyImage }}

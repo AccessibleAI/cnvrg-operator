@@ -38,6 +38,7 @@ spec:
       tolerations:
         - operator: "Exists"
       {{- end }}
+      enableServiceLinks: false
       containers:
         - name: istio-operator
           image: {{ image .Spec.ImageHub .Spec.Networking.Istio.OperatorImage }}

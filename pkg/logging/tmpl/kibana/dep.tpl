@@ -26,6 +26,9 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
+        {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         app: {{ .Spec.Logging.Kibana.SvcName }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
@@ -54,6 +57,7 @@ spec:
           secret:
             secretName: "oauth-proxy-{{.Spec.Logging.Kibana.SvcName}}"
         {{- end }}
+      enableServiceLinks: false
       containers:
         {{- if isTrue .Spec.SSO.Enabled }}
         - name: "cnvrg-oauth-proxy"

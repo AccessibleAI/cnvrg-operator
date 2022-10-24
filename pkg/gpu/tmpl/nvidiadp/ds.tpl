@@ -36,6 +36,7 @@ spec:
       priorityClassName: "system-node-critical"
       nodeSelector:
         accelerator: nvidia
+      enableServiceLinks: false
       containers:
         - image: {{ image .Data.ImageHub .Data.NvidiaDp.Image }}
           name: nvidia-device-plugin-ctr

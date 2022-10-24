@@ -43,6 +43,7 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
+      enableServiceLinks: false
       containers:
       - args:
         - --kubelet-service=kube-system/kubelet

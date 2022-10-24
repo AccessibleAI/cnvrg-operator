@@ -36,6 +36,7 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Cvat.Redis.ServiceAccount }}
+      enableServiceLinks: false
       containers:
         - image: {{ .Spec.Dbs.Cvat.Redis.Image }}
           name: redis

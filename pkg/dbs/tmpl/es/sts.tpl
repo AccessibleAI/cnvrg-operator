@@ -24,6 +24,9 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
       labels:
+        {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
         app: {{ .Spec.Dbs.Es.SvcName }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
@@ -65,6 +68,7 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      enableServiceLinks: false
       containers:
       - name: elastic
         image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}

@@ -34,6 +34,7 @@ spec:
           app: ingresscheck
     spec:
       serviceAccountName: cnvrg-control-plane
+      enableServiceLinks: false
       containers:
         - name: ingresscheck
           image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
