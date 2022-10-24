@@ -121,11 +121,7 @@ func (c *CentralStateManager) jwksUrl() string {
 
 func (c *CentralStateManager) jwksUrlWithAudience() string {
 
-	return fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id=cnvrg-tenant",
-		c.schema(),
-		c.app.Spec.SSO.Jwks.Name,
-		c.app.Spec.ClusterDomain,
-		c.domainId())
+	return fmt.Sprintf("%s=cnvrg-tenant", c.jwksUrl())
 }
 
 func (c *CentralStateManager) Apply() error {
