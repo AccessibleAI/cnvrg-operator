@@ -6,6 +6,11 @@ metadata:
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
     haproxy.router.openshift.io/timeout: {{ .Spec.Networking.Ingress.PerTryTimeout }}
+    {{- if isTrue .Spec.SSO.Enabled }}
+    sso.cnvrg.io/enabled: "true"
+    sso.cnvrg.io/skipAuthRoutes: \/api\/health
+    sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
+    {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}

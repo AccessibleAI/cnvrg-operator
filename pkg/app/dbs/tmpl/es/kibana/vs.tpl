@@ -7,6 +7,11 @@ metadata:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
+    {{- if isTrue .Spec.SSO.Enabled }}
+    sso.cnvrg.io/enabled: "true"
+    sso.cnvrg.io/skipAuthRoutes: ""
+    sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
+    {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}

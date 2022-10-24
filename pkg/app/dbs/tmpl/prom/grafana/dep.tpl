@@ -54,6 +54,9 @@ spec:
       {{- end }}
       - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
         env:
           - name: GF_AUTH_BASIC_ENABLED
             value: "false"
