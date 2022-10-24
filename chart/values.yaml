@@ -396,4 +396,4 @@ cnvrgAppPriorityClass:
 cnvrgJobPriorityClass:
   name: ''
   value: 0
-  description: ''
+  description: 'cnvrg job priority class'

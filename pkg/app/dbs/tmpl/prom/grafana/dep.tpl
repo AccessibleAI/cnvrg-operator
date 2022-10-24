@@ -34,9 +34,6 @@ spec:
           value: "{{ .Data.Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
       serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
       {{- if isTrue .Data.Spec.SSO.Enabled }}
@@ -57,7 +54,6 @@ spec:
       {{- end }}
       - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
-
         env:
           - name: GF_AUTH_BASIC_ENABLED
             value: "false"
