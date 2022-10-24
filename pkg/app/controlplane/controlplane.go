@@ -24,7 +24,7 @@ type CpStateManager struct {
 	app *mlopsv1.CnvrgApp
 }
 
-func NewControlPlaneCredsStateManager(c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
+func NewControlPlaneCrdsStateManager(c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
 	l := log.WithValues("stateManager", "controlPlaneCrds")
 	asm := desired.NewAssetsStateManager(nil, c, s, l, fs, fsRoot+"/crds", nil)
 	return &CpCrdsStateManager{AssetsStateManager: asm}

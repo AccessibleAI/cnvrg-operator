@@ -23,7 +23,7 @@ spec:
   ports:
   - name: http
     port: {{ .Spec.Dbs.Es.Port }}
-    targetPort: http
+    targetPort: {{ .Spec.Dbs.Es.Port }}
     {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
     nodePort: {{ .Spec.Dbs.Es.NodePort }}
     {{- end }}

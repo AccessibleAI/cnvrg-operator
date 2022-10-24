@@ -3,7 +3,7 @@
 # It should be run by config/default
 resources:
 - bases/mlops.cnvrg.io_cnvrgapps.yaml
-- bases/mlops.cnvrg.io_cnvrginfras.yaml
+- bases/mlops.cnvrg.io_cnvrgthirdparties.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

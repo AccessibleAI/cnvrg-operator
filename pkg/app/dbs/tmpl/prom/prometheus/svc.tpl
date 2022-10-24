@@ -10,7 +10,7 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 9090
-      targetPort: http
+      port: {{ .Spec.Dbs.Prom.Port }}
+      targetPort: {{ .Spec.Dbs.Prom.Port }}
   selector:
     app: {{ .Spec.Dbs.Prom.SvcName }}

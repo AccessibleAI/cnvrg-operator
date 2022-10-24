@@ -21,7 +21,7 @@ data:
       uwsgi_temp_path       /tmp/uwsgi_temp;
       scgi_temp_path        /tmp/scgi_temp;
       server {
-        listen 8080;
+        listen {{ .Spec.Logging.Elastalert.Port }};
         location / {
         auth_basic           "Cnvrg's ElastAlert";
         auth_basic_user_file /etc/nginx/htpasswd/htpasswd;

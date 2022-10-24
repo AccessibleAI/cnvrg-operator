@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prom
+  name:  {{ .Spec.Dbs.Prom.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -10,13 +10,15 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: prom
+      app:  {{ .Spec.Dbs.Prom.SvcName }}
   template:
     metadata:
       labels:
-        app: prom
-        {{- if contains "eastwest" .Spec.ClusterDomain }}
+        app: {{ .Spec.Dbs.Prom.SvcName }}
+        {{- range $k, $v := .ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
         sidecar.istio.io/inject: "true"
+        {{- end }}
         {{- end }}
     spec:
       serviceAccountName: cnvrg-prom
@@ -39,7 +41,7 @@ spec:
         - --config.file=/prometheus/config/scrape/prometheus.yml
         - --web.config.file=/prometheus/config/web/web-config.yml
         ports:
-          - containerPort: 9090
+          - containerPort: {{ .Spec.Dbs.Prom.Port }}
       volumes:
         - name: prom-scrape-configs
           configMap:
@@ -49,4 +51,4 @@ spec:
             name: prom-web-configs
         - name: prom-data
           persistentVolumeClaim:
-            claimName: prom
+            claimName: {{ .Spec.Dbs.Prom.SvcName }}

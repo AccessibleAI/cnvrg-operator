@@ -11,7 +11,7 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: prom
+  name: {{ .Spec.Dbs.Prom.SvcName }}
   namespace: {{ .Namespace }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
@@ -20,13 +20,13 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: "prom.{{ .Spec.ClusterDomain }}"
+    - host: "{{ .Spec.Dbs.Prom.SvcName }}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: prom
+                name:  {{ .Spec.Dbs.Prom.SvcName }}
                 port:
-                 number: 9090
+                 number: {{ .Spec.Dbs.Prom.Port }}

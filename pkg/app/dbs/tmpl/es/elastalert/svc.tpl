@@ -24,7 +24,7 @@ spec:
     - name: http
       port: {{ .Spec.Dbs.Es.Elastalert.Port }}
       protocol: TCP
-      targetPort: http
+      targetPort: {{ .Spec.Dbs.Es.Elastalert.Port }}
       {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
       nodePort: {{ .Spec.Dbs.Es.Elastalert.NodePort }}
       {{- end }}

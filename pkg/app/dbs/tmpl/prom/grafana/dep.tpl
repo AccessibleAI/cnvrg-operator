@@ -24,8 +24,10 @@ spec:
     metadata:
       labels:
         app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
-        {{- if contains "eastwest" .Spec.ClusterDomain }}
+        {{- range $k, $v := .Data.ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
         sidecar.istio.io/inject: "true"
+        {{- end }}
         {{- end }}
     spec:
       {{- if isTrue .Data.Spec.Tenancy.Enabled }}
@@ -75,10 +77,10 @@ spec:
           - name: GF_SERVER_HTTP_ADDR
             value: "0.0.0.0"
           - name: GF_SERVER_HTTP_PORT
-            value: "8080"
+            value: "{{ .Data.Spec.Dbs.Prom.Grafana.Port }}"
           {{- end }}
         ports:
-        - containerPort: 8080
+        - containerPort: {{ .Data.Spec.Dbs.Prom.Grafana.Port }}
           name: http
         readinessProbe:
           httpGet:

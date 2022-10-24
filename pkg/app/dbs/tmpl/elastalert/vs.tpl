@@ -23,6 +23,4 @@ spec:
     timeout: {{ .Spec.Networking.Ingress.Timeout }}
     route:
     - destination:
-        port:
-          number: 80
         host: "{{ .Spec.Logging.Elastalert.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"

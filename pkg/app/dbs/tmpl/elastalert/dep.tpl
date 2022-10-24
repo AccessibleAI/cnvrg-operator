@@ -25,8 +25,10 @@ spec:
         {{- end }}
       labels:
         app: {{ .Spec.Logging.Elastalert.SvcName }}
-        {{- if and (.Spec.Networking.EastWest.Enabled) (not .Spec.Networking.EastWest.Primary) }}
+        {{- range $k, $v := .ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
         sidecar.istio.io/inject: "true"
+        {{- end }}
         {{- end }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
@@ -80,7 +82,7 @@ spec:
       - name: "elastalert-auth-proxy"
         image: {{ image .Spec.ImageHub .Spec.Logging.Elastalert.AuthProxyImage }}
         ports:
-        - containerPort: 8080
+        - containerPort: {{ .Spec.Logging.Elastalert.Port }}
         volumeMounts:
         - name: elastalert-auth-proxy
           mountPath: "/etc/nginx"

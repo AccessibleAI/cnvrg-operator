@@ -811,6 +811,10 @@ spec:
                         type: object
                       image:
                         type: string
+                      port:
+                        type: integer
+                      svcName:
+                        type: string
                     type: object
                   redis:
                     properties:

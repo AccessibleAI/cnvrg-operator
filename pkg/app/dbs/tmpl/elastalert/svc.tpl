@@ -20,7 +20,7 @@ spec:
   ports:
     - port: {{ .Spec.Logging.Elastalert.Port }}
       protocol: TCP
-      targetPort: 8080
+      targetPort: {{ .Spec.Logging.Elastalert.Port }}
       {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
       nodePort: {{ .Spec.Logging.Elastalert.NodePort }}
       {{- end }}

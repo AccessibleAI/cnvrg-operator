@@ -366,6 +366,7 @@ var promDefaults = Prom{
 	Enabled:  false,
 	CredsRef: "prom-creds",
 	SvcName:  "prometheus",
+	Port:     9090,
 	Image:    "prom/prometheus:v2.37.1",
 	Grafana: Grafana{
 		Enabled:  false,

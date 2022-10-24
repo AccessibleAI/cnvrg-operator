@@ -25,6 +25,7 @@ spec:
   ports:
     - name: http
       port: {{ .Spec.Dbs.Es.Kibana.Port }}
+      targetPort: {{ .Spec.Dbs.Es.Kibana.Port }}
       protocol: TCP
       {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
       nodePort: {{ .Spec.Dbs.Es.Kibana.NodePort }}
