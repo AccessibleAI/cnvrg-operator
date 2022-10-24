@@ -68,7 +68,7 @@ spec:
       terminationGracePeriodSeconds: 1
       containers:
         - name: cnvrgapp
-          image: docker.io/cnvrg/cnvrg-tools:v0.3
+          image: "{{ .Values.imageHub }}/cnvrg-tools:v0.3"
           args:
             - /bin/bash
             - -c
@@ -107,7 +107,7 @@ spec:
       serviceAccountName: cnvrg-operator
       containers:
         - name: delete-cnvrgapp
-          image: docker.io/cnvrg/cnvrg-tools:v0.3
+          image: "{{ .Values.imageHub }}/cnvrg-tools:v0.3"
           args:
             - /bin/bash
             - -c
