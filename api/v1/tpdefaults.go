@@ -41,9 +41,8 @@ func DefaultCnvrgThirdPartySpec() CnvrgThirdPartySpec {
 			MetricsExporter: HabanaMetricsExporter{},
 		},
 		Metagpu: Metagpu{
-			Enabled:      false,
-			Image:        "metagpu-device-plugin:main",
-			NodeSelector: map[string]string{},
+			Enabled: false,
+			Image:   "metagpu-device-plugin:main",
 		},
 	}
 }

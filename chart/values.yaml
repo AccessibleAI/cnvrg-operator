@@ -1,4 +1,3 @@
----
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg
@@ -99,7 +98,7 @@ controlPlane:
     nodePort: 30081
   baseConfig:
     jobsStorageClass: ''
-    featureFlags:
+    featureFlags: {}
     sentryUrl: ''
     runJobsOnSelfCluster: ''
     agentCustomTag: latest
@@ -306,7 +305,7 @@ dbs:
     redis:
       enabled: false
       serviceAccount: cvat-redis
-      image: redis:4.0.5-alpine
+      image: redis:7.0.5
       svcName: cvat-redis
       port: 6379
       storageSize: 10Gi
@@ -327,7 +326,7 @@ dbs:
     image: prometheus:v2.37.1
     grafana:
       enabled: true
-      image: grafana-oss:9.1.6
+      image: grafana-oss:9.1.7
       svcName: grafana
       port: 8080
       nodePort: 30012
@@ -362,7 +361,7 @@ sso:
     image: jwks:latest
     cache:
       enabled: true
-      image: redis:4.0.5-alpine
+      image: redis:7.0.5
   central:
     enabled: false
     publicUrl: ''
@@ -379,12 +378,12 @@ sso:
     serviceUrl: ''
     scope: openid email profile
     insecureOidcAllowUnverifiedEmail: true
-    whitelistDomain: []
-    cookieDomain: []
+    whitelistDomain: ''
+    cookieDomain: ''
     groupsAuth: false
   authz:
     enabled: false
-    image: proxy:v1.0.0
+    image: proxy:v1.0.1
     address: cnvrg-authz:50052
 tenancy:
   enabled: false
@@ -397,4 +396,4 @@ cnvrgAppPriorityClass:
 cnvrgJobPriorityClass:
   name: ''
   value: 0
-  description: ''
+  description: 'cnvrg job priority class'

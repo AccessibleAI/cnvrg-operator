@@ -27,52 +27,6 @@ func NewIstioGwState(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme, 
 	return &IstioGwState{AssetsStateManager: desired.NewAssetsStateManager(app, c, s, l, fs, fsRoot+"/ingress", f)}
 }
 
-//
-//func ingressState() []*desired.State {
-//	return []*desired.State{
-//		{
-//			TemplatePath:   path + "/ingress/gw.tpl",
-//			Template:       nil,
-//			ParsedTemplate: "",
-//			Obj:            &unstructured.Unstructured{},
-//			GVK:            desired.Kinds[desired.IstioGwGVK],
-//			Own:            true,
-//			Updatable:      true,
-//			Fs:             &templatesContent,
-//		},
-//	}
-//}
-//
-//func proxyState() []*desired.State {
-//	return []*desired.State{
-//		{
-//			TemplatePath:   path + "/proxy/proxy-cm.tpl",
-//			Template:       nil,
-//			ParsedTemplate: "",
-//			Obj:            &unstructured.Unstructured{},
-//			GVK:            desired.Kinds[desired.ConfigMapGVK],
-//			Own:            true,
-//			Updatable:      true,
-//			Fs:             &templatesContent,
-//		},
-//	}
-//}
-//
-//func AppNetworkingState(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
-//	var state []*desired.State
-//
-//	if cnvrgApp.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && cnvrgApp.Spec.Networking.Ingress.IstioGwEnabled {
-//		state = append(state, ingressState()...)
-//	}
-//
-//	if cnvrgApp.Spec.Networking.Proxy.Enabled {
-//		state = append(state, proxyState()...)
-//	}
-//
-//	return state
-//}
-//
-
 func DefaultNoProxy(clusterInternalDomain string) []string {
 	return append([]string{
 		"localhost",

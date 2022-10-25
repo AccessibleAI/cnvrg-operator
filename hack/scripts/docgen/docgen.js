@@ -6,15 +6,11 @@ const spec = {
     "clusterDomain": "",
     "clusterInternalDomain": "cluster.local",
     "imageHub": "docker.io/cnvrg",
-    "labels": {
-        "owner": "cnvrg-control-plane"
-    },
-    "annotations": null,
     "controlPlane": {
         "image": "core:3.6.99",
         "webapp": {
             "replicas": 1,
-            "enabled": false,
+            "enabled": true,
             "port": 8080,
             "requests": {
                 "cpu": "500m",
@@ -32,14 +28,14 @@ const spec = {
             "readinessTimeoutSeconds": 20,
             "failureThreshold": 5,
             "hpa": {
-                "enabled": false,
+                "enabled": true,
                 "utilization": 85,
                 "maxReplicas": 5
             }
         },
         "sidekiq": {
-            "enabled": false,
-            "split": false,
+            "enabled": true,
+            "split": true,
             "requests": {
                 "cpu": "200m",
                 "memory": "3750Mi"
@@ -50,13 +46,13 @@ const spec = {
             },
             "replicas": 2,
             "hpa": {
-                "enabled": false,
+                "enabled": true,
                 "utilization": 85,
                 "maxReplicas": 5
             }
         },
         "searchkiq": {
-            "enabled": false,
+            "enabled": true,
             "requests": {
                 "cpu": "200m",
                 "memory": "1Gi"
@@ -67,13 +63,13 @@ const spec = {
             },
             "replicas": 1,
             "hpa": {
-                "enabled": false,
+                "enabled": true,
                 "utilization": 85,
                 "maxReplicas": 5
             }
         },
         "systemkiq": {
-            "enabled": false,
+            "enabled": true,
             "requests": {
                 "cpu": "300m",
                 "memory": "2Gi"
@@ -84,13 +80,13 @@ const spec = {
             },
             "replicas": 1,
             "hpa": {
-                "enabled": false,
+                "enabled": true,
                 "utilization": 85,
                 "maxReplicas": 5
             }
         },
         "hyper": {
-            "enabled": false,
+            "enabled": true,
             "image": "hyper-server:latest",
             "port": 5050,
             "replicas": 1,
@@ -111,7 +107,7 @@ const spec = {
             "readinessTimeoutSeconds": 60
         },
         "cnvrgScheduler": {
-            "enabled": false,
+            "enabled": true,
             "requests": {
                 "cpu": "200m",
                 "memory": "1000Mi"
@@ -121,19 +117,6 @@ const spec = {
                 "memory": "4Gi"
             },
             "replicas": 1
-        },
-        "cnvrgClusterProvisionerOperator": {
-            "enabled": false,
-            "requests": {
-                "cpu": "200m",
-                "memory": "1Gi"
-            },
-            "limits": {
-                "cpu": "2",
-                "memory": "4Gi"
-            },
-            "image": "cnvrg/ccp-operator:v1",
-            "awsCredsRef": ""
         },
         "cnvrgRouter": {
             "enabled": false,
@@ -206,7 +189,7 @@ const spec = {
         },
         "nomex": {
             "enabled": true,
-            "image": "docker.io/cnvrg/nomex:v1.0.0"
+            "image": "nomex:v1.0.0"
         }
     },
     "registry": {
@@ -217,7 +200,7 @@ const spec = {
     },
     "dbs": {
         "pg": {
-            "enabled": false,
+            "enabled": true,
             "serviceAccount": "pg",
             "image": "postgresql-12-centos7:latest",
             "port": 5432,
@@ -245,7 +228,7 @@ const spec = {
             "pvcName": "pg-storage"
         },
         "redis": {
-            "enabled": false,
+            "enabled": true,
             "serviceAccount": "redis",
             "image": "cnvrg-redis:v3.0.5.c2",
             "svcName": "redis",
@@ -265,7 +248,7 @@ const spec = {
             "pvcName": "redis-storage"
         },
         "minio": {
-            "enabled": false,
+            "enabled": true,
             "serviceAccount": "minio",
             "replicas": 1,
             "image": "minio:RELEASE.2021-05-22T02-34-39Z",
@@ -286,7 +269,7 @@ const spec = {
             "pvcName": "minio-storage"
         },
         "es": {
-            "enabled": false,
+            "enabled": true,
             "serviceAccount": "es",
             "image": "cnvrg-es:v7.8.1.a1-dynamic-indices",
             "port": 9200,
@@ -314,7 +297,7 @@ const spec = {
                 "endpoints": "1825d"
             },
             "kibana": {
-                "enabled": false,
+                "enabled": true,
                 "serviceAccount": "kibana",
                 "svcName": "kibana",
                 "port": 8080,
@@ -331,7 +314,7 @@ const spec = {
                 "credsRef": "kibana-creds"
             },
             "elastalert": {
-                "enabled": false,
+                "enabled": true,
                 "image": "elastalert:3.0.0-beta.1",
                 "authProxyImage": "nginx:1.20",
                 "credsRef": "elastalert-creds",
@@ -404,12 +387,12 @@ const spec = {
             }
         },
         "prom": {
-            "enabled": false,
+            "enabled": true,
             "credsRef": "prom-creds",
             "extraScrapeConfigs": null,
-            "image": "prom/prometheus:v2.37.1",
+            "image": "prometheus:v2.37.1",
             "grafana": {
-                "enabled": false,
+                "enabled": true,
                 "image": "grafana-oss:9.1.6",
                 "svcName": "grafana",
                 "port": 8080,
@@ -429,21 +412,18 @@ const spec = {
         },
         "https": {
             "enabled": false,
-            "cert": "",
-            "key": "",
             "certSecret": ""
         },
         "proxy": {
             "enabled": false,
             "configRef": "cp-proxy",
-            "httpProxy": null,
-            "httpsProxy": null,
-            "noProxy": null
+            "httpProxy": [],
+            "httpsProxy": [],
+            "noProxy": []
         }
     },
     "sso": {
         "enabled": false,
-        "groups": null,
         "pki": {
             "enabled": false,
             "rootCaSecret": "sso-idp-root-ca",
@@ -453,18 +433,18 @@ const spec = {
         "jwks": {
             "enabled": false,
             "name": "cnvrg-jwks",
-            "image": "cnvrg/jwks:latest",
+            "image": "jwks:latest",
             "cache": {
                 "enabled": true,
-                "image": "docker.io/redis"
+                "image": "redis:4.0.5-alpine"
             }
         },
         "central": {
             "enabled": false,
             "publicUrl": "",
-            "cnvrgProxyImage": "docker.io/cnvrg/proxy:v1.0.1",
-            "oauthProxyImage": "cnvrg/oauth2-proxy:v7.3.x.ssov3.p2-01",
-            "centralUiImage": "docker.io/cnvrg/centralsso:latest",
+            "cnvrgProxyImage": "proxy:v1.0.1",
+            "oauthProxyImage": "oauth2-proxy:v7.3.x.ssov3.p2-01",
+            "centralUiImage": "centralsso:latest",
             "adminUser": "",
             "provider": "",
             "emailDomain": [
@@ -478,11 +458,11 @@ const spec = {
             "insecureOidcAllowUnverifiedEmail": true,
             "whitelistDomain": "",
             "cookieDomain": "",
-            "groupsAuth": true
+            "groupsAuth": false
         },
         "authz": {
             "enabled": false,
-            "image": "docker.io/cnvrg/proxy:v1.0.0",
+            "image": "proxy:v1.0.0",
             "address": "cnvrg-authz:50052"
         }
     },
@@ -996,15 +976,15 @@ const flattenJSON = (obj = {}, res = {}, extraKey = '') => {
     return res;
 };
 
-// let flat = flattenJSON(spec)
-let flat = flattenJSON(docs)
+let flat = flattenJSON(spec)
+// let flat = flattenJSON(docs)
 Object.entries(flat).forEach((el, idx) => {
     let val = el[1]
     if (val === "") {
         val = "-"
     }
-    console.log("|`" + el[0] + "` | " + val + "|")
-    // _.set(spec, el[0], "{{" + ".Values."+ el[0] + "}}")
+    // console.log("|`" + el[0] + "` | " + val + "|")
+    _.set(spec, el[0], "{{" + ".Values."+ el[0] + "}}")
 })
 // let yamlSpec = YAML
 //     .stringify(spec, null, 2)
@@ -1014,3 +994,6 @@ Object.entries(flat).forEach((el, idx) => {
 // console.log(yamlSpec)
 // console.log('{{- end }}')
 
+
+let yamlSpec = YAML.stringify(spec, null, 2)
+console.log(yamlSpec)

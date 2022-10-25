@@ -271,6 +271,8 @@
 | `networking.ingress.perTryTimeout`             | 3600s                               |
 | `networking.ingress.istioGwEnabled`            | false                               |
 | `networking.ingress.istioGwName`               | -                                   |
+| `networking.ingress.istioIngressSelectorKey`   | istio                               |
+| `networking.ingress.istioIngressSelectorValue` | ingressgateway                      |
 | `networking.https.enabled`                     | false                               |
 | `networking.https.certSecret`                  | -                                   |
 | `networking.proxy.enabled`                     | false                               |

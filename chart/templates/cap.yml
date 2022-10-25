@@ -13,10 +13,10 @@ spec:
       enabled: {{.Values.controlPlane.webapp.enabled}}
       port: {{.Values.controlPlane.webapp.port}}
       requests:
-        cpu: {{.Values.controlPlane.webapp.requests.cpu}}
+        cpu: "{{.Values.controlPlane.webapp.requests.cpu}}"
         memory: {{.Values.controlPlane.webapp.requests.memory}}
       limits:
-        cpu: {{.Values.controlPlane.webapp.limits.cpu}}
+        cpu: "{{.Values.controlPlane.webapp.limits.cpu}}"
         memory: {{.Values.controlPlane.webapp.limits.memory}}
       svcName: {{.Values.controlPlane.webapp.svcName}}
       nodePort: {{.Values.controlPlane.webapp.nodePort}}
@@ -33,10 +33,10 @@ spec:
       enabled: {{.Values.controlPlane.sidekiq.enabled}}
       split: {{.Values.controlPlane.sidekiq.split}}
       requests:
-        cpu: {{.Values.controlPlane.sidekiq.requests.cpu}}
+        cpu: "{{.Values.controlPlane.sidekiq.requests.cpu}}"
         memory: {{.Values.controlPlane.sidekiq.requests.memory}}
       limits:
-        cpu: {{.Values.controlPlane.sidekiq.limits.cpu}}
+        cpu: "{{.Values.controlPlane.sidekiq.limits.cpu}}"
         memory: {{.Values.controlPlane.sidekiq.limits.memory}}
       replicas: {{.Values.controlPlane.sidekiq.replicas}}
       hpa:
@@ -46,11 +46,11 @@ spec:
     searchkiq:
       enabled: {{.Values.controlPlane.searchkiq.enabled}}
       requests:
-        cpu: {{.Values.controlPlane.searchkiq.requests.cpu}}
+        cpu: "{{.Values.controlPlane.searchkiq.requests.cpu}}"
         memory: {{.Values.controlPlane.searchkiq.requests.memory}}
       limits:
-        cpu: {{.Values.controlPlane.searchkiq.limits.cpu}}
-        memory: {{.Values.controlPlane.searchkiq.limits.memory}}
+        cpu: "{{.Values.controlPlane.searchkiq.limits.cpu}}"
+        memory: "{{.Values.controlPlane.searchkiq.limits.memory}}"
       replicas: {{.Values.controlPlane.searchkiq.replicas}}
       hpa:
         enabled: {{.Values.controlPlane.searchkiq.hpa.enabled}}
@@ -59,10 +59,10 @@ spec:
     systemkiq:
       enabled: {{.Values.controlPlane.systemkiq.enabled}}
       requests:
-        cpu: {{.Values.controlPlane.systemkiq.requests.cpu}}
+        cpu: "{{.Values.controlPlane.systemkiq.requests.cpu}}"
         memory: {{.Values.controlPlane.systemkiq.requests.memory}}
       limits:
-        cpu: {{.Values.controlPlane.systemkiq.limits.cpu}}
+        cpu: "{{.Values.controlPlane.systemkiq.limits.cpu}}"
         memory: {{.Values.controlPlane.systemkiq.limits.memory}}
       replicas: {{.Values.controlPlane.systemkiq.replicas}}
       hpa:
@@ -81,7 +81,7 @@ spec:
         cpu: {{.Values.controlPlane.hyper.requests.cpu}}
         memory: {{.Values.controlPlane.hyper.requests.memory}}
       limits:
-        cpu: {{.Values.controlPlane.hyper.limits.cpu}}
+        cpu: "{{.Values.controlPlane.hyper.limits.cpu}}"
         memory: {{.Values.controlPlane.hyper.limits.memory}}
       cpuLimit: {{.Values.controlPlane.hyper.cpuLimit}}
       memoryLimit: {{.Values.controlPlane.hyper.memoryLimit}}
@@ -93,7 +93,7 @@ spec:
         cpu: {{.Values.controlPlane.cnvrgScheduler.requests.cpu}}
         memory: {{.Values.controlPlane.cnvrgScheduler.requests.memory}}
       limits:
-        cpu: {{.Values.controlPlane.cnvrgScheduler.limits.cpu}}
+        cpu: "{{.Values.controlPlane.cnvrgScheduler.limits.cpu}}"
         memory: {{.Values.controlPlane.cnvrgScheduler.limits.memory}}
       replicas: {{.Values.controlPlane.cnvrgScheduler.replicas}}
     cnvrgRouter:
@@ -103,12 +103,15 @@ spec:
       nodePort: {{.Values.controlPlane.cnvrgRouter.nodePort}}
     baseConfig:
       jobsStorageClass: {{.Values.controlPlane.baseConfig.jobsStorageClass}}
-      featureFlags: null
+      featureFlags:
+      {{- range $fk, $fv := .Values.controlPlane.baseConfig.featureFlags }}
+        {{$fk}}: "{{$fv}}"
+      {{- end }}
       sentryUrl: {{.Values.controlPlane.baseConfig.sentryUrl}}
       runJobsOnSelfCluster: {{.Values.controlPlane.baseConfig.runJobsOnSelfCluster}}
       agentCustomTag: {{.Values.controlPlane.baseConfig.agentCustomTag}}
-      intercom: {{.Values.controlPlane.baseConfig.intercom}}
-      cnvrgJobUid: {{.Values.controlPlane.baseConfig.cnvrgJobUid}}
+      intercom: "{{.Values.controlPlane.baseConfig.intercom}}"
+      cnvrgJobUid: "{{.Values.controlPlane.baseConfig.cnvrgJobUid}}"
       cnvrgJobRbacStrict: {{.Values.controlPlane.baseConfig.cnvrgJobRbacStrict}}
       cnvrgPrivilegedJob: {{.Values.controlPlane.baseConfig.cnvrgPrivilegedJob}}
       metagpuEnabled: {{.Values.controlPlane.baseConfig.metagpuEnabled}}
@@ -174,10 +177,10 @@ spec:
       svcName: {{.Values.dbs.pg.svcName}}
       storageClass: {{.Values.dbs.pg.storageClass}}
       requests:
-        cpu: {{.Values.dbs.pg.requests.cpu}}
+        cpu: "{{.Values.dbs.pg.requests.cpu}}"
         memory: {{.Values.dbs.pg.requests.memory}}
       limits:
-        cpu: {{.Values.dbs.pg.limits.cpu}}
+        cpu: "{{.Values.dbs.pg.limits.cpu}}"
         memory: {{.Values.dbs.pg.limits.memory}}
       maxConnections: {{.Values.dbs.pg.maxConnections}}
       sharedBuffers: {{.Values.dbs.pg.sharedBuffers}}
@@ -198,10 +201,10 @@ spec:
       storageSize: {{.Values.dbs.redis.storageSize}}
       storageClass: {{.Values.dbs.redis.storageClass}}
       requests:
-        cpu: {{.Values.dbs.redis.requests.cpu}}
+        cpu: "{{.Values.dbs.redis.requests.cpu}}"
         memory: {{.Values.dbs.redis.requests.memory}}
       limits:
-        cpu: {{.Values.dbs.redis.limits.cpu}}
+        cpu: "{{.Values.dbs.redis.limits.cpu}}"
         memory: {{.Values.dbs.redis.limits.memory}}
       nodeSelector: null
       credsRef: {{.Values.dbs.redis.credsRef}}
@@ -217,10 +220,10 @@ spec:
       nodePort: {{.Values.dbs.minio.nodePort}}
       storageClass: {{.Values.dbs.minio.storageClass}}
       requests:
-        cpu: {{.Values.dbs.minio.requests.cpu}}
+        cpu: "{{.Values.dbs.minio.requests.cpu}}"
         memory: {{.Values.dbs.minio.requests.memory}}
       limits:
-        cpu: {{.Values.dbs.minio.limits.cpu}}
+        cpu: "{{.Values.dbs.minio.limits.cpu}}"
         memory: {{.Values.dbs.minio.limits.memory}}
       nodeSelector: null
       pvcName: {{.Values.dbs.minio.pvcName}}
@@ -234,10 +237,10 @@ spec:
       nodePort: {{.Values.dbs.es.nodePort}}
       storageClass: {{.Values.dbs.es.storageClass}}
       requests:
-        cpu: {{.Values.dbs.es.requests.cpu}}
+        cpu: "{{.Values.dbs.es.requests.cpu}}"
         memory: {{.Values.dbs.es.requests.memory}}
       limits:
-        cpu: {{.Values.dbs.es.limits.cpu}}
+        cpu: "{{.Values.dbs.es.limits.cpu}}"
         memory: {{.Values.dbs.es.limits.memory}}
       javaOpts: {{.Values.dbs.es.javaOpts}}
       patchEsNodes: {{.Values.dbs.es.patchEsNodes}}
@@ -292,10 +295,10 @@ spec:
         svcName: {{.Values.dbs.cvat.pg.svcName}}
         storageClass: {{.Values.dbs.cvat.pg.storageClass}}
         requests:
-          cpu: {{.Values.dbs.cvat.pg.requests.cpu}}
+          cpu: "{{.Values.dbs.cvat.pg.requests.cpu}}"
           memory: {{.Values.dbs.cvat.pg.requests.memory}}
         limits:
-          cpu: {{.Values.dbs.cvat.pg.limits.cpu}}
+          cpu: "{{.Values.dbs.cvat.pg.limits.cpu}}"
           memory: {{.Values.dbs.cvat.pg.limits.memory}}
         maxConnections: {{.Values.dbs.cvat.pg.maxConnections}}
         sharedBuffers: {{.Values.dbs.cvat.pg.sharedBuffers}}

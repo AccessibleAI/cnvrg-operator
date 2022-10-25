@@ -367,24 +367,20 @@ var promDefaults = Prom{
 	CredsRef: "prom-creds",
 	SvcName:  "prometheus",
 	Port:     9090,
-	Image:    "prom/prometheus:v2.37.1",
+	Image:    "prometheus:v2.37.1",
 	Grafana: Grafana{
 		Enabled:  false,
-		Image:    "grafana-oss:9.1.6",
+		Image:    "grafana-oss:9.1.7",
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,
-		//OauthProxy: OauthProxyServiceConf{
-		//	SkipAuthRegex:        []string{`\/api\/health`},
-		//	TokenValidationRegex: nil,
-		//},
 		CredsRef: "grafana-creds",
 	},
 }
 
 var defaultNomex = Nomex{
 	Enabled: true,
-	Image:   "docker.io/cnvrg/nomex:v1.0.0",
+	Image:   "nomex:v1.0.0",
 }
 
 var cvatPgDefault = Pg{
@@ -419,7 +415,7 @@ var cvatPgDefault = Pg{
 var cvatRedisDefault = Redis{
 	Enabled:        false,
 	ServiceAccount: "cvat-redis",
-	Image:          "redis:4.0.5-alpine",
+	Image:          "redis:7.0.5",
 	SvcName:        "cvat-redis",
 	Port:           6379,
 	StorageSize:    "10Gi",
@@ -439,12 +435,14 @@ var cvatRedisDefault = Redis{
 
 var networkingDefault = Networking{
 	Ingress: Ingress{
-		Type:            IstioIngress,
-		Timeout:         "18000s",
-		RetriesAttempts: 5,
-		PerTryTimeout:   "3600s",
-		IstioGwEnabled:  false,
-		IstioGwName:     "",
+		Type:                      IstioIngress,
+		Timeout:                   "18000s",
+		RetriesAttempts:           5,
+		PerTryTimeout:             "3600s",
+		IstioGwEnabled:            false,
+		IstioGwName:               "",
+		IstioIngressSelectorKey:   "istio",
+		IstioIngressSelectorValue: "ingressgateway",
 	},
 	HTTPS: HTTPS{Enabled: false},
 	Proxy: Proxy{Enabled: false, ConfigRef: "cp-proxy"},
@@ -467,15 +465,15 @@ var ssoDefault = SSO{
 		Name:    "cnvrg-jwks",
 		Cache: JwksCache{
 			Enabled: true,
-			Image:   "docker.io/redis",
+			Image:   "redis:7.0.5",
 		},
 	},
 
 	Central: CentralSSO{
 		Enabled:                          false,
-		CnvrgProxyImage:                  "docker.io/cnvrg/proxy:v1.0.1",
-		OauthProxyImage:                  "cnvrg/oauth2-proxy:v7.3.x.ssov3.p2-01",
-		CentralUiImage:                   "docker.io/cnvrg/centralsso:latest",
+		CnvrgProxyImage:                  "proxy:v1.0.1",
+		OauthProxyImage:                  "oauth2-proxy:v7.3.x.ssov3.p2-01",
+		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
 		Scope:                            "openid email profile",
 		InsecureOidcAllowUnverifiedEmail: true,
@@ -484,7 +482,7 @@ var ssoDefault = SSO{
 
 	Authz: Authz{
 		Enabled: false,
-		Image:   "docker.io/cnvrg/proxy:v1.0.0",
+		Image:   "proxy:v1.0.1",
 		Address: "cnvrg-authz:50052",
 	},
 }

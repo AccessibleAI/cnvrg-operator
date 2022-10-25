@@ -64,10 +64,6 @@ spec:
                   value:
                     format: int32
                     type: integer
-                required:
-                - description
-                - name
-                - value
                 type: object
               cnvrgJobPriorityClass:
                 properties:
@@ -78,10 +74,6 @@ spec:
                   value:
                     format: int32
                     type: integer
-                required:
-                - description
-                - name
-                - value
                 type: object
               controlPlane:
                 properties:
@@ -876,6 +868,10 @@ spec:
                       istioGwEnabled:
                         type: boolean
                       istioGwName:
+                        type: string
+                      istioIngressSelectorKey:
+                        type: string
+                      istioIngressSelectorValue:
                         type: string
                       perTryTimeout:
                         type: string
