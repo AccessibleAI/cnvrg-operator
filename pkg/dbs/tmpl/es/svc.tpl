@@ -1,4 +1,3 @@
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -19,8 +18,15 @@ spec:
   {{- end }}
   ports:
   - port: {{ .Spec.Dbs.Es.Port }}
+    name: http
     {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
     nodePort: {{ .Spec.Dbs.Es.NodePort }}
+    {{- end }}
+  - name: transport
+    protocol: TCP
+    port: 9300
+    {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
+    nodePort: 9300
     {{- end }}
   selector:
     app: {{ .Spec.Dbs.Es.SvcName }}

@@ -6,6 +6,7 @@ monitoring:
     svcName: {{ .Values.monitoring.grafana.svcName }}
   prometheus:
     enabled: {{ .Values.monitoring.prometheus.enabled }}
+    replicas: {{ .Values.monitoring.prometheus.replicas }}
     storageClass: "{{ .Values.monitoring.prometheus.storageClass }}"
     retention: {{ .Values.monitoring.prometheus.retention }}
     storageSize: {{ .Values.monitoring.prometheus.storageSize }}

@@ -138,7 +138,7 @@ spec:
           periodSeconds: 20
           failureThreshold: 5
         volumeMounts:
-        - name: es-storage
+        - name: {{ .Spec.Dbs.Es.PvcName }}
           mountPath: "/usr/share/elasticsearch/data"
   volumeClaimTemplates:
   - metadata:

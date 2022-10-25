@@ -96,6 +96,7 @@ dbs:
     enabled: false
   es:
     enabled: true
+    replicas: 1
     storageSize: 80Gi
     storageClass: ""
     patchEsNodes: true
