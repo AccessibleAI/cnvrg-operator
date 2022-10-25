@@ -988,6 +988,15 @@ spec:
                       rootCaSecret:
                         type: string
                     type: object
+                  proxy:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                    type: object
                 type: object
               tenancy:
                 properties:

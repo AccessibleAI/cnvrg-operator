@@ -483,4 +483,10 @@ var ssoDefault = SSO{
 		Image:   "proxy:v1.0.1",
 		Address: "cnvrg-authz:50052",
 	},
+
+	Proxy: CentralProxy{
+		Enabled: false,
+		Image:   "proxy:make-central",
+		SvcName: "cnvrg-proxy-central",
+	},
 }

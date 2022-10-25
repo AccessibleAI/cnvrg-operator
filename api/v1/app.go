@@ -385,11 +385,12 @@ type Networking struct {
 }
 
 type SSO struct {
-	Enabled bool       `json:"enabled,omitempty"`
-	Pki     Pki        `json:"pki,omitempty"`
-	Jwks    Jwks       `json:"jwks,omitempty"`
-	Central CentralSSO `json:"central,omitempty"`
-	Authz   Authz      `json:"authz,omitempty"`
+	Enabled bool         `json:"enabled,omitempty"`
+	Pki     Pki          `json:"pki,omitempty"`
+	Jwks    Jwks         `json:"jwks,omitempty"`
+	Central CentralSSO   `json:"central,omitempty"`
+	Authz   Authz        `json:"authz,omitempty"`
+	Proxy   CentralProxy `json:"proxy,omitempty"`
 }
 
 type Pki struct {
@@ -435,4 +436,10 @@ type CentralSSO struct {
 	WhitelistDomain                  string   `json:"whitelistDomain,omitempty"`
 	CookieDomain                     string   `json:"cookieDomain,omitempty"`
 	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
+}
+
+type CentralProxy struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+	SvcName string `json:"name,omitempty"`
 }

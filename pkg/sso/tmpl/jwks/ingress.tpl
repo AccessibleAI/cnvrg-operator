@@ -20,13 +20,13 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: "jwks.{{ .Spec.ClusterDomain }}"
+    - host: "{{.Spec.SSO.Jwks.Name}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: cnvrg-jwks
+                name: "{{.Spec.SSO.Jwks.Name}}"
                 port:
                   number: 8080

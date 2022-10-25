@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cnvrg-authz
-  namespace: {{ .Namespace }}
+  name: {{.Spec.SSO.Proxy.SvcName}}
+  namespace: {{.Namespace}}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:
   ports:
-    - name: grpc
-      port: 50052
+    - name: http
+      port: 8888
   selector:
-    app: cnvrg-authz
+    app: {{.Spec.SSO.Proxy.SvcName}}
