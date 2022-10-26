@@ -426,6 +426,7 @@ type CentralSSO struct {
 	SvcName                          string   `json:"svcName,omitempty"`
 	PublicUrl                        string   `json:"publicUrl,omitempty"`
 	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
+	CnvrgProxyImage                  string   `json:"cnvrgProxyImage,omitempty"`
 	CentralUiImage                   string   `json:"centralUiImage,omitempty"`
 	AdminUser                        string   `json:"adminUser,omitempty"`
 	Provider                         string   `json:"provider,omitempty"`
