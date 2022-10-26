@@ -365,7 +365,6 @@ sso:
   central:
     enabled: false
     publicUrl: ''
-    cnvrgProxyImage: proxy:v1.0.1
     oauthProxyImage: oauth2-proxy:v7.3.x.ssov3.p2-01
     centralUiImage: centralsso:latest
     adminUser: ''
@@ -384,7 +383,11 @@ sso:
   authz:
     enabled: false
     image: proxy:v1.0.1
-    address: cnvrg-authz:50052
+    address: ""
+  proxy:
+    enabled: false
+    image: "proxy:make-central"
+    address: ""
 tenancy:
   enabled: false
   key: purpose

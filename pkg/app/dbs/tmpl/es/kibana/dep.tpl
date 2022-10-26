@@ -12,7 +12,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-kibana-oauth"
     app: {{ .Spec.Dbs.Es.Kibana.SvcName }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
@@ -53,22 +52,6 @@ spec:
           secret:
             secretName: "kibana-config"
       containers:
-        {{- if isTrue .Spec.SSO.Enabled }}
-        - name: "cnvrg-proxy"
-          image: {{ image .Spec.ImageHub .Spec.SSO.Central.CnvrgProxyImage }}
-          command:
-          - /opt/app-root/proxy
-          - --listener-addr=0.0.0.0:8080
-          - --upstream-addr=127.0.0.1:3000
-          - --authz-addr={{ .Spec.SSO.Authz.Address }}
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100m
-            limits:
-              cpu: 500m
-              memory: 1Gi
-        {{- end }}
         - name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
           image: {{image .Spec.ImageHub .Spec.Dbs.Es.Kibana.Image }}
           command:
@@ -105,13 +88,8 @@ spec:
               mountPath: "/usr/share/kibana/config"
               readOnly: true
           env:
-          {{- if isTrue .Spec.SSO.Enabled }}
-          - name: SERVER_PORT
-            value: "3000"
-          {{- else }}
           - name: SERVER_PORT
             value: "{{ .Spec.Dbs.Es.Kibana.Port }}"
-          {{- end }}
           ports:
           - containerPort: {{ .Spec.Dbs.Es.Kibana.Port }}
           resources:

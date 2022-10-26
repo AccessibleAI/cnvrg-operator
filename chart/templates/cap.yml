@@ -376,7 +376,6 @@ spec:
     central:
       enabled: {{.Values.sso.central.enabled}}
       publicUrl: {{.Values.sso.central.publicUrl}}
-      cnvrgProxyImage: {{.Values.sso.central.cnvrgProxyImage}}
       oauthProxyImage: {{.Values.sso.central.oauthProxyImage}}
       centralUiImage: {{.Values.sso.central.centralUiImage}}
       adminUser: {{.Values.sso.central.adminUser}}
@@ -395,6 +394,10 @@ spec:
       enabled: {{.Values.sso.authz.enabled}}
       image: {{.Values.sso.authz.image}}
       address: {{.Values.sso.authz.address}}
+    proxy:
+      enabled: {{.Values.sso.proxy.enabled}}
+      image: {{.Values.sso.proxy.image}}
+      address: {{.Values.sso.proxy.address}}
   tenancy:
     enabled: {{.Values.tenancy.enabled}}
     key: {{.Values.tenancy.key}}
