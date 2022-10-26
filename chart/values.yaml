@@ -382,11 +382,11 @@ sso:
     groupsAuth: false
   authz:
     enabled: false
-    image: proxy:v1.0.1
+    image: proxy:v1.0.2
     address: ""
   proxy:
     enabled: false
-    image: "proxy:make-central"
+    image: proxy:v1.0.2
     address: ""
 tenancy:
   enabled: false

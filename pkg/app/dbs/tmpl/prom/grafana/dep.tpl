@@ -36,22 +36,6 @@ spec:
       {{- end }}
       serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
-      {{- if isTrue .Data.Spec.SSO.Enabled }}
-      - name: "cnvrg-proxy"
-        image: {{ image .Data.Spec.ImageHub .Data.Spec.SSO.Central.CnvrgProxyImage }}
-        command:
-        - /opt/app-root/proxy
-        - --listener-addr=0.0.0.0:8080
-        - --upstream-addr=127.0.0.1:3000
-        - --authz-addr={{ .Data.Spec.SSO.Authz.Address }}
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100m
-          limits:
-            cpu: 500m
-            memory: 1Gi
-      {{- end }}
       - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
         securityContext:
@@ -66,17 +50,10 @@ spec:
             value: Admin
           - name: GF_SECURITY_ALLOW_EMBEDDING
             value: "true"
-          {{- if isTrue .Data.Spec.SSO.Enabled }}
-          - name: GF_SERVER_HTTP_ADDR
-            value: "127.0.0.1"
-          - name: GF_SERVER_HTTP_PORT
-            value: "3000"
-          {{- else }}
           - name: GF_SERVER_HTTP_ADDR
             value: "0.0.0.0"
           - name: GF_SERVER_HTTP_PORT
             value: "8080"
-          {{- end }}
         ports:
         - containerPort: 8080
           name: http

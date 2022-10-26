@@ -30,7 +30,7 @@ data:
   OAUTH_PROXY_ENABLED: "{{ isTrue .Spec.SSO.Enabled }}"
   OAUTH_ADMIN_USER: "{{ .Spec.SSO.Central.AdminUser }}"
   CNVRG_PASSENGER_BIND_ADDRESS: "0.0.0.0"
-  CNVRG_PASSENGER_BIND_PORT: "{{Spec.ControlPlane.WebApp.Port}}"
+  CNVRG_PASSENGER_BIND_PORT: "{{.Spec.ControlPlane.WebApp.Port}}"
   CNVRG_JOB_UID: "{{ .Spec.ControlPlane.BaseConfig.CnvrgJobUID }}"
   CNVRG_JOBS_SERVICE_ACCOUNT: "cnvrg-job"
   CNVRG_JOBS_PRIORITY_CLASS: "{{ .Spec.CnvrgJobPriorityClass.Name }}"
