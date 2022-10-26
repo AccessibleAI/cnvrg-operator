@@ -27,6 +27,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: sso-central.{{.Namespace }}
+                name: sso-central
                 port:
                   number: 8080

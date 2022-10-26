@@ -32,6 +32,12 @@ spec:
             pathType: Prefix
             backend:
               service:
+                {{- if isTrue .Spec.SSO.Enabled }}
+                name: {{ .Spec.SSO.Proxy.SvcName }}
+                port:
+                  number: 80
+                {{- else }}
                 name: {{ .Spec.ControlPlane.WebApp.SvcName }}
                 port:
                   number: {{ .Spec.ControlPlane.WebApp.Port }}
+                {{- end}}

@@ -31,7 +31,11 @@ spec:
       timeout: {{ .Spec.Networking.Ingress.Timeout }}
       route:
         - destination:
+            {{- if isTrue .Spec.SSO.Enabled }}
+            host: "{{.Spec.SSO.Proxy.Address}}"
+            {{- else }}
             host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
+            {{- end }}
       headers:
         request:
           set:

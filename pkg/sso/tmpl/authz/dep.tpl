@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cnvrg-authz
+  name: {{ .Spec.SSO.Authz.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
   labels:
-    app: cnvrg-authz
+    app: {{ .Spec.SSO.Authz.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: cnvrg-authz
+      app: {{ .Spec.SSO.Authz.SvcName }}
   template:
     metadata:
       labels:
-        app: cnvrg-authz
+        app: {{ .Spec.SSO.Authz.SvcName }}
     spec:
-      serviceAccountName: cnvrg-authz
+      serviceAccountName: {{ .Spec.SSO.Authz.SvcName }}
       containers:
       - name: authz
         imagePullPolicy: Always

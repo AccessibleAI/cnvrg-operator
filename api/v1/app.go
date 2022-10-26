@@ -415,13 +415,13 @@ type Jwks struct {
 type Authz struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
+	SvcName string `json:"svcName,omitempty"`
 	Address string `json:"address,omitempty"`
 }
 
 type CentralSSO struct {
 	Enabled                          bool     `json:"enabled,omitempty"`
 	PublicUrl                        string   `json:"publicUrl,omitempty"`
-	CnvrgProxyImage                  string   `json:"cnvrgProxyImage,omitempty"`
 	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
 	CentralUiImage                   string   `json:"centralUiImage,omitempty"`
 	AdminUser                        string   `json:"adminUser,omitempty"`
@@ -442,4 +442,5 @@ type CentralProxy struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
 	SvcName string `json:"name,omitempty"`
+	Address string `json:"address,omitempty"`
 }

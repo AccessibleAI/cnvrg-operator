@@ -10,6 +10,7 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8888
+      port: 80
+      targetPort: 8888
   selector:
     app: {{.Spec.SSO.Proxy.SvcName}}
