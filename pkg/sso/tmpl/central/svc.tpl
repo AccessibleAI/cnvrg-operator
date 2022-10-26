@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .SvcName }}
+  name: {{.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "false"

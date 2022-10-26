@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{.SvcName}}
+  name: {{.Spec.SSO.Central.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
@@ -28,4 +28,4 @@ spec:
         - destination:
             port:
               number: 8080
-            host: "{{.SvcName}}.{{.Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"
+            host: "{{.Spec.SSO.Central.SvcName}}.{{.Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"

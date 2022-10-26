@@ -122,6 +122,9 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(app *mlopsv1.CnvrgAp
 	if len(readyState) > 0 {
 		percentageReady = readyCount * 100 / len(readyState)
 	}
+	if len(readyState) == 0 {
+		percentageReady = 100
+	}
 
 	return readyCount == len(readyState), percentageReady, readyState, nil
 }

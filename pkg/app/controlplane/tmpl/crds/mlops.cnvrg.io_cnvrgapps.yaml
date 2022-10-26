@@ -939,6 +939,8 @@ spec:
                         type: string
                       clientSecret:
                         type: string
+                      cnvrgProxyImage:
+                        type: string
                       cookieDomain:
                         type: string
                       emailDomain:
