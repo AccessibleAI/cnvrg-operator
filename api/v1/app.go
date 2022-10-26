@@ -421,6 +421,7 @@ type Authz struct {
 
 type CentralSSO struct {
 	Enabled                          bool     `json:"enabled,omitempty"`
+	SvcName                          string   `json:"svcName,omitempty"`
 	PublicUrl                        string   `json:"publicUrl,omitempty"`
 	CnvrgProxyImage                  string   `json:"cnvrgProxyImage,omitempty"`
 	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
@@ -437,4 +438,5 @@ type CentralSSO struct {
 	WhitelistDomain                  string   `json:"whitelistDomain,omitempty"`
 	CookieDomain                     string   `json:"cookieDomain,omitempty"`
 	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
+	JwksURL                          string   `json:"jwksURL,omitempty"`
 }

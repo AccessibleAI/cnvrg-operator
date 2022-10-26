@@ -12,4 +12,4 @@ spec:
     - name: http
       port: 8080
   selector:
-    app: sso-central
+    app: {{.SvcName}}

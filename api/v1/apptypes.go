@@ -87,10 +87,18 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 			Key:     "purpose",
 			Value:   "cnvrg-control-plane",
 		},
-		Labels:                map[string]string{"owner": "cnvrg-control-plane"},
-		Annotations:           nil,
-		CnvrgAppPriorityClass: PriorityClass{},
-		CnvrgJobPriorityClass: PriorityClass{},
+		Labels:      map[string]string{"owner": "cnvrg-control-plane"},
+		Annotations: nil,
+		CnvrgAppPriorityClass: PriorityClass{
+			Name:        "cnvrg-apps",
+			Value:       2000000,
+			Description: "cnvrg control plane apps priority class",
+		},
+		CnvrgJobPriorityClass: PriorityClass{
+			Name:        "cnvrg-jobs",
+			Value:       1000000,
+			Description: "cnvrg jobs priority class",
+		},
 	}
 }
 

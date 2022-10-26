@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cnvrg-sso-central
+  name: {{.SvcName}}-central
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"

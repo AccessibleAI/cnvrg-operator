@@ -948,6 +948,8 @@ spec:
                         type: boolean
                       insecureOidcAllowUnverifiedEmail:
                         type: boolean
+                      jwksURL:
+                        type: string
                       oauthProxyImage:
                         type: string
                       oidcIssuerUrl:
@@ -959,6 +961,8 @@ spec:
                       scope:
                         type: string
                       serviceUrl:
+                        type: string
+                      svcName:
                         type: string
                       whitelistDomain:
                         type: string

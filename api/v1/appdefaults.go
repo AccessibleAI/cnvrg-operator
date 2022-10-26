@@ -471,6 +471,7 @@ var ssoDefault = SSO{
 
 	Central: CentralSSO{
 		Enabled:                          false,
+		SvcName:                          "sso-central",
 		CnvrgProxyImage:                  "proxy:v1.0.1",
 		OauthProxyImage:                  "oauth2-proxy:v7.3.x.ssov3.p2-01",
 		CentralUiImage:                   "centralsso:latest",
