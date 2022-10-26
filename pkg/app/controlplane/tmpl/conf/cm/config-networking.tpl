@@ -11,7 +11,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

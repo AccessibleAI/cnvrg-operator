@@ -12,6 +12,7 @@ metadata:
     sso.cnvrg.io/enabled: "true"
     sso.cnvrg.io/skipAuthRoutes: ""
     sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
+    sso.cnvrg.io/upstream: "{{ .Spec.Dbs.Es.Kibana.SvcName }}.{{ ns . }}.svc:{{.Spec.Dbs.Es.Kibana.Port}}"
     {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"

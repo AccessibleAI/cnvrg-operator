@@ -11,7 +11,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     app: systemkiq
     owner: cnvrg-control-plane
     cnvrg-component: systemkiq

@@ -102,7 +102,11 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 			desiredAppSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s.%s", scheme, desiredAppSpec.SSO.Central.SvcName, app.Spec.ClusterDomain)
 		}
 		if app.Spec.SSO.Proxy.Address == "" {
-			desiredAppSpec.SSO.Proxy.Address = fmt.Sprintf("%s.%s.svc", desiredAppSpec.SSO.Proxy.SvcName, app.Namespace)
+			desiredAppSpec.SSO.Proxy.Address = fmt.Sprintf("%s.%s.svc.%s",
+				desiredAppSpec.SSO.Proxy.SvcName,
+				app.Namespace,
+				desiredAppSpec.ClusterInternalDomain,
+			)
 		}
 		if app.Spec.SSO.Authz.Address == "" {
 			desiredAppSpec.SSO.Authz.Address = fmt.Sprintf("%s.%s.svc:50052", desiredAppSpec.SSO.Authz.SvcName, app.Namespace)

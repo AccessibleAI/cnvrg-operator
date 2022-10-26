@@ -11,7 +11,6 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    cnvrg-config-reloader.mlops.cnvrg.io: "autoreload-ccp"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -30,8 +29,8 @@ data:
   CNVRG_PASSENGER_MAX_POOL_SIZE: "{{ .Spec.ControlPlane.WebApp.PassengerMaxPoolSize }}"
   OAUTH_PROXY_ENABLED: "{{ isTrue .Spec.SSO.Enabled }}"
   OAUTH_ADMIN_USER: "{{ .Spec.SSO.Central.AdminUser }}"
-  CNVRG_PASSENGER_BIND_ADDRESS: "{{ cnvrgPassengerBindAddress . }}"
-  CNVRG_PASSENGER_BIND_PORT: "{{ cnvrgPassengerBindPort . }}"
+  CNVRG_PASSENGER_BIND_ADDRESS: "0.0.0.0"
+  CNVRG_PASSENGER_BIND_PORT: "{{.Spec.ControlPlane.WebApp.Port}}"
   CNVRG_JOB_UID: "{{ .Spec.ControlPlane.BaseConfig.CnvrgJobUID }}"
   CNVRG_JOBS_SERVICE_ACCOUNT: "cnvrg-job"
   CNVRG_JOBS_PRIORITY_CLASS: "{{ .Spec.CnvrgJobPriorityClass.Name }}"

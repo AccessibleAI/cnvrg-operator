@@ -483,13 +483,13 @@ var ssoDefault = SSO{
 
 	Authz: Authz{
 		Enabled: false,
-		Image:   "proxy:make-central",
+		Image:   "proxy:v1.0.2",
 		SvcName: "cnvrg-authz",
 	},
 
 	Proxy: CentralProxy{
 		Enabled: false,
-		Image:   "proxy:make-central",
+		Image:   "proxy:v1.0.2",
 		SvcName: "cnvrg-proxy-central",
 	},
 }

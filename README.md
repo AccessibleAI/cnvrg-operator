@@ -304,8 +304,11 @@
 | `sso.central.groupsAuth`                       | false                               |
 | `sso.authz.enabled`                            | false                               |
 | `sso.authz.image`                              | proxy:v1.0.0                        |
-| `sso.authz.address`                            | cnvrg-authz:50052                   |
+| `sso.authz.address`                            | -                                   |
 | `tenancy.enabled`                              | false                               |
+| `sso.proxy.enabled`                            | false                               |
+| `sso.proxy.image`                              | proxy:v1.0.0                        |
+| `sso.proxy.address`                            | -                                   |
 | `tenancy.key`                                  | purpose                             |
 | `tenancy.value`                                | cnvrg-control-plane                 |
 | `cnvrgAppPriorityClass.name`                   | -                                   |
