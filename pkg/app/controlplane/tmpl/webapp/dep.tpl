@@ -75,7 +75,7 @@ spec:
         image: {{ image .Spec.ImageHub .Spec.SSO.Central.CnvrgProxyImage }}
         command:
         - /opt/app-root/proxy
-        - --listener-addr=0.0.0.0:8080
+        - --listener-addr=0.0.0.0:8889
         - --upstream-addr=127.0.0.1:3000
         - --authz-addr={{ .Spec.SSO.Authz.Address }}
         resources:

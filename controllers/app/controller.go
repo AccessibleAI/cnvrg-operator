@@ -24,7 +24,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
-	"k8s.io/client-go/util/retry"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -225,6 +224,12 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 			}
 		}
 
+		if app.Spec.SSO.Proxy.Enabled {
+			if err := sso.NewProxyStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	if err := controlplane.NewControlPlaneStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
@@ -244,25 +249,17 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 		msg := fmt.Sprintf("%s/%s error acoured during reconcile", app.GetNamespace(), app.GetName())
 		r.recorder.Event(app, "Warning", "ReconcileError", msg)
 	}
-	ctx := context.Background()
-	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-
-		app.Status.Status = status.Status
-		app.Status.Message = status.Message
-		if status.Progress >= 0 {
-			app.Status.Progress = status.Progress
-		}
-		if status.StackReadiness != nil {
-			app.Status.StackReadiness = status.StackReadiness
-		}
-		return r.Status().Update(ctx, app)
-	})
-	if err != nil && errors.IsConflict(err) {
-		r.Log.V(1).Error(err, "can't update status")
-	} else if err != nil {
-		r.Log.Error(err, "can't update status")
+	app.Status.Status = status.Status
+	app.Status.Message = status.Message
+	if status.Progress >= 0 {
+		app.Status.Progress = status.Progress
 	}
-
+	if status.StackReadiness != nil {
+		app.Status.StackReadiness = status.StackReadiness
+	}
+	if err := r.Status().Update(context.Background(), app); err != nil {
+		r.recorder.Event(app, "Warning", "StatusUpdateError", err.Error())
+	}
 }
 
 func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, error) {

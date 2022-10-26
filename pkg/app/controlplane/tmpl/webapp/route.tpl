@@ -27,8 +27,13 @@ spec:
     targetPort: {{ .Spec.ControlPlane.WebApp.Port }}
   to:
     kind: Service
+    {{- if isTrue .Spec.SSO.Enabled }}
+    name: {{ .Spec.SSO.Proxy.SvcName }}
+    weight: 100
+    {{- else }}
     name: {{ .Spec.ControlPlane.WebApp.SvcName }}
     weight: 100
+    {{- end}}
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:
     termination: edge

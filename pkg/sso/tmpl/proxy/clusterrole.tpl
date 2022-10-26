@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: ClusterRole
 metadata:
-  name: {{ .Spec.SSO.Authz.SvcName }}
+  name: {{.Spec.SSO.Proxy.SvcName}}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "false"
@@ -13,11 +13,18 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cnvrg-authz
-subjects:
-  - kind: ServiceAccount
-    name: cnvrg-authz
-    namespace: {{.Namespace }}
+rules:
+- apiGroups:
+  - "networking.k8s.io"
+  - "networking.istio.io"
+  - "route.openshift.io"
+  - ""
+  resources:
+  - ingresses
+  - virtualservices
+  - routes
+  - secrets
+  verbs:
+  - watch
+  - get
+  - list

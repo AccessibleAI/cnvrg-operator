@@ -926,6 +926,8 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      svcName:
+                        type: string
                     type: object
                   central:
                     properties:
@@ -936,8 +938,6 @@ spec:
                       clientId:
                         type: string
                       clientSecret:
-                        type: string
-                      cnvrgProxyImage:
                         type: string
                       cookieDomain:
                         type: string
@@ -997,6 +997,17 @@ spec:
                       publicKeySecret:
                         type: string
                       rootCaSecret:
+                        type: string
+                    type: object
+                  proxy:
+                    properties:
+                      address:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
                         type: string
                     type: object
                 type: object

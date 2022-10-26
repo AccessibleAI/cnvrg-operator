@@ -1,28 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cnvrg-authz
+  name: {{ .Spec.SSO.Authz.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
-    mlops.cnvrg.io/default-loader: "false"
+    mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
   labels:
-    app: cnvrg-authz
+    app: {{ .Spec.SSO.Authz.SvcName }}
 spec:
   selector:
     matchLabels:
-      app: cnvrg-authz
+      app: {{ .Spec.SSO.Authz.SvcName }}
   template:
     metadata:
       labels:
-        app: cnvrg-authz
+        app: {{ .Spec.SSO.Authz.SvcName }}
     spec:
-      serviceAccountName: cnvrg-authz
+      serviceAccountName: {{ .Spec.SSO.Authz.SvcName }}
       containers:
       - name: authz
         imagePullPolicy: Always
-        image: {{  image .ImageHub .Image }}
+        image: {{  image .Spec.ImageHub .Spec.SSO.Authz.Image }}
         command:
           - /opt/app-root/authz
-          - --ingress-type={{ .IngressType }}
+          - --ingress-type={{.Spec.Networking.Ingress.Type}}

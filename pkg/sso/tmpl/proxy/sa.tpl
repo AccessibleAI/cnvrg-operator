@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Spec.SSO.Authz.SvcName }}
+  name: {{.Spec.SSO.Proxy.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"

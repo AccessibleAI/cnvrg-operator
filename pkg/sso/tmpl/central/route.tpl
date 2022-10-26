@@ -9,7 +9,7 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: cnvrg-jwks
+  name: sso-central
   namespace: {{.Namespace }}
   labels:
     app: {{.Namespace }}
@@ -17,12 +17,12 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{.Spec.SSO.Jwks.Name}}.{{ .Spec.ClusterDomain }}"
+  host: "sso-central.{{ .Spec.ClusterDomain }}"
   port:
     targetPort: 8080
   to:
     kind: Service
-    name: "{{.Spec.SSO.Jwks.Name}}.{{.Namespace }}.svc"
+    name: "sso-central.{{.Namespace }}.svc"
     weight: 100
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:

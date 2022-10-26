@@ -387,11 +387,12 @@ type Networking struct {
 }
 
 type SSO struct {
-	Enabled bool       `json:"enabled,omitempty"`
-	Pki     Pki        `json:"pki,omitempty"`
-	Jwks    Jwks       `json:"jwks,omitempty"`
-	Central CentralSSO `json:"central,omitempty"`
-	Authz   Authz      `json:"authz,omitempty"`
+	Enabled bool         `json:"enabled,omitempty"`
+	Pki     Pki          `json:"pki,omitempty"`
+	Jwks    Jwks         `json:"jwks,omitempty"`
+	Central CentralSSO   `json:"central,omitempty"`
+	Authz   Authz        `json:"authz,omitempty"`
+	Proxy   CentralProxy `json:"proxy,omitempty"`
 }
 
 type Pki struct {
@@ -416,6 +417,7 @@ type Jwks struct {
 type Authz struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
+	SvcName string `json:"svcName,omitempty"`
 	Address string `json:"address,omitempty"`
 }
 
@@ -423,7 +425,6 @@ type CentralSSO struct {
 	Enabled                          bool     `json:"enabled,omitempty"`
 	SvcName                          string   `json:"svcName,omitempty"`
 	PublicUrl                        string   `json:"publicUrl,omitempty"`
-	CnvrgProxyImage                  string   `json:"cnvrgProxyImage,omitempty"`
 	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
 	CentralUiImage                   string   `json:"centralUiImage,omitempty"`
 	AdminUser                        string   `json:"adminUser,omitempty"`
@@ -439,4 +440,11 @@ type CentralSSO struct {
 	CookieDomain                     string   `json:"cookieDomain,omitempty"`
 	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
 	JwksURL                          string   `json:"jwksURL,omitempty"`
+}
+
+type CentralProxy struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+	SvcName string `json:"name,omitempty"`
+	Address string `json:"address,omitempty"`
 }

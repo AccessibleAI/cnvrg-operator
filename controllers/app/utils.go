@@ -2,16 +2,12 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/controllers"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"reflect"
@@ -42,63 +38,6 @@ func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost s
 		return domain.(string), nil
 
 	}
-}
-
-func discoverOcpPromCreds(clientset client.Client, ns string) {
-	promCreds := &v1.Secret{ObjectMeta: metav1.ObjectMeta{
-		Name:      "prom-creds",
-		Namespace: ns,
-	}}
-	err := clientset.Get(context.Background(), types.NamespacedName{Name: promCreds.Name, Namespace: promCreds.Namespace}, promCreds)
-	if errors.IsNotFound(err) {
-		dataSourceSecret := &v1.Secret{}
-		name := types.NamespacedName{Name: "grafana-datasources-v2", Namespace: "openshift-monitoring"}
-		err := clientset.Get(context.Background(), name, dataSourceSecret)
-		if err != nil {
-			log.Error(err, "failed to discover prom creds")
-			return
-
-		}
-		if _, ok := dataSourceSecret.Data["prometheus.yaml"]; !ok {
-			log.Error(err, "failed to discover prom creds")
-			return
-		}
-		promData := &struct {
-			Datasources []struct {
-				Url            string
-				BasicAuthUser  string
-				SecureJsonData struct {
-					BasicAuthPassword string
-				}
-			}
-		}{}
-
-		err = json.Unmarshal(dataSourceSecret.Data["prometheus.yaml"], &promData)
-
-		if err != nil {
-			log.Error(err, "error unmarshal prometheus.yaml")
-			return
-		}
-
-		if len(promData.Datasources) < 1 {
-			log.Error(err, "unexpected prom data")
-			return
-		}
-
-		promCreds.Data = make(map[string][]byte)
-		promCreds.Data["CNVRG_PROMETHEUS_URL"] = []byte(promData.Datasources[0].Url)
-		promCreds.Data["CNVRG_PROMETHEUS_USER"] = []byte(promData.Datasources[0].BasicAuthUser)
-		promCreds.Data["CNVRG_PROMETHEUS_PASS"] = []byte(promData.Datasources[0].SecureJsonData.BasicAuthPassword)
-
-		err = clientset.Create(context.Background(), promCreds)
-		if err != nil {
-			log.Error(err, "error creating promCreds for OCP setup")
-		}
-
-	} else if err != nil {
-		log.Error(err, "failed to discover prom creds")
-	}
-	return
 }
 
 func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1.CnvrgAppSpec, clientset client.Client) error {
@@ -151,10 +90,7 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 				desiredAppSpec.ClusterDomain = clusterDomain
 			}
 		}
-		// Never do that!
-		//if !app.Spec.Dbs.Prom.Enabled {
-		//	discoverOcpPromCreds(clientset, app.Namespace)
-		//}
+
 	}
 
 	if app.Spec.SSO.Enabled {
@@ -164,6 +100,12 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 				scheme = "https"
 			}
 			desiredAppSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s.%s", scheme, desiredAppSpec.SSO.Central.SvcName, app.Spec.ClusterDomain)
+		}
+		if app.Spec.SSO.Proxy.Address == "" {
+			desiredAppSpec.SSO.Proxy.Address = fmt.Sprintf("%s.%s.svc", desiredAppSpec.SSO.Proxy.SvcName, app.Namespace)
+		}
+		if app.Spec.SSO.Authz.Address == "" {
+			desiredAppSpec.SSO.Authz.Address = fmt.Sprintf("%s.%s.svc:50052", desiredAppSpec.SSO.Authz.SvcName, app.Namespace)
 		}
 	}
 
