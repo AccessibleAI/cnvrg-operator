@@ -380,10 +380,23 @@ sso:
     whitelistDomain: ''
     cookieDomain: ''
     groupsAuth: false
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
   proxy:
     enabled: false
     image: proxy:v1.0.2
     address: ""
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
+
 tenancy:
   enabled: false
   key: purpose

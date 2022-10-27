@@ -920,6 +920,13 @@ spec:
                         type: boolean
                       insecureOidcAllowUnverifiedEmail:
                         type: boolean
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       oauthProxyImage:
                         type: string
                       oidcIssuerUrl:
@@ -928,6 +935,13 @@ spec:
                         type: string
                       publicUrl:
                         type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       scope:
                         type: string
                       serviceUrl:
@@ -972,8 +986,22 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       name:
                         type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                     type: object
                 type: object
               tenancy:

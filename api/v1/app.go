@@ -427,11 +427,15 @@ type CentralSSO struct {
 	WhitelistDomain                  string   `json:"whitelistDomain,omitempty"`
 	CookieDomain                     string   `json:"cookieDomain,omitempty"`
 	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
+	Limits                           Limits   `json:"limits,omitempty"`
+	Requests                         Requests `json:"requests,omitempty"`
 }
 
 type CentralProxy struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-	SvcName string `json:"name,omitempty"`
-	Address string `json:"address,omitempty"`
+	Enabled  bool     `json:"enabled,omitempty"`
+	Image    string   `json:"image,omitempty"`
+	SvcName  string   `json:"name,omitempty"`
+	Address  string   `json:"address,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
 }

@@ -475,11 +475,27 @@ var ssoDefault = SSO{
 		Scope:                            "openid email profile",
 		InsecureOidcAllowUnverifiedEmail: true,
 		GroupsAuth:                       true,
+		Requests: Requests{
+			Cpu:    "500m",
+			Memory: "1Gi",
+		},
+		Limits: Limits{
+			Cpu:    "2",
+			Memory: "4Gi",
+		},
 	},
 
 	Proxy: CentralProxy{
 		Enabled: false,
 		Image:   "proxy:v1.0.2",
 		SvcName: "cnvrg-proxy-central",
+		Requests: Requests{
+			Cpu:    "500m",
+			Memory: "1Gi",
+		},
+		Limits: Limits{
+			Cpu:    "2",
+			Memory: "4Gi",
+		},
 	},
 }

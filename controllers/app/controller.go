@@ -291,11 +291,6 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 			r.Log.Info(diff)
 		}
 
-		if diff, equal := messagediff.PrettyDiff(app.Spec, desiredSpec); !equal {
-			r.Log.Info("diff between actual and desired")
-			r.Log.Info(diff)
-		}
-
 	}
 
 	equal := reflect.DeepEqual(desiredSpec, app.Spec)

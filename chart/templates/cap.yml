@@ -391,10 +391,22 @@ spec:
       whitelistDomain: {{.Values.sso.central.whitelistDomain}}
       cookieDomain: {{.Values.sso.central.cookieDomain}}
       groupsAuth: {{.Values.sso.central.groupsAuth}}
+      requests:
+        cpu: "{{.Values.sso.central.requests.cpu}}"
+        memory: "{{.Values.sso.central.requests.memory}}"
+      limits:
+        cpu: "{{.Values.sso.central.limits.cpu}}"
+        memory: "{{.Values.sso.central.limits.memory}}"
     proxy:
       enabled: {{.Values.sso.proxy.enabled}}
       image: {{.Values.sso.proxy.image}}
       address: {{.Values.sso.proxy.address}}
+      requests:
+        cpu: "{{.Values.sso.proxy.requests.cpu}}"
+        memory: "{{.Values.sso.proxy.requests.memory}}"
+      limits:
+        cpu: "{{.Values.sso.proxy.limits.cpu}}"
+        memory: "{{.Values.sso.proxy.limits.memory}}"
   tenancy:
     enabled: {{.Values.tenancy.enabled}}
     key: {{.Values.tenancy.key}}

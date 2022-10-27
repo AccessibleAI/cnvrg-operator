@@ -47,6 +47,13 @@ spec:
           - name: "proxy-config"
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
+        resources:
+          limits:
+            cpu: {{ .Limits.Cpu }}
+            memory: {{ .Limits.Memory }}
+          requests:
+            cpu: {{ .Requests.Cpu }}
+            memory: {{ .Requests.Memory }}
       volumes:
       - name: "proxy-config"
         configMap:
