@@ -391,10 +391,6 @@ spec:
       whitelistDomain: {{.Values.sso.central.whitelistDomain}}
       cookieDomain: {{.Values.sso.central.cookieDomain}}
       groupsAuth: {{.Values.sso.central.groupsAuth}}
-    authz:
-      enabled: {{.Values.sso.authz.enabled}}
-      image: {{.Values.sso.authz.image}}
-      address: {{.Values.sso.authz.address}}
     proxy:
       enabled: {{.Values.sso.proxy.enabled}}
       image: {{.Values.sso.proxy.image}}
@@ -403,11 +399,6 @@ spec:
     enabled: {{.Values.tenancy.enabled}}
     key: {{.Values.tenancy.key}}
     value: {{.Values.tenancy.value}}
-  cnvrgAppPriorityClass:
-    name: {{.Values.cnvrgAppPriorityClass.name}}
-    value: {{.Values.cnvrgAppPriorityClass.value}}
-    description: {{.Values.cnvrgAppPriorityClass.description}}
-  cnvrgJobPriorityClass:
-    name: {{.Values.cnvrgJobPriorityClass.name}}
-    value: {{.Values.cnvrgJobPriorityClass.value}}
-    description: {{.Values.cnvrgJobPriorityClass.description}}
+  priorityClass:
+    appClassRef: {{.Values.priorityClass.appClassRef}}
+    jobClassRef: {{.Values.priorityClass.jobClassRef}}

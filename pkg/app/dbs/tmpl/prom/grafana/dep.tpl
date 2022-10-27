@@ -5,39 +5,39 @@ metadata:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
-    {{- range $k, $v := .Data.Spec.Annotations }}
+    {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
-    {{- range $k, $v := .Data.Spec.Labels }}
+    app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+    {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
-  namespace: {{ .Data.Namespace }}
+  name: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
+      app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
   template:
     metadata:
       labels:
-        app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
+        app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
     spec:
-      {{- if isTrue .Data.Spec.Tenancy.Enabled }}
+      {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
-        "{{ .Data.Spec.Tenancy.Key }}": "{{ .Data.Spec.Tenancy.Value }}"
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
       tolerations:
-        - key: "{{ .Data.Spec.Tenancy.Key }}"
+        - key: "{{ .Spec.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .Data.Spec.Tenancy.Value }}"
+          value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
-      serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
+      serviceAccountName: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
-      - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
+      - image: {{image .Spec.ImageHub .Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
         securityContext:
           runAsNonRoot: true
