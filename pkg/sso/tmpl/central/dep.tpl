@@ -37,6 +37,13 @@ spec:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
       - name: oauth2-proxy
         image: {{  image .ImageHub  .OauthProxyImage }}
         command: [ "oauth2-proxy", "--config", "/opt/app-root/conf/proxy-config/conf" ]
