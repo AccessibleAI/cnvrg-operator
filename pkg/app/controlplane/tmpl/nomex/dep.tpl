@@ -21,6 +21,7 @@ spec:
         app: nomex
         component: nomex
     spec:
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-nomex
       containers:
       - name: nomex

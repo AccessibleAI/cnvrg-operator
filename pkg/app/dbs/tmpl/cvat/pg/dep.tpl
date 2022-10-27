@@ -33,7 +33,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       {{- if (gt (len .Spec.Dbs.Cvat.Pg.NodeSelector) 0) }}
       nodeSelector:
         {{- range $key, $val := .Spec.Dbs.Cvat.Pg.NodeSelector }}

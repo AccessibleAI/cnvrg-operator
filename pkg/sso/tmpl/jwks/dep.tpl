@@ -28,7 +28,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-jwks
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:

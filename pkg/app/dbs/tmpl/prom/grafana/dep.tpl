@@ -34,6 +34,7 @@ spec:
           value: "{{ .Data.Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
       - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}

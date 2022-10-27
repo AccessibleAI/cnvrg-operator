@@ -55,26 +55,6 @@ spec:
                 type: string
               clusterInternalDomain:
                 type: string
-              cnvrgAppPriorityClass:
-                properties:
-                  description:
-                    type: string
-                  name:
-                    type: string
-                  value:
-                    format: int32
-                    type: integer
-                type: object
-              cnvrgJobPriorityClass:
-                properties:
-                  description:
-                    type: string
-                  name:
-                    type: string
-                  value:
-                    format: int32
-                    type: integer
-                type: object
               controlPlane:
                 properties:
                   baseConfig:
@@ -897,6 +877,16 @@ spec:
                           type: string
                         type: array
                     type: object
+                type: object
+              priorityClass:
+                properties:
+                  appClassRef:
+                    type: string
+                  jobClassRef:
+                    type: string
+                required:
+                - appClassRef
+                - jobClassRef
                 type: object
               registry:
                 properties:

@@ -67,7 +67,7 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       containers:
       - image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         env:

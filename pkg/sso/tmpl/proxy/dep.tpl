@@ -18,6 +18,7 @@ spec:
       labels:
         app: {{.Spec.SSO.Proxy.SvcName}}
     spec:
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
       containers:
       - name: proxy-central
@@ -25,7 +26,13 @@ spec:
         image: {{image .Spec.ImageHub .Spec.SSO.Proxy.Image}}
         command:
           - /opt/app-root/proxy
-          - --authz-addr={{.Spec.SSO.Authz.Address}}
+          - --authz-addr=127.0.0.1:50052
           - --ingress-type={{.Spec.Networking.Ingress.Type}}
         ports:
           - containerPort: 8888
+      - name: authz
+        imagePullPolicy: Always
+        image: {{  image .Spec.ImageHub .Spec.SSO.Proxy.Image }}
+        command:
+          - /opt/app-root/authz
+          - --ingress-type={{.Spec.Networking.Ingress.Type}}

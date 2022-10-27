@@ -193,9 +193,8 @@ type Mpi struct {
 }
 
 type PriorityClass struct {
-	Name        string `json:"name,omitempty"`
-	Value       int32  `json:"value,omitempty"`
-	Description string `json:"description,omitempty"`
+	AppClassRef string `json:"appClassRef"`
+	JobClassRef string `json:"jobClassRef"`
 }
 
 type Tenancy struct {
@@ -389,7 +388,6 @@ type SSO struct {
 	Pki     Pki          `json:"pki,omitempty"`
 	Jwks    Jwks         `json:"jwks,omitempty"`
 	Central CentralSSO   `json:"central,omitempty"`
-	Authz   Authz        `json:"authz,omitempty"`
 	Proxy   CentralProxy `json:"proxy,omitempty"`
 }
 
@@ -410,13 +408,6 @@ type Jwks struct {
 	Name    string    `json:"name,omitempty"`
 	Image   string    `json:"image,omitempty"`
 	Cache   JwksCache `json:"cache,omitempty"`
-}
-
-type Authz struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-	SvcName string `json:"svcName,omitempty"`
-	Address string `json:"address,omitempty"`
 }
 
 type CentralSSO struct {

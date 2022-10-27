@@ -16,6 +16,7 @@ spec:
       labels:
         app: prom
     spec:
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-prom
       securityContext:
         runAsUser: 1000

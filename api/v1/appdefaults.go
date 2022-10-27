@@ -477,12 +477,6 @@ var ssoDefault = SSO{
 		GroupsAuth:                       true,
 	},
 
-	Authz: Authz{
-		Enabled: false,
-		Image:   "proxy:v1.0.2",
-		SvcName: "cnvrg-authz",
-	},
-
 	Proxy: CentralProxy{
 		Enabled: false,
 		Image:   "proxy:v1.0.2",
