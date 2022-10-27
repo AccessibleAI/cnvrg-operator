@@ -218,12 +218,6 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 			}
 		}
 
-		if app.Spec.SSO.Authz.Enabled {
-			if err := sso.NewAuthzStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
-				return err
-			}
-		}
-
 		if app.Spec.SSO.Proxy.Enabled {
 			if err := sso.NewProxyStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err

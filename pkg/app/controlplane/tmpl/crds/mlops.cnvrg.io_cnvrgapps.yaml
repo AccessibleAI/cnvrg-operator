@@ -884,9 +884,6 @@ spec:
                     type: string
                   jobClassRef:
                     type: string
-                required:
-                - appClassRef
-                - jobClassRef
                 type: object
               registry:
                 properties:
@@ -901,17 +898,6 @@ spec:
                 type: object
               sso:
                 properties:
-                  authz:
-                    properties:
-                      address:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
                   central:
                     properties:
                       adminUser:

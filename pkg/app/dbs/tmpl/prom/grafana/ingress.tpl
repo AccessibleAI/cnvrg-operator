@@ -33,6 +33,12 @@ spec:
             pathType: Prefix
             backend:
               service:
+                {{- if isTrue .Spec.SSO.Enabled }}
+                name: {{ .Spec.SSO.Proxy.SvcName }}
+                port:
+                  number: 80
+                {{- else }}
                 name: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
                 port:
                   number: {{ .Spec.Dbs.Prom.Grafana.Port }}
+                {{- end }}

@@ -32,6 +32,10 @@ spec:
     timeout: {{ .Spec.Networking.Ingress.Timeout }}
     route:
     - destination:
+        {{- if isTrue .Spec.SSO.Enabled }}
+        host: "{{.Spec.SSO.Proxy.Address}}"
+        {{- else }}
         port:
           number: {{.Spec.Dbs.Es.Kibana.Port}}
         host: "{{ .Spec.Dbs.Es.Kibana.SvcName }}.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"
+        {{- end }}

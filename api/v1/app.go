@@ -193,8 +193,8 @@ type Mpi struct {
 }
 
 type PriorityClass struct {
-	AppClassRef string `json:"appClassRef"`
-	JobClassRef string `json:"jobClassRef"`
+	AppClassRef string `json:"appClassRef,omitempty"`
+	JobClassRef string `json:"jobClassRef,omitempty"`
 }
 
 type Tenancy struct {

@@ -18,7 +18,7 @@ spec:
       labels:
         app: sso-central
     spec:
-      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
+      priorityClassName: {{ .AppClassRef }}
       serviceAccountName: cnvrg-sso-central
       containers:
       - name: sso-central

@@ -72,6 +72,7 @@ func (c *CentralStateManager) depData() map[string]string {
 		"RedisCredsRef":    c.app.Spec.Dbs.Redis.CredsRef,
 		"SvcName":          CentralSsoSvcName,
 		"ImageHub":         c.app.Spec.ImageHub,
+		"AppClassRef":      c.app.Spec.PriorityClass.AppClassRef,
 	}
 }
 

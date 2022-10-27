@@ -28,8 +28,13 @@ spec:
     targetPort: {{ .Spec.Dbs.Es.Kibana.Port }}
   to:
     kind: Service
+    {{- if isTrue .Spec.SSO.Enabled }}
+    name: {{ .Spec.SSO.Proxy.SvcName }}
+    weight: 100
+    {{- else }}
     name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
     weight: 100
+    {{- end}}
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:
     termination: edge

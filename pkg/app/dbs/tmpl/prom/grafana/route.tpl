@@ -29,8 +29,13 @@ spec:
     targetPort: {{ .Spec.Dbs.Prom.Grafana.Port }}
   to:
     kind: Service
+    {{- if isTrue .Spec.SSO.Enabled }}
+    name: {{ .Spec.SSO.Proxy.SvcName }}
+    weight: 100
+    {{- else }}
     name: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
     weight: 100
+    {{- end }}
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:
     termination: edge

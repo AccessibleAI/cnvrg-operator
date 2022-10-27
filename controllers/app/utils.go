@@ -109,9 +109,6 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 				desiredAppSpec.ClusterInternalDomain,
 			)
 		}
-		if app.Spec.SSO.Authz.Address == "" {
-			desiredAppSpec.SSO.Authz.Address = fmt.Sprintf("%s.%s.svc:50052", desiredAppSpec.SSO.Authz.SvcName, app.Namespace)
-		}
 	}
 
 	return nil
