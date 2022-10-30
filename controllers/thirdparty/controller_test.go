@@ -1016,14 +1016,14 @@ package thirdparty
 //			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
 //			pr := v12.PriorityClass{}
 //			Eventually(func() bool {
-//				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.CnvrgAppPriorityClass.Name, Namespace: ns}, &pr)
+//				err := k8sClient.Get(ctx, types.NamespacedName{Name: infra.Spec.PriorityClass.AppClassRef, Namespace: ns}, &pr)
 //				if err != nil {
 //					return false
 //				}
 //				return true
 //			}, timeout, interval).Should(BeTrue())
 //			expectedPr := v12.PriorityClass{
-//				ObjectMeta:  metav1.ObjectMeta{Name: infra.Spec.CnvrgAppPriorityClass.Name},
+//				ObjectMeta:  metav1.ObjectMeta{Name: infra.Spec.PriorityClass.AppClassRef},
 //				Value:       infra.Spec.CnvrgAppPriorityClass.Value,
 //				Description: infra.Spec.CnvrgAppPriorityClass.Description,
 //			}

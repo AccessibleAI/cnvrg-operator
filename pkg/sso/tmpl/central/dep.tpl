@@ -18,6 +18,7 @@ spec:
       labels:
         app: {{.SvcName}}
     spec:
+      priorityClassName: {{ .AppClassRef }}
       serviceAccountName: cnvrg-{{.SvcName}}
       containers:
       - name: {{.SvcName}}
@@ -36,6 +37,13 @@ spec:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
       - name: oauth2-proxy
         image: {{  image .ImageHub  .OauthProxyImage }}
         command: [ "oauth2-proxy", "--config", "/opt/app-root/conf/proxy-config/conf" ]
@@ -46,6 +54,13 @@ spec:
           - name: "proxy-config"
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
+        resources:
+          limits:
+            cpu: {{ .Limits.Cpu }}
+            memory: {{ .Limits.Memory }}
+          requests:
+            cpu: {{ .Requests.Cpu }}
+            memory: {{ .Requests.Memory }}
       volumes:
       - name: "proxy-config"
         configMap:

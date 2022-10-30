@@ -391,23 +391,26 @@ spec:
       whitelistDomain: {{.Values.sso.central.whitelistDomain}}
       cookieDomain: {{.Values.sso.central.cookieDomain}}
       groupsAuth: {{.Values.sso.central.groupsAuth}}
-    authz:
-      enabled: {{.Values.sso.authz.enabled}}
-      image: {{.Values.sso.authz.image}}
-      address: {{.Values.sso.authz.address}}
+      requests:
+        cpu: "{{.Values.sso.central.requests.cpu}}"
+        memory: "{{.Values.sso.central.requests.memory}}"
+      limits:
+        cpu: "{{.Values.sso.central.limits.cpu}}"
+        memory: "{{.Values.sso.central.limits.memory}}"
     proxy:
       enabled: {{.Values.sso.proxy.enabled}}
       image: {{.Values.sso.proxy.image}}
       address: {{.Values.sso.proxy.address}}
+      requests:
+        cpu: "{{.Values.sso.proxy.requests.cpu}}"
+        memory: "{{.Values.sso.proxy.requests.memory}}"
+      limits:
+        cpu: "{{.Values.sso.proxy.limits.cpu}}"
+        memory: "{{.Values.sso.proxy.limits.memory}}"
   tenancy:
     enabled: {{.Values.tenancy.enabled}}
     key: {{.Values.tenancy.key}}
     value: {{.Values.tenancy.value}}
-  cnvrgAppPriorityClass:
-    name: {{.Values.cnvrgAppPriorityClass.name}}
-    value: {{.Values.cnvrgAppPriorityClass.value}}
-    description: {{.Values.cnvrgAppPriorityClass.description}}
-  cnvrgJobPriorityClass:
-    name: {{.Values.cnvrgJobPriorityClass.name}}
-    value: {{.Values.cnvrgJobPriorityClass.value}}
-    description: {{.Values.cnvrgJobPriorityClass.description}}
+  priorityClass:
+    appClassRef: {{.Values.priorityClass.appClassRef}}
+    jobClassRef: {{.Values.priorityClass.jobClassRef}}

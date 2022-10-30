@@ -32,6 +32,10 @@ spec:
     timeout: {{ .Spec.Networking.Ingress.Timeout }}
     route:
     - destination:
+        {{- if isTrue .Spec.SSO.Enabled }}
+        host: "{{.Spec.SSO.Proxy.Address}}"
+        {{- else }}
         host: "{{ .Spec.Dbs.Prom.Grafana.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
         port:
           number: {{ .Spec.Dbs.Prom.Grafana.Port }}
+        {{- end }}

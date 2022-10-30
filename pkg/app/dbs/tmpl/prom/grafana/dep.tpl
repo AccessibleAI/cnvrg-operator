@@ -5,43 +5,44 @@ metadata:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
-    {{- range $k, $v := .Data.Spec.Annotations }}
+    {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
-    {{- range $k, $v := .Data.Spec.Labels }}
+    app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+    {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
-  namespace: {{ .Data.Namespace }}
+  name: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+  namespace: {{ .Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
+      app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
   template:
     metadata:
       labels:
-        app: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
-        {{- range $k, $v := .Data.ObjectMeta.Annotations }}
+        app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+        {{- range $k, $v := .Spec.Annotations }}
         {{- if eq $k "eastwest_custom_name" }}
         sidecar.istio.io/inject: "true"
         {{- end }}
         {{- end }}
     spec:
-      {{- if isTrue .Data.Spec.Tenancy.Enabled }}
+      {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
-        "{{ .Data.Spec.Tenancy.Key }}": "{{ .Data.Spec.Tenancy.Value }}"
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
       tolerations:
-        - key: "{{ .Data.Spec.Tenancy.Key }}"
+        - key: "{{ .Spec.Tenancy.Key }}"
           operator: "Equal"
-          value: "{{ .Data.Spec.Tenancy.Value }}"
+          value: "{{ .Spec.Tenancy.Value }}"
           effect: "NoSchedule"
       {{- end }}
-      serviceAccountName: {{ .Data.Spec.Dbs.Prom.Grafana.SvcName }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
+      serviceAccountName: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
       containers:
-      - image: {{image .Data.Spec.ImageHub .Data.Spec.Dbs.Prom.Grafana.Image }}
+      - image: {{image .Spec.ImageHub .Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
         securityContext:
           runAsNonRoot: true
@@ -58,9 +59,9 @@ spec:
           - name: GF_SERVER_HTTP_ADDR
             value: "0.0.0.0"
           - name: GF_SERVER_HTTP_PORT
-            value: "{{ .Data.Spec.Dbs.Prom.Grafana.Port }}"
+            value: "{{ .Spec.Dbs.Prom.Grafana.Port }}"
         ports:
-        - containerPort: {{ .Data.Spec.Dbs.Prom.Grafana.Port }}
+        - containerPort: {{ .Spec.Dbs.Prom.Grafana.Port }}
           name: http
         readinessProbe:
           httpGet:

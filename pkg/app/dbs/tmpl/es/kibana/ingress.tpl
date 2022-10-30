@@ -33,6 +33,12 @@ spec:
             pathType: Prefix
             backend:
               service:
+                {{- if isTrue .Spec.SSO.Enabled }}
+                name: {{ .Spec.SSO.Proxy.SvcName }}
+                port:
+                  number: 80
+                {{- else }}
                 name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
                 port:
                  number: {{ .Spec.Dbs.Es.Kibana.Port }}
+                {{- end}}

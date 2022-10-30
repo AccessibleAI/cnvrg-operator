@@ -28,7 +28,7 @@ spec:
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-jwks
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
@@ -46,7 +46,7 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 100Mi
+            memory: 500Mi
           limits:
             cpu: 1000m
             memory: 1Gi

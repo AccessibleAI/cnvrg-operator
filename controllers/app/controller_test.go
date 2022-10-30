@@ -2156,7 +2156,7 @@ package app
 //			infra := getDefaultTestInfraSpec(ns)
 //			app := getDefaultTestAppSpec(ns)
 //			app.Spec.CnvrgJobPriorityClass.Name = ""
-//			app.Spec.CnvrgAppPriorityClass.Name = ""
+//			app.Spec.PriorityClass.AppClassRef = ""
 //			app.Spec.Dbs.Pg.Enabled = true
 //			// create infra
 //			Expect(k8sClient.Create(ctx, infra)).Should(Succeed())
@@ -2181,7 +2181,7 @@ package app
 //				return true
 //			}, timeout, interval).Should(BeTrue())
 //
-//			Expect(expectedApp.Spec.CnvrgAppPriorityClass.Name).To(Equal(infra.Spec.CnvrgAppPriorityClass.Name))
+//			Expect(expectedApp.Spec.PriorityClass.AppClassRef).To(Equal(infra.Spec.PriorityClass.AppClassRef))
 //			Expect(expectedApp.Spec.CnvrgJobPriorityClass.Name).To(Equal(infra.Spec.CnvrgJobPriorityClass.Name))
 //			Expect(k8sClient.Delete(ctx, app)).Should(Succeed())
 //			Expect(k8sClient.Delete(ctx, infra)).Should(Succeed())

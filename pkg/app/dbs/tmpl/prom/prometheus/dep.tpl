@@ -21,6 +21,7 @@ spec:
         {{- end }}
         {{- end }}
     spec:
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-prom
       securityContext:
         runAsUser: 1000

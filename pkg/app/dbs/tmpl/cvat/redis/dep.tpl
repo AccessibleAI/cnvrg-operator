@@ -28,7 +28,7 @@ spec:
         owner: cnvrg-control-plane
         cnvrg-component: redis
     spec:
-      priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       {{- if (gt (len .Spec.Dbs.Cvat.Redis.NodeSelector) 0) }}
       nodeSelector:
         {{- range $key, $val := .Spec.Dbs.Cvat.Redis.NodeSelector }}

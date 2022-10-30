@@ -218,12 +218,6 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 			}
 		}
 
-		if app.Spec.SSO.Authz.Enabled {
-			if err := sso.NewAuthzStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
-				return err
-			}
-		}
-
 		if app.Spec.SSO.Proxy.Enabled {
 			if err := sso.NewProxyStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
@@ -294,11 +288,6 @@ func (r *CnvrgAppReconciler) syncCnvrgAppSpec(name types.NamespacedName) (bool, 
 
 		if diff, equal := messagediff.PrettyDiff(desiredSpec, app.Spec); !equal {
 			r.Log.Info("diff between desiredSpec and actual")
-			r.Log.Info(diff)
-		}
-
-		if diff, equal := messagediff.PrettyDiff(app.Spec, desiredSpec); !equal {
-			r.Log.Info("diff between actual and desired")
 			r.Log.Info(diff)
 		}
 

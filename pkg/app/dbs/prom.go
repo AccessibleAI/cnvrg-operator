@@ -282,7 +282,8 @@ func (m *GrafanaStateManager) deployment() error {
 	}
 
 	data := map[string]interface{}{
-		"Data":       m.app,
+		"Namespace":  m.app.Namespace,
+		"Spec":       m.app.Spec,
 		"Dashboards": m.dashboardsToList(),
 	}
 	if err := dep.Render(data); err != nil {

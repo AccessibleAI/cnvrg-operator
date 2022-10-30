@@ -33,8 +33,7 @@ type CnvrgAppSpec struct {
 	Networking            Networking        `json:"networking,omitempty"`
 	SSO                   SSO               `json:"sso,omitempty"`
 	Tenancy               Tenancy           `json:"tenancy,omitempty"`
-	CnvrgAppPriorityClass PriorityClass     `json:"cnvrgAppPriorityClass,omitempty"`
-	CnvrgJobPriorityClass PriorityClass     `json:"cnvrgJobPriorityClass,omitempty"`
+	PriorityClass         PriorityClass     `json:"priorityClass,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -89,15 +88,9 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		},
 		Labels:      map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations: nil,
-		CnvrgAppPriorityClass: PriorityClass{
-			Name:        "cnvrg-apps",
-			Value:       2000000,
-			Description: "cnvrg control plane apps priority class",
-		},
-		CnvrgJobPriorityClass: PriorityClass{
-			Name:        "cnvrg-jobs",
-			Value:       1000000,
-			Description: "cnvrg jobs priority class",
+		PriorityClass: PriorityClass{
+			AppClassRef: "cnvrg-apps",
+			JobClassRef: "cnvrg-jobs",
 		},
 	}
 }

@@ -193,9 +193,8 @@ type Mpi struct {
 }
 
 type PriorityClass struct {
-	Name        string `json:"name,omitempty"`
-	Value       int32  `json:"value,omitempty"`
-	Description string `json:"description,omitempty"`
+	AppClassRef string `json:"appClassRef,omitempty"`
+	JobClassRef string `json:"jobClassRef,omitempty"`
 }
 
 type Tenancy struct {
@@ -391,7 +390,6 @@ type SSO struct {
 	Pki     Pki          `json:"pki,omitempty"`
 	Jwks    Jwks         `json:"jwks,omitempty"`
 	Central CentralSSO   `json:"central,omitempty"`
-	Authz   Authz        `json:"authz,omitempty"`
 	Proxy   CentralProxy `json:"proxy,omitempty"`
 }
 
@@ -414,13 +412,6 @@ type Jwks struct {
 	Cache   JwksCache `json:"cache,omitempty"`
 }
 
-type Authz struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-	SvcName string `json:"svcName,omitempty"`
-	Address string `json:"address,omitempty"`
-}
-
 type CentralSSO struct {
 	Enabled                          bool     `json:"enabled,omitempty"`
 	SvcName                          string   `json:"svcName,omitempty"`
@@ -441,11 +432,15 @@ type CentralSSO struct {
 	CookieDomain                     string   `json:"cookieDomain,omitempty"`
 	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
 	JwksURL                          string   `json:"jwksURL,omitempty"`
+	Limits                           Limits   `json:"limits,omitempty"`
+	Requests                         Requests `json:"requests,omitempty"`
 }
 
 type CentralProxy struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-	SvcName string `json:"name,omitempty"`
-	Address string `json:"address,omitempty"`
+	Enabled  bool     `json:"enabled,omitempty"`
+	Image    string   `json:"image,omitempty"`
+	SvcName  string   `json:"name,omitempty"`
+	Address  string   `json:"address,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
 }

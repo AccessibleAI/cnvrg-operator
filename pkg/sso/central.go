@@ -59,8 +59,8 @@ func (c *CentralStateManager) renderDeploymentAndSvc() error {
 	return nil
 }
 
-func (c *CentralStateManager) depData() map[string]string {
-	return map[string]string{
+func (c *CentralStateManager) depData() map[string]interface{} {
+	return map[string]interface{}{
 		"Namespace":        c.app.Namespace,
 		"SsoDomainId":      strings.Split(c.app.Spec.ClusterDomain, ".")[0],
 		"JwksUrl":          c.jwksUrl(),
@@ -70,6 +70,9 @@ func (c *CentralStateManager) depData() map[string]string {
 		"RedisCredsRef":    c.app.Spec.Dbs.Redis.CredsRef,
 		"SvcName":          c.app.Spec.SSO.Central.SvcName,
 		"ImageHub":         c.app.Spec.ImageHub,
+		"AppClassRef":      c.app.Spec.PriorityClass.AppClassRef,
+		"Limits":           c.app.Spec.SSO.Central.Limits,
+		"Requests":         c.app.Spec.SSO.Central.Requests,
 	}
 }
 

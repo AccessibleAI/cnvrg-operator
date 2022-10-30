@@ -55,26 +55,6 @@ spec:
                 type: string
               clusterInternalDomain:
                 type: string
-              cnvrgAppPriorityClass:
-                properties:
-                  description:
-                    type: string
-                  name:
-                    type: string
-                  value:
-                    format: int32
-                    type: integer
-                type: object
-              cnvrgJobPriorityClass:
-                properties:
-                  description:
-                    type: string
-                  name:
-                    type: string
-                  value:
-                    format: int32
-                    type: integer
-                type: object
               controlPlane:
                 properties:
                   baseConfig:
@@ -902,6 +882,13 @@ spec:
                         type: array
                     type: object
                 type: object
+              priorityClass:
+                properties:
+                  appClassRef:
+                    type: string
+                  jobClassRef:
+                    type: string
+                type: object
               registry:
                 properties:
                   name:
@@ -915,17 +902,6 @@ spec:
                 type: object
               sso:
                 properties:
-                  authz:
-                    properties:
-                      address:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      svcName:
-                        type: string
-                    type: object
                   central:
                     properties:
                       adminUser:
@@ -952,6 +928,13 @@ spec:
                         type: boolean
                       jwksURL:
                         type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       oauthProxyImage:
                         type: string
                       oidcIssuerUrl:
@@ -960,6 +943,13 @@ spec:
                         type: string
                       publicUrl:
                         type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       scope:
                         type: string
                       serviceUrl:
@@ -1006,8 +996,22 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                       name:
                         type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
                     type: object
                 type: object
               tenancy:

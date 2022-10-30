@@ -380,23 +380,27 @@ sso:
     whitelistDomain: ''
     cookieDomain: ''
     groupsAuth: false
-  authz:
-    enabled: false
-    image: proxy:v1.0.2
-    address: ""
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
   proxy:
     enabled: false
     image: proxy:v1.0.2
     address: ""
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
+
 tenancy:
   enabled: false
   key: purpose
   value: cnvrg-control-plane
-cnvrgAppPriorityClass:
-  name: ''
-  value: 0
-  description: ''
-cnvrgJobPriorityClass:
-  name: ''
-  value: 0
-  description: 'cnvrg job priority class'
+priorityClass:
+  appClassRef: ""
+  jobClassRef: ""
