@@ -101,7 +101,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(app *mlopsv1.CnvrgAp
 
 	// check prometheus status
 	if app.Spec.Dbs.Prom.Enabled {
-		name := types.NamespacedName{Name: "prom", Namespace: app.Namespace}
+		name := types.NamespacedName{Name: app.Spec.Dbs.Prom.SvcName, Namespace: app.Namespace}
 		ready, err := r.CheckDeploymentReadiness(name)
 		if err != nil {
 			return false, 0, nil, err
