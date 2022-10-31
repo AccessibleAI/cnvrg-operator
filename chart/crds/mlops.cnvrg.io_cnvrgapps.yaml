@@ -935,6 +935,8 @@ spec:
                         type: string
                       publicUrl:
                         type: string
+                      readiness:
+                        type: boolean
                       requests:
                         properties:
                           cpu:

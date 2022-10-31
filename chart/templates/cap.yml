@@ -391,6 +391,7 @@ spec:
       whitelistDomain: {{.Values.sso.central.whitelistDomain}}
       cookieDomain: {{.Values.sso.central.cookieDomain}}
       groupsAuth: {{.Values.sso.central.groupsAuth}}
+      readiness: {{.Values.sso.central.readiness}}
       requests:
         cpu: "{{.Values.sso.central.requests.cpu}}"
         memory: "{{.Values.sso.central.requests.memory}}"

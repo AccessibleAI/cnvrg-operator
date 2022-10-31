@@ -380,6 +380,7 @@ sso:
     whitelistDomain: ''
     cookieDomain: ''
     groupsAuth: false
+    readiness: true
     requests:
       cpu: 500m
       memory: 1Gi
