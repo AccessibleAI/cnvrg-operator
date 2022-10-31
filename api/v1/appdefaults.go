@@ -487,7 +487,7 @@ var ssoDefault = SSO{
 
 	Proxy: CentralProxy{
 		Enabled: false,
-		Image:   "proxy:v1.0.2",
+		Image:   "proxy:v1.0.3",
 		SvcName: "cnvrg-proxy-central",
 		Requests: Requests{
 			Cpu:    "500m",
