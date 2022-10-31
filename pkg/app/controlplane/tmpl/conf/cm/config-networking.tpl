@@ -30,6 +30,7 @@ data:
   {{- if isTrue .Spec.SSO.Enabled }}
   {{- if eq "true" (routeBy . "ISTIO")}}
   CNVRG_SSO_CENTRAL_PROXY: "{{.Spec.SSO.Proxy.Address}}"
+  CNVRG_SSO_PUBLIC_URL: "{{.Spec.SSO.Central.PublicUrl}}"
   {{- else }}
   CNVRG_SSO_CENTRAL_PROXY: "{{.Spec.SSO.Proxy.SvcName}}"
   {{- end }}
