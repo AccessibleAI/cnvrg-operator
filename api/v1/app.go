@@ -429,6 +429,7 @@ type CentralSSO struct {
 	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
 	Limits                           Limits   `json:"limits,omitempty"`
 	Requests                         Requests `json:"requests,omitempty"`
+	Readiness                        bool     `json:"readiness,omitempty"`
 }
 
 type CentralProxy struct {

@@ -10,7 +10,6 @@ require (
 	github.com/go-logr/zapr v1.2.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/imdario/mergo v0.3.13
-	github.com/jeremywohl/flatten v1.0.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.12.0

@@ -75,6 +75,7 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 		"AppClassRef":      c.app.Spec.PriorityClass.AppClassRef,
 		"Limits":           c.app.Spec.SSO.Central.Limits,
 		"Requests":         c.app.Spec.SSO.Central.Requests,
+		"Readiness":        c.app.Spec.SSO.Central.Readiness,
 	}
 }
 
