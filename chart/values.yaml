@@ -388,7 +388,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: proxy:v1.0.2
+    image: proxy:v1.0.3
     address: ""
     requests:
       cpu: 500m

@@ -44,6 +44,7 @@ data:
     whitelist_domains = [ "{{ .WhitelistDomain }}" ]
     cookie_domains = [ "{{ .CookieDomain }}" ]
     extra_jwt_issuers = [ "{{.ExtraJwtIssuer}}" ]
+    redis_connection_idle_timeout = 5
     {{- $groupLen := len .Groups }}
     {{- if gt $groupLen 0 }}
     allowed_groups = [
