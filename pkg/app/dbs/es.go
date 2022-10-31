@@ -132,10 +132,6 @@ func (m *KibanaStateManager) getKibanaConfigSecretData() (map[string]interface{}
 		m.Log().Error(err, "can't fetch es creds")
 		return nil, err
 	}
-	if m.app.Spec.SSO.Enabled {
-		kibanaHost = "127.0.0.1"
-		kibanaPort = "3000"
-	}
 	return map[string]interface{}{
 		"Namespace":   m.app.Namespace,
 		"Host":        kibanaHost,
