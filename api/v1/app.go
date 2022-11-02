@@ -439,7 +439,7 @@ type CentralSSO struct {
 type CentralProxy struct {
 	Enabled  bool     `json:"enabled,omitempty"`
 	Image    string   `json:"image,omitempty"`
-	SvcName  string   `json:"name,omitempty"`
+	SvcName  string   `json:"svcName,omitempty"`
 	Address  string   `json:"address,omitempty"`
 	Limits   Limits   `json:"limits,omitempty"`
 	Requests Requests `json:"requests,omitempty"`

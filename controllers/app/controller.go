@@ -147,7 +147,7 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
-	if app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+	if app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && app.Spec.Networking.Ingress.IstioGwEnabled {
 		if err := networking.NewIstioGwState(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			return err
 		}

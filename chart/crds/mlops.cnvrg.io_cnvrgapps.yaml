@@ -1003,8 +1003,6 @@ spec:
                           memory:
                             type: string
                         type: object
-                      name:
-                        type: string
                       requests:
                         properties:
                           cpu:
@@ -1012,6 +1010,8 @@ spec:
                           memory:
                             type: string
                         type: object
+                      svcName:
+                        type: string
                     type: object
                 type: object
               tenancy:

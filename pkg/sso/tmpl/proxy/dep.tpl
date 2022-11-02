@@ -17,6 +17,11 @@ spec:
     metadata:
       labels:
         app: {{.Spec.SSO.Proxy.SvcName}}
+        {{- range $k, $v := .ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
+        {{- end }}
     spec:
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
