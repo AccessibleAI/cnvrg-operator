@@ -439,7 +439,7 @@ var networkingDefault = Networking{
 		Timeout:                   "18000s",
 		RetriesAttempts:           5,
 		PerTryTimeout:             "3600s",
-		IstioGwEnabled:            false,
+		IstioGwEnabled:            true,
 		IstioGwName:               "",
 		IstioIngressSelectorKey:   "istio",
 		IstioIngressSelectorValue: "ingressgateway",
