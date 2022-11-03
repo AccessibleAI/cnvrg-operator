@@ -60,12 +60,6 @@ func (m *CpStateManager) LoadKiqs(kiqName string, hpa bool) error {
 func (m *CpStateManager) Load() error {
 	f := &desired.LoadFilter{DefaultLoader: true}
 
-	ccp := desired.NewAssetsGroup(fs, fsRoot+"/ccp", m.Log(), f)
-	if err := ccp.LoadAssets(); err != nil {
-		return err
-	}
-	m.AddToAssets(ccp)
-
 	conf := desired.NewAssetsGroup(fs, fsRoot+"/conf/cm", m.Log(), f)
 	if err := conf.LoadAssets(); err != nil {
 		return err
@@ -85,6 +79,14 @@ func (m *CpStateManager) Load() error {
 			return err
 		}
 		m.AddToAssets(ocpScc)
+	}
+
+	if m.app.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
+		ccp := desired.NewAssetsGroup(fs, fsRoot+"/ccp", m.Log(), f)
+		if err := ccp.LoadAssets(); err != nil {
+			return err
+		}
+		m.AddToAssets(ccp)
 	}
 
 	if m.app.Spec.ControlPlane.Hyper.Enabled {
