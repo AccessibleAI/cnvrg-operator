@@ -103,7 +103,7 @@ spec:
                   curl -XPOST "http://localhost:$SERVER_PORT/api/saved_objects/index-pattern/$cnvrgIndexPattern" \
                      -H 'kbn-xsrf: true' \
                      -H 'Content-Type: application/json' \
-                     -d '{"attributes":{"title": "cnvrg","timeFieldName": "@timestamp"}}'
+                     -d '{"attributes":{"title": "cnvrg*","timeFieldName": "@timestamp"}}'
                   echo "[$(date)][cnvrg-init] Index created!"
                 fi
               } &
