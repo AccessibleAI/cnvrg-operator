@@ -29,6 +29,7 @@ data:
   CNVRG_PASSENGER_MAX_POOL_SIZE: "{{ .Spec.ControlPlane.WebApp.PassengerMaxPoolSize }}"
   OAUTH_PROXY_ENABLED: "{{ isTrue .Spec.SSO.Enabled }}"
   OAUTH_ADMIN_USER: "{{ .Spec.SSO.Central.AdminUser }}"
+  SSO_IDP_PRIVATE_KEY_REF: "{{ .Spec.SSO.Pki.PrivateKeySecret }}"
   CNVRG_PASSENGER_BIND_ADDRESS: "0.0.0.0"
   CNVRG_PASSENGER_BIND_PORT: "{{.Spec.ControlPlane.WebApp.Port}}"
   CNVRG_JOB_UID: "{{ .Spec.ControlPlane.BaseConfig.CnvrgJobUID }}"
