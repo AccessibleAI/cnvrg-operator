@@ -390,6 +390,7 @@ sso:
     enabled: false
     image: proxy:v1.0.3
     address: ""
+    readiness: true
     requests:
       cpu: 500m
       memory: 1Gi

@@ -995,6 +995,8 @@ spec:
                         type: object
                       name:
                         type: string
+                      readiness:
+                        type: boolean
                       requests:
                         properties:
                           cpu:

@@ -30,6 +30,14 @@ spec:
           - --ingress-type={{.Spec.Networking.Ingress.Type}}
         ports:
           - containerPort: 8888
+        {{- if isTrue .Spec.SSO.Proxy.Readiness }}
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8889
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        {{- end }}
         resources:
           limits:
             cpu: {{ .Spec.SSO.Proxy.Limits.Cpu }}
