@@ -24,11 +24,6 @@ spec:
     metadata:
       labels:
         app: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
-        {{- range $k, $v := .Spec.Annotations }}
-        {{- if eq $k "eastwest_custom_name" }}
-        sidecar.istio.io/inject: "true"
-        {{- end }}
-        {{- end }}
     spec:
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
