@@ -20,6 +20,7 @@ spec:
     spec:
       priorityClassName: {{ .AppClassRef }}
       serviceAccountName: cnvrg-{{.SvcName}}
+      enableServiceLinks: false
       containers:
       - name: {{.SvcName}}
         imagePullPolicy: Always

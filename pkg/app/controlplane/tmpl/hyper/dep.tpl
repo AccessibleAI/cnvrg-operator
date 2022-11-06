@@ -50,6 +50,7 @@ spec:
           effect: "NoSchedule"
       {{- end }}
       serviceAccountName: cnvrg-control-plane
+      enableServiceLinks: false
       containers:
         - image: {{ image .Spec.ImageHub .Spec.ControlPlane.Hyper.Image }}
           name: {{ .Spec.ControlPlane.Hyper.SvcName }}

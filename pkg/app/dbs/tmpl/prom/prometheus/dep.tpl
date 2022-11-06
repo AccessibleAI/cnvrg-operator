@@ -26,6 +26,7 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      enableServiceLinks: false
       containers:
       - name: prometheus
         image: {{ image .Spec.ImageHub .Spec.Dbs.Prom.Image }}

@@ -36,6 +36,7 @@ spec:
       {{- end }}
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+      enableServiceLinks: false
       containers:
       - image: {{image .Spec.ImageHub .Spec.Dbs.Prom.Grafana.Image }}
         name: grafana

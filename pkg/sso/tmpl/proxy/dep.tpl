@@ -25,6 +25,7 @@ spec:
     spec:
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
+      enableServiceLinks: false
       containers:
       - name: proxy-central
         imagePullPolicy: Always

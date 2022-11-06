@@ -36,6 +36,7 @@ spec:
       tolerations:
         - operator: "Exists"
       {{- end }}
+      enableServiceLinks: false
       containers:
       - name: cnvrg-jwks
         command:
