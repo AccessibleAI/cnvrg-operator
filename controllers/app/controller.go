@@ -123,7 +123,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", percentageReady)
 	log.Info(statusMsg)
 
-	if ready { // ura, done
+	if ready { // u r done, done
 		s := mlopsv1.Status{
 			Status:         mlopsv1.StatusReady,
 			Message:        statusMsg,
@@ -147,7 +147,7 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
-	if app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress {
+	if app.Spec.Networking.Ingress.Type == mlopsv1.IstioIngress && app.Spec.Networking.Ingress.IstioGwEnabled {
 		if err := networking.NewIstioGwState(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			return err
 		}
@@ -385,7 +385,7 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	if viper.GetBool("create-crds") {
-		if err := controlplane.NewControlPlaneCredsStateManager(r.Client, r.Scheme, r.Log).Apply(); err != nil {
+		if err := controlplane.NewControlPlaneCrdsStateManager(r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			return err
 		}
 	}

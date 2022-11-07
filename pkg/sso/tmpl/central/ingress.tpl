@@ -15,18 +15,18 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: sso-central
+  name: {{.Spec.SSO.Central.SvcName}}
   namespace: {{.Namespace }}
 spec:
   ingressClassName: nginx
   rules:
-    - host: "sso-central.{{ .Spec.ClusterDomain }}"
+    - host: "{{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: sso-central
+                name: {{.Spec.SSO.Central.SvcName}}
                 port:
                   number: 8080

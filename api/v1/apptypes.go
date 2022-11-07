@@ -18,6 +18,7 @@ const (
 	NginxIngress     IngressType = "ingress"
 	OpenShiftIngress IngressType = "openshift"
 	NodePortIngress  IngressType = "nodeport"
+	NoneIngress      IngressType = "none"
 )
 
 type CnvrgAppSpec struct {
@@ -88,8 +89,8 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Labels:      map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations: nil,
 		PriorityClass: PriorityClass{
-			AppClassRef: "",
-			JobClassRef: "",
+			AppClassRef: "cnvrg-apps",
+			JobClassRef: "cnvrg-jobs",
 		},
 	}
 }

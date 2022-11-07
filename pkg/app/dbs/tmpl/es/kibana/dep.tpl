@@ -51,6 +51,7 @@ spec:
         - name: "kibana-config"
           secret:
             secretName: "kibana-config"
+      enableServiceLinks: false
       containers:
         - name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
           image: {{image .Spec.ImageHub .Spec.Dbs.Es.Kibana.Image }}

@@ -369,7 +369,7 @@ spec:
       publicKeySecret: {{.Values.sso.pki.publicKeySecret}}
     jwks:
       enabled: {{.Values.sso.jwks.enabled}}
-      name: {{.Values.sso.jwks.name}}
+      name: {{.Values.sso.jwks.svcName}}
       image: {{.Values.sso.jwks.image}}
       cache:
         enabled: {{.Values.sso.jwks.cache.enabled}}

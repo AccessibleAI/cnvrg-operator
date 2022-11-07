@@ -47,6 +47,7 @@ spec:
       serviceAccountName: mpi-operator
       imagePullSecrets:
         - name: {{ .Spec.ControlPlane.Mpi.Registry.Name }}
+      enableServiceLinks: false
       containers:
       - name: mpi-operator
         imagePullPolicy: Always

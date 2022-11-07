@@ -638,6 +638,8 @@ spec:
                         type: integer
                       pvcName:
                         type: string
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:
@@ -783,6 +785,10 @@ spec:
                         type: object
                       image:
                         type: string
+                      port:
+                        type: integer
+                      svcName:
+                        type: string
                     type: object
                   redis:
                     properties:
@@ -908,6 +914,8 @@ spec:
                         type: string
                       clientSecret:
                         type: string
+                      cnvrgProxyImage:
+                        type: string
                       cookieDomain:
                         type: string
                       emailDomain:
@@ -920,12 +928,18 @@ spec:
                         type: boolean
                       insecureOidcAllowUnverifiedEmail:
                         type: boolean
+                      jwksURL:
+                        type: string
                       limits:
                         properties:
                           cpu:
                             type: string
                           memory:
                             type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
                         type: object
                       oauthProxyImage:
                         type: string
@@ -935,6 +949,8 @@ spec:
                         type: string
                       publicUrl:
                         type: string
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:
@@ -946,6 +962,8 @@ spec:
                         type: string
                       serviceUrl:
                         type: string
+                      svcName:
+                        type: string
                       whitelistDomain:
                         type: string
                     type: object
@@ -953,18 +971,19 @@ spec:
                     type: boolean
                   jwks:
                     properties:
-                      cache:
-                        properties:
-                          enabled:
-                            type: boolean
-                          image:
-                            type: string
-                        type: object
+                      cacheImage:
+                        type: string
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      name:
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      svcName:
                         type: string
                     type: object
                   pki:
@@ -993,8 +1012,12 @@ spec:
                           memory:
                             type: string
                         type: object
-                      name:
-                        type: string
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:
@@ -1002,6 +1025,8 @@ spec:
                           memory:
                             type: string
                         type: object
+                      svcName:
+                        type: string
                     type: object
                 type: object
               tenancy:

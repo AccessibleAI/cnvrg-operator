@@ -1,27 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sso-central
+  name: {{.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
   labels:
-    app: sso-central
+    app: {{.SvcName}}
 spec:
+  replicas: {{ .Replicas }}
   selector:
     matchLabels:
-      app: sso-central
+      app: {{.SvcName}}
   template:
     metadata:
       labels:
-        app: sso-central
+        app: {{.SvcName}}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .AppClassRef }}
-      serviceAccountName: cnvrg-sso-central
+      serviceAccountName: cnvrg-{{.SvcName}}
+      enableServiceLinks: false
       containers:
-      - name: sso-central
+      - name: {{.SvcName}}
         imagePullPolicy: Always
         image: {{ image .ImageHub  .CentralUIImage }}
         env:

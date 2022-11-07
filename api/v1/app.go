@@ -242,6 +242,8 @@ type Grafana struct {
 
 type Prom struct {
 	Enabled            bool                  `json:"enabled,omitempty"`
+	SvcName            string                `json:"svcName,omitempty"`
+	Port               int                   `json:"port,omitempty"`
 	CredsRef           string                `json:"credsRef,omitempty"`
 	ExtraScrapeConfigs []*ExtraScrapeConfigs `json:"extraScrapeConfigs,omitempty"`
 	Image              string                `json:"image,omitempty"`
@@ -313,6 +315,7 @@ type Kibana struct {
 type Es struct {
 	Enabled        bool              `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
+	Replicas       int               `json:"replicas,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`
@@ -398,44 +401,48 @@ type Pki struct {
 	PublicKeySecret  string `json:"publicKeySecret,omitempty"`
 }
 
-type JwksCache struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-}
-
 type Jwks struct {
-	Enabled bool      `json:"enabled,omitempty"`
-	Name    string    `json:"name,omitempty"`
-	Image   string    `json:"image,omitempty"`
-	Cache   JwksCache `json:"cache,omitempty"`
+	Enabled      bool              `json:"enabled,omitempty"`
+	SvcName      string            `json:"svcName,omitempty"`
+	Replicas     int               `json:"replicas,omitempty"`
+	Image        string            `json:"image,omitempty"`
+	CacheImage   string            `json:"cacheImage,omitempty"`
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type CentralSSO struct {
-	Enabled                          bool     `json:"enabled,omitempty"`
-	PublicUrl                        string   `json:"publicUrl,omitempty"`
-	OauthProxyImage                  string   `json:"oauthProxyImage,omitempty"`
-	CentralUiImage                   string   `json:"centralUiImage,omitempty"`
-	AdminUser                        string   `json:"adminUser,omitempty"`
-	Provider                         string   `json:"provider,omitempty"`
-	EmailDomain                      []string `json:"emailDomain,omitempty"`
-	ClientID                         string   `json:"clientId,omitempty"`
-	ClientSecret                     string   `json:"clientSecret,omitempty"`
-	OidcIssuerURL                    string   `json:"oidcIssuerUrl,omitempty"`
-	ServiceUrl                       string   `json:"serviceUrl,omitempty"`
-	Scope                            string   `json:"scope,omitempty"`
-	InsecureOidcAllowUnverifiedEmail bool     `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
-	WhitelistDomain                  string   `json:"whitelistDomain,omitempty"`
-	CookieDomain                     string   `json:"cookieDomain,omitempty"`
-	GroupsAuth                       bool     `json:"groupsAuth,omitempty"`
-	Limits                           Limits   `json:"limits,omitempty"`
-	Requests                         Requests `json:"requests,omitempty"`
+	Enabled                          bool              `json:"enabled,omitempty"`
+	SvcName                          string            `json:"svcName,omitempty"`
+	Replicas                         int               `json:"replicas,omitempty"`
+	PublicUrl                        string            `json:"publicUrl,omitempty"`
+	OauthProxyImage                  string            `json:"oauthProxyImage,omitempty"`
+	CnvrgProxyImage                  string            `json:"cnvrgProxyImage,omitempty"`
+	CentralUiImage                   string            `json:"centralUiImage,omitempty"`
+	AdminUser                        string            `json:"adminUser,omitempty"`
+	Provider                         string            `json:"provider,omitempty"`
+	EmailDomain                      []string          `json:"emailDomain,omitempty"`
+	ClientID                         string            `json:"clientId,omitempty"`
+	ClientSecret                     string            `json:"clientSecret,omitempty"`
+	OidcIssuerURL                    string            `json:"oidcIssuerUrl,omitempty"`
+	ServiceUrl                       string            `json:"serviceUrl,omitempty"`
+	Scope                            string            `json:"scope,omitempty"`
+	InsecureOidcAllowUnverifiedEmail bool              `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
+	WhitelistDomain                  string            `json:"whitelistDomain,omitempty"`
+	CookieDomain                     string            `json:"cookieDomain,omitempty"`
+	GroupsAuth                       bool              `json:"groupsAuth,omitempty"`
+	JwksURL                          string            `json:"jwksURL,omitempty"`
+	Limits                           Limits            `json:"limits,omitempty"`
+	Requests                         Requests          `json:"requests,omitempty"`
+	NodeSelector                     map[string]string `json:"nodeSelector,omitempty"`
 }
 
 type CentralProxy struct {
-	Enabled  bool     `json:"enabled,omitempty"`
-	Image    string   `json:"image,omitempty"`
-	SvcName  string   `json:"name,omitempty"`
-	Address  string   `json:"address,omitempty"`
-	Limits   Limits   `json:"limits,omitempty"`
-	Requests Requests `json:"requests,omitempty"`
+	Enabled      bool              `json:"enabled,omitempty"`
+	Replicas     int               `json:"replicas,omitempty"`
+	Image        string            `json:"image,omitempty"`
+	SvcName      string            `json:"svcName,omitempty"`
+	Address      string            `json:"address,omitempty"`
+	Limits       Limits            `json:"limits,omitempty"`
+	Requests     Requests          `json:"requests,omitempty"`
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 }

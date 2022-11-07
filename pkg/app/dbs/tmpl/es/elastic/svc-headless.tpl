@@ -1,10 +1,11 @@
-
-apiVersion: v1
+---
 kind: Service
+apiVersion: v1
 metadata:
-  name: {{ .Spec.Dbs.Es.SvcName }}
+  name: {{ .Spec.Dbs.Es.SvcName }}-headless
   namespace: {{ .Namespace }}
   annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
@@ -17,15 +18,13 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
-  type: NodePort
-  {{- end }}
-  ports:
-  - name: http
-    port: {{ .Spec.Dbs.Es.Port }}
-    targetPort: {{ .Spec.Dbs.Es.Port }}
-    {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
-    nodePort: {{ .Spec.Dbs.Es.NodePort }}
-    {{- end }}
+  clusterIP: None # This is needed for statefulset hostnames like elasticsearch-0 to resolve
+  # Create endpoints also if the related pod isn't ready
+  publishNotReadyAddresses: true
   selector:
     app: {{ .Spec.Dbs.Es.SvcName }}
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300

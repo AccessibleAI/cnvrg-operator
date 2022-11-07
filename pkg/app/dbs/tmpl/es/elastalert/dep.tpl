@@ -16,6 +16,8 @@ metadata:
   name: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
   namespace: {{ ns . }}
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
@@ -28,6 +30,11 @@ spec:
         {{- end }}
       labels:
         app: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
+        {{- range $k, $v := .ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
+        {{- end }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
