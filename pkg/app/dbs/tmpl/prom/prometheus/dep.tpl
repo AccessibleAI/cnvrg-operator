@@ -23,6 +23,17 @@ spec:
         {{- end }}
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.Spec.Dbs.Prom.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-prom
       securityContext:

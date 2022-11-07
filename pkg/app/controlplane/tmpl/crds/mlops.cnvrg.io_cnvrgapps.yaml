@@ -940,6 +940,10 @@ spec:
                           memory:
                             type: string
                         type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
                       oauthProxyImage:
                         type: string
                       oidcIssuerUrl:
@@ -948,6 +952,8 @@ spec:
                         type: string
                       publicUrl:
                         type: string
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:
@@ -968,18 +974,19 @@ spec:
                     type: boolean
                   jwks:
                     properties:
-                      cache:
-                        properties:
-                          enabled:
-                            type: boolean
-                          image:
-                            type: string
-                        type: object
+                      cacheImage:
+                        type: string
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      name:
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      svcName:
                         type: string
                     type: object
                   pki:
@@ -1008,6 +1015,12 @@ spec:
                           memory:
                             type: string
                         type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:

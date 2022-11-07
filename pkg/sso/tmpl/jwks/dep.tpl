@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Spec.SSO.Jwks.Name }}
+  name: {{ .Spec.SSO.Jwks.SvcName }}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -11,25 +11,36 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: cnvrg-jwks
+    app: {{ .Spec.SSO.Jwks.SvcName }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  replicas: 1
+  replicas: {{ .Spec.SSO.Jwks.Replicas }}
   selector:
     matchLabels:
-      app: {{ .Spec.SSO.Jwks.Name }}
+      app: {{ .Spec.SSO.Jwks.SvcName }}
   template:
     metadata:
       labels:
-        app: {{ .Spec.SSO.Jwks.Name }}
+        app: {{ .Spec.SSO.Jwks.SvcName }}
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.Spec.SSO.Jwks.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
-      serviceAccountName: cnvrg-jwks
+      serviceAccountName: {{ .Spec.SSO.Jwks.SvcName }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
@@ -38,7 +49,7 @@ spec:
       {{- end }}
       enableServiceLinks: false
       containers:
-      - name: cnvrg-jwks
+      - name: {{ .Spec.SSO.Jwks.SvcName }}
         command:
           - /usr/bin/cnvrg-jwks
           - start
@@ -53,7 +64,7 @@ spec:
             memory: 1Gi
         volumeMounts:
           - mountPath: /opt/app-root/config
-            name: cnvrg-jwks
+            name: {{ .Spec.SSO.Jwks.SvcName }}
         ports:
           - containerPort: 8080
         livenessProbe:
@@ -75,7 +86,7 @@ spec:
             port: 8080
             path: /healthz
       - name: redis-cache
-        image: {{ image .Spec.ImageHub .Spec.SSO.Jwks.Cache.Image }}
+        image: {{ image .Spec.ImageHub .Spec.SSO.Jwks.CacheImage }}
         resources:
           requests:
             cpu: 200m
@@ -98,6 +109,6 @@ spec:
           exec:
             command: [ "redis-cli", "ping" ]
       volumes:
-        - name: cnvrg-jwks
+        - name: {{ .Spec.SSO.Jwks.SvcName }}
           configMap:
-            name: cnvrg-jwks
+            name: {{ .Spec.SSO.Jwks.SvcName }}

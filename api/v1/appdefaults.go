@@ -461,17 +461,17 @@ var ssoDefault = SSO{
 	},
 
 	Jwks: Jwks{
-		Enabled: false,
-		Image:   "cnvrg/jwks:latest",
-		Name:    "cnvrg-jwks",
-		Cache: JwksCache{
-			Enabled: true,
-			Image:   "redis:7.0.5",
-		},
+		Enabled:      false,
+		Image:        "cnvrg/jwks:latest",
+		Replicas:     1,
+		SvcName:      "cnvrg-jwks",
+		CacheImage:   "redis:7.0.5",
+		NodeSelector: nil,
 	},
 
 	Central: CentralSSO{
 		Enabled:                          false,
+		Replicas:                         1,
 		SvcName:                          "sso-central",
 		CnvrgProxyImage:                  "proxy:v1.0.1",
 		OauthProxyImage:                  "oauth2-proxy:v7.3.x.ssov3.p2-01",
@@ -481,26 +481,29 @@ var ssoDefault = SSO{
 		InsecureOidcAllowUnverifiedEmail: true,
 		GroupsAuth:                       true,
 		Requests: Requests{
-			Cpu:    "500m",
-			Memory: "1Gi",
+			Cpu:    "200m",
+			Memory: "400Mi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
 			Memory: "4Gi",
 		},
+		NodeSelector: nil,
 	},
 
 	Proxy: CentralProxy{
-		Enabled: false,
-		Image:   "proxy:v1.0.3",
-		SvcName: "cnvrg-proxy-central",
+		Enabled:  false,
+		Replicas: 1,
+		Image:    "proxy:v1.0.3",
+		SvcName:  "cnvrg-proxy-central",
 		Requests: Requests{
-			Cpu:    "500m",
-			Memory: "1Gi",
+			Cpu:    "200m",
+			Memory: "500Mi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
 			Memory: "4Gi",
 		},
+		NodeSelector: nil,
 	},
 }

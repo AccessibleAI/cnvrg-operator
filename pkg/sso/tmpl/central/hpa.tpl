@@ -8,7 +8,7 @@ metadata:
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:
-  minReplicas: 1
+  minReplicas: {{ .Spec.SSO.Central.Replicas }}
   maxReplicas: 10
   scaleTargetRef:
     apiVersion: apps/v1

@@ -10,6 +10,7 @@ metadata:
   labels:
     app: {{.SvcName}}
 spec:
+  replicas: {{ .Replicas }}
   selector:
     matchLabels:
       app: {{.SvcName}}
@@ -18,6 +19,17 @@ spec:
       labels:
         app: {{.SvcName}}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .AppClassRef }}
       serviceAccountName: cnvrg-{{.SvcName}}
       enableServiceLinks: false

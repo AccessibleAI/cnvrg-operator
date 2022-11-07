@@ -64,6 +64,7 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 		"Namespace":        c.app.Namespace,
 		"SsoDomainId":      strings.Split(c.app.Spec.ClusterDomain, ".")[0],
 		"JwksUrl":          c.jwksUrl(),
+		"Replicas":         c.app.Spec.SSO.Central.Replicas,
 		"PrivateKeySecret": c.app.Spec.SSO.Pki.PrivateKeySecret,
 		"CentralUIImage":   c.app.Spec.SSO.Central.CentralUiImage,
 		"OauthProxyImage":  c.app.Spec.SSO.Central.OauthProxyImage,

@@ -10,6 +10,7 @@ metadata:
   labels:
     app: {{.Spec.SSO.Proxy.SvcName}}
 spec:
+  replicas: {{ .Spec.SSO.Proxy.Replicas }}
   selector:
     matchLabels:
       app: {{.Spec.SSO.Proxy.SvcName}}
@@ -23,6 +24,17 @@ spec:
         {{- end }}
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.Spec.SSO.Proxy.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
       enableServiceLinks: false
