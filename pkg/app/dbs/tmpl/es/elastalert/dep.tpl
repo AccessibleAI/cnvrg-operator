@@ -16,6 +16,8 @@ metadata:
   name: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
   namespace: {{ ns . }}
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:

@@ -8,6 +8,8 @@ metadata:
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app:  {{ .Spec.Dbs.Prom.SvcName }}
