@@ -94,11 +94,11 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 	}
 
 	if app.Spec.SSO.Enabled {
+		scheme := "http"
+		if app.Spec.Networking.HTTPS.Enabled {
+			scheme = "https"
+		}
 		if app.Spec.SSO.Central.PublicUrl == "" {
-			scheme := "http"
-			if app.Spec.Networking.HTTPS.Enabled {
-				scheme = "https"
-			}
 			desiredAppSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s.%s", scheme, desiredAppSpec.SSO.Central.SvcName, app.Spec.ClusterDomain)
 		}
 		if app.Spec.SSO.Proxy.Address == "" {
@@ -106,6 +106,20 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, desiredAppSpec *mlopsv1
 				desiredAppSpec.SSO.Proxy.SvcName,
 				app.Namespace,
 				desiredAppSpec.ClusterInternalDomain,
+			)
+		}
+		if app.Spec.SSO.Central.JwksURL == "" {
+
+			desiredAppSpec.SSO.Central.JwksURL = fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id", scheme,
+				app.Spec.SSO.Jwks.SvcName,
+				app.Spec.ClusterDomain,
+				strings.Split(app.Spec.ClusterDomain, ".")[0],
+			)
+
+		} else if !strings.HasSuffix(desiredAppSpec.SSO.Central.JwksURL, "jwks.json?client_id") {
+			desiredAppSpec.SSO.Central.JwksURL = fmt.Sprintf("%s/v1/%s/.well-known/jwks.json?client_id",
+				desiredAppSpec.SSO.Central.JwksURL,
+				strings.Split(app.Spec.ClusterDomain, ".")[0],
 			)
 		}
 	}

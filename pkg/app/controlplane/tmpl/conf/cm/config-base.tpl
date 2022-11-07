@@ -37,6 +37,8 @@ data:
   CNVRG_JOBS_PRIORITY_CLASS: "{{ .Spec.PriorityClass.JobClassRef }}"
   HAS_CNVRG_SCHEDULER: "{{ .Spec.ControlPlane.CnvrgScheduler.Enabled }}"
   CNVRG_SSO_SERVICE_URL: "{{ .Spec.SSO.Central.ServiceUrl }}"
+  JWKS_ISS: "{{ .Spec.SSO.Central.JwksURL }}"
+  JWKS_AUD: "cnvrg-tenant"
   CNVRG_BUILD_IMAGE_JOB_SA: "cnvrg-buildimage-job"
   CNVRG_ENDPOINTS_INDEX: "cnvrg-endpoints*"
   CNVRG_SPARK_JOB_SA: "cnvrg-spark-job"

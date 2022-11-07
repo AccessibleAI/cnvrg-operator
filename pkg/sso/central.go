@@ -63,7 +63,7 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 	return map[string]interface{}{
 		"Namespace":        c.app.Namespace,
 		"SsoDomainId":      strings.Split(c.app.Spec.ClusterDomain, ".")[0],
-		"JwksUrl":          c.jwksUrl(),
+		"jwksUrl":          c.app.Spec.SSO.Central.JwksURL,
 		"Replicas":         c.app.Spec.SSO.Central.Replicas,
 		"PrivateKeySecret": c.app.Spec.SSO.Pki.PrivateKeySecret,
 		"CentralUIImage":   c.app.Spec.SSO.Central.CentralUiImage,
@@ -112,16 +112,16 @@ func (c *CentralStateManager) schema() string {
 	return schema
 }
 
-func (c *CentralStateManager) jwksUrl() string {
-
-	return fmt.Sprintf("%s/v1/%s/.well-known/jwks.json?client_id",
-		c.app.Spec.SSO.Central.JwksURL,
-		c.domainId())
-}
+//func (c *CentralStateManager) jwksUrl() string {
+//
+//	return fmt.Sprintf("%s/v1/%s/.well-known/jwks.json?client_id",
+//		c.app.Spec.SSO.Central.JwksURL,
+//		c.domainId())
+//}
 
 func (c *CentralStateManager) jwksUrlWithAudience() string {
 
-	return fmt.Sprintf("%s=cnvrg-tenant", c.jwksUrl())
+	return fmt.Sprintf("%s=cnvrg-tenant", c.app.Spec.SSO.Central.JwksURL)
 }
 
 func (c *CentralStateManager) Apply() error {
