@@ -1014,6 +1014,14 @@ spec:
                           memory:
                             type: string
                         type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      readiness:
+                        type: boolean
+                      replicas:
+                        type: integer
                       requests:
                         properties:
                           cpu:

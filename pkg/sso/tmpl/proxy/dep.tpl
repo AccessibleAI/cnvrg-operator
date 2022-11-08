@@ -52,7 +52,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /ready
-            port: 8889
+            port: 2112
           initialDelaySeconds: 10
           periodSeconds: 20
         {{- end }}
