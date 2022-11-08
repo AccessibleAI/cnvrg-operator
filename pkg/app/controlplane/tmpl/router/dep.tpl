@@ -36,6 +36,7 @@ spec:
           effect: "NoSchedule"
       {{- end }}
       serviceAccountName: cnvrg-control-plane
+      enableServiceLinks: false
       containers:
         - name: nginx
           image: {{  image .Spec.ImageHub .Spec.ControlPlane.CnvrgRouter.Image }}

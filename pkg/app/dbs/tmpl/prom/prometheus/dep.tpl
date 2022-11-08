@@ -1,26 +1,45 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prom
+  name:  {{ .Spec.Dbs.Prom.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      app: prom
+      app:  {{ .Spec.Dbs.Prom.SvcName }}
   template:
     metadata:
       labels:
-        app: prom
+        app: {{ .Spec.Dbs.Prom.SvcName }}
+        {{- range $k, $v := .ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
+        {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.Spec.Dbs.Prom.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-prom
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      enableServiceLinks: false
       containers:
       - name: prometheus
         image: {{ image .Spec.ImageHub .Spec.Dbs.Prom.Image }}
@@ -37,7 +56,7 @@ spec:
         - --config.file=/prometheus/config/scrape/prometheus.yml
         - --web.config.file=/prometheus/config/web/web-config.yml
         ports:
-          - containerPort: 9090
+          - containerPort: {{ .Spec.Dbs.Prom.Port }}
       volumes:
         - name: prom-scrape-configs
           configMap:
@@ -47,4 +66,4 @@ spec:
             name: prom-web-configs
         - name: prom-data
           persistentVolumeClaim:
-            claimName: prom
+            claimName: {{ .Spec.Dbs.Prom.SvcName }}

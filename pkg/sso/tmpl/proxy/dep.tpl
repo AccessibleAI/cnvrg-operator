@@ -10,6 +10,7 @@ metadata:
   labels:
     app: {{.Spec.SSO.Proxy.SvcName}}
 spec:
+  replicas: {{ .Spec.SSO.Proxy.Replicas }}
   selector:
     matchLabels:
       app: {{.Spec.SSO.Proxy.SvcName}}
@@ -17,9 +18,26 @@ spec:
     metadata:
       labels:
         app: {{.Spec.SSO.Proxy.SvcName}}
+        {{- range $k, $v := .ObjectMeta.Annotations }}
+        {{- if eq $k "eastwest_custom_name" }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
+        {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.Spec.SSO.Proxy.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
+      enableServiceLinks: false
       containers:
       - name: proxy-central
         imagePullPolicy: Always

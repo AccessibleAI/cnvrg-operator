@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-const CentralSsoSvcName = "sso-central"
-
 type CentralStateManager struct {
 	*desired.AssetsStateManager
 	app *mlopsv1.CnvrgApp
@@ -65,12 +63,13 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 	return map[string]interface{}{
 		"Namespace":        c.app.Namespace,
 		"SsoDomainId":      strings.Split(c.app.Spec.ClusterDomain, ".")[0],
-		"JwksUrl":          c.jwksUrl(),
+		"JwksUrl":          c.app.Spec.SSO.Central.JwksURL,
+		"Replicas":         c.app.Spec.SSO.Central.Replicas,
 		"PrivateKeySecret": c.app.Spec.SSO.Pki.PrivateKeySecret,
 		"CentralUIImage":   c.app.Spec.SSO.Central.CentralUiImage,
 		"OauthProxyImage":  c.app.Spec.SSO.Central.OauthProxyImage,
 		"RedisCredsRef":    c.app.Spec.Dbs.Redis.CredsRef,
-		"SvcName":          CentralSsoSvcName,
+		"SvcName":          c.app.Spec.SSO.Central.SvcName,
 		"ImageHub":         c.app.Spec.ImageHub,
 		"AppClassRef":      c.app.Spec.PriorityClass.AppClassRef,
 		"Limits":           c.app.Spec.SSO.Central.Limits,
@@ -90,7 +89,7 @@ func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
 		"Provider":                         c.app.Spec.SSO.Central.Provider,
 		"ClientId":                         c.app.Spec.SSO.Central.ClientID,
 		"ClientSecret":                     c.app.Spec.SSO.Central.ClientSecret,
-		"RedirectUrl":                      fmt.Sprintf("%s://%s.%s", c.schema(), CentralSsoSvcName, c.app.Spec.ClusterDomain),
+		"RedirectUrl":                      fmt.Sprintf("%s://%s.%s", c.schema(), c.app.Spec.SSO.Central.SvcName, c.app.Spec.ClusterDomain),
 		"OidcIssuerURL":                    c.app.Spec.SSO.Central.OidcIssuerURL,
 		"Scope":                            c.app.Spec.SSO.Central.Scope,
 		"InsecureOidcAllowUnverifiedEmail": c.app.Spec.SSO.Central.InsecureOidcAllowUnverifiedEmail,
@@ -114,18 +113,16 @@ func (c *CentralStateManager) schema() string {
 	return schema
 }
 
-func (c *CentralStateManager) jwksUrl() string {
-
-	return fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id",
-		c.schema(),
-		c.app.Spec.SSO.Jwks.Name,
-		c.app.Spec.ClusterDomain,
-		c.domainId())
-}
+//func (c *CentralStateManager) jwksUrl() string {
+//
+//	return fmt.Sprintf("%s/v1/%s/.well-known/jwks.json?client_id",
+//		c.app.Spec.SSO.Central.JwksURL,
+//		c.domainId())
+//}
 
 func (c *CentralStateManager) jwksUrlWithAudience() string {
 
-	return fmt.Sprintf("%s=cnvrg-tenant", c.jwksUrl())
+	return fmt.Sprintf("%s=cnvrg-tenant", c.app.Spec.SSO.Central.JwksURL)
 }
 
 func (c *CentralStateManager) Apply() error {

@@ -15,18 +15,18 @@ metadata:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: cnvrg-jwks
+  name: {{ .Spec.SSO.Jwks.SvcName }}
   namespace: {{.Namespace }}
 spec:
   ingressClassName: nginx
   rules:
-    - host: "{{.Spec.SSO.Jwks.Name}}.{{ .Spec.ClusterDomain }}"
+    - host: "{{.Spec.SSO.Jwks.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: "{{.Spec.SSO.Jwks.Name}}"
+                name: "{{.Spec.SSO.Jwks.SvcName}}"
                 port:
                   number: 8080

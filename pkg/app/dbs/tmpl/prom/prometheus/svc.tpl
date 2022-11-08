@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: prom
+  name: {{ .Spec.Dbs.Prom.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -10,6 +10,7 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 9090
+      port: {{ .Spec.Dbs.Prom.Port }}
+      targetPort: {{ .Spec.Dbs.Prom.Port }}
   selector:
-    app: prom
+    app: {{ .Spec.Dbs.Prom.SvcName }}

@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: prom
+  name:  {{ .Spec.Dbs.Prom.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "prom.{{ .Spec.ClusterDomain }}"
+    - "{{ .Spec.Dbs.Prom.SvcName }}.{{ .Spec.ClusterDomain }}"
   gateways:
   - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:
@@ -27,5 +27,5 @@ spec:
     route:
     - destination:
         port:
-          number: 9090
-        host: "prom.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"
+          number: {{ .Spec.Dbs.Prom.Port }}
+        host: "{{ .Spec.Dbs.Prom.SvcName }}.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"

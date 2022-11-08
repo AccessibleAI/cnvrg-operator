@@ -283,7 +283,8 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
-	Image:          "cnvrg-es:v7.8.1.a1-dynamic-indices",
+	Replicas:       1,
+	Image:          "cnvrg-es:7.17.5",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
@@ -329,7 +330,7 @@ var esDefault = Es{
 		Image:          "elastalert:3.0.0-beta.1",
 		CredsRef:       "elastalert-creds",
 		AuthProxyImage: "nginx:1.20",
-		Port:           80,
+		Port:           8080,
 		NodePort:       32030,
 		StorageSize:    "30Gi",
 		SvcName:        "elastalert",
@@ -365,6 +366,8 @@ var cvatDefault = Cvat{
 var promDefaults = Prom{
 	Enabled:  false,
 	CredsRef: "prom-creds",
+	SvcName:  "prometheus",
+	Port:     9090,
 	Image:    "prometheus:v2.37.1",
 	Grafana: Grafana{
 		Enabled:  false,
@@ -437,7 +440,7 @@ var networkingDefault = Networking{
 		Timeout:                   "18000s",
 		RetriesAttempts:           5,
 		PerTryTimeout:             "3600s",
-		IstioGwEnabled:            false,
+		IstioGwEnabled:            true,
 		IstioGwName:               "",
 		IstioIngressSelectorKey:   "istio",
 		IstioIngressSelectorValue: "ingressgateway",
@@ -458,17 +461,19 @@ var ssoDefault = SSO{
 	},
 
 	Jwks: Jwks{
-		Enabled: false,
-		Image:   "cnvrg/jwks:latest",
-		Name:    "cnvrg-jwks",
-		Cache: JwksCache{
-			Enabled: true,
-			Image:   "redis:7.0.5",
-		},
+		Enabled:      false,
+		Image:        "cnvrg/jwks:latest",
+		Replicas:     1,
+		SvcName:      "cnvrg-jwks",
+		CacheImage:   "redis:7.0.5",
+		NodeSelector: nil,
 	},
 
 	Central: CentralSSO{
 		Enabled:                          false,
+		Replicas:                         1,
+		SvcName:                          "sso-central",
+		CnvrgProxyImage:                  "proxy:v1.0.1",
 		OauthProxyImage:                  "oauth2-proxy:v7.3.x.ssov3.p2-01",
 		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
@@ -476,26 +481,29 @@ var ssoDefault = SSO{
 		InsecureOidcAllowUnverifiedEmail: true,
 		GroupsAuth:                       true,
 		Requests: Requests{
-			Cpu:    "500m",
-			Memory: "1Gi",
+			Cpu:    "200m",
+			Memory: "400Mi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
 			Memory: "4Gi",
 		},
+		NodeSelector: nil,
 	},
 
 	Proxy: CentralProxy{
-		Enabled: false,
-		Image:   "proxy:v1.0.3",
-		SvcName: "cnvrg-proxy-central",
+		Enabled:  false,
+		Replicas: 1,
+		Image:    "proxy:v1.0.3",
+		SvcName:  "cnvrg-proxy-central",
 		Requests: Requests{
-			Cpu:    "500m",
-			Memory: "1Gi",
+			Cpu:    "200m",
+			Memory: "500Mi",
 		},
 		Limits: Limits{
 			Cpu:    "2",
 			Memory: "4Gi",
 		},
+		NodeSelector: nil,
 	},
 }

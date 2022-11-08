@@ -4,7 +4,7 @@ metadata:
   name: mpi-operator
   annotations:
     mlops.cnvrg.io/default-loader: "true"
-    mlops.cnvrg.io/own: "true"
+    mlops.cnvrg.io/own: "false"
     mlops.cnvrg.io/updatable: "true"
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"

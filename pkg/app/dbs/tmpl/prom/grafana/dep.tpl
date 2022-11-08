@@ -36,6 +36,7 @@ spec:
       {{- end }}
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
+      enableServiceLinks: false
       containers:
       - image: {{image .Spec.ImageHub .Spec.Dbs.Prom.Grafana.Image }}
         name: grafana
@@ -54,9 +55,9 @@ spec:
           - name: GF_SERVER_HTTP_ADDR
             value: "0.0.0.0"
           - name: GF_SERVER_HTTP_PORT
-            value: "8080"
+            value: "{{ .Spec.Dbs.Prom.Grafana.Port }}"
         ports:
-        - containerPort: 8080
+        - containerPort: {{ .Spec.Dbs.Prom.Grafana.Port }}
           name: http
         readinessProbe:
           httpGet:
