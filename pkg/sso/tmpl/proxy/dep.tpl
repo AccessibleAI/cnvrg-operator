@@ -37,6 +37,12 @@ spec:
             weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - operator: "Exists"
+      {{- end }}
       enableServiceLinks: false
       containers:
       - name: proxy-central

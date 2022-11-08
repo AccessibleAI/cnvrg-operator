@@ -24,6 +24,12 @@ spec:
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-nomex
       enableServiceLinks: false
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - operator: "Exists"
+      {{- end }}
       containers:
       - name: nomex
         imagePullPolicy: Always
