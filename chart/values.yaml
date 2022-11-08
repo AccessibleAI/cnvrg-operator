@@ -222,7 +222,7 @@ dbs:
   es:
     enabled: true
     serviceAccount: es
-    image: cnvrg-es:v7.8.1.a1-dynamic-indices
+    image: cnvrg-es:7.17.5
     port: 9200
     storageSize: 80Gi
     svcName: elasticsearch
@@ -235,7 +235,7 @@ dbs:
       cpu: '4'
       memory: 8Gi
     javaOpts: ''
-    patchEsNodes: false
+    patchEsNodes: true
     nodeSelector:
     credsRef: es-creds
     pvcName: es-storage
@@ -337,7 +337,7 @@ networking:
     timeout: 18000s
     retriesAttempts: 5
     perTryTimeout: 3600s
-    istioGwEnabled: false
+    istioGwEnabled: true
     istioGwName: ''
   https:
     enabled: false
@@ -359,9 +359,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:latest
-    cache:
-      enabled: true
-      image: redis:7.0.5
+    cacheImage: redis:7.0.5
   central:
     enabled: false
     publicUrl: ''

@@ -89,8 +89,8 @@ func DefaultCnvrgAppSpec() CnvrgAppSpec {
 		Labels:      map[string]string{"owner": "cnvrg-control-plane"},
 		Annotations: nil,
 		PriorityClass: PriorityClass{
-			AppClassRef: "cnvrg-apps",
-			JobClassRef: "cnvrg-jobs",
+			AppClassRef: "",
+			JobClassRef: "",
 		},
 	}
 }
