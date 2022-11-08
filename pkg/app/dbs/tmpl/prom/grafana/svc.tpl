@@ -22,7 +22,7 @@ spec:
   ports:
   - name: http
     port: {{ .Spec.Dbs.Prom.Grafana.Port }}
-    targetPort: http
+    targetPort: {{ .Spec.Dbs.Prom.Grafana.Port }}
     {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
     nodePort: {{ .Spec.Dbs.Prom.Grafana.NodePort }}
     {{- end }}

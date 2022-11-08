@@ -1,19 +1,19 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Spec.SSO.Jwks.Name }}
+  name: {{ .Spec.SSO.Jwks.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
 spec:
-  minReplicas: 1
+  minReplicas: {{ .Spec.SSO.Jwks.Replicas }}
   maxReplicas: 10
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Spec.SSO.Jwks.Name }}
+    name: {{ .Spec.SSO.Jwks.SvcName }}
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300

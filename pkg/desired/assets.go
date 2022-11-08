@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
+	"net/http"
 	"regexp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -228,13 +229,22 @@ func (g *AssetsGroup) Apply(spec v1.Object, c client.Client, s *runtime.Scheme, 
 		}
 
 		// need to merge the object before applying the update
-		if err := mergo.Merge(existingObj, a.Obj, mergo.WithOverride); err != nil {
+		if err = mergo.Merge(existingObj, a.Obj, mergo.WithOverride); err != nil {
 			log.Error(err, "can't merge")
 			continue
 		}
 
-		if err := c.Update(ctx, existingObj); err != nil {
+		if err = c.Update(ctx, existingObj); err != nil {
 			log.Info("error updating object")
+			if updateErr, ok := err.(*errors.StatusError); ok && updateErr.Status().Code == http.StatusUnprocessableEntity {
+				if deleteErr := c.Delete(ctx, existingObj); deleteErr == nil {
+					if createErr := c.Create(ctx, a.Obj); createErr != nil {
+						log.Info("error recreated object")
+					} else {
+						log.Info("recreated object")
+					}
+				}
+			}
 		}
 
 	}

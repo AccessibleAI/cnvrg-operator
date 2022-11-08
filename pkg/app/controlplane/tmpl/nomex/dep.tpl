@@ -23,6 +23,7 @@ spec:
     spec:
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-nomex
+      enableServiceLinks: false
       containers:
       - name: nomex
         imagePullPolicy: Always

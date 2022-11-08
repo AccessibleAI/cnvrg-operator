@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cnvrg-jwks
+  name: {{ .Spec.SSO.Jwks.SvcName }}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"

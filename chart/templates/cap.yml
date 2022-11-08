@@ -369,11 +369,8 @@ spec:
       publicKeySecret: {{.Values.sso.pki.publicKeySecret}}
     jwks:
       enabled: {{.Values.sso.jwks.enabled}}
-      name: {{.Values.sso.jwks.name}}
       image: {{.Values.sso.jwks.image}}
-      cache:
-        enabled: {{.Values.sso.jwks.cache.enabled}}
-        image: {{.Values.sso.jwks.cache.image}}
+      cacheImage: {{.Values.sso.jwks.cacheImage}}
     central:
       enabled: {{.Values.sso.central.enabled}}
       publicUrl: {{.Values.sso.central.publicUrl}}
@@ -391,6 +388,7 @@ spec:
       whitelistDomain: {{.Values.sso.central.whitelistDomain}}
       cookieDomain: {{.Values.sso.central.cookieDomain}}
       groupsAuth: {{.Values.sso.central.groupsAuth}}
+      readiness: {{.Values.sso.central.readiness}}
       requests:
         cpu: "{{.Values.sso.central.requests.cpu}}"
         memory: "{{.Values.sso.central.requests.memory}}"

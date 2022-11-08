@@ -1,7 +1,7 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: prom
+  name:  {{ .Spec.Dbs.Prom.SvcName }}
   namespace: {{ .Namespace }}
   labels:
     mlops.cnvrg.io/default-loader: "true"
@@ -12,12 +12,12 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "prom.{{ .Spec.ClusterDomain }}"
+  host: "{{ .Spec.Dbs.Prom.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:
-    targetPort: 9090
+    targetPort: {{ .Spec.Dbs.Prom.Port }}
   to:
     kind: Service
-    name: prom
+    name:  {{ .Spec.Dbs.Prom.SvcName }}
     weight: 100
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:

@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: cnvrg-jwks
+  name: {{ .Spec.SSO.Jwks.SvcName }}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{ .Spec.SSO.Jwks.Name }}.{{ .Spec.ClusterDomain }}"
+    - "{{ .Spec.SSO.Jwks.SvcName }}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:
@@ -28,4 +28,4 @@ spec:
         - destination:
             port:
               number: 8080
-            host: "{{ .Spec.SSO.Jwks.Name }}.{{.Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"
+            host: "{{ .Spec.SSO.Jwks.SvcName }}.{{.Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"

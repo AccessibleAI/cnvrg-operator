@@ -174,7 +174,7 @@ func (m *PromStateManager) promCredsData() (map[string]interface{}, error) {
 		"User":        user,
 		"Pass":        pass,
 		"PassHash":    string(passHash),
-		"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", "prom", m.app.Namespace, 9090),
+		"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", m.app.Spec.Dbs.Prom.SvcName, m.app.Namespace, m.app.Spec.Dbs.Prom.Port),
 	}, nil
 }
 

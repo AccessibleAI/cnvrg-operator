@@ -283,7 +283,7 @@
 | `sso.pki.privateKeySecret`                     | sso-idp-private-key                 |
 | `sso.pki.publicKeySecret`                      | sso-idp-pki-public-key              |
 | `sso.jwks.enabled`                             | false                               |
-| `sso.jwks.name`                                | cnvrg-jwks                          |
+| `sso.jwks.svcName`                                | cnvrg-jwks                          |
 | `sso.jwks.image`                               | jwks:latest                         |
 | `sso.jwks.cache.enabled`                       | true                                |
 | `sso.jwks.cache.image`                         | redis:4.0.5-alpine                  |

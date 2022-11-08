@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Spec.SSO.Jwks.Name }}
+  name: {{ .Spec.SSO.Jwks.SvcName }}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -11,7 +11,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   labels:
-    app: cnvrg-jwks
+    app: {{ .Spec.SSO.Jwks.SvcName }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -19,4 +19,4 @@ spec:
   ports:
     - port: 8080
   selector:
-    app: {{ .Spec.SSO.Jwks.Name }}
+    app: {{ .Spec.SSO.Jwks.SvcName }}

@@ -9,7 +9,7 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
-  name: sso-central
+  name: {{.Spec.SSO.Central.SvcName}}
   namespace: {{.Namespace }}
   labels:
     app: {{.Namespace }}
@@ -17,12 +17,12 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "sso-central.{{ .Spec.ClusterDomain }}"
+  host: "{{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}"
   port:
     targetPort: 8080
   to:
     kind: Service
-    name: "sso-central.{{.Namespace }}.svc"
+    name: "{{.Spec.SSO.Central.SvcName}}.{{.Namespace }}.svc"
     weight: 100
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:

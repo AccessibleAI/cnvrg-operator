@@ -68,6 +68,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
+      enableServiceLinks: false
       containers:
       - image: {{ image .Spec.ImageHub .Spec.ControlPlane.Image }}
         env:

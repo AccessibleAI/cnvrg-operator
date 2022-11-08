@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Spec.Dbs.Es.ServiceAccount }}
+  name: {{ .Spec.Dbs.Es.SvcName }}
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -17,7 +17,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ .Spec.Dbs.Es.ServiceAccount }}
+  name: {{ .Spec.Dbs.Es.SvcName }}
 subjects:
   - kind: ServiceAccount
     name: {{ .Spec.Dbs.Es.ServiceAccount }}

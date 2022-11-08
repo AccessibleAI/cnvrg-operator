@@ -1,32 +1,45 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sso-central
+  name: {{.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
   labels:
-    app: sso-central
+    app: {{.SvcName}}
 spec:
+  replicas: {{ .Replicas }}
   selector:
     matchLabels:
-      app: sso-central
+      app: {{.SvcName}}
   template:
     metadata:
       labels:
-        app: sso-central
+        app: {{.SvcName}}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: {{.SvcName}}
+              namespaces:
+              - {{.Namespace}}
+              topologyKey: kubernetes.io/hostname
+            weight: 1
       priorityClassName: {{ .AppClassRef }}
-      serviceAccountName: cnvrg-sso-central
+      serviceAccountName: cnvrg-{{.SvcName}}
+      enableServiceLinks: false
       containers:
-      - name: sso-central
+      - name: {{.SvcName}}
         imagePullPolicy: Always
         image: {{ image .ImageHub  .CentralUIImage }}
         env:
           - name: CNVRG_CENTRAL_SSO_BIND_ADDR
-            value: "127.0.0.1:8000"
+            value: "0.0.0.0:8000"
           - name: CNVRG_CENTRAL_SSO_DOMAIN_ID
             value: {{ .SsoDomainId }}
           - name: CNVRG_CENTRAL_SSO_SIGN_KEY
@@ -37,6 +50,14 @@ spec:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
+        {{- if isTrue .Readiness }}
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 20
+        {{- end }}
         resources:
           limits:
             cpu: 100m
