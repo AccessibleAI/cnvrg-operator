@@ -31,7 +31,7 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       priorityClassName: {{ .AppClassRef }}
-      serviceAccountName: cnvrg-{{.SvcName}}
+      serviceAccountName: {{.SvcName}}-central
       enableServiceLinks: false
       containers:
       - name: {{.SvcName}}
