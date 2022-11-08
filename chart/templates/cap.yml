@@ -399,6 +399,7 @@ spec:
       enabled: {{.Values.sso.proxy.enabled}}
       image: {{.Values.sso.proxy.image}}
       address: {{.Values.sso.proxy.address}}
+      readiness: {{.Values.sso.proxy.readiness}}
       requests:
         cpu: "{{.Values.sso.proxy.requests.cpu}}"
         memory: "{{.Values.sso.proxy.requests.memory}}"

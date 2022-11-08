@@ -446,4 +446,5 @@ type CentralProxy struct {
 	Limits       Limits            `json:"limits,omitempty"`
 	Requests     Requests          `json:"requests,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+  Readiness bool                 `json:"readiness,omitempty"`
 }

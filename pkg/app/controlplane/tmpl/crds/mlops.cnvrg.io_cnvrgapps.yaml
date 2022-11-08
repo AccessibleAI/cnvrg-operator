@@ -1017,12 +1017,6 @@ spec:
                           memory:
                             type: string
                         type: object
-                      nodeSelector:
-                        additionalProperties:
-                          type: string
-                        type: object
-                      replicas:
-                        type: integer
                       requests:
                         properties:
                           cpu:
