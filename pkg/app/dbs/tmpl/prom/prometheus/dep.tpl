@@ -36,6 +36,12 @@ spec:
             weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: cnvrg-prom
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - operator: "Exists"
+      {{- end }}
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
