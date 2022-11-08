@@ -125,6 +125,8 @@ spec:
             secretKeyRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
               key: CNVRG_ES_PASS
+        - name: ingest.geoip.downloader.enabled
+          value: "false"
         - name: network.host
           value: "0.0.0.0"
         - name: cluster.initial_master_nodes
@@ -179,7 +181,7 @@ spec:
               - -c
               - |
                 set -e
-                # If the node is starting up wait for the cluster to be ready (request params: "wait_for_status=green&timeout=1s" )
+                # If the node is starting up wait for the cluster to be ready (request params: "wait_for_status=yellow&timeout=1s" )
                 # Once it has started only check that the node itself is responding
                 START_FILE=/tmp/.es_start_file
 
@@ -222,12 +224,12 @@ spec:
                   fi
 
                 else
-                  echo 'Waiting for elasticsearch cluster to become ready (request params: "wait_for_status=green&timeout=1s" )'
-                  if http "/_cluster/health?wait_for_status=green&timeout=1s" "--fail" ; then
+                  echo 'Waiting for elasticsearch cluster to become ready (request params: "wait_for_status=yellow&timeout=1s" )'
+                  if http "/_cluster/health?wait_for_status=yellow&timeout=1s" "--fail" ; then
                     touch ${START_FILE}
                     exit 0
                   else
-                    echo 'Cluster is not yet ready (request params: "wait_for_status=green&timeout=1s" )'
+                    echo 'Cluster is not yet ready (request params: "wait_for_status=yellow&timeout=1s" )'
                     exit 1
                   fi
                 fi
