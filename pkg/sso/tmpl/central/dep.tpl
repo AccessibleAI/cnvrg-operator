@@ -39,7 +39,7 @@ spec:
         image: {{ image .ImageHub  .CentralUIImage }}
         env:
           - name: CNVRG_CENTRAL_SSO_BIND_ADDR
-            value: "127.0.0.1:8000"
+            value: "0.0.0.0:8000"
           - name: CNVRG_CENTRAL_SSO_DOMAIN_ID
             value: {{ .SsoDomainId }}
           - name: CNVRG_CENTRAL_SSO_SIGN_KEY
@@ -50,6 +50,14 @@ spec:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
+        {{- if isTrue .Readiness }}
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 20
+        {{- end }}
         resources:
           limits:
             cpu: 100m

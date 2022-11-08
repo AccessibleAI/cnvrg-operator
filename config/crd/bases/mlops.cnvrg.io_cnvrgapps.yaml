@@ -949,8 +949,6 @@ spec:
                         type: string
                       publicUrl:
                         type: string
-                      replicas:
-                        type: integer
                       requests:
                         properties:
                           cpu:
