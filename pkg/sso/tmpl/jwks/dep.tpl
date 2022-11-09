@@ -46,6 +46,11 @@ spec:
         "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
       tolerations:
         - operator: "Exists"
+      {{- else if (gt (len .Spec.SSO.Jwks.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.SSO.Jwks.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
       {{- end }}
       enableServiceLinks: false
       containers:

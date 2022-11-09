@@ -42,6 +42,11 @@ spec:
         "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
       tolerations:
         - operator: "Exists"
+      {{- else if (gt (len .Spec.SSO.Proxy.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.SSO.Proxy.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
       {{- end }}
       enableServiceLinks: false
       containers:

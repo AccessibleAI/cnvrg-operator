@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.SvcName}}
+  name: {{.Spec.SSO.Central.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "false"
@@ -12,4 +12,4 @@ spec:
     - name: http
       port: 8080
   selector:
-    app: {{.SvcName}}
+    app: {{.Spec.SSO.Central.SvcName}}

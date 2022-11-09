@@ -433,7 +433,7 @@ type CentralSSO struct {
 	JwksURL                          string            `json:"jwksURL,omitempty"`
 	Limits                           Limits            `json:"limits,omitempty"`
 	Requests                         Requests          `json:"requests,omitempty"`
-  Readiness                        bool               `json:"readiness,omitempty"`
+	Readiness                        bool              `json:"readiness,omitempty"`
 	NodeSelector                     map[string]string `json:"nodeSelector,omitempty"`
 }
 
@@ -446,5 +446,5 @@ type CentralProxy struct {
 	Limits       Limits            `json:"limits,omitempty"`
 	Requests     Requests          `json:"requests,omitempty"`
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
-  Readiness bool                 `json:"readiness,omitempty"`
+	Readiness    bool              `json:"readiness,omitempty"`
 }

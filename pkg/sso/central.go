@@ -61,20 +61,9 @@ func (c *CentralStateManager) renderDeploymentAndSvc() error {
 
 func (c *CentralStateManager) depData() map[string]interface{} {
 	return map[string]interface{}{
-		"Namespace":        c.app.Namespace,
-		"SsoDomainId":      strings.Split(c.app.Spec.ClusterDomain, ".")[0],
-		"JwksUrl":          c.app.Spec.SSO.Central.JwksURL,
-		"Replicas":         c.app.Spec.SSO.Central.Replicas,
-		"PrivateKeySecret": c.app.Spec.SSO.Pki.PrivateKeySecret,
-		"CentralUIImage":   c.app.Spec.SSO.Central.CentralUiImage,
-		"OauthProxyImage":  c.app.Spec.SSO.Central.OauthProxyImage,
-		"RedisCredsRef":    c.app.Spec.Dbs.Redis.CredsRef,
-		"SvcName":          c.app.Spec.SSO.Central.SvcName,
-		"ImageHub":         c.app.Spec.ImageHub,
-		"AppClassRef":      c.app.Spec.PriorityClass.AppClassRef,
-		"Limits":           c.app.Spec.SSO.Central.Limits,
-		"Requests":         c.app.Spec.SSO.Central.Requests,
-		"Readiness":        c.app.Spec.SSO.Central.Readiness,
+		"Namespace":   c.app.Namespace,
+		"SsoDomainId": strings.Split(c.app.Spec.ClusterDomain, ".")[0],
+		"Spec":        c.app.Spec,
 	}
 }
 

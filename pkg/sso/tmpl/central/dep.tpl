@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.SvcName}}
+  name: {{.Spec.SSO.Central.SvcName}}
   namespace: {{.Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
   labels:
-    app: {{.SvcName}}
+    app: {{.Spec.SSO.Central.SvcName}}
 spec:
-  replicas: {{ .Replicas }}
+  replicas: {{.Spec.SSO.Central.Replicas}}
   selector:
     matchLabels:
-      app: {{.SvcName}}
+      app: {{.Spec.SSO.Central.SvcName}}
   template:
     metadata:
       labels:
-        app: {{.SvcName}}
+        app: {{.Spec.SSO.Central.SvcName}}
     spec:
       affinity:
         podAntiAffinity:
@@ -25,18 +25,29 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: {{.SvcName}}
+                  app: {{.Spec.SSO.Central.SvcName}}
               namespaces:
               - {{.Namespace}}
               topologyKey: kubernetes.io/hostname
             weight: 1
-      priorityClassName: {{ .AppClassRef }}
-      serviceAccountName: {{.SvcName}}-central
+      priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
+      serviceAccountName: {{.Spec.SSO.Central.SvcName}}-central
+      {{- if isTrue .Spec.Tenancy.Enabled }}
+      nodeSelector:
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
+      tolerations:
+        - operator: "Exists"
+      {{- else if (gt (len .Spec.SSO.Central.NodeSelector) 0) }}
+      nodeSelector:
+        {{- range $key, $val := .Spec.SSO.Central.NodeSelector }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
+      {{- end }}
       enableServiceLinks: false
       containers:
-      - name: {{.SvcName}}
+      - name: {{.Spec.SSO.Central.SvcName}}
         imagePullPolicy: Always
-        image: {{ image .ImageHub  .CentralUIImage }}
+        image: {{  image .Spec.ImageHub .Spec.SSO.Central.CentralUiImage }}
         env:
           - name: CNVRG_CENTRAL_SSO_BIND_ADDR
             value: "0.0.0.0:8000"
@@ -45,12 +56,12 @@ spec:
           - name: CNVRG_CENTRAL_SSO_SIGN_KEY
             value: "config/CNVRG_PKI_PRIVATE_KEY"
           - name: CNVRG_CENTRAL_SSO_JWT_IIS
-            value: "{{ .JwksUrl }}"
+            value: "{{ .Spec.SSO.Central.JwksURL }}"
         volumeMounts:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
-        {{- if isTrue .Readiness }}
+        {{- if isTrue .Spec.SSO.Central.Readiness }}
         readinessProbe:
           httpGet:
             path: /ready
@@ -66,26 +77,26 @@ spec:
             cpu: 100m
             memory: 128Mi
       - name: oauth2-proxy
-        image: {{  image .ImageHub  .OauthProxyImage }}
+        image: {{  image .Spec.ImageHub .Spec.SSO.Central.OauthProxyImage }}
         command: [ "oauth2-proxy", "--config", "/opt/app-root/conf/proxy-config/conf" ]
         envFrom:
           - secretRef:
-              name: {{ .RedisCredsRef }}
+              name: {{ .Spec.Dbs.Redis.CredsRef }}
         volumeMounts:
           - name: "proxy-config"
             mountPath: "/opt/app-root/conf/proxy-config"
             readOnly: true
         resources:
           limits:
-            cpu: {{ .Limits.Cpu }}
-            memory: {{ .Limits.Memory }}
+            cpu: {{ .Spec.SSO.Central.Limits.Cpu }}
+            memory: {{ .Spec.SSO.Central.Limits.Memory }}
           requests:
-            cpu: {{ .Requests.Cpu }}
-            memory: {{ .Requests.Memory }}
+            cpu: {{ .Spec.SSO.Central.Requests.Cpu }}
+            memory: {{ .Spec.SSO.Central.Requests.Memory }}
       volumes:
       - name: "proxy-config"
         configMap:
          name: "proxy-config"
       - name: "private-key"
         secret:
-          secretName: {{ .PrivateKeySecret }}
+          secretName: {{ .Spec.SSO.Pki.PrivateKeySecret }}

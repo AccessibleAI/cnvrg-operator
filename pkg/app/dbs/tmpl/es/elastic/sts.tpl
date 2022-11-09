@@ -86,12 +86,12 @@ spec:
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
-        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
-        {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
-        {{ $key }}: {{ $val }}
-        {{- end }}
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
       tolerations:
-        - operator: "Exists"
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
       {{- else if (gt (len .Spec.Dbs.Es.NodeSelector) 0) }}
       nodeSelector:
         {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
