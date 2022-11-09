@@ -187,7 +187,7 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	},
 	DcgmExporter: DcgmExporter{
 		Enabled: false,
-		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:2.0.13-2.1.2-ubuntu20.04",
+		Image:   "nvcr.io/nvidia/k8s/dcgm-exporter:latest",
 	},
 	HabanaExporter: HabanaExporter{
 		Enabled:   true,
