@@ -78,17 +78,12 @@ spec:
       priorityClassName: {{ .Spec.CnvrgAppPriorityClass.Name }}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
-        {{ .Spec.Tenancy.Key }}: {{ .Spec.Tenancy.Value }}
-        {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
-        {{ $key }}: {{ $val }}
-        {{- end }}
+        "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
       tolerations:
-        - operator: "Exists"
-      {{- else if (gt (len .Spec.Dbs.Es.NodeSelector) 0) }}
-      nodeSelector:
-        {{- range $key, $val := .Spec.Dbs.Es.NodeSelector }}
-        {{ $key }}: {{ $val }}
-        {{- end }}
+        - key: "{{ .Spec.Tenancy.Key }}"
+          operator: "Equal"
+          value: "{{ .Spec.Tenancy.Value }}"
+          effect: "NoSchedule"
       {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
       enableServiceLinks: false

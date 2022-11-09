@@ -368,6 +368,9 @@ func (r *CnvrgInfraReconciler) getCnvrgAppInstances(infra *mlopsv1.CnvrgInfra) (
 	var cmKeys []string
 	var apps []mlopsv1.AppInstance
 	for key, _ := range cnvrgAppCm.Data {
+		if err := r.Get(context.Background(), types.NamespacedName{Namespace: key, Name: key}, &v1.Namespace{}); err != nil && errors.IsNotFound(err) {
+			continue
+		}
 		cmKeys = append(cmKeys, key)
 	}
 	sort.Strings(cmKeys)
