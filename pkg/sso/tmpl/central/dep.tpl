@@ -61,14 +61,6 @@ spec:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
-        {{- if isTrue .Spec.SSO.Central.Readiness }}
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 20
-        {{- end }}
         resources:
           limits:
             cpu: 100m
@@ -93,6 +85,14 @@ spec:
           requests:
             cpu: {{ .Spec.SSO.Central.Requests.Cpu }}
             memory: {{ .Spec.SSO.Central.Requests.Memory }}
+        {{- if isTrue .Spec.SSO.Central.Readiness }}
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 20
+        {{- end }}
       volumes:
       - name: "proxy-config"
         configMap:
