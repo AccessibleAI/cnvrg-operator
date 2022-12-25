@@ -105,6 +105,13 @@ type CnvrgClusterProvisionerOperator struct {
 	AwsCredsRef string   `json:"awsCredsRef,omitempty"`
 }
 
+type CnvrgJobsOperator struct {
+	Enabled  bool     `json:"enabled,omitempty"`
+	Requests Requests `json:"requests,omitempty"`
+	Limits   Limits   `json:"limits,omitempty"`
+	Image    string   `json:"image,omitempty"`
+}
+
 type Nomex struct {
 	Enabled bool   `json:"enabled,omitempty"`
 	Image   string `json:"image,omitempty"`
@@ -173,6 +180,7 @@ type ControlPlane struct {
 	Hyper                           Hyper                           `json:"hyper,omitempty"`
 	CnvrgScheduler                  CnvrgScheduler                  `json:"cnvrgScheduler,omitempty"`
 	CnvrgClusterProvisionerOperator CnvrgClusterProvisionerOperator `json:"cnvrgClusterProvisionerOperator,omitempty"`
+	CnvrgJobsOperator               CnvrgJobsOperator               `json:"cnvrgJobsOperator,omitempty"`
 	CnvrgRouter                     CnvrgRouter                     `json:"cnvrgRouter,omitempty"`
 	BaseConfig                      BaseConfig                      `json:"baseConfig,omitempty"`
 	Ldap                            Ldap                            `json:"ldap,omitempty"`

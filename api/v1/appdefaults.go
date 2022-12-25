@@ -131,6 +131,19 @@ var controlPlaneDefault = ControlPlane{
 		AwsCredsRef: "",
 	},
 
+	CnvrgJobsOperator: CnvrgJobsOperator{
+		Enabled: false,
+		Requests: Requests{
+			Cpu:    "2",
+			Memory: "2Gi",
+		},
+		Limits: Limits{
+			Cpu:    "2",
+			Memory: "4Gi",
+		},
+		Image: "cnvrg/jobs-operator:latest",
+	},
+
 	CnvrgRouter: CnvrgRouter{
 		Enabled:  false,
 		Image:    "nginx:1.21.0",

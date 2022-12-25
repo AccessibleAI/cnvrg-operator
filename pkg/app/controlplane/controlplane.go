@@ -89,6 +89,14 @@ func (m *CpStateManager) Load() error {
 		m.AddToAssets(ccp)
 	}
 
+	if m.app.Spec.ControlPlane.CnvrgJobsOperator.Enabled {
+		jobs := desired.NewAssetsGroup(fs, fsRoot+"/jobs", m.Log(), f)
+		if err := jobs.LoadAssets(); err != nil {
+			return err
+		}
+		m.AddToAssets(jobs)
+	}
+
 	if m.app.Spec.ControlPlane.Hyper.Enabled {
 		hyper := desired.NewAssetsGroup(fs, m.RootPath()+"/hyper", m.Log(), nil)
 		if err := hyper.LoadAssets(); err != nil {
