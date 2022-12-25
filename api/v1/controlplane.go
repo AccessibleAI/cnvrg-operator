@@ -116,6 +116,14 @@ type CnvrgClusterProvisionerOperator struct {
 	AwsCredsRef string   `json:"awsCredsRef,omitempty"`
 }
 
+type CnvrgJobsOperator struct {
+	Enabled       bool     `json:"enabled,omitempty"`
+	Requests      Requests `json:"requests,omitempty"`
+	Limits        Limits   `json:"limits,omitempty"`
+	Image         string   `json:"image,omitempty"`
+	ExecuterImage string   `json:"executerImage,omitempty"`
+}
+
 type Registry struct {
 	Name     string `json:"name,omitempty"`
 	URL      string `json:"url,omitempty"`
@@ -178,6 +186,7 @@ type ControlPlane struct {
 	Hyper                           Hyper                           `json:"hyper,omitempty"`
 	CnvrgScheduler                  CnvrgScheduler                  `json:"cnvrgScheduler,omitempty"`
 	CnvrgClusterProvisionerOperator CnvrgClusterProvisionerOperator `json:"cnvrgClusterProvisionerOperator,omitempty"`
+	CnvrgJobsOperator               CnvrgJobsOperator               `json:"cnvrgJobsOperator,omitempty"`
 	CnvrgRouter                     CnvrgRouter                     `json:"cnvrgRouter,omitempty"`
 	BaseConfig                      BaseConfig                      `json:"baseConfig,omitempty"`
 	Ldap                            Ldap                            `json:"ldap,omitempty"`
@@ -370,6 +379,20 @@ var controlPlaneDefault = ControlPlane{
 		},
 		Image:       "cnvrg/ccp-operator:v1",
 		AwsCredsRef: "",
+	},
+
+	CnvrgJobsOperator: CnvrgJobsOperator{
+		Enabled: false,
+		Requests: Requests{
+			Cpu:    "2",
+			Memory: "2Gi",
+		},
+		Limits: Limits{
+			Cpu:    "2",
+			Memory: "4Gi",
+		},
+		Image:         "cnvrg/jobs-operator:latest",
+		ExecuterImage: "cnvrg/jobs-operator-executer:latest",
 	},
 
 	CnvrgRouter: CnvrgRouter{
