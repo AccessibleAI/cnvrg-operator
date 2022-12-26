@@ -7,8 +7,8 @@ metadata:
       mlops.cnvrg.io/default-loader: "true"
       mlops.cnvrg.io/own: "true"
       mlops.cnvrg.io/updatable: "true"
-    labels:
-      control-plane: controller-manager
+  labels:
+    control-plane: controller-manager
 spec:
   replicas: 1
   selector:
