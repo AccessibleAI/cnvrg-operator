@@ -382,7 +382,7 @@ var controlPlaneDefault = ControlPlane{
 	},
 
 	CnvrgJobsOperator: CnvrgJobsOperator{
-		Enabled: false,
+		Enabled: true,
 		Requests: Requests{
 			Cpu:    "2",
 			Memory: "2Gi",

@@ -634,6 +634,81 @@ func cnvrgClusterProvisionerOperator() []*desired.State {
 	}
 }
 
+func cnvrgJobsOperator() []*desired.State {
+	return []*desired.State{
+		{
+
+			TemplatePath:   path + "/jobs/dep.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.DeploymentGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/jobs/sa.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SaGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/jobs/role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/jobs/mgr-role.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/jobs/rb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/jobs/mgr-rb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.RoleBindingGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
+			TemplatePath:   path + "/jobs/cm.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.ConfigMapGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+	}
+}
+
 func ssoState() []*desired.State {
 	return []*desired.State{
 		{
@@ -777,6 +852,10 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 
 	if cnvrgApp.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
 		state = append(state, cnvrgClusterProvisionerOperator()...)
+	}
+
+	if cnvrgApp.Spec.ControlPlane.CnvrgJobsOperator.Enabled {
+		state = append(state, cnvrgJobsOperator()...)
 	}
 
 	if cnvrgApp.Spec.ControlPlane.CnvrgRouter.Enabled {
