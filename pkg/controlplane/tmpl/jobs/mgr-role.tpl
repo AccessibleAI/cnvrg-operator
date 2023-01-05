@@ -40,6 +40,18 @@ rules:
   - update
   - watch
 - apiGroups:
+  - ""
+  resources:
+  - virtualservices
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - mlops.cnvrg.io
   resources:
   - workflowmaps
