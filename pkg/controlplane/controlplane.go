@@ -853,7 +853,6 @@ func State(cnvrgApp *mlopsv1.CnvrgApp) []*desired.State {
 	if cnvrgApp.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
 		state = append(state, cnvrgClusterProvisionerOperator()...)
 	}
-
 	if cnvrgApp.Spec.ControlPlane.CnvrgJobsOperator.Enabled {
 		state = append(state, cnvrgJobsOperator()...)
 	}
