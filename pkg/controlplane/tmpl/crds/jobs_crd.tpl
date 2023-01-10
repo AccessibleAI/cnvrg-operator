@@ -72,11 +72,9 @@ spec:
                   - targetPort
                   type: object
                 type: array
-              podsDefinition:
+              replicasDefinition:
                 additionalProperties:
                   properties:
-                    name:
-                      type: string
                     podSpec:
                       description: PodSpec is a description of a pod.
                       properties:
@@ -4141,6 +4139,9 @@ spec:
                       required:
                       - containers
                       type: object
+                    replicas:
+                      format: int32
+                      type: integer
                   type: object
                 type: object
               volumessSpec:
