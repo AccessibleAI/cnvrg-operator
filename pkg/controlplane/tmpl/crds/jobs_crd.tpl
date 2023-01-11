@@ -29,6 +29,8 @@ spec:
             type: object
           spec:
             properties:
+              cleanUp:
+                type: string
               commands:
                 items:
                   properties:
