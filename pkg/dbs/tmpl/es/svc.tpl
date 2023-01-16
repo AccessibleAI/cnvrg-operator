@@ -26,7 +26,7 @@ spec:
     protocol: TCP
     port: 9300
     {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
-    nodePort: {{ .Spec.Logging.Es.NodePort }}
+    nodePort: {{ .Spec.Dbs.Es.NodePort }}
     {{- end }}
   selector:
     app: {{ .Spec.Dbs.Es.SvcName }}
