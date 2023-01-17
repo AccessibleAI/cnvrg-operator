@@ -208,14 +208,14 @@ Helm chart command line options
 
 |**Flag**|**Default value**|**Description**
 | ------------------|---|-------
-`ldap.enabled` | false | set to true to enable sso
-`ldap.host` | - | Ldap host 
-`ldap.port` | - | Ldap port
-`ldap.account` | - | userPrincipalName
-`ldap.base` | - | for example: dc=my-domain,dc=local
-`ldap.adminUser` | - | admin user
-`ldap.adminPassword` | - | admin password
-`ldap.ssl` | "false" | ("true" or "false")
+`controlPlane.ldap.enabled` | false | set to true to enable sso
+`controlPlane.ldap.host` | - | Ldap host 
+`controlPlane.ldap.port` | - | Ldap port
+`controlPlane.ldap.account` | - | userPrincipalName
+`controlPlane.ldap.base` | - | for example: dc=my-domain,dc=local
+`controlPlane.ldap.adminUser` | - | admin user
+`controlPlane.ldap.adminPassword` | - | admin password
+`controlPlane.ldap.ssl` | "false" | ("true" or "false")
 
 
 #### Storage options
