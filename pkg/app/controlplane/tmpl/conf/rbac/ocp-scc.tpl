@@ -12,7 +12,7 @@ allowHostNetwork: false
 allowHostPID: false
 allowHostPorts: false
 allowPrivilegeEscalation: true
-allowPrivilegedContainer: false
+allowPrivilegedContainer: true
 allowedCapabilities: null
 readOnlyRootFilesystem: false
 runAsUser:
