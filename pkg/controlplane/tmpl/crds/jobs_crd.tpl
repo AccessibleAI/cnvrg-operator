@@ -31,52 +31,58 @@ spec:
             properties:
               cleanUp:
                 type: string
-              commands:
-                items:
-                  properties:
-                    bashCommand:
-                      type: string
-                    cnvrgExecution:
-                      type: string
-                    commandType:
-                      type: string
-                    id:
-                      type: string
-                    lastUpdate:
-                      format: date-time
-                      type: string
-                  required:
-                  - id
-                  type: object
-                type: array
-              networksSpec:
-                items:
-                  properties:
-                    gateway:
-                      type: string
-                    host:
-                      type: string
-                    name:
-                      type: string
-                    port:
-                      format: int32
-                      type: integer
-                    protocol:
-                      default: TCP
-                      type: string
-                    targetPort:
-                      format: int32
-                      type: integer
-                  required:
-                  - name
-                  - port
-                  - protocol
-                  - targetPort
-                  type: object
-                type: array
               replicasDefinition:
                 additionalProperties:
                   properties:
+                    commands:
+                      items:
+                        properties:
+                          bashCommand:
+                            type: string
+                          cnvrgExecution:
+                            type: string
+                          commandType:
+                            type: string
+                          id:
+                            type: string
+                          lastUpdate:
+                            format: date-time
+                            type: string
+                        required:
+                        - id
+                        type: object
+                      type: array
+                    executionData:
+                      properties:
+                        generation:
+                          format: int64
+                          type: integer
+                      type: object
+                    networksSpec:
+                      items:
+                        properties:
+                          gateway:
+                            type: string
+                          host:
+                            type: string
+                          name:
+                            type: string
+                          port:
+                            format: int32
+                            type: integer
+                          protocol:
+                            default: TCP
+                            type: string
+                          targetPort:
+                            format: int32
+                            type: integer
+                        required:
+                        - name
+                        - port
+                        - protocol
+                        - targetPort
+                        type: object
+                      type: array
                     podSpec:
                       description: PodSpec is a description of a pod.
                       properties:
@@ -4144,22 +4150,22 @@ spec:
                     replicas:
                       format: int32
                       type: integer
+                    volumesSpec:
+                      items:
+                        properties:
+                          storageClassName:
+                            type: string
+                          volumeName:
+                            type: string
+                          volumeSize:
+                            type: string
+                        required:
+                        - volumeName
+                        - volumeSize
+                        type: object
+                      type: array
                   type: object
                 type: object
-              volumessSpec:
-                items:
-                  properties:
-                    storageClassName:
-                      type: string
-                    volumeName:
-                      type: string
-                    volumeSize:
-                      type: string
-                  required:
-                  - volumeName
-                  - volumeSize
-                  type: object
-                type: array
             type: object
           status:
             properties:
@@ -4191,7 +4197,6 @@ spec:
                         type: object
                       type: array
                     podCreatedAt:
-                      description: PodStatus string            `json:"podStatus,omitempty"` // TODO do we need this?
                       format: date-time
                       type: string
                   type: object
