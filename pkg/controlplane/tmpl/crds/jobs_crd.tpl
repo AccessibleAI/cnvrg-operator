@@ -63,6 +63,8 @@ spec:
                         properties:
                           gateway:
                             type: string
+                          headless:
+                            type: boolean
                           host:
                             type: string
                           name:
