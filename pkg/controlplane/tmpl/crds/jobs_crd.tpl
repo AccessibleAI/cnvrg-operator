@@ -71,6 +71,10 @@ spec:
                             type: boolean
                           host:
                             type: string
+                          labels:
+                            additionalProperties:
+                              type: string
+                            type: object
                           name:
                             type: string
                           port:
