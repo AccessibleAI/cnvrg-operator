@@ -58,6 +58,10 @@ spec:
                           format: int64
                           type: integer
                       type: object
+                    labels:
+                      additionalProperties:
+                        type: string
+                      type: object
                     networksSpec:
                       items:
                         properties:
