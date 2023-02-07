@@ -175,6 +175,7 @@ func (m *PromStateManager) promCredsData() (map[string]interface{}, error) {
 		"Pass":        pass,
 		"PassHash":    string(passHash),
 		"PromUrl":     fmt.Sprintf("http://%s.%s.svc:%d", m.app.Spec.Dbs.Prom.SvcName, m.app.Namespace, m.app.Spec.Dbs.Prom.Port),
+		"InternalUrl": fmt.Sprintf("http://%s.%s.svc:%d", m.app.Spec.Dbs.Prom.SvcName, m.app.Namespace, m.app.Spec.Dbs.Prom.Port),
 	}, nil
 }
 
@@ -240,7 +241,6 @@ func (m *GrafanaStateManager) dataSources() error {
 		"Annotations": m.app.Spec.Annotations,
 		"Labels":      m.app.Spec.Labels,
 		"Url":         url,
-		"InternalUrl": fmt.Sprintf("%s:%d", m.app.Spec.Dbs.Prom.SvcName, m.app.Spec.Dbs.Prom.Port),
 		"User":        user,
 		"Pass":        pass,
 	}
