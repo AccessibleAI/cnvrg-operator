@@ -19,4 +19,4 @@ data:
   CNVRG_PROMETHEUS_PASS: {{ .Pass | b64enc }}
   CNVRG_PROMETHEUS_HASHED_PASS: {{ .PassHash | b64enc }}
   CNVRG_PROMETHEUS_URL: {{ .PromUrl | b64enc }}
-  CNVRG_PROMETHEUS_INTERNAL_URL: "{{ InternalUrl }}"
+  CNVRG_PROMETHEUS_INTERNAL_URL: "{{ .InternalUrl | b64enc }}"
