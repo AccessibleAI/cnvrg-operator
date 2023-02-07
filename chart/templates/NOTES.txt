@@ -1,8 +1,3 @@
-
-{{- if eq .Values.spec "infra" }}
-🚀 Thank you for installing cnvrg infra!
-Now you can proceed to the cnvrg control plane installation.
-{{- else }}
 🚀 Thank you for installing cnvrg.io!
 
 Your installation of cnvrg.io is finished!
@@ -16,6 +11,5 @@ Access to the app via:
 {{- end }}
 Join our community at https://community.cnvrg.io
 Talk to our team via email at hi@cnvrg.io
-{{- end }}
 
 
