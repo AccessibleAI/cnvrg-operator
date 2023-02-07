@@ -240,6 +240,7 @@ func (m *GrafanaStateManager) dataSources() error {
 		"Annotations": m.app.Spec.Annotations,
 		"Labels":      m.app.Spec.Labels,
 		"Url":         url,
+		"InternalUrl": fmt.Sprintf("%s:%d", m.app.Spec.Dbs.Prom.SvcName, m.app.Spec.Dbs.Prom.Port),
 		"User":        user,
 		"Pass":        pass,
 	}

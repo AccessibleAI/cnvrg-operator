@@ -18,5 +18,5 @@ data:
   CNVRG_PROMETHEUS_USER: {{ .User | b64enc }}
   CNVRG_PROMETHEUS_PASS: {{ .Pass | b64enc }}
   CNVRG_PROMETHEUS_HASHED_PASS: {{ .PassHash | b64enc }}
-  CNVRG_PROMETHEUS_URL:  {{ .PromUrl | b64enc }}
-  CNVRG_PROMETHEUS_INTERNAL_URL: "{{ .Spec.Dbs.Prom.SvcName }}:{{ .Spec.Dbs.Prom.Port }}"
+  CNVRG_PROMETHEUS_URL: {{ .PromUrl | b64enc }}
+  CNVRG_PROMETHEUS_INTERNAL_URL: "{{ InternalUrl }}"
