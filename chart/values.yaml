@@ -26,6 +26,16 @@ controlPlane:
     enabled: true
   cnvrgClusterProvisionerOperator:
     enabled: false
+  cnvrgJobsOperator:
+    enabled: true
+    executerImage: cnvrg/jobs-operator-executer:latest
+    image: cnvrg/jobs-operator:latest
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: "2"
+      memory: 2Gi
   objectStorage:
     type: minio
     bucket: cnvrg-storage
