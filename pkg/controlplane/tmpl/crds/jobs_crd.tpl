@@ -31,7 +31,7 @@ spec:
             properties:
               cleanUp:
                 type: string
-              networkSpec:
+              network:
                 items:
                   properties:
                     gateway:
@@ -76,7 +76,7 @@ spec:
                   - targetPort
                   type: object
                 type: array
-              replicasDefinition:
+              replicas:
                 additionalProperties:
                   properties:
                     commands:
@@ -4277,7 +4277,7 @@ spec:
                     replicas:
                       format: int32
                       type: integer
-                    volumesSpec:
+                    volumes:
                       items:
                         properties:
                           storageClassName:
