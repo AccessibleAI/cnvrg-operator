@@ -31,4 +31,4 @@ spec:
           service:
             name: {{ .Spec.Dbs.Minio.SvcName }}
             port:
-              number: {{ .Spec.Dbs.Minio.Port }}
+              number: 80
