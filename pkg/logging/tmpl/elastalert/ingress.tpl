@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -20,9 +20,6 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: {{ .Spec.Logging.Elastalert.SvcName }}
-                port:
-                  number: {{ .Spec.Logging.Elastalert.Port }}
+              serviceName: {{ .Spec.Logging.Elastalert.SvcName }}
+              servicePort: {{ .Spec.Logging.Elastalert.Port }}

@@ -15,12 +15,6 @@ metadata:
     {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
-  {{- if ne .Spec.Networking.HTTPS.CertSecret "" }}
-  tls:
-  - hosts:
-    - "{{ .Spec.Monitoring.Prometheus.SvcName}}.{{ .Spec.ClusterDomain }}"
-    secretName: "{{ .Spec.Networking.HTTPS.CertSecret }}"
-  {{- end }}
   rules:
   - host: "{{ .Spec.Monitoring.Prometheus.SvcName }}.{{ .Spec.ClusterDomain }}"
     http:
