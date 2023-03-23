@@ -3,6 +3,7 @@ networking:
   https:
     enabled: {{ .Values.networking.https.enabled }}
     certSecret: "{{ .Values.networking.https.certSecret }}"
+    acmeCert: {{ .Values.networking.https.acmeCert }}
   proxy:
     enabled: {{ .Values.networking.proxy.enabled }}
     {{- if .Values.networking.proxy.httpProxy }}
@@ -32,6 +33,9 @@ networking:
     {{- else }}
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     {{- end }}
+    {{- end }}
+    {{- if and (eq .Values.networking.ingress.type "ingress") (ne .Values.networking.ingress.className "") }}
+    className: {{ .Values.networking.ingress.className }}
     {{- end }}
   eastWest:
     enabled: {{ .Values.networking.eastWest.enabled }}

@@ -15,6 +15,9 @@ metadata:
     {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
+{{- if ne .Spec.Networking.Ingress.ClassName "" }}
+  ingressClassName: {{ .Spec.Networking.Ingress.ClassName }}
+{{- end }}
   rules:
   - host: "{{ .Spec.Monitoring.Grafana.SvcName }}.{{ .Spec.ClusterDomain }}"
     http:
@@ -26,3 +29,13 @@ spec:
             name: {{ .Spec.Monitoring.Grafana.SvcName }}
             port:
               number: {{ .Spec.Monitoring.Grafana.Port }}
+{{- if isTrue .Spec.Networking.HTTPS.Enabled }}
+  tls:
+  - hosts:
+    - {{ .Spec.Monitoring.Grafana.SvcName }}.{{ .Spec.ClusterDomain }}
+{{- if isTrue .Spec.Networking.HTTPS.AcmeCert }}
+    secretName: grafana-tls-cert
+{{- else if ne .Spec.Networking.HTTPS.CertSecret "" }}
+    secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+{{- end }}
+{{- end }}

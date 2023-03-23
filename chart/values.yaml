@@ -176,6 +176,7 @@ monitoring:
 networking:
   https:
     enabled: false
+    acmeCert: false
     certSecret: ""
   proxy:
     enabled: false
@@ -186,6 +187,7 @@ networking:
     type: "istio"
     istioGwEnabled: true
     istioGwName: ""
+    className: ""
   istio:
     enabled: true
     externalIp: [ ]
