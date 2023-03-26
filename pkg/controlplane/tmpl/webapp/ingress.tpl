@@ -15,6 +15,12 @@ metadata:
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ ns . }}
 spec:
+  {{- if ne .Spec.Networking.HTTPS.CertSecret "" }}
+  tls:
+  - hosts:
+    - "{{ .Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
+    secretName: "{{ .Spec.Networking.HTTPS.CertSecret }}"
+  {{- end }}
   rules:
   - host: "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
     http:
