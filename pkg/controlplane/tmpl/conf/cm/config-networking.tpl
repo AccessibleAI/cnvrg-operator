@@ -34,6 +34,6 @@ data:
   CNVRG_PROXY_CONFIG_REF: {{ .Spec.Networking.Proxy.ConfigRef }}
   {{- end }}
   {{- if isTrue .Spec.Networking.HTTPS.Enabled }}
-  CNVRG_CERT_SECRET: "{{ .Spec.Networking.HTTPS.CertSecret }}"
+  CNVRG_CERT_SECRET: {{ .Spec.Networking.HTTPS.CertSecret }}
   {{- end }}
 
