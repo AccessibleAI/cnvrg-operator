@@ -4,6 +4,7 @@ type SSO struct {
 	Enabled                          bool     `json:"enabled,omitempty"`
 	Image                            string   `json:"image,omitempty"`
 	AdminUser                        string   `json:"adminUser,omitempty"`
+	AdminPassword                    string   `json:"adminPassword,omitempty"`
 	Provider                         string   `json:"provider,omitempty"`
 	EmailDomain                      []string `json:"emailDomain,omitempty"`
 	ClientID                         string   `json:"clientId,omitempty"`
@@ -25,6 +26,7 @@ var ssoDefault = SSO{
 	Enabled:                          false,
 	Image:                            "saas-oauth2-proxy:latest",
 	AdminUser:                        "",
+	AdminPassword:                    "",
 	Provider:                         "",
 	EmailDomain:                      nil,
 	ClientID:                         "",

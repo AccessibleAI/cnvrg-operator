@@ -179,7 +179,7 @@ var infraMonitoringDefault = CnvrgInfraMonitoring{
 	},
 	KubeStateMetrics: KubeStateMetrics{
 		Enabled: false,
-		Image:   "kube-state-metrics:v2.8.1",
+		Image:   "kube-state-metrics:v1.9.7",
 	},
 	NodeExporter: NodeExporter{
 		Enabled: false,

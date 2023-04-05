@@ -21,3 +21,6 @@ data:
   STS_IV: {{ "DeJ/CGz/Hkb/IbRe4t1xLg==" | b64enc }}
 {{/*  STS_KEY: {{ randAlphaNum 32 | lower | b64enc }} -> waiting for big boss */}}
   STS_KEY: {{ "05646d3cbf8baa5be7150b4283eda07d" | b64enc }}
+  {{- if .Spec.SSO.AdminPassword }}
+  SSO_ADMIN_PASSWORD: {{ .Spec.SSO.AdminPassword | b64enc }}
+  {{- end }}

@@ -7,7 +7,7 @@ metadata:
     {{- end }}
   labels:
     app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: 2.8.1
+    app.kubernetes.io/version: 1.9.7
     cnvrg-infra-prometheus: {{ .Name }}-{{ ns .}}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
