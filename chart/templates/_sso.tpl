@@ -2,6 +2,7 @@
 sso:
   enabled: {{ .Values.sso.enabled}}
   adminUser: "{{ .Values.sso.adminUser }}"
+  adminPassword: "{{ .Values.sso.adminPassword }}"
   provider: "{{ .Values.sso.provider }}"
   {{- if .Values.sso.emailDomain }}
   emailDomain:
