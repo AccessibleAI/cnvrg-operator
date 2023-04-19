@@ -36,6 +36,9 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       serviceAccountName: {{ .Spec.SSO.Proxy.SvcName}}
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
