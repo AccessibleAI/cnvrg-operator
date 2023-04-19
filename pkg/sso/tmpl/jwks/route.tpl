@@ -22,7 +22,7 @@ spec:
     targetPort: 8080
   to:
     kind: Service
-    name: "{{.Spec.SSO.Jwks.SvcName}}.{{.Namespace }}.svc"
+    name: "{{.Spec.SSO.Jwks.SvcName}}"
     weight: 100
   {{- if isTrue .Spec.Networking.HTTPS.Enabled  }}
   tls:

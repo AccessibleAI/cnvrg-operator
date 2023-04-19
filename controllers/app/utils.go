@@ -88,6 +88,7 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 
 			} else {
 				defaultSpec.ClusterDomain = clusterDomain
+				app.Spec.ClusterDomain = clusterDomain
 			}
 		}
 
@@ -111,7 +112,7 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 		if app.Spec.SSO.Central.JwksURL == "" {
 
 			defaultSpec.SSO.Central.JwksURL = fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id", scheme,
-				defaultSpec.SSO.Central.SvcName,
+				defaultSpec.SSO.Jwks.SvcName,
 				app.Spec.ClusterDomain,
 				strings.Split(app.Spec.ClusterDomain, ".")[0],
 			)

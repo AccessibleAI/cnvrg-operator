@@ -25,7 +25,11 @@ metadata:
 spec:
   host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:
+    {{- if isTrue .Spec.SSO.Enabled }}
+    targetPort: 8888
+    {{- else }}
     targetPort: {{ .Spec.ControlPlane.WebApp.Port }}
+    {{- end }}
   to:
     kind: Service
     {{- if isTrue .Spec.SSO.Enabled }}

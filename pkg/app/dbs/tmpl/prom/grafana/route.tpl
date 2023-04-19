@@ -26,7 +26,11 @@ metadata:
 spec:
   host: "{{ .Spec.Dbs.Prom.Grafana.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:
+    {{- if isTrue .Spec.SSO.Enabled }}
+    targetPort: 8888
+    {{- else }}
     targetPort: {{ .Spec.Dbs.Prom.Grafana.Port }}
+    {{- end }}
   to:
     kind: Service
     {{- if isTrue .Spec.SSO.Enabled }}

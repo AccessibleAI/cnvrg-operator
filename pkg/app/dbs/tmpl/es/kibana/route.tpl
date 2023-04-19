@@ -25,7 +25,11 @@ metadata:
 spec:
   host: "{{ .Spec.Dbs.Es.Kibana.SvcName }}.{{ .Spec.ClusterDomain }}"
   port:
+    {{- if isTrue .Spec.SSO.Enabled }}
+    targetPort: 8888
+    {{- else }}
     targetPort: {{ .Spec.Dbs.Es.Kibana.Port }}
+    {{- end }}
   to:
     kind: Service
     {{- if isTrue .Spec.SSO.Enabled }}

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/controllers"
@@ -65,6 +66,8 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	// specs are synced, proceed reconcile
 	cnvrgApp, err := r.getCnvrgAppSpec(req.NamespacedName)
+	b, _ := json.Marshal(cnvrgApp)
+	log.Info(string(b))
 	if err != nil {
 		return ctrl.Result{}, err
 	}
