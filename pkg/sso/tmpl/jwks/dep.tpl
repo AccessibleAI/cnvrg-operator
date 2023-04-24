@@ -41,6 +41,9 @@ spec:
             weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
       serviceAccountName: {{ .Spec.SSO.Jwks.SvcName }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       {{- if isTrue .Spec.Tenancy.Enabled }}
       nodeSelector:
         "{{ .Spec.Tenancy.Key }}": "{{ .Spec.Tenancy.Value }}"
@@ -92,6 +95,9 @@ spec:
             path: /healthz
       - name: redis-cache
         image: {{ image .Spec.ImageHub .Spec.SSO.Jwks.CacheImage }}
+        args:
+          - --save ""
+          - --appendonly "no"
         resources:
           requests:
             cpu: 200m

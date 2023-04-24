@@ -123,6 +123,12 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 				strings.Split(app.Spec.ClusterDomain, ".")[0],
 			)
 		}
+		if app.Spec.SSO.Central.WhitelistDomain == "" {
+			defaultSpec.SSO.Central.WhitelistDomain = fmt.Sprintf(".%s", app.Spec.ClusterDomain)
+		}
+		if app.Spec.SSO.Central.CookieDomain == "" {
+			defaultSpec.SSO.Central.CookieDomain = fmt.Sprintf(".%s", app.Spec.ClusterDomain)
+		}
 	}
 
 	return nil
