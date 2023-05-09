@@ -191,7 +191,7 @@ var redisDefault = Redis{
 var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
-	Image:          "cnvrg-es:v7.8.1.a1-dynamic-indices",
+	Image:          "cnvrg-es:8.7.1-test",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
@@ -210,9 +210,9 @@ var esDefault = Es{
 	CredsRef:     "es-creds",
 	PvcName:      "es-storage",
 	CleanupPolicy: CleanupPolicy{
-		All: "3d",
-		App: "30d",
-		Jobs: "14d",
+		All:       "3d",
+		App:       "30d",
+		Jobs:      "14d",
 		Endpoints: "1825d",
 	},
 }
