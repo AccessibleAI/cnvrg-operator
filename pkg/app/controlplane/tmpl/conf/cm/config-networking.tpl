@@ -27,14 +27,8 @@ data:
   ROUTE_BY_NGINX_INGRESS: "{{ routeBy . "NGINX_INGRESS" }}"
   ROUTE_BY_NODE_PORT: "{{ routeBy . "NODE_PORT" }}"
   CNVRG_ISTIO_GATEWAY: "{{ .Spec.Networking.Ingress.IstioGwName }}"
-  {{- if isTrue .Spec.SSO.Enabled }}
-  {{- if eq "true" (routeBy . "ISTIO")}}
   CNVRG_SSO_CENTRAL_PROXY: "{{.Spec.SSO.Proxy.Address}}"
   CNVRG_SSO_PUBLIC_URL: "{{.Spec.SSO.Central.PublicUrl}}"
-  {{- else }}
-  CNVRG_SSO_CENTRAL_PROXY: "{{.Spec.SSO.Proxy.SvcName}}"
-  {{- end }}
-  {{- end }}
   {{- if isTrue .Spec.ControlPlane.CnvrgRouter.Enabled }}
   DEPLOY_URL: "{{ cnvrgRoutingService . }}"
   NOTEBOOK_URL: "{{ cnvrgRoutingService . }}"
