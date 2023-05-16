@@ -62,6 +62,7 @@ type Redis struct {
 type Es struct {
 	Enabled        bool              `json:"enabled,omitempty"`
 	ServiceAccount string            `json:"serviceAccount,omitempty"`
+	Replicas       int               `json:"replicas,omitempty"`
 	Image          string            `json:"image,omitempty"`
 	Port           int               `json:"port,omitempty"`
 	StorageSize    string            `json:"storageSize,omitempty"`

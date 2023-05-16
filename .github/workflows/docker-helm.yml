@@ -24,7 +24,7 @@ jobs:
 
     - name: Set up Helm
       if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      uses: azure/setup-helm@v1
+      uses: azure/setup-helm@v3.4
 
     - name: Run chart-testing (lint)
       if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}

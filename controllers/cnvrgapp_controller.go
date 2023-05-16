@@ -497,6 +497,12 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 			r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
 			return err
 		}
+		if app.Spec.Dbs.Es.Replicas > 1 {
+			if err := desired.Apply(dbs.EsCerts(), app, r.Client, r.Scheme, appLog); err != nil {
+				r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+				return err
+			}
+		}
 	}
 
 	if app.Spec.Dbs.Pg.Enabled {
@@ -538,6 +544,15 @@ func (r *CnvrgAppReconciler) dbsState(app *mlopsv1.CnvrgApp) error {
 
 	if err := desired.Apply(dbs.AppDbsState(app), app, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, app)
+		sts := &v1apps.StatefulSet{}
+		if err = r.Client.Get(context.Background(), types.NamespacedName{Namespace: app.Namespace, Name: app.Spec.Dbs.Es.SvcName}, sts); err != nil {
+			return err
+		}
+		if int32(app.Spec.Dbs.Es.Replicas) != *sts.Spec.Replicas && app.Spec.Dbs.Es.Replicas != 0 {
+			if err = r.Client.Delete(context.Background(), sts); err != nil {
+				return err
+			}
+		}
 		return err
 	}
 	return nil
