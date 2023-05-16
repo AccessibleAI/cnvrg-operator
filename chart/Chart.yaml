@@ -2,5 +2,5 @@ apiVersion: v2
 name: cnvrg
 description: A cnvrg.io operator v3 chart for K8s
 type: application
-version: 4.3.22-DEV-15047-slim-cnvrg-86
+version: 4.3.22-DEV-15047-slim-cnvrg-88
 appVersion: 1.2.3
