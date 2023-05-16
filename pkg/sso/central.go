@@ -64,6 +64,7 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 		"Namespace":   c.app.Namespace,
 		"SsoDomainId": strings.Split(c.app.Spec.ClusterDomain, ".")[0],
 		"Spec":        c.app.Spec,
+		"AppUrl":      fmt.Sprintf("%s://%s.%s", c.schema(), c.app.Spec.ControlPlane.WebApp.SvcName, c.app.Spec.ClusterDomain),
 	}
 }
 

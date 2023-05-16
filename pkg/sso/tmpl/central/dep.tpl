@@ -57,6 +57,8 @@ spec:
             value: "config/CNVRG_PKI_PRIVATE_KEY"
           - name: CNVRG_CENTRAL_SSO_JWT_IIS
             value: "{{ .Spec.SSO.Central.JwksURL }}"
+          - name: CNVRG_CENTRAL_SSO_APP_URL
+            value: "{{ .AppUrl }}"
         volumeMounts:
           - name: "private-key"
             mountPath: "/opt/app-root/config"

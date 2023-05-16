@@ -473,8 +473,8 @@ var ssoDefault = SSO{
 		Enabled:                          false,
 		Replicas:                         1,
 		SvcName:                          "sso-central",
-		CnvrgProxyImage:                  "cnvrg-proxy:v1.0.9",
-		OauthProxyImage:                  "oauth2-proxy:v7.3.x.ssov3.p2-01",
+		CnvrgProxyImage:                  "cnvrg-proxy:v1.0.11",
+		OauthProxyImage:                  "oauth2-proxy:v7.4.ssov3.p3",
 		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
 		Scope:                            "openid email profile",
@@ -494,7 +494,7 @@ var ssoDefault = SSO{
 	Proxy: CentralProxy{
 		Enabled:  false,
 		Replicas: 1,
-		Image:    "cnvrg-proxy:v1.0.9",
+		Image:    "cnvrg-proxy:v1.0.11",
 		SvcName:  "cnvrg-proxy-central",
 		Requests: Requests{
 			Cpu:    "200m",

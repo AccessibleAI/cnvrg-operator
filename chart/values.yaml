@@ -363,7 +363,7 @@ sso:
   central:
     enabled: false
     publicUrl: ''
-    oauthProxyImage: oauth2-proxy:v7.3.x.ssov3.p2-01
+    oauthProxyImage: oauth2-proxy:v7.4.ssov3.p3
     centralUiImage: centralsso:latest
     adminUser: ''
     provider: ''
@@ -387,7 +387,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: cnvrg-proxy:v1.0.9
+    image: cnvrg-proxy:v1.0.11
     address: ""
     readiness: true
     requests:
