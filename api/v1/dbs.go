@@ -203,8 +203,8 @@ var esDefault = Es{
 		Memory: "4Gi",
 	},
 	Limits: Limits{
-		Cpu:    "4",
-		Memory: "8Gi",
+		Cpu:    "8",
+		Memory: "16Gi",
 	},
 	JavaOpts:     "",
 	PatchEsNodes: false,
