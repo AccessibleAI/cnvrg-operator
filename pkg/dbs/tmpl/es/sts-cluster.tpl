@@ -95,7 +95,7 @@ spec:
       initContainers:
       {{- if isTrue .Spec.Dbs.Es.PatchEsNodes }}
       - name: "maxmap"
-        image: cnvrg/cnvrg-es:7.17.5
+        image: cnvrg/cnvrg-es:v8.7.1-test
         imagePullPolicy: "Always"
         command: ["/bin/bash","-c","sysctl -w vm.max_map_count=262144"]
         securityContext:
@@ -112,7 +112,7 @@ spec:
       containers:
       - name: elastic
         imagePullPolicy: "Always"
-        image: cnvrg/cnvrg-es:7.17.5
+        image: cnvrg/cnvrg-es:v8.7.1-test
         env:
         - name: cluster.name
           value: "cnvrg-es"
