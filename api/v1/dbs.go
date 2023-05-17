@@ -202,10 +202,6 @@ var esDefault = Es{
 		Cpu:    "500m",
 		Memory: "4Gi",
 	},
-	Limits: Limits{
-		Cpu:    "8",
-		Memory: "16Gi",
-	},
 	JavaOpts:     "",
 	PatchEsNodes: false,
 	CredsRef:     "es-creds",
