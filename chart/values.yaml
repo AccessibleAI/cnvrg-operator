@@ -279,49 +279,6 @@ dbs:
         memory: 800Mi
       nodeSelector:
       pvcName: elastalert-storage
-  cvat:
-    enabled: false
-    pg:
-      enabled: false
-      serviceAccount: cvat-pg
-      image: postgresql-12-centos7:latest
-      port: 5432
-      storageSize: 100Gi
-      svcName: cvat-postgres
-      storageClass: ''
-      requests:
-        cpu: '1'
-        memory: 2Gi
-      limits:
-        cpu: '2'
-        memory: 4Gi
-      maxConnections: 500
-      sharedBuffers: 1024MB
-      effectiveCacheSize: 2048MB
-      hugePages:
-        enabled: false
-        size: 2Mi
-        memory: ''
-      nodeSelector:
-      credsRef: cvat-pg-secret
-      pvcName: cvat-pg-storage
-    redis:
-      enabled: false
-      serviceAccount: cvat-redis
-      image: redis:7.0.5
-      svcName: cvat-redis
-      port: 6379
-      storageSize: 10Gi
-      storageClass: ''
-      requests:
-        cpu: 250m
-        memory: 500Mi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-      nodeSelector:
-      credsRef: cvat-redis-secret
-      pvcName: cvat-redis-storage
   prom:
     enabled: true
     credsRef: prom-creds

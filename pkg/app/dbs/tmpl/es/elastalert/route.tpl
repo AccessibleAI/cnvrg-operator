@@ -10,9 +10,9 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   name: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   labels:
-    app: {{ ns . }}
+    app: {{ .Namespace }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

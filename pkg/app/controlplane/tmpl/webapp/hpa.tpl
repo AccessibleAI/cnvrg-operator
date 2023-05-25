@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"

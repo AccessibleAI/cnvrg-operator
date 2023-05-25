@@ -7,7 +7,7 @@ metadata:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "true"
-    app: {{ ns . }}
+    app: {{ .Namespace }}
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

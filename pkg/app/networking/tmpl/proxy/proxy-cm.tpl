@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Spec.Networking.Proxy.ConfigRef }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"

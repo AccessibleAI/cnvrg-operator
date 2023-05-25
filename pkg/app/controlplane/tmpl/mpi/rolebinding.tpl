@@ -2,7 +2,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: mpi-operator
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -22,6 +22,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: mpi-operator
-    namespace: {{ ns . }}
+    namespace: {{ .Namespace }}
 
 

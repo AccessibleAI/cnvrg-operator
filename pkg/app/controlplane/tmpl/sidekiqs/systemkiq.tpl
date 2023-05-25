@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: systemkiq
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -45,7 +45,7 @@ spec:
                 matchLabels:
                   app: systemkiq
               namespaces:
-              - {{ ns . }}
+              - {{ .Namespace }}
               topologyKey: kubernetes.io/hostname
             weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
@@ -96,12 +96,6 @@ spec:
                 name: cp-object-storage
             - secretRef:
                 name: cp-smtp
-            {{- if isTrue .Spec.Dbs.Cvat.Enabled }}
-            - secretRef:
-                name: {{ .Spec.Dbs.Cvat.Pg.CredsRef }}
-            - secretRef:
-                name: {{ .Spec.Dbs.Cvat.Redis.CredsRef }}
-            {{- end }}
             - secretRef:
                 name: {{ .Spec.Dbs.Es.CredsRef }}
             - secretRef:
@@ -144,4 +138,4 @@ spec:
               memory: "1Gi"
           env:
             - name: "CNVRG_NS"
-              value: {{ ns . }}
+              value: {{ .Namespace }}

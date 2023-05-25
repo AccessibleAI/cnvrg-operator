@@ -12,13 +12,13 @@ metadata:
     sso.cnvrg.io/enabled: "true"
     sso.cnvrg.io/skipAuthRoutes: \/api\/health
     sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
-    sso.cnvrg.io/upstream: "{{.Spec.Dbs.Prom.Grafana.SvcName}}.{{ ns . }}.svc:{{.Spec.Dbs.Prom.Grafana.Port}}"
+    sso.cnvrg.io/upstream: "{{.Spec.Dbs.Prom.Grafana.SvcName}}.{{ .Namespace }}.svc:{{.Spec.Dbs.Prom.Grafana.Port}}"
     {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
   name: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"

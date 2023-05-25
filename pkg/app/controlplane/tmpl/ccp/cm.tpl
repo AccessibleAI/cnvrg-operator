@@ -15,7 +15,7 @@ data:
 kind: ConfigMap
 metadata:
   name: cnvrg-ccp-operator-manager-config
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"

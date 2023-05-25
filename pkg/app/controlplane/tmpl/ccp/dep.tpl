@@ -4,7 +4,7 @@ metadata:
   labels:
     control-plane: controller-manager
   name: cnvrg-ccp-operator-controller-manager
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -45,7 +45,7 @@ spec:
             - /manager
           env:
             - name: TENANT_NAMESPACE
-              value: {{ ns . }}
+              value: {{ .Namespace }}
             - name: USER_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

@@ -12,7 +12,7 @@ metadata:
     sso.cnvrg.io/enabled: "true"
     sso.cnvrg.io/skipAuthRoutes: \/assets \/healthz \/public \/pack \/vscode.tar.gz \/jupyter.vsix \/gitlens.vsix \/ms-python-release.vsix \/webhooks \/api/v2/metrics \/api/v1/events/endpoint_rule_alert \/api/v2/version
     sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
-    sso.cnvrg.io/upstream: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ ns . }}.svc:{{.Spec.ControlPlane.WebApp.Port}}"
+    sso.cnvrg.io/upstream: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ .Namespace }}.svc:{{.Spec.ControlPlane.WebApp.Port}}"
     {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
@@ -22,7 +22,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
 spec:
   ingressClassName: nginx
   rules:

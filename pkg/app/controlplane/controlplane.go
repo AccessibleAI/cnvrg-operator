@@ -105,14 +105,6 @@ func (m *CpStateManager) Load() error {
 		m.AddToAssets(mpi)
 	}
 
-	if m.app.Spec.ControlPlane.CnvrgRouter.Enabled {
-		router := desired.NewAssetsGroup(fs, m.RootPath()+"/router", m.Log(), nil)
-		if err := router.LoadAssets(); err != nil {
-			return err
-		}
-		m.AddToAssets(router)
-	}
-
 	if m.app.Spec.ControlPlane.CnvrgScheduler.Enabled {
 		scheduler := desired.NewAssetsGroup(fs, m.RootPath()+"/scheduler", m.Log(), nil)
 		if err := scheduler.LoadAssets(); err != nil {

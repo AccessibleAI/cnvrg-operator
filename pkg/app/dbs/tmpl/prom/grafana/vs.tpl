@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: {{ .Spec.Dbs.Prom.Grafana.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -11,7 +11,7 @@ metadata:
     sso.cnvrg.io/enabled: "true"
     sso.cnvrg.io/skipAuthRoutes: \/api\/health
     sso.cnvrg.io/central: "{{ .Spec.SSO.Central.PublicUrl }}"
-    sso.cnvrg.io/upstream: "{{.Spec.Dbs.Prom.Grafana.SvcName}}.{{ ns . }}.svc:{{.Spec.Dbs.Prom.Grafana.Port}}"
+    sso.cnvrg.io/upstream: "{{.Spec.Dbs.Prom.Grafana.SvcName}}.{{ .Namespace }}.svc:{{.Spec.Dbs.Prom.Grafana.Port}}"
     {{- end }}
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
@@ -35,7 +35,7 @@ spec:
         {{- if isTrue .Spec.SSO.Enabled }}
         host: "{{.Spec.SSO.Proxy.Address}}"
         {{- else }}
-        host: "{{ .Spec.Dbs.Prom.Grafana.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
+        host: "{{ .Spec.Dbs.Prom.Grafana.SvcName }}.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"
         port:
           number: {{ .Spec.Dbs.Prom.Grafana.Port }}
         {{- end }}

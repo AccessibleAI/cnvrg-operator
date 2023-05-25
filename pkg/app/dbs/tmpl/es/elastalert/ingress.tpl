@@ -12,7 +12,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   name: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"

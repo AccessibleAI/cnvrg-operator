@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: cp-smtp
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"

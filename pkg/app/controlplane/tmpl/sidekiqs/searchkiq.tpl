@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: searchkiq
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -46,7 +46,7 @@ spec:
                 matchLabels:
                   app: searchkiq
               namespaces:
-              - {{ ns . }}
+              - {{ .Namespace }}
               topologyKey: kubernetes.io/hostname
             weight: 1
       priorityClassName: {{ .Spec.PriorityClass.AppClassRef }}
@@ -138,4 +138,4 @@ spec:
             memory: "1Gi"
         env:
         - name: "CNVRG_NS"
-          value: {{ ns . }}
+          value: {{ .Namespace }}

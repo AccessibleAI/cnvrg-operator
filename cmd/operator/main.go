@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/AccessibleAI/cnvrg-operator/controllers/app"
-	"github.com/AccessibleAI/cnvrg-operator/controllers/thirdparty"
 	"github.com/go-logr/zapr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -120,15 +119,6 @@ func runOperator() {
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
-		os.Exit(1)
-	}
-
-	if err = (&thirdparty.CnvrgThirdPartyReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("CnvrgThirdParty"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "CnvrgThirdParty")
 		os.Exit(1)
 	}
 

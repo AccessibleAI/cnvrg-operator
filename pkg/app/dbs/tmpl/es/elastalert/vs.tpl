@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -28,4 +28,4 @@ spec:
     - destination:
         port:
           number: {{ .Spec.Dbs.Es.Elastalert.Port }}
-        host: "{{ .Spec.Dbs.Es.Elastalert.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
+        host: "{{ .Spec.Dbs.Es.Elastalert.SvcName }}.{{ .Namespace }}.svc.{{ .Spec.ClusterInternalDomain }}"

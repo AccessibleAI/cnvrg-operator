@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: scheduler
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -125,4 +125,4 @@ spec:
             memory: "1Gi"
         env:
           - name: "CNVRG_NS"
-            value: {{ ns . }}
+            value: {{ .Namespace }}

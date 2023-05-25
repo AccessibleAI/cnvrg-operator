@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mpi-operator
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -64,9 +64,9 @@ spec:
         - --kubectl-delivery-image
         - {{ .Spec.ControlPlane.Mpi.KubectlDeliveryImage }}
         - --lock-namespace
-        - {{ ns . }}
+        - {{ .Namespace }}
         - --namespace
-        - {{ ns . }}
+        - {{ .Namespace }}
         {{- range $extraArgName, $extraArgValue := .Spec.ControlPlane.Mpi.ExtraArgs }}
         - "{{ $extraArgName }}"
         - "{{ $extraArgValue }}"

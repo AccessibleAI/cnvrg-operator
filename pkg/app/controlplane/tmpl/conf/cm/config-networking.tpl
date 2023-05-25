@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cp-networking-config
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -29,11 +29,6 @@ data:
   CNVRG_ISTIO_GATEWAY: "{{ .Spec.Networking.Ingress.IstioGwName }}"
   CNVRG_SSO_CENTRAL_PROXY: "{{.Spec.SSO.Proxy.Address}}"
   CNVRG_SSO_PUBLIC_URL: "{{.Spec.SSO.Central.PublicUrl}}"
-  {{- if isTrue .Spec.ControlPlane.CnvrgRouter.Enabled }}
-  DEPLOY_URL: "{{ cnvrgRoutingService . }}"
-  NOTEBOOK_URL: "{{ cnvrgRoutingService . }}"
-  TENSORBOARD_URL: "{{ cnvrgRoutingService . }}"
-  {{- end }}
   {{- if isTrue .Spec.Networking.Proxy.Enabled }}
   CNVRG_PROXY_CONFIG_REF: {{ .Spec.Networking.Proxy.ConfigRef }}
   {{- end }}

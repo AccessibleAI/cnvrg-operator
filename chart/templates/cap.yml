@@ -285,49 +285,6 @@ spec:
           memory: {{.Values.dbs.es.elastalert.limits.memory}}
         nodeSelector: null
         pvcName: {{.Values.dbs.es.elastalert.pvcName}}
-    cvat:
-      enabled: {{.Values.dbs.cvat.enabled}}
-      pg:
-        enabled: {{.Values.dbs.cvat.pg.enabled}}
-        serviceAccount: {{.Values.dbs.cvat.pg.serviceAccount}}
-        image: {{.Values.dbs.cvat.pg.image}}
-        port: {{.Values.dbs.cvat.pg.port}}
-        storageSize: {{.Values.dbs.cvat.pg.storageSize}}
-        svcName: {{.Values.dbs.cvat.pg.svcName}}
-        storageClass: {{.Values.dbs.cvat.pg.storageClass}}
-        requests:
-          cpu: "{{.Values.dbs.cvat.pg.requests.cpu}}"
-          memory: {{.Values.dbs.cvat.pg.requests.memory}}
-        limits:
-          cpu: "{{.Values.dbs.cvat.pg.limits.cpu}}"
-          memory: {{.Values.dbs.cvat.pg.limits.memory}}
-        maxConnections: {{.Values.dbs.cvat.pg.maxConnections}}
-        sharedBuffers: {{.Values.dbs.cvat.pg.sharedBuffers}}
-        effectiveCacheSize: {{.Values.dbs.cvat.pg.effectiveCacheSize}}
-        hugePages:
-          enabled: {{.Values.dbs.cvat.pg.hugePages.enabled}}
-          size: {{.Values.dbs.cvat.pg.hugePages.size}}
-          memory: {{.Values.dbs.cvat.pg.hugePages.memory}}
-        nodeSelector: null
-        credsRef: {{.Values.dbs.cvat.pg.credsRef}}
-        pvcName: {{.Values.dbs.cvat.pg.pvcName}}
-      redis:
-        enabled: {{.Values.dbs.cvat.redis.enabled}}
-        serviceAccount: {{.Values.dbs.cvat.redis.serviceAccount}}
-        image: {{.Values.dbs.cvat.redis.image}}
-        svcName: {{.Values.dbs.cvat.redis.svcName}}
-        port: {{.Values.dbs.cvat.redis.port}}
-        storageSize: {{.Values.dbs.cvat.redis.storageSize}}
-        storageClass: {{.Values.dbs.cvat.redis.storageClass}}
-        requests:
-          cpu: {{.Values.dbs.cvat.redis.requests.cpu}}
-          memory: {{.Values.dbs.cvat.redis.requests.memory}}
-        limits:
-          cpu: {{.Values.dbs.cvat.redis.limits.cpu}}
-          memory: {{.Values.dbs.cvat.redis.limits.memory}}
-        nodeSelector: null
-        credsRef: {{.Values.dbs.cvat.redis.credsRef}}
-        pvcName: {{.Values.dbs.cvat.redis.pvcName}}
     prom:
       enabled: {{.Values.dbs.prom.enabled}}
       credsRef: {{.Values.dbs.prom.credsRef}}

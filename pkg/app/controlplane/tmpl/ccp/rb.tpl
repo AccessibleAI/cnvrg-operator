@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: cnvrg-ccp-operator-leader-election-rolebinding
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -21,4 +21,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: cnvrg-ccp-operator-controller-manager
-    namespace: {{ ns . }}
+    namespace: {{ .Namespace }}

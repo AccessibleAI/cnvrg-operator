@@ -24,4 +24,4 @@ fsGroup:
 supplementalGroups:
   type: RunAsAny
 groups:
-- "system:serviceaccounts:{{ ns . }}"
+- "system:serviceaccounts:{{ .Namespace }}"

@@ -353,14 +353,7 @@ var appDbsDefaults = Dbs{
 	Redis: redisDefault,
 	Minio: minioDefaults,
 	Es:    esDefault,
-	Cvat:  cvatDefault,
 	Prom:  promDefaults,
-}
-
-var cvatDefault = Cvat{
-	Enabled: false,
-	Pg:      cvatPgDefault,
-	Redis:   cvatRedisDefault,
 }
 
 var promDefaults = Prom{

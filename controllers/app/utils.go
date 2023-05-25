@@ -42,11 +42,6 @@ func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost s
 
 func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.CnvrgAppSpec, clientset client.Client) error {
 
-	if app.Spec.Dbs.Cvat.Enabled {
-		defaultSpec.Dbs.Cvat.Pg.Enabled = true
-		defaultSpec.Dbs.Cvat.Redis.Enabled = true
-	}
-
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
 		requestMem := strings.TrimSuffix(app.Spec.Dbs.Es.Requests.Memory, "Gi")

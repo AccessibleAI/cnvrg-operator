@@ -14,7 +14,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
   name: {{ .Spec.Dbs.Es.Elastalert.SvcName }}
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
 spec:
   strategy:
     type: Recreate

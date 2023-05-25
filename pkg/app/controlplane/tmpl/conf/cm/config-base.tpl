@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cp-base-config
-  namespace: {{ ns . }}
+  namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
@@ -23,7 +23,7 @@ data:
   USE_STDOUT: "true"
   EXTRACT_TAGS_FROM_CMD: "true"
   AGENT_CUSTOM_TAG: "{{ .Spec.ControlPlane.BaseConfig.AgentCustomTag }}"
-  KUBE_NAMESPACE: "{{ ns . }}"
+  KUBE_NAMESPACE: "{{ .Namespace }}"
   SHOW_INTERCOM: "{{ .Spec.ControlPlane.BaseConfig.Intercom }}"
   SPLIT_SIDEKIQ: "{{ .Spec.ControlPlane.Sidekiq.Split }}"
   CNVRG_PASSENGER_MAX_POOL_SIZE: "{{ .Spec.ControlPlane.WebApp.PassengerMaxPoolSize }}"
@@ -42,7 +42,7 @@ data:
   CNVRG_BUILD_IMAGE_JOB_SA: "cnvrg-buildimage-job"
   CNVRG_ENDPOINTS_INDEX: "cnvrg-endpoints*"
   CNVRG_SPARK_JOB_SA: "cnvrg-spark-job"
-  CVAT_ENABLED: "{{ .Spec.Dbs.Cvat.Enabled }}"
+  CVAT_ENABLED: "false"
   {{- if ne .Spec.ControlPlane.BaseConfig.JobsStorageClass "" }}
   CNVRG_JOBS_STORAGECLASS: "{{ .Spec.ControlPlane.BaseConfig.JobsStorageClass }}" # if is set, app's job will use this storageClass for notebooks/experiments
   {{- end }}
