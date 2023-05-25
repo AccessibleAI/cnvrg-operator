@@ -79,26 +79,6 @@ func getGrafanaDashboards(obj interface{}) []string {
 	return nil
 }
 
-func getSSOConfig(obj interface{}) *mlopsv1.SSO {
-
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		return &obj.(*mlopsv1.CnvrgApp).Spec.SSO
-	}
-	return nil
-}
-
-func getSSORedirectUrl(obj interface{}, svc string) string {
-	if reflect.TypeOf(&mlopsv1.CnvrgApp{}) == reflect.TypeOf(obj) {
-		app := obj.(*mlopsv1.CnvrgApp)
-		if app.Spec.Networking.HTTPS.Enabled {
-			return fmt.Sprintf("https://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
-		} else {
-			return fmt.Sprintf("http://%v.%v/oauth2/callback", svc, app.Spec.ClusterDomain)
-		}
-	}
-	return ""
-}
-
 func cnvrgTemplateFuncs() map[string]interface{} {
 	return map[string]interface{}{
 		"ns": func(obj interface{}) string {
@@ -319,73 +299,6 @@ func (s *State) GenerateDeployable() error {
 	if _, _, err := dec.Decode([]byte(s.ParsedTemplate), nil, s.Obj); err != nil {
 		zap.S().Errorf("%v, template: %v", err, s.ParsedTemplate)
 		return err
-	}
-	return nil
-}
-
-func Apply(desiredManifests []*State, desiredSpec v1.Object, client client.Client, schema *runtime.Scheme, log logr.Logger) error {
-
-	ctx := context.Background()
-	for _, manifest := range desiredManifests {
-
-		if manifest.TemplateData == nil {
-
-			manifest.TemplateData = desiredSpec
-		}
-		if err := manifest.GenerateDeployable(); err != nil {
-			log.Error(err, "error generating deployable", "name", manifest.Obj.GetName())
-			return err
-		}
-
-		if manifest.Own {
-			if err := ctrl.SetControllerReference(desiredSpec, manifest.Obj, schema); err != nil {
-				log.Error(err, "error setting controller reference", "name", manifest.Obj.GetName())
-				return err
-			}
-		}
-
-		if viper.GetBool("dry-run") {
-			log.Info("dry run enabled, skipping applying...")
-			continue
-		}
-		actualObject := &unstructured.Unstructured{}
-		actualObject.SetGroupVersionKind(manifest.GVK)
-		err := client.Get(ctx, types.NamespacedName{Name: manifest.Obj.GetName(), Namespace: manifest.Obj.GetNamespace()}, actualObject)
-		if err != nil && errors.IsNotFound(err) {
-			log.V(1).Info("creating", "name", manifest.Obj.GetName(), "kind", manifest.GVK.Kind)
-			if err := client.Create(ctx, manifest.Obj); err != nil {
-				log.Error(err, "error creating object", "name", manifest.Obj.GetName())
-				return err
-			}
-		} else {
-
-			if !manifest.Updatable {
-				log.Info("skipping update, manifest is not updatable", "manifest", manifest.Obj.GetName(), "kind", manifest.GVK.Kind)
-				continue
-			}
-
-			// for deployment|statefulset|daemonset do not override labels and annotations, but merge them
-			manifest.mergeMetadata(actualObject, log)
-
-			// if override true, do not merge object with existing state
-			// currently, Override=true set only for fluentbit CM
-			// this required when removing cnvrgapp, and fluentbit CM has to be overridden and not merged
-			// in case of merge, CM will have not existing cnvrgapp ES configuration/instance
-			if manifest.Override {
-				actualObject = manifest.Obj
-			} else {
-				if err := mergo.Merge(actualObject, manifest.Obj, mergo.WithOverride); err != nil {
-					log.Error(err, "can't merge")
-					return err
-				}
-			}
-
-			err := client.Update(ctx, actualObject)
-			if err != nil {
-				log.Info("error updating object", "manifest", manifest.TemplatePath)
-				return err
-			}
-		}
 	}
 	return nil
 }

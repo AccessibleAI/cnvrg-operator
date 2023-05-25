@@ -10,8 +10,8 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/dbs"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/registry"
+	sso2 "github.com/AccessibleAI/cnvrg-operator/pkg/app/sso"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
-	"github.com/AccessibleAI/cnvrg-operator/pkg/sso"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
@@ -204,25 +204,25 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 	if app.Spec.SSO.Enabled {
 
 		if app.Spec.SSO.Pki.Enabled {
-			if err := sso.NewPkiStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			if err := sso2.NewPkiStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}
 
 		if app.Spec.SSO.Jwks.Enabled {
-			if err := sso.NewJwksStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			if err := sso2.NewJwksStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}
 
 		if app.Spec.SSO.Central.Enabled {
-			if err := sso.NewCentralStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			if err := sso2.NewCentralStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}
 
 		if app.Spec.SSO.Proxy.Enabled {
-			if err := sso.NewProxyStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			if err := sso2.NewProxyStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 				return err
 			}
 		}
