@@ -83,7 +83,7 @@ controlPlane:
     readinessPeriodSeconds: 100
     readinessTimeoutSeconds: 60
   cnvrgScheduler:
-    enabled: true
+    enabled: false
     requests:
       cpu: 200m
       memory: 1000Mi
@@ -98,10 +98,13 @@ controlPlane:
     nodePort: 30081
   baseConfig:
     jobsStorageClass: ''
-    featureFlags: {}
+    featureFlags:
+      CNVRG_ENABLE_MOUNT_FOLDERS: false
+      CNVRG_MOUNT_HOST_FOLDERS: false
+      CNVRG_PROMETHEUS_METRICS: true
     sentryUrl: ''
     runJobsOnSelfCluster: ''
-    agentCustomTag: latest
+    agentCustomTag: agnostic-logs
     intercom: 'true'
     cnvrgJobUid: '0'
     cnvrgJobRbacStrict: false
