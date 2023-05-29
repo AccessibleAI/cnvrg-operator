@@ -43,6 +43,7 @@ data:
   CNVRG_ENDPOINTS_INDEX: "cnvrg-endpoints*"
   CNVRG_SPARK_JOB_SA: "cnvrg-spark-job"
   CVAT_ENABLED: "false"
+  SSO_VERSION: "{{ .Spec.SSO.Version }}"
   {{- if ne .Spec.ControlPlane.BaseConfig.JobsStorageClass "" }}
   CNVRG_JOBS_STORAGECLASS: "{{ .Spec.ControlPlane.BaseConfig.JobsStorageClass }}" # if is set, app's job will use this storageClass for notebooks/experiments
   {{- end }}
