@@ -937,6 +937,8 @@ spec:
                       svcName:
                         type: string
                     type: object
+                  version:
+                    type: string
                 type: object
               tenancy:
                 properties:

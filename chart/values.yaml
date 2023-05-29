@@ -312,6 +312,7 @@ networking:
     noProxy: []
 sso:
   enabled: false
+  version: v3
   pki:
     enabled: false
     rootCaSecret: sso-idp-root-ca

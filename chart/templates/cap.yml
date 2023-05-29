@@ -318,6 +318,7 @@ spec:
       noProxy: null
   sso:
     enabled: {{.Values.sso.enabled}}
+    version: {{.Values.sso.version}}
     pki:
       enabled: {{.Values.sso.pki.enabled}}
       rootCaSecret: {{.Values.sso.pki.rootCaSecret}}
