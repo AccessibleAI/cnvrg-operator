@@ -305,10 +305,10 @@ spec:
       perTryTimeout: {{.Values.networking.ingress.perTryTimeout}}
       istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
       istioGwName: {{.Values.networking.ingress.istioGwName}}
+      istioIngressSelectorKey: {{.Values.networking.ingress.istioIngressSelectorKey}}
+      istioIngressSelectorValue: {{.Values.networking.ingress.istioIngressSelectorValue}}
     https:
       enabled: {{.Values.networking.https.enabled}}
-      cert: {{.Values.networking.https.cert}}
-      key: {{.Values.networking.https.key}}
       certSecret: {{.Values.networking.https.certSecret}}
     proxy:
       enabled: {{.Values.networking.proxy.enabled}}
@@ -318,7 +318,6 @@ spec:
       noProxy: null
   sso:
     enabled: {{.Values.sso.enabled}}
-    groups: null
     pki:
       enabled: {{.Values.sso.pki.enabled}}
       rootCaSecret: {{.Values.sso.pki.rootCaSecret}}

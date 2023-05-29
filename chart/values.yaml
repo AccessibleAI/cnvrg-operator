@@ -299,6 +299,8 @@ networking:
     perTryTimeout: 3600s
     istioGwEnabled: true
     istioGwName: ''
+    istioIngressSelectorKey: 'istio'
+    istioIngressSelectorValue: 'ingressgateway'
   https:
     enabled: false
     certSecret: ''
@@ -347,7 +349,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: cnvrg-proxy:v1.0.11
+    image: cnvrg-proxy:v1.0.12
     address: ""
     readiness: true
     requests:
