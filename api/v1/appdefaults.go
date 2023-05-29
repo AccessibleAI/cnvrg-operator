@@ -446,6 +446,8 @@ var ssoDefault = SSO{
 
 	Enabled: false,
 
+	Version: "v3",
+
 	Pki: Pki{
 		Enabled:          false,
 		RootCaSecret:     "sso-idp-root-ca",

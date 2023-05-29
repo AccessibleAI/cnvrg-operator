@@ -381,6 +381,7 @@ type Networking struct {
 
 type SSO struct {
 	Enabled bool         `json:"enabled,omitempty"`
+	Version string       `json:"version,omitempty"`
 	Pki     Pki          `json:"pki,omitempty"`
 	Jwks    Jwks         `json:"jwks,omitempty"`
 	Central CentralSSO   `json:"central,omitempty"`
