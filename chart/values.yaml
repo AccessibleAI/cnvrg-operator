@@ -266,7 +266,7 @@ dbs:
       image: elastalert:3.0.0-beta.1
       authProxyImage: nginx:1.20
       credsRef: elastalert-creds
-      port: 80
+      port: 8080
       nodePort: 32030
       storageSize: 30Gi
       svcName: elastalert
