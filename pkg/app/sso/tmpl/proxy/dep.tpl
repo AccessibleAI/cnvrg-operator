@@ -58,6 +58,7 @@ spec:
         image: {{image .Spec.ImageHub .Spec.SSO.Proxy.Image}}
         command:
           - /opt/app-root/proxy
+          - start
           - --authz-addr=127.0.0.1:50052
           - --ingress-type={{.Spec.Networking.Ingress.Type}}
         ports:
@@ -82,6 +83,7 @@ spec:
         image: {{  image .Spec.ImageHub .Spec.SSO.Proxy.Image }}
         command:
           - /opt/app-root/authz
+          - start
           - --ingress-type={{.Spec.Networking.Ingress.Type}}
         resources:
           limits:
