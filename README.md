@@ -12,8 +12,9 @@ helm install \
   --set registry.password="<REGISTRY-PASSWORD>"
 ```
 
-## Deploy cnvrg instance (quick start)
+## Deploy cnvrg instance
 ```bash
+# simple deploy  
 helm install \
   cnvrg charts/cap \
   -n cnvrg --create-namespace \
@@ -21,6 +22,45 @@ helm install \
   --set controlPlane.image="<CNVRG-APP-IMAGE>" \
   --set registry.user="<CNVRG-USERNAME>" \
   --set registry.password="<CNVRG-PASSWORD>"
+
+# utilize non default ingress controller
+# networking.ingress.type = ingress | istio | openshift  
+helm install \
+  cnvrg charts/cap \
+  -n cnvrg --create-namespace \
+  --set clusterDomain="<CLUSTER-DOMAIN>" \
+  --set controlPlane.image="<CNVRG-APP-IMAGE>" \
+  --set registry.user="<CNVRG-USERNAME>" \
+  --set registry.password="<CNVRG-PASSWORD>" \
+  --set networking.ingress.type="ingress"
+  
+
+# deploy with SSO  
+helm install \
+  cnvrg charts/cap \
+  -n cnvrg --create-namespace \
+  --set clusterDomain="<CLUSTER-DOMAIN>" \
+  --set controlPlane.image="<CNVRG-APP-IMAGE>" \
+  --set registry.user="<CNVRG-USERNAME>" \
+  --set registry.password="<CNVRG-PASSWORD>" \
+  --set sso.central.enabled=true \
+  --set sso.proxy.enabled=true \
+  --set sso.central.adminUser='<FIRST-ADMIN-USER>' \
+  --set sso.central.provider='oidc' \
+  --set sso.central.clientId='<CLIENT-ID>' \
+  --set sso.central.clientSecret='<CLIENT-SECRET' \
+  --set sso.central.oidcIssuerUrl='<OIDC-ISSUER-URL>'
+
+
+# deploy on OpenShift
+helm install \
+  cnvrg charts/cap \
+  -n cnvrg --create-namespace \
+  --set controlPlane.image="<CNVRG-APP-IMAGE>" \
+  --set registry.user="<CNVRG-USERNAME>" \
+  --set registry.password="<CNVRG-PASSWORD>" \
+  --set networking.ingress.type="openshift" \
+  --set networking.https.enabled="true"   
 ```
 
 #### Helm chart deployment options
