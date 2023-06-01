@@ -1,0 +1,5 @@
+registry:
+  name: cnvrg-app-registry
+  url: docker.io
+  user: ''
+  password: ''
