@@ -55,6 +55,11 @@ spec:
         - image: {{ image .Spec.ImageHub .Spec.Dbs.Redis.Image }}
           name: redis
           command: [ "/bin/bash", "-lc", "redis-server /config/redis.conf" ]
+          envFrom:
+            {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+            - configMapRef:
+                name: {{ .Spec.Networking.Proxy.ConfigRef }}
+            {{- end }}
           ports:
             - containerPort: {{ .Spec.Dbs.Redis.Port }}
           resources:

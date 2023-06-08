@@ -63,6 +63,11 @@ spec:
           - start
         image: {{ image .Spec.ImageHub .Spec.SSO.Jwks.Image }}
         imagePullPolicy: Always
+        envFrom:
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         resources:
           requests:
             cpu: 100m

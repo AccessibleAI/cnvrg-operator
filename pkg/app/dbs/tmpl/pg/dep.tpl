@@ -61,6 +61,10 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ .Spec.Dbs.Pg.CredsRef }}
+            {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+            - configMapRef:
+                name: {{ .Spec.Networking.Proxy.ConfigRef }}
+            {{- end }}
           image: {{ image .Spec.ImageHub .Spec.Dbs.Pg.Image}}
           imagePullPolicy: IfNotPresent
           ports:

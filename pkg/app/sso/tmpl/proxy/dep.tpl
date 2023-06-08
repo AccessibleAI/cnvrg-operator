@@ -56,6 +56,11 @@ spec:
       - name: proxy-central
         imagePullPolicy: Always
         image: {{image .Spec.ImageHub .Spec.SSO.Proxy.Image}}
+        envFrom:
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         command:
           - /opt/app-root/proxy
           - start

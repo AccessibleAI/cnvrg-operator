@@ -83,6 +83,7 @@ func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
 		"OidcIssuerURL":                    c.app.Spec.SSO.Central.OidcIssuerURL,
 		"Scope":                            c.app.Spec.SSO.Central.Scope,
 		"InsecureOidcAllowUnverifiedEmail": c.app.Spec.SSO.Central.InsecureOidcAllowUnverifiedEmail,
+		"SslInsecureSkipVerify":            c.app.Spec.SSO.Central.SslInsecureSkipVerify,
 		"WhitelistDomain":                  c.app.Spec.SSO.Central.WhitelistDomain,
 		"CookieDomain":                     c.app.Spec.SSO.Central.CookieDomain,
 		"ExtraJwtIssuer":                   c.jwksUrlWithAudience(),
@@ -102,13 +103,6 @@ func (c *CentralStateManager) schema() string {
 	}
 	return schema
 }
-
-//func (c *CentralStateManager) jwksUrl() string {
-//
-//	return fmt.Sprintf("%s/v1/%s/.well-known/jwks.json?client_id",
-//		c.app.Spec.SSO.Central.JwksURL,
-//		c.domainId())
-//}
 
 func (c *CentralStateManager) jwksUrlWithAudience() string {
 

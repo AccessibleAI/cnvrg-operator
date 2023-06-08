@@ -63,6 +63,11 @@ spec:
           - name: "private-key"
             mountPath: "/opt/app-root/config"
             readOnly: true
+        envFrom:
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         resources:
           limits:
             cpu: 100m
@@ -76,6 +81,10 @@ spec:
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Redis.CredsRef }}
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         volumeMounts:
           - name: "proxy-config"
             mountPath: "/opt/app-root/conf/proxy-config"

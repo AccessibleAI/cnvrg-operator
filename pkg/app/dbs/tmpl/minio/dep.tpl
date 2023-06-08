@@ -58,6 +58,10 @@ spec:
           envFrom:
           - secretRef:
               name: cp-object-storage
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
           env:
             - name: MINIO_ACCESS_KEY
               valueFrom:

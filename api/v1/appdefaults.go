@@ -474,6 +474,7 @@ var ssoDefault = SSO{
 		EmailDomain:                      []string{"*"},
 		Scope:                            "openid email profile",
 		InsecureOidcAllowUnverifiedEmail: true,
+		SslInsecureSkipVerify:            true,
 		GroupsAuth:                       true,
 		Requests: Requests{
 			Cpu:    "200m",

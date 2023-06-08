@@ -342,6 +342,7 @@ spec:
       serviceUrl: {{.Values.sso.central.serviceUrl}}
       scope: {{.Values.sso.central.scope}}
       insecureOidcAllowUnverifiedEmail: {{.Values.sso.central.insecureOidcAllowUnverifiedEmail}}
+      sslInsecureSkipVerify: {{ .Values.sso.central.sslInsecureSkipVerify }}
       whitelistDomain: {{.Values.sso.central.whitelistDomain}}
       cookieDomain: {{.Values.sso.central.cookieDomain}}
       groupsAuth: {{.Values.sso.central.groupsAuth}}

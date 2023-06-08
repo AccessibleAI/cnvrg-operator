@@ -68,6 +68,10 @@ spec:
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         resources:
           requests:
             cpu: {{.Spec.Dbs.Es.Elastalert.Requests.Cpu}}

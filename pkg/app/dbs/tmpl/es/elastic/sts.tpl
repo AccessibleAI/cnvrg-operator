@@ -169,6 +169,10 @@ spec:
               name: {{ .Spec.Dbs.Es.CredsRef }}
           - configMapRef:
               name: es-ilm-cm
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         ports:
         - name: http
           containerPort: {{ .Spec.Dbs.Es.Port }}

@@ -21,10 +21,20 @@ type IstioGwState struct {
 	*desired.AssetsStateManager
 }
 
+type HttpProxyState struct {
+	*desired.AssetsStateManager
+}
+
 func NewIstioGwState(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
 	l := log.WithValues("stateManager", "istioGw")
 	f := &desired.LoadFilter{DefaultLoader: true}
 	return &IstioGwState{AssetsStateManager: desired.NewAssetsStateManager(app, c, s, l, fs, fsRoot+"/ingress", f)}
+}
+
+func NewHttpProxyState(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
+	l := log.WithValues("stateManager", "httpProxyState")
+	f := &desired.LoadFilter{DefaultLoader: true}
+	return &HttpProxyState{AssetsStateManager: desired.NewAssetsStateManager(app, c, s, l, fs, fsRoot+"/proxy", f)}
 }
 
 func DefaultNoProxy(clusterInternalDomain string) []string {

@@ -421,6 +421,7 @@ type CentralSSO struct {
 	ServiceUrl                       string            `json:"serviceUrl,omitempty"`
 	Scope                            string            `json:"scope,omitempty"`
 	InsecureOidcAllowUnverifiedEmail bool              `json:"insecureOidcAllowUnverifiedEmail,omitempty"`
+	SslInsecureSkipVerify            bool              `json:"sslInsecureSkipVerify,omitempty"`
 	WhitelistDomain                  string            `json:"whitelistDomain,omitempty"`
 	CookieDomain                     string            `json:"cookieDomain,omitempty"`
 	GroupsAuth                       bool              `json:"groupsAuth,omitempty"`

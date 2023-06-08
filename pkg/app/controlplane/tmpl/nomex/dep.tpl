@@ -38,3 +38,8 @@ spec:
           - /opt/app-root/nomex
         ports:
         - containerPort: 2112
+        envFrom:
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}

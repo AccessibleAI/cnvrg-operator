@@ -338,6 +338,7 @@ sso:
     serviceUrl: ''
     scope: openid email profile
     insecureOidcAllowUnverifiedEmail: true
+    sslInsecureSkipVerify: true
     whitelistDomain: ''
     cookieDomain: ''
     groupsAuth: false

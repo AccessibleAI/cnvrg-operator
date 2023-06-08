@@ -38,10 +38,10 @@ data:
     session_store_type = "redis"
     set_xauthrequest = true
     pass_access_token = true
-    ssl_insecure_skip_verify = true
     pass_authorization_header = true
     skip_jwt_bearer_tokens = true
     insecure_oidc_allow_unverified_email = {{ .InsecureOidcAllowUnverifiedEmail }}
+    ssl_insecure_skip_verify  = {{ .SslInsecureSkipVerify }}
     whitelist_domains = [ "{{ .WhitelistDomain }}" ]
     cookie_domains = [ "{{ .CookieDomain }}" ]
     extra_jwt_issuers = [ "{{.ExtraJwtIssuer}}" ]

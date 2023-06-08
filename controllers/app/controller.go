@@ -153,6 +153,12 @@ func (r *CnvrgAppReconciler) apply(app *mlopsv1.CnvrgApp) error {
 		}
 	}
 
+	if app.Spec.Networking.Proxy.Enabled {
+		if err := networking.NewHttpProxyState(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
+			return err
+		}
+	}
+
 	if app.Spec.Dbs.Pg.Enabled {
 		if err := dbs.NewPgStateManager(app, r.Client, r.Scheme, r.Log).Apply(); err != nil {
 			return err

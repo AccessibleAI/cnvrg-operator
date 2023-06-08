@@ -55,6 +55,11 @@ spec:
       containers:
         - name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
           image: {{image .Spec.ImageHub .Spec.Dbs.Es.Kibana.Image }}
+          envFrom:
+            {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+            - configMapRef:
+                name: {{ .Spec.Networking.Proxy.ConfigRef }}
+            {{- end }}
           command:
             - /bin/bash
             - -lc

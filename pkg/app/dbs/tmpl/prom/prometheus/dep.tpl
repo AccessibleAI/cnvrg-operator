@@ -49,6 +49,11 @@ spec:
       containers:
       - name: prometheus
         image: {{ image .Spec.ImageHub .Spec.Dbs.Prom.Image }}
+        envFrom:
+          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          - configMapRef:
+              name: {{ .Spec.Networking.Proxy.ConfigRef }}
+          {{- end }}
         volumeMounts:
           - mountPath: /prometheus/config/scrape
             name: prom-scrape-configs

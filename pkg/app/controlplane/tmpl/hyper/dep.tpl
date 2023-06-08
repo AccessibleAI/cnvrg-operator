@@ -65,6 +65,10 @@ spec:
                 name: cp-ldap
             - secretRef:
                 name: cp-object-storage
+            {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+            - configMapRef:
+                name: {{ .Spec.Networking.Proxy.ConfigRef }}
+            {{- end }}
           ports:
             - containerPort: {{ .Spec.ControlPlane.Hyper.Port }}
           readinessProbe:
