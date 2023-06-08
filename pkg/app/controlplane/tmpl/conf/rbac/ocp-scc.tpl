@@ -1,7 +1,7 @@
 kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
-  name: cnvrg-scc-control-plane
+  name: "cnvrg-scc-control-plane-{{ .Namespace }}"
   annotations:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "false"
