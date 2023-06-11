@@ -17,29 +17,23 @@ jobs:
         fetch-depth: 0
 
     - name: Change Chart Version
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: |
         VERSION=1.0.0 envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file chart/Chart.yaml
         cat chart/Chart.yaml
 
     - name: Set up Helm
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       uses: azure/setup-helm@v1
 
     - name: Run chart-testing (lint)
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: helm lint chart/
 
     - name: Create kind cluster
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       uses: helm/kind-action@v1.2.0
 
     - name: Install Crds
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: kubectl apply -f chart/crds/ ; sleep 2
 
     - name: Run chart-testing (install)
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: helm install cnvrg ./chart  --dry-run --namespace=cnvrg  --debug
 
     - name: Bump version and push tag
@@ -163,9 +157,8 @@ jobs:
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
     - name: Change Chart Version
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: |
-        sed -i 's#1.0.0#${{ steps.tag_bump.outputs.new_tag }}#g' chart/Chart.yaml
+        sed -i 's#1.0.0#$slim-{{ steps.tag_bump.outputs.new_tag }}#g' chart/Chart.yaml
         cat chart/Chart.yaml
 
     - name: Package and release helm
