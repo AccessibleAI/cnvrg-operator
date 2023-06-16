@@ -9,6 +9,7 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     istioGwName: "{{.Values.networking.ingress.istioGwName}}"
     {{- end }}
+    ocpSecureRoutes: {{.Values.networking.ingress.OcpSecureRoutes}}
   proxy:
     enabled: {{ .Values.networking.proxy.enabled }}
     {{- if .Values.networking.proxy.httpProxy }}
