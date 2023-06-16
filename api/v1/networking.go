@@ -40,6 +40,7 @@ type Ingress struct {
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
 	IstioGwEnabled  bool        `json:"istioGwEnabled,omitempty"`
 	IstioGwName     string      `json:"istioGwName,omitempty"`
+	OcpSecureRoutes bool        `json:"OcpSecureRoutes,omitempty"`
 }
 
 type HTTPS struct {
@@ -121,6 +122,7 @@ var ingressAppDefault = Ingress{
 	PerTryTimeout:   "3600s",
 	IstioGwEnabled:  false,
 	IstioGwName:     "",
+	OcpSecureRoutes: false,
 }
 
 var ingressInfraDefault = Ingress{
@@ -130,6 +132,7 @@ var ingressInfraDefault = Ingress{
 	PerTryTimeout:   "3600s",
 	IstioGwEnabled:  false,
 	IstioGwName:     "",
+	OcpSecureRoutes: false,
 }
 
 var cnvrgAppNetworkingDefault = CnvrgAppNetworking{
