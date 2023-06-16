@@ -34,6 +34,6 @@ data:
   CNVRG_PROXY_CONFIG_REF: {{ .Spec.Networking.Proxy.ConfigRef }}
   {{- end }}
   {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
-  OCP_SECURE_ROUTES: true
+  OCP_SECURE_ROUTES: "true"
   {{- end }}
 
