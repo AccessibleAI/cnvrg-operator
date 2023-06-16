@@ -40,7 +40,7 @@ type Ingress struct {
 	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
 	IstioGwEnabled  bool        `json:"istioGwEnabled,omitempty"`
 	IstioGwName     string      `json:"istioGwName,omitempty"`
-	OcpSecureRoutes bool        `json:"OcpSecureRoutes,omitempty"`
+	OcpSecureRoutes bool        `json:"ocpSecureRoutes,omitempty"`
 }
 
 type HTTPS struct {
