@@ -25,4 +25,11 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+    {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
+    {{- $tlsSecret := secret .Spec.Networking.HTTPS.CertSecret }}
+    certificate: |-
+      {{ $tlsSecret.Data."tls.crt" | indent 6 }}
+    key: |-
+      {{ $tlsSecret.Data."tls.key" | indent 6 }}
+    {{- end }}
   {{- end }}
