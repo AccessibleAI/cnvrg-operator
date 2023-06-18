@@ -15,6 +15,13 @@ metadata:
     {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
+spec:
+  {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
+  tls:
+  - hosts:
+      - {{ .Spec.Dbs.Minio.SvcName}}.{{ .Spec.ClusterDomain }}
+    secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+  {{- end }}
   rules:
   - host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ .Spec.ClusterDomain }}"
     http:
