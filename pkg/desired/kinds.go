@@ -172,7 +172,7 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 	},
 	HpaGVK: schema.GroupVersionKind{
 		Group:   "autoscaling",
-		Version: "v2beta2",
+		Version: "v2",
 		Kind:    "HorizontalPodAutoscaler",
 	},
 	PriorityClassGVK: schema.GroupVersionKind{

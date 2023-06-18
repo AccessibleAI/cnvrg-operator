@@ -186,6 +186,7 @@ networking:
     type: "istio"
     istioGwEnabled: true
     istioGwName: ""
+    ocpSecureRoutes: false
   istio:
     enabled: true
     externalIp: [ ]
