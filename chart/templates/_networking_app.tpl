@@ -33,6 +33,9 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     {{- end }}
     {{- end }}
+    {{- if eq .Values.networking.ingress.type "openshift" }}
+    ocpSecureRoutes: false
+    {{- end }}
   eastWest:
     enabled: {{ .Values.networking.eastWest.enabled }}
     primary: {{ .Values.networking.eastWest.primary }}
