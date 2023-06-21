@@ -33,7 +33,9 @@ data:
   {{- if isTrue .Spec.Networking.Proxy.Enabled }}
   CNVRG_PROXY_CONFIG_REF: {{ .Spec.Networking.Proxy.ConfigRef }}
   {{- end }}
+  {{- if isTrue .Spec.Networking.HTTPS.Enabled }}
+  CNVRG_CERT_SECRET: {{ .Spec.Networking.HTTPS.CertSecret }}
+  {{- end }}
   {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
   OCP_SECURE_ROUTES: "true"
   {{- end }}
-
