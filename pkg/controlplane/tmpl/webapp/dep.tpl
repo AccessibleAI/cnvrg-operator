@@ -177,7 +177,7 @@ spec:
           mountPath: /opt/app-root/conf/gcp-keyfile
           readOnly: true
         {{- end }}
-        {{- if and .Spec.Networking.Ingress.OcpSecureRoutes .Spec.Networking.HTTPS.Enabled (eq .Spec.Networking.Ingress.Type "openshift") }}
+        {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
         volumeMounts:
         - name: tls-secret
           readOnly: true
@@ -194,7 +194,7 @@ spec:
         secret:
           secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
       {{- end }}
-      {{- if and .Spec.Networking.Ingress.OcpSecureRoutes .Spec.Networking.HTTPS.Enabled (eq .Spec.Networking.Ingress.Type "openshift") }}
+      {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
       - name: tls-secret
         secret:
           secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
