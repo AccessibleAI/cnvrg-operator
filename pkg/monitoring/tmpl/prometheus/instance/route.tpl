@@ -1,4 +1,3 @@
-{{- import "sigs.k8s.io/controller-runtime/pkg/template" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -27,12 +26,4 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
-    {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
-    certificate: |-
-      {{- $tlsCrtVal := (template.lookup "v1" "Secret" "cnvrg" (print .Spec.Networking.HTTPS.CertSecret)).data.tls\.crt | default dict }}
-      {{ $tlsCrtVal | indent 6 }}
-    key: |-
-      {{- $tlsKeyVal := (template.lookup "v1" "Secret" "cnvrg" (print .Spec.Networking.HTTPS.CertSecret)).data.tls\.key | default dict }}
-      {{ $tlsKeyVal | indent 6 }}
-    {{- end }}
   {{- end }}
