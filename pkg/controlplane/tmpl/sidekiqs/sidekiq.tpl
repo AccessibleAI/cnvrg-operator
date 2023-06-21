@@ -76,6 +76,12 @@ spec:
               mountPath: /opt/app-root/conf/gcp-keyfile
               readOnly: true
           {{- end }}
+          {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
+          volumeMounts:
+            - name: tls-secret
+              readOnly: true
+              mountPath: /opt/app-root/src/tls
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: cp-base-config
@@ -125,6 +131,12 @@ spec:
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           secret:
             secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
+      {{- end }}
+      {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
+      volumes:
+        - name: tls-secret
+          secret:
+            secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
       {{- end }}
       initContainers:
         - name: seeder

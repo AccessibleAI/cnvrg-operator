@@ -181,7 +181,7 @@ spec:
         volumeMounts:
         - name: tls-secret
           readOnly: true
-          mountPath: /etc/tls
+          mountPath: /opt/app-root/src/tls
         {{- end }}
       volumes:
       {{- if isTrue .Spec.SSO.Enabled }}
