@@ -357,7 +357,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 		if _, ok := certSecret.Data["tls.crt"]; !ok {
 			err := fmt.Errorf("certificate secret %s missing required file tls.crt", namespacedName.Name)
 			appLog.Error(err, "missing required field")
-			return "", "", err
+			return err
 		}
 
 		if _, ok := certSecret.Data["tls.key"]; !ok {
@@ -391,54 +391,54 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// dbs
 	if err := r.dbsState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// backups
 	if err := r.backupsState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// networking
 	appLog.Info("applying networking")
 	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// logging
 	if err := r.loggingState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// controlplane
 	appLog.Info("applying controlplane")
 	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// monitoring
 	if err := r.monitoringState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
 	// ingress check
 	if err := r.ingressCheckState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return "", "", err
+		return err
 	}
 
-	return "", "", nil
+	return nil
 }
 
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
