@@ -18,7 +18,6 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
-	"gopkg.in/d4l3k/messagediff.v1"
 	"io/ioutil"
 	v1apps "k8s.io/api/apps/v1"
 	v1batch "k8s.io/api/batch/v1"
@@ -136,7 +135,7 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	r.updateStatusMessage(s, cnvrgApp)
 
 	// apply spec manifests
-	if err := r.applyManifests(cnvrgApp); err != nil {
+	if _, _, err := r.applyManifests(cnvrgApp); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -341,7 +340,45 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	return readyCount == len(readyState), percentageReady, readyState, nil
 }
 
-func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
+func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *interface{}) (string, string, error) {
+	// TLS cert secret retrieval function
+	func (r *CnvrgAppReconciler) getCertSecretVals(app *mlopsv1.CnvrgApp) (tlscrt string, tlskey string, err error) {
+		user = "cnvrg"
+		namespacedName := types.NamespacedName{Name: app.Spec.Networking.HTTPS.CertSecret, Namespace: app.Namespace}
+		certSecret := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+		if err := r.Get(context.Background(), namespacedName, &certSecret); err != nil && errors.IsNotFound(err) {
+			appLog.Error(err, "certificate secret not found")
+			return "", "", err
+		} else if err != nil {
+			appLog.Error(err, "can't check if certificate secret exists", "name", namespacedName.Name)
+			return "", "", err
+		}
+
+		if _, ok := certSecret.Data["tls.crt"]; !ok {
+			err := fmt.Errorf("certificate secret %s missing required file tls.crt", namespacedName.Name)
+			appLog.Error(err, "missing required field")
+			return "", "", err
+		}
+
+		if _, ok := certSecret.Data["tls.key"]; !ok {
+			err := fmt.Errorf("certificate secret %s missing required file tls.key", namespacedName.Name)
+			appLog.Error(err, "missing required field")
+			return "", "", err
+		}
+
+		return string(certSecret.Data["tls.crt"]), string(certSecret.Data["tls.key"]), nil
+	}
+
+	tlscrt, tlskey, err := r.getCertSecretVals(app)
+	if err != nil {
+		appLog.Error(err, "can't fetch TLS/SSL certificate values")
+		return "", "", nil
+	}
+	appLog.Info("printing the content of tls.crt:")
+	appLog.Info(tlscrt)
+	appLog.Info("printing the content of tls.key:")
+	appLog.Info(tlskey)
+
 	// registry
 	appLog.Info("applying registry")
 	registryData := desired.TemplateData{
@@ -354,54 +391,54 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	}
 	if err := desired.Apply(registry.State(registryData), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// dbs
 	if err := r.dbsState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// backups
 	if err := r.backupsState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// networking
 	appLog.Info("applying networking")
 	if err := desired.Apply(networking.CnvrgAppNetworkingState(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// logging
 	if err := r.loggingState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// controlplane
 	appLog.Info("applying controlplane")
 	if err := desired.Apply(controlplane.State(cnvrgApp), cnvrgApp, r.Client, r.Scheme, appLog); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// monitoring
 	if err := r.monitoringState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
 	// ingress check
 	if err := r.ingressCheckState(cnvrgApp); err != nil {
 		r.updateStatusMessage(mlopsv1.Status{Status: mlopsv1.StatusError, Message: err.Error(), Progress: -1}, cnvrgApp)
-		return err
+		return "", "", err
 	}
 
-	return nil
+	return "", "", nil
 }
 
 func (r *CnvrgAppReconciler) loggingState(app *mlopsv1.CnvrgApp) error {
