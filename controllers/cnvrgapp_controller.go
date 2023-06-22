@@ -340,7 +340,7 @@ func (r *CnvrgAppReconciler) getControlPlaneReadinessStatus(cnvrgApp *mlopsv1.Cn
 	return readyCount == len(readyState), percentageReady, readyState, nil
 }
 
-func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *interface{}) (string, string, error) {
+func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *mlopsv1.CnvrgApp) error {
 	// TLS cert secret retrieval function
 	func (r *CnvrgAppReconciler) getCertSecretVals(app *mlopsv1.CnvrgApp) (tlscrt string, tlskey string, err error) {
 		user = "cnvrg"
@@ -369,7 +369,7 @@ func (r *CnvrgAppReconciler) applyManifests(cnvrgApp *interface{}) (string, stri
 		return string(certSecret.Data["tls.crt"]), string(certSecret.Data["tls.key"]), nil
 	}
 
-	tlscrt, tlskey, err := r.getCertSecretVals(app)
+	tlscrt, tlskey, err := r.getCertSecretVals(cnvrgApp)
 	if err != nil {
 		appLog.Error(err, "can't fetch TLS/SSL certificate values")
 		return "", "", nil
