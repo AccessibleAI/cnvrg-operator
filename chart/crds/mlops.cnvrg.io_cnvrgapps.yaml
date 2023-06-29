@@ -1050,6 +1050,10 @@ spec:
                         - openshift
                         - nodeport
                         type: string
+                      dynamicCertsEnabled:
+                        type: boolean
+                      dynamicCertsIssuer:
+                        type: string
                     type: object
                   proxy:
                     properties:

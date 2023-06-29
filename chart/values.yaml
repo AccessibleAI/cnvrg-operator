@@ -186,6 +186,8 @@ networking:
     type: "istio"
     istioGwEnabled: true
     istioGwName: ""
+    dynamicCertsEnabled: false
+    dynamicCertsIssuer: ""
   istio:
     enabled: true
     externalIp: [ ]

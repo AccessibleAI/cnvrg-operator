@@ -33,6 +33,8 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     {{- end }}
     {{- end }}
+    dynamicCertsEnabled: {{ .Values.networking.ingress.dynamicCertsEnabled }}
+    dynamicCertsIssuer: {{ .Values.networking.ingress.dynamicCertsIssuer }}
   eastWest:
     enabled: {{ .Values.networking.eastWest.enabled }}
     primary: {{ .Values.networking.eastWest.primary }}

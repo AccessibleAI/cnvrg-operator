@@ -9,6 +9,8 @@ networking:
     istioGwEnabled: {{.Values.networking.ingress.istioGwEnabled}}
     istioGwName: "{{.Values.networking.ingress.istioGwName}}"
     {{- end }}
+    dynamicCertsEnabled: {{ .Values.networking.ingress.dynamicCertsEnabled }}
+    dynamicCertsIssuer: {{ .Values.networking.ingress.dynamicCertsIssuer }}
   proxy:
     enabled: {{ .Values.networking.proxy.enabled }}
     {{- if .Values.networking.proxy.httpProxy }}

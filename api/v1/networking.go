@@ -34,12 +34,14 @@ type EastWest struct {
 }
 
 type Ingress struct {
-	Type            IngressType `json:"type,omitempty"`
-	Timeout         string      `json:"timeout,omitempty"`
-	RetriesAttempts int         `json:"retriesAttempts,omitempty"`
-	PerTryTimeout   string      `json:"perTryTimeout,omitempty"`
-	IstioGwEnabled  bool        `json:"istioGwEnabled,omitempty"`
-	IstioGwName     string      `json:"istioGwName,omitempty"`
+	Type                IngressType `json:"type,omitempty"`
+	Timeout             string      `json:"timeout,omitempty"`
+	RetriesAttempts     int         `json:"retriesAttempts,omitempty"`
+	PerTryTimeout       string      `json:"perTryTimeout,omitempty"`
+	IstioGwEnabled      bool        `json:"istioGwEnabled,omitempty"`
+	IstioGwName         string      `json:"istioGwName,omitempty"`
+	DynamicCertsEnabled bool        `json:"dynamicCertsEnabled,omitempty"`
+	DynamicCertsIssuer  string      `json:"dynamicCertsIssuer,omitempty"`
 }
 
 type HTTPS struct {
