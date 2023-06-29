@@ -35,10 +35,10 @@ data:
   {{- end }}
   {{- if isTrue .Spec.Networking.HTTPS.Enabled }}
   CNVRG_CERT_SECRET: {{ .Spec.Networking.HTTPS.CertSecret }}
+  {{- end }}
   {{- if isTrue .Spec.Networking.Ingress.DynamicCertsEnabled }}
   DYNAMIC_NGINX_CERTS_ENABLED: {{ .Spec.Networking.Ingress.DynamicCertsEnabled }}
   DYNAMIC_NGINX_CERTS_ISSUER: {{ .Spec.Networking.Ingress.DynamicCertsIssuer }}
-  {{- end }}
   {{- end }}
 
 
