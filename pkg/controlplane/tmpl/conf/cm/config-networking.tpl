@@ -34,7 +34,7 @@ data:
   CNVRG_PROXY_CONFIG_REF: {{ .Spec.Networking.Proxy.ConfigRef }}
   {{- end }}
   {{- if isTrue .Spec.Networking.HTTPS.Enabled }}
-  CNVRG_CERT_SECRET: {{ .Spec.Networking.Ingress.CertSecret }}
+  CNVRG_CERT_SECRET: {{ .Spec.Networking.HTTPS.CertSecret }}
   {{- if isTrue .Spec.Networking.Ingress.DynamicCertsEnabled }}
   DYNAMIC_NGINX_CERTS_ENABLED: {{ .Spec.Networking.Ingress.DynamicCertsEnabled }}
   DYNAMIC_NGINX_CERTS_ISSUER: {{ .Spec.Networking.Ingress.DynamicCertsIssuer }}
