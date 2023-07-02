@@ -8,6 +8,9 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{$k}}: "{{$v}}"
     {{- end }}
+    {{- if and ( isTrue .Spec.Networking.Ingress.DynamicCertsEnabled ) (ne .Spec.Networking.Ingress.DynamicCertsIssuer "") }}
+    cert-manager.io/issuer: {{ .Spec.Networking.Ingress.DynamicCertsIssuer }}
+    {{- end }}
   labels:
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
@@ -15,11 +18,16 @@ metadata:
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ ns . }}
 spec:
-  {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
+  {{- if isTrue .Spec.Networking.HTTPS.Enabled }}
   tls:
   - hosts:
       - {{ .Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}
+    {{- if ne .Spec.Networking.HTTPS.CertSecret "" }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+    {{- end }}
+    {{- if isTrue .Spec.Networking.Ingress.DynamicCertsEnabled }}
+    secretName: {{ .Spec.ControlPlane.WebApp.SvcName }}-tls
+    {{- end }}
   {{- end }}
   rules:
   - host: "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"

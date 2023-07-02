@@ -8,6 +8,9 @@ metadata:
     {{- range $k, $v := .Spec.Annotations }}
     {{ $k }}: "{{ $v }}"
     {{- end }}
+    {{- if and ( isTrue .Spec.Networking.Ingress.DynamicCertsEnabled ) (ne .Spec.Networking.Ingress.DynamicCertsIssuer "") }}
+    cert-manager.io/issuer: {{ .Spec.Networking.Ingress.DynamicCertsIssuer }}
+    {{- end }}
   name: {{ .Spec.Logging.Kibana.SvcName }}
   namespace: {{ ns . }}
   labels:
@@ -15,11 +18,16 @@ metadata:
     {{ $k }}: "{{ $v }}"
     {{- end }}
 spec:
-  {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
+  {{- if isTrue .Spec.Networking.HTTPS.Enabled }}
   tls:
   - hosts:
       - {{ .Spec.Logging.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}
+    {{- if ne .Spec.Networking.HTTPS.CertSecret "" }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+    {{- end }}
+    {{- if isTrue .Spec.Networking.Ingress.DynamicCertsEnabled }}
+    secretName: {{ .Spec.Logging.Kibana.SvcName }}-tls
+    {{- end }}
   {{- end }}
   rules:
   - host: "{{ .Spec.Logging.Kibana.SvcName }}.{{ .Spec.ClusterDomain }}"
