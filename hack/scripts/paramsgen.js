@@ -419,7 +419,7 @@ let params = {
         },
         "proxy": {
             "enabled": false,
-            "image": "cnvrg-proxy:v1.0.14",
+            "image": "cnvrg-proxy:v1.0.15",
             "address": "",
             "readiness": true,
             "requests": {

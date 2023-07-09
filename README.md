@@ -346,7 +346,7 @@ helm install \
 | `sso.central.limits.cpu`                                          | 2                                   |
 | `sso.central.limits.memory`                                       | 4Gi                                 |
 | `sso.proxy.enabled`                                               | false                               |
-| `sso.proxy.image`                                                 | cnvrg-proxy:v1.0.14                 |
+| `sso.proxy.image`                                                 | cnvrg-proxy:v1.0.15                 |
 | `sso.proxy.address`                                               | -                                   |
 | `sso.proxy.readiness`                                             | true                                |
 | `sso.proxy.requests.cpu`                                          | 500m                                |
