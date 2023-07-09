@@ -866,8 +866,6 @@ spec:
                         type: string
                       serviceUrl:
                         type: string
-                      sslInsecureSkipVerify:
-                        type: boolean
                       svcName:
                         type: string
                       whitelistDomain:

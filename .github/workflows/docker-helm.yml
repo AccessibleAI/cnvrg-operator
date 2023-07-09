@@ -17,30 +17,30 @@ jobs:
         fetch-depth: 0
 
     - name: Change Chart Version
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: |
-        VERSION=1.0.0 envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file chart/Chart.yaml
-        cat chart/Chart.yaml
+        VERSION=1.0.0 envsubst < charts/cnvrg-cap/Chart.yaml | tee tmp-file && mv tmp-file charts/cnvrg-cap/Chart.yaml
+        VERSION=1.0.0 envsubst < charts/cnvrg-operator/Chart.yaml | tee tmp-file && mv tmp-file charts/cnvrg-operator/Chart.yaml
+        cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
 
     - name: Set up Helm
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       uses: azure/setup-helm@v1
 
     - name: Run chart-testing (lint)
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: helm lint chart/
+      run: |
+        helm lint charts/cnvrg-cap/
+        helm lint charts/cnvrg-operator/
 
-    - name: Create kind cluster
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      uses: helm/kind-action@v1.2.0
+    - name: Start Minikube
+      id: minikube
+      uses: medyagh/setup-minikube@master
 
     - name: Install Crds
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: kubectl apply -f chart/crds/ ; sleep 2
+      run: kubectl apply -f charts/cnvrg-operator/crds/ ; sleep 2
 
     - name: Run chart-testing (install)
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: helm install cnvrg ./chart  --dry-run --namespace=cnvrg  --debug
+      run: |
+        helm install cnvrg ./charts/cnvrg-operator --dry-run --namespace=cnvrg-system --debug
+        kubectl apply -f charts/cnvrg-operator/crds/ && helm install cnvrg ./charts/cnvrg-cap --dry-run --namespace=cnvrg --debug
 
     - name: Bump version and push tag
       uses: AccessibleAI/github-tag-action@1.0.0
@@ -163,10 +163,10 @@ jobs:
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
     - name: Change Chart Version
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: |
-        sed -i 's#1.0.0#${{ steps.tag_bump.outputs.new_tag }}#g' chart/Chart.yaml
-        cat chart/Chart.yaml
+        sed -i 's#1.0.0#$slim-operator-{{ steps.tag_bump.outputs.new_tag }}#g' charts/cnvrg-operator/Chart.yaml
+        sed -i 's#1.0.0#$slim-cnvrg-cap-{{ steps.tag_bump.outputs.new_tag }}#g' charts/cnvrg-cap/Chart.yaml
+        cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
 
     - name: Package and release helm
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
@@ -175,8 +175,10 @@ jobs:
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
       run: |
           helm plugin install https://github.com/chartmuseum/helm-push.git
-          helm package chart -d .
-          helm cm-push chart https://charts.v3.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+          helm package charts/cnvrg-operator -d .
+          helm cm-push charts/cnvrg-operator https://charts.slim.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+          helm package charts/cnvrg-cap -d .
+          helm cm-push charts/cnvrg-cap https://charts.slim.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
