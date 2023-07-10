@@ -30,9 +30,8 @@ jobs:
         helm lint charts/cnvrg-cap/
         helm lint charts/cnvrg-operator/
 
-    - name: Start Minikube
-      id: minikube
-      uses: medyagh/setup-minikube@master
+    - name: Create kind cluster
+      uses: helm/kind-action@v1.7.0
 
     - name: Install Crds
       run: kubectl apply -f charts/cnvrg-operator/crds/ ; sleep 2
@@ -40,7 +39,7 @@ jobs:
     - name: Run chart-testing (install)
       run: |
         helm install cnvrg ./charts/cnvrg-operator --dry-run --namespace=cnvrg-system --debug
-# kubectl apply -f charts/cnvrg-operator/crds/ && helm install cnvrg ./charts/cnvrg-cap --dry-run --namespace=cnvrg --debug
+# helm install cnvrg ./charts/cnvrg-cap --dry-run --namespace=cnvrg --debug
 
     - name: Bump version and push tag
       uses: AccessibleAI/github-tag-action@1.0.0
