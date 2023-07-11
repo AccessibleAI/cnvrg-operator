@@ -174,9 +174,9 @@ jobs:
       run: |
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm package charts/cnvrg-operator -d .
-          helm cm-push charts/cnvrg-operator https://charts.slim.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+          helm cm-push charts/cnvrg-operator https://charts.slim.cnvrg.io/cnvrg-operator -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
           helm package charts/cnvrg-cap -d .
-          helm cm-push charts/cnvrg-cap https://charts.slim.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+          helm cm-push charts/cnvrg-cap https://charts.slim.cnvrg.io/cnvrg-cap -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
