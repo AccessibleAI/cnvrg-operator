@@ -172,6 +172,7 @@ jobs:
         CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
       run: |
+          helm init --client-only
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm package charts/cnvrg-operator -d .
           helm cm-push charts/cnvrg-operator https://charts.slim.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
