@@ -23,7 +23,7 @@ jobs:
         cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
 
     - name: Set up Helm
-      uses: azure/setup-helm@v1
+      uses: azure/setup-helm@v3.5
 
     - name: Run chart-testing (lint)
       run: |
