@@ -323,6 +323,7 @@ helm install \
 | `networking.ingress.istioGwName`                                  | -                                   |
 | `networking.ingress.istioIngressSelectorKey`                      | istio                               |
 | `networking.ingress.istioIngressSelectorValue`                    | ingressgateway                      |
+| `networking.ingress.ocpSecureRoutes`                              | false                               |
 | `networking.https.enabled`                                        | false                               |
 | `networking.https.certSecret`                                     | -                                   |
 | `networking.proxy.enabled`                                        | false                               |

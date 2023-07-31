@@ -765,6 +765,8 @@ spec:
                         type: string
                       type:
                         type: string
+                      ocpSecureRoutes:
+                        type: boolean
                     type: object
                   proxy:
                     properties:
