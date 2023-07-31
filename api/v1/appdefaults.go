@@ -469,7 +469,7 @@ var ssoDefault = SSO{
 		Replicas:                         1,
 		SvcName:                          "sso-central",
 		CnvrgProxyImage:                  "cnvrg-proxy:v1.0.15",
-		OauthProxyImage:                  "oauth2-proxy:v7.4.ssov3.p3",
+		OauthProxyImage:                  "oauth2-proxy:v7.4.ssov3.p6",
 		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
 		Scope:                            "openid email profile",

@@ -1,12 +1,21 @@
-# cnvrg.io operator (v3)
+# cnvrg.io operator (v5)
 ---
 
 ## Deploy cnvrg stack on EKS | AKS | GKE | OpenShift | On-Premise clusters
 
+
+## Add cnvrg helm chart repo 
+```bash
+helm repo add cnvrg-operator https://charts.slim.cnvrg.io/cnvrg-operator
+helm repo add cnvrg-cap https://charts.slim.cnvrg.io/cnvrg-cap
+```
+
+
 ## Deploy cnvrg operator
 ```bash
 helm install \
-  cnvrg-operator charts/operator \
+  cnvrg-operator \
+  cnvrg-operator/cnvrg-operator \
   -n cnvrg-system --create-namespace \
   --set registry.user="<REGISTRY-USERNAME>" \
   --set registry.password="<REGISTRY-PASSWORD>"
@@ -16,7 +25,8 @@ helm install \
 ```bash
 # simple deploy  
 helm install \
-  cnvrg charts/cap \
+  cnvrg \
+  cnvrg-cap/cnvrg-cap \
   -n cnvrg --create-namespace \
   --set clusterDomain="<CLUSTER-DOMAIN>" \
   --set controlPlane.image="<CNVRG-APP-IMAGE>" \
@@ -26,7 +36,8 @@ helm install \
 # utilize non default ingress controller
 # networking.ingress.type = ingress | istio | openshift  
 helm install \
-  cnvrg charts/cap \
+  cnvrg \
+  cnvrg-cap/cnvrg-cap \
   -n cnvrg --create-namespace \
   --set clusterDomain="<CLUSTER-DOMAIN>" \
   --set controlPlane.image="<CNVRG-APP-IMAGE>" \
@@ -37,7 +48,8 @@ helm install \
 
 # deploy with SSO  
 helm install \
-  cnvrg charts/cap \
+  cnvrg \
+  cnvrg-cap/cnvrg-cap \
   -n cnvrg --create-namespace \
   --set clusterDomain="<CLUSTER-DOMAIN>" \
   --set controlPlane.image="<CNVRG-APP-IMAGE>" \
@@ -54,7 +66,8 @@ helm install \
 
 # deploy on OpenShift
 helm install \
-  cnvrg charts/cap \
+  cnvrg \
+  cnvrg-cap/cnvrg-cap \
   -n cnvrg --create-namespace \
   --set controlPlane.image="<CNVRG-APP-IMAGE>" \
   --set registry.user="<CNVRG-USERNAME>" \
@@ -326,7 +339,7 @@ helm install \
 | `sso.jwks.cacheImage`                                             | redis:7.0.5                         |
 | `sso.central.enabled`                                             | false                               |
 | `sso.central.publicUrl`                                           | -                                   |
-| `sso.central.oauthProxyImage`                                     | oauth2-proxy:v7.4.ssov3.p3          |
+| `sso.central.oauthProxyImage`                                     | oauth2-proxy:v7.4.ssov3.p6          |
 | `sso.central.centralUiImage`                                      | centralsso:latest                   |
 | `sso.central.adminUser`                                           | -                                   |
 | `sso.central.provider`                                            | -                                   |

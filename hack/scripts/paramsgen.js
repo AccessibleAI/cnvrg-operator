@@ -391,7 +391,7 @@ let params = {
         "central": {
             "enabled": false,
             "publicUrl": "",
-            "oauthProxyImage": "oauth2-proxy:v7.4.ssov3.p3",
+            "oauthProxyImage": "oauth2-proxy:v7.4.ssov3.p6",
             "centralUiImage": "centralsso:latest",
             "adminUser": "",
             "provider": "",
