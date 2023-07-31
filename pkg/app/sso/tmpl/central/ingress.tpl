@@ -19,6 +19,12 @@ metadata:
   namespace: {{.Namespace }}
 spec:
   ingressClassName: nginx
+  {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
+  tls:
+  - hosts:
+      - {{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}
+    secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+  {{- end }}
   rules:
     - host: "{{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}"
       http:
