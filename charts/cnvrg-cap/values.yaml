@@ -301,6 +301,7 @@ networking:
     istioGwName: ''
     istioIngressSelectorKey: 'istio'
     istioIngressSelectorValue: 'ingressgateway'
+    ocpSecureRoutes: false
   https:
     enabled: false
     certSecret: ''
