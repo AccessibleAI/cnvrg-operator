@@ -8,6 +8,8 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
+	v1core "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"reflect"
@@ -38,6 +40,26 @@ func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost s
 		return domain.(string), nil
 
 	}
+}
+
+func getTlsCert(app *mlopsv1.CnvrgApp, clientset client.Client) (cert string, key string, err error) {
+	namespacedName := types.NamespacedName{Name: app.Spec.Networking.HTTPS.CertSecret, Namespace: app.Namespace}
+	certSecret := v1core.Secret{ObjectMeta: metav1.ObjectMeta{Name: namespacedName.Name, Namespace: namespacedName.Namespace}}
+	if err := clientset.Get(context.Background(), namespacedName, &certSecret); err != nil {
+		return "", "", err
+	}
+
+	if _, ok := certSecret.Data["tls.crt"]; !ok {
+		err := fmt.Errorf("certificate secret %s missing required field tls.crt", namespacedName.Name)
+		return "", "", err
+	}
+
+	if _, ok := certSecret.Data["tls.key"]; !ok {
+		err := fmt.Errorf("certificate secret %s missing required field tls.key", namespacedName.Name)
+		return "", "", err
+	}
+
+	return string(certSecret.Data["tls.crt"]), string(certSecret.Data["tls.key"]), nil
 }
 
 func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.CnvrgAppSpec, clientset client.Client) error {
@@ -87,6 +109,18 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 			}
 		}
 
+	}
+
+	if app.Spec.Networking.Ingress.OcpSecureRoutes &&
+		(app.Spec.Networking.HTTPS.Cert == "" || app.Spec.Networking.HTTPS.Key == "" ||
+			defaultSpec.Networking.HTTPS.CertSecret != app.Spec.Networking.HTTPS.CertSecret) {
+		cert, key, err := getTlsCert(app, clientset)
+		if err != nil {
+			log.Error(err, "unable to retrieve tls secret")
+		} else {
+			defaultSpec.Networking.HTTPS.Cert = cert
+			defaultSpec.Networking.HTTPS.Key = key
+		}
 	}
 
 	if app.Spec.SSO.Enabled {
