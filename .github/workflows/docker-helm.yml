@@ -181,7 +181,7 @@ jobs:
         cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
 
     - name: Package and release helm
-      if: ${{(github.ref == 'refs/heads/DEV-15047-slim-cnvrg' }}
+      if: ${{ github.ref == 'refs/heads/DEV-15047-slim-cnvrg' }}
       env:
         CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
