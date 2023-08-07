@@ -71,17 +71,16 @@ spec:
             - name: "CNVRG_RUN_MODE"
               value: "sidekiq"
           imagePullPolicy: Always
-          {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
           volumeMounts:
+          {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
             - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
               mountPath: /opt/app-root/conf/gcp-keyfile
               readOnly: true
           {{- end }}
           {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
-           volumeMounts:
-             - name: tls-secret
-               readOnly: true
-               mountPath: /opt/app-root/src/tls
+            - name: tls-secret
+              readOnly: true
+              mountPath: /opt/app-root/src/tls
           {{- end }}
           envFrom:
             - configMapRef:
@@ -131,9 +130,9 @@ spec:
       {{- end }}
       {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
        volumes:
-         - name: tls-secret
-           secret:
-             secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
+        - name: tls-secret
+          secret:
+            secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
       {{- end }}
       initContainers:
         - name: seeder
