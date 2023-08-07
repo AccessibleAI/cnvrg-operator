@@ -122,14 +122,13 @@ spec:
             preStop:
               exec:
                 command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid 60"]
-      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       volumes:
+      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           secret:
             secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
       {{- end }}
       {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
-       volumes:
         - name: tls-secret
           secret:
             secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
