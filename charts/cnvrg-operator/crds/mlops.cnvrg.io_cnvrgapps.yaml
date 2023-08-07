@@ -746,6 +746,10 @@ spec:
                         type: string
                       enabled:
                         type: boolean
+                      cert:
+                        type: string
+                      key:
+                        type: string
                     type: object
                   ingress:
                     properties:

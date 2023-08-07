@@ -364,7 +364,9 @@ let params = {
         },
         "https": {
             "enabled": false,
-            "certSecret": ""
+            "certSecret": "",
+            "cert": "",
+            "key": ""
         },
         "proxy": {
             "enabled": false,
