@@ -139,17 +139,16 @@ spec:
           limits:
             cpu: "{{.Spec.ControlPlane.WebApp.Limits.Cpu}}"
             memory: "{{.Spec.ControlPlane.WebApp.Limits.Memory}}"
-        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         volumeMounts:
+        {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           mountPath: /opt/app-root/conf/gcp-keyfile
           readOnly: true
         {{- end }}
         {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
-        volumeMounts:
-         - name: tls-secret
-           readOnly: true
-           mountPath: /opt/app-root/src/tls
+        - name: tls-secret
+          readOnly: true
+          mountPath: /opt/app-root/src/tls
         {{- end }}
       volumes:
       {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
