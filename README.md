@@ -326,6 +326,8 @@ helm install \
 | `networking.ingress.ocpSecureRoutes`                              | false                               |
 | `networking.https.enabled`                                        | false                               |
 | `networking.https.certSecret`                                     | -                                   |
+| `networking.https.cert`                                     | -                                   |
+| `networking.https.key`                                     | -                                   |
 | `networking.proxy.enabled`                                        | false                               |
 | `networking.proxy.configRef`                                      | cp-proxy                            |
 | `sso.enabled`                                                     | false                               |
