@@ -55,8 +55,10 @@ helm install \
   --set controlPlane.image="<CNVRG-APP-IMAGE>" \
   --set registry.user="<CNVRG-USERNAME>" \
   --set registry.password="<CNVRG-PASSWORD>" \
-  --set sso.central.enabled=true \
+  --set sso.enabled=true \
+  --set sso.jwks.enabled=true \
   --set sso.proxy.enabled=true \
+  --set sso.central.enabled=true \
   --set sso.central.adminUser='<FIRST-ADMIN-USER>' \
   --set sso.central.provider='oidc' \
   --set sso.central.clientId='<CLIENT-ID>' \
