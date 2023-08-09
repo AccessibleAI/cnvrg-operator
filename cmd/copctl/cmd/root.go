@@ -31,7 +31,7 @@ func initConfig() {
 	initZapLog()
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("COPCTL")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 }
 
 func initZapLog() {
