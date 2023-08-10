@@ -57,6 +57,7 @@ helm install \
   --set registry.password="<CNVRG-PASSWORD>" \
   --set sso.enabled=true \
   --set sso.jwks.enabled=true \
+  --set sso.pki.enabled=true \
   --set sso.proxy.enabled=true \
   --set sso.central.enabled=true \
   --set sso.central.adminUser='<FIRST-ADMIN-USER>' \
