@@ -43,10 +43,10 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
-    ### secure route section placeholder start ###
-    {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
-    certificate: tls_crt_content
-    key: tls_key_content
+    {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
+    certificate: |
+{{ printf "%s" .Spec.Networking.HTTPS.Cert | indent 6 }}
+    key: |
+{{ printf "%s" .Spec.Networking.HTTPS.Key | indent 6 }}
     {{- end }}
-    ### secure route section placeholder end ###
   {{- end }}

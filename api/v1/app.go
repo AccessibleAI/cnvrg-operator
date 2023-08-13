@@ -364,6 +364,8 @@ type Ingress struct {
 type HTTPS struct {
 	Enabled    bool   `json:"enabled,omitempty"`
 	CertSecret string `json:"certSecret,omitempty"`
+	Cert       string `json:"cert,omitempty"`
+	Key        string `json:"key,omitempty"`
 }
 
 type Proxy struct {

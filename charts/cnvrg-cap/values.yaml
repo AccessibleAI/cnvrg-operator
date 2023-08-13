@@ -305,6 +305,8 @@ networking:
   https:
     enabled: false
     certSecret: ''
+    cert: ''
+    key: ''
   proxy:
     enabled: false
     configRef: cp-proxy
