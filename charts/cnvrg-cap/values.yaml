@@ -284,6 +284,8 @@ dbs:
     credsRef: prom-creds
     extraScrapeConfigs:
     image: prometheus:v2.37.1
+    storageClass: ""
+    storageSize: 50Gi
     grafana:
       enabled: true
       image: grafana-oss:9.1.7

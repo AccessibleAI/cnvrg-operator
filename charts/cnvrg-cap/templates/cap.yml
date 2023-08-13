@@ -290,6 +290,8 @@ spec:
       credsRef: {{.Values.dbs.prom.credsRef}}
       extraScrapeConfigs: null
       image: {{.Values.dbs.prom.image}}
+      storageClass: {{.Values.dbs.prom.storageClass}}
+      storageSize: {{.Values.dbs.prom.storageSize}}
       grafana:
         enabled: {{.Values.dbs.prom.grafana.enabled}}
         image: {{.Values.dbs.prom.grafana.image}}
