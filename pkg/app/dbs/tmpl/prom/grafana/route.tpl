@@ -44,4 +44,10 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+    {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
+    certificate: |
+{{ printf "%s" .Spec.Networking.HTTPS.Cert | indent 6 }}
+    key: |
+{{ printf "%s" .Spec.Networking.HTTPS.Key | indent 6 }}
+    {{- end }}
   {{- end }}

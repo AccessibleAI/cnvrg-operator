@@ -71,11 +71,16 @@ spec:
             - name: "CNVRG_RUN_MODE"
               value: "sidekiq"
           imagePullPolicy: Always
-          {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
           volumeMounts:
+          {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
             - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
               mountPath: /opt/app-root/conf/gcp-keyfile
               readOnly: true
+          {{- end }}
+          {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
+            - name: tls-secret
+              readOnly: true
+              mountPath: /opt/app-root/src/tls
           {{- end }}
           envFrom:
             - configMapRef:
@@ -117,11 +122,16 @@ spec:
             preStop:
               exec:
                 command: ["/bin/bash","-lc","sidekiqctl quiet sidekiq-0.pid && sidekiqctl stop sidekiq-0.pid 60"]
-      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       volumes:
+      {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
         - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
           secret:
             secretName: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
+      {{- end }}
+      {{- if and ( isTrue .Spec.Networking.Ingress.OcpSecureRoutes) (eq .Spec.Networking.Ingress.Type "openshift") }}
+        - name: tls-secret
+          secret:
+            secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
       {{- end }}
       initContainers:
         - name: seeder

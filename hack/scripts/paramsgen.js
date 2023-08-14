@@ -359,11 +359,14 @@ let params = {
             "istioGwEnabled": true,
             "istioGwName": "",
             "istioIngressSelectorKey": "istio",
-            "istioIngressSelectorValue": "ingressgateway"
+            "istioIngressSelectorValue": "ingressgateway",
+            "ocpSecureRoutes": false
         },
         "https": {
             "enabled": false,
-            "certSecret": ""
+            "certSecret": "",
+            "cert": "",
+            "key": ""
         },
         "proxy": {
             "enabled": false,

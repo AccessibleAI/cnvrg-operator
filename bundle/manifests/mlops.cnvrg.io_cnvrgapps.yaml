@@ -1023,6 +1023,8 @@ spec:
                         - openshift
                         - nodeport
                         type: string
+                      ocpSecureRoutes:
+                        type: boolean
                     type: object
                   proxy:
                     properties:

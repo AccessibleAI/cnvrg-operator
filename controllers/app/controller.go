@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"dario.cat/mergo"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/controllers"
@@ -12,7 +13,6 @@ import (
 	sso2 "github.com/AccessibleAI/cnvrg-operator/pkg/app/sso"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
-	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
 	"gopkg.in/d4l3k/messagediff.v1"
 	v1apps "k8s.io/api/apps/v1"

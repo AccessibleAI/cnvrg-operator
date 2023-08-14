@@ -3,11 +3,11 @@ package desired
 import (
 	"bytes"
 	"context"
+	"dario.cat/mergo"
 	"embed"
 	v1mlops "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/Masterminds/sprig"
 	"github.com/go-logr/logr"
-	"github.com/imdario/mergo"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

@@ -303,9 +303,12 @@ networking:
     istioGwName: ''
     istioIngressSelectorKey: 'istio'
     istioIngressSelectorValue: 'ingressgateway'
+    ocpSecureRoutes: false
   https:
     enabled: false
     certSecret: ''
+    cert: ''
+    key: ''
   proxy:
     enabled: false
     configRef: cp-proxy
