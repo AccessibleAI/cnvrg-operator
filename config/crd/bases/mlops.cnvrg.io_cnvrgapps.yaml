@@ -689,6 +689,10 @@ spec:
                         type: string
                       port:
                         type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
                       svcName:
                         type: string
                     type: object
