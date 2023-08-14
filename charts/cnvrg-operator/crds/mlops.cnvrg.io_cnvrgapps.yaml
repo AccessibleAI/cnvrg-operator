@@ -750,6 +750,10 @@ spec:
                         type: string
                       enabled:
                         type: boolean
+                      cert:
+                        type: string
+                      key:
+                        type: string
                     type: object
                   ingress:
                     properties:
@@ -769,6 +773,8 @@ spec:
                         type: string
                       type:
                         type: string
+                      ocpSecureRoutes:
+                        type: boolean
                     type: object
                   proxy:
                     properties:
