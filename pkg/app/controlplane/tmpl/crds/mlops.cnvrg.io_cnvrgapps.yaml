@@ -3,6 +3,9 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "true"
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
   name: cnvrgapps.mlops.cnvrg.io
@@ -689,6 +692,10 @@ spec:
                         type: string
                       port:
                         type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
                       svcName:
                         type: string
                     type: object

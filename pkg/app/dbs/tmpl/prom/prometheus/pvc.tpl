@@ -19,4 +19,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 50Gi
+      storage: {{ .Spec.Dbs.Prom.StorageSize }}
+  {{- if ne .Spec.Dbs.Prom.StorageClass "" }}
+  storageClassName: {{ .Spec.Dbs.Prom.StorageClass }}
+  {{- end }}

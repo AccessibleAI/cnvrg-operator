@@ -357,11 +357,12 @@ var appDbsDefaults = Dbs{
 }
 
 var promDefaults = Prom{
-	Enabled:  false,
-	CredsRef: "prom-creds",
-	SvcName:  "prometheus",
-	Port:     9090,
-	Image:    "prometheus:v2.37.1",
+	Enabled:     false,
+	CredsRef:    "prom-creds",
+	SvcName:     "prometheus",
+	Port:        9090,
+	Image:       "prometheus:v2.37.1",
+	StorageSize: "50Gi",
 	Grafana: Grafana{
 		Enabled:  false,
 		Image:    "grafana-oss:9.1.7",

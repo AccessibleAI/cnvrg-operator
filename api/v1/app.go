@@ -248,6 +248,8 @@ type Prom struct {
 	ExtraScrapeConfigs []*ExtraScrapeConfigs `json:"extraScrapeConfigs,omitempty"`
 	Image              string                `json:"image,omitempty"`
 	Grafana            Grafana               `json:"grafana,omitempty"`
+	StorageClass       string                `json:"storageClass,omitempty"`
+	StorageSize        string                `json:"storageSize,omitempty"`
 }
 
 type Pg struct {
