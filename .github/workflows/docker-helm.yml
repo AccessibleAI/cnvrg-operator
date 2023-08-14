@@ -95,12 +95,25 @@ jobs:
     - name: Build and push tagged image
       id: docker_build_tag
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/DEV-15047-slim-cnvrg') }}
       with:
         context: ./
         file: ./Dockerfile
         push: true
         tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:5.0.0
+        build-args: |
+          BUILD_SHA=${{ steps.extract_info.outputs.head }}
+          BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
+
+    - name: Build and push tagged image
+      id: docker_build_tag_branch
+      uses: docker/build-push-action@v2
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/DEV-15047-slim-cnvrg') }}
+      with:
+        context: ./
+        file: ./Dockerfile
+        push: true
+        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:5.0.0-${{ steps.extract_info.outputs.branch }}-${{ github.run_number }}
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
@@ -168,6 +181,7 @@ jobs:
         cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
 
     - name: Package and release helm
+      if: ${{ github.ref == 'refs/heads/DEV-15047-slim-cnvrg' }}
       env:
         CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
