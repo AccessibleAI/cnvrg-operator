@@ -28,7 +28,7 @@ spec:
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
-      - {{ .Spec.Logging.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}
+      - {{.Spec.Dbs.Es.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
   {{- end }}
   rules:
