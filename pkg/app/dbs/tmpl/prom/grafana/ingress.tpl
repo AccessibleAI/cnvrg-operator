@@ -28,7 +28,7 @@ spec:
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
-      - {{ .Spec.Monitoring.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}
+      - {{ .Spec.Dbs.Prom.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
   {{- end }}
   rules:
