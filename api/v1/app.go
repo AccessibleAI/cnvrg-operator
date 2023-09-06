@@ -204,19 +204,20 @@ type Tenancy struct {
 }
 
 type Elastalert struct {
-	Enabled        bool              `json:"enabled,omitempty"`
-	Image          string            `json:"image,omitempty"`
-	AuthProxyImage string            `json:"authProxyImage,omitempty"`
-	CredsRef       string            `json:"credsRef,omitempty"`
-	Port           int               `json:"port,omitempty"`
-	NodePort       int               `json:"nodePort,omitempty"`
-	StorageSize    string            `json:"storageSize,omitempty"`
-	SvcName        string            `json:"svcName,omitempty"`
-	StorageClass   string            `json:"storageClass,omitempty"`
-	Requests       Requests          `json:"requests,omitempty"`
-	Limits         Limits            `json:"limits,omitempty"`
-	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
-	PvcName        string            `json:"pvcName,omitempty"`
+	Enabled          bool              `json:"enabled,omitempty"`
+	Image            string            `json:"image,omitempty"`
+	AuthProxyImage   string            `json:"authProxyImage,omitempty"`
+	CredsRef         string            `json:"credsRef,omitempty"`
+	Port             int               `json:"port,omitempty"`
+	NodePort         int               `json:"nodePort,omitempty"`
+	StorageSize      string            `json:"storageSize,omitempty"`
+	SvcName          string            `json:"svcName,omitempty"`
+	StorageClass     string            `json:"storageClass,omitempty"`
+	Requests         Requests          `json:"requests,omitempty"`
+	Limits           Limits            `json:"limits,omitempty"`
+	NodeSelector     map[string]string `json:"nodeSelector,omitempty"`
+	PvcName          string            `json:"pvcName,omitempty"`
+	MountProxyConfig bool              `json:"mountProxyConfig,omitempty"`
 }
 
 type HugePages struct {

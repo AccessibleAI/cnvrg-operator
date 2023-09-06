@@ -68,7 +68,7 @@ spec:
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
-          {{- if isTrue .Spec.Networking.Proxy.Enabled }}
+          {{- if and (isTrue .Spec.Networking.Proxy.Enabled) (isTrue .Spec.Dbs.Es.Elastalert.MountProxyConfig) }}
           - configMapRef:
               name: {{ .Spec.Networking.Proxy.ConfigRef }}
           {{- end }}

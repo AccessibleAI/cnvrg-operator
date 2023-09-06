@@ -279,6 +279,7 @@ dbs:
         memory: 800Mi
       nodeSelector:
       pvcName: elastalert-storage
+      mountProxyConfig: true
   prom:
     enabled: true
     credsRef: prom-creds

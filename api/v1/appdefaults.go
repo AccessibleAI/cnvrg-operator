@@ -343,8 +343,9 @@ var esDefault = Es{
 			Cpu:    "400m",
 			Memory: "800Mi",
 		},
-		NodeSelector: nil,
-		PvcName:      "elastalert-storage",
+		NodeSelector:     nil,
+		PvcName:          "elastalert-storage",
+		MountProxyConfig: true,
 	},
 }
 

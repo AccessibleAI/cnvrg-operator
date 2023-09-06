@@ -285,6 +285,7 @@ spec:
           memory: {{.Values.dbs.es.elastalert.limits.memory}}
         nodeSelector: null
         pvcName: {{.Values.dbs.es.elastalert.pvcName}}
+        mountProxyConfig: {{.Values.dbs.es.elastalert.mountProxyConfig}}
     prom:
       enabled: {{.Values.dbs.prom.enabled}}
       credsRef: {{.Values.dbs.prom.credsRef}}

@@ -486,6 +486,8 @@ spec:
                             type: string
                           svcName:
                             type: string
+                          mountProxyConfig:
+                            type: boolean
                         type: object
                       enabled:
                         type: boolean

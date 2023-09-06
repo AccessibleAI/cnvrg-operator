@@ -332,7 +332,8 @@ let params = {
                     "memory": "800Mi"
                 },
                 "nodeSelector": null,
-                "pvcName": "elastalert-storage"
+                "pvcName": "elastalert-storage",
+                "mountProxyConfig": true
             }
         },
         "prom": {
