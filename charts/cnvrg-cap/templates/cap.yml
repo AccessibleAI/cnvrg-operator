@@ -318,9 +318,9 @@ spec:
     proxy:
       enabled: {{.Values.networking.proxy.enabled}}
       configRef: {{.Values.networking.proxy.configRef}}
-      httpProxy: null
-      httpsProxy: null
-      noProxy: null
+      httpProxy: {{.Values.networking.proxy.HttpProxy}}
+      httpsProxy: {{.Values.networking.proxy.HttpsProxy}}
+      noProxy: {{.Values.networking.proxy.NoProxy}}
   sso:
     enabled: {{.Values.sso.enabled}}
     version: {{.Values.sso.version}}
