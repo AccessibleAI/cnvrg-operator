@@ -1,0 +1,979 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: cnvrgapps.mlops.cnvrg.io
+spec:
+  group: mlops.cnvrg.io
+  names:
+    kind: CnvrgApp
+    listKind: CnvrgAppList
+    plural: cnvrgapps
+    shortNames:
+    - cap
+    singular: cnvrgapp
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.controlPlane.image
+      name: Version
+      type: string
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - jsonPath: .status.message
+      name: Message
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: CnvrgApp represent the cnvrg.io AI/MLOps control plane stack,
+          which includes frontend and backend services & persistent workloads (DBs).
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
+              clusterDomain:
+                type: string
+              clusterInternalDomain:
+                type: string
+              controlPlane:
+                properties:
+                  baseConfig:
+                    properties:
+                      agentCustomTag:
+                        type: string
+                      cnvrgJobRbacStrict:
+                        type: boolean
+                      cnvrgJobUid:
+                        type: string
+                      cnvrgPrivilegedJob:
+                        type: boolean
+                      featureFlags:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      intercom:
+                        type: string
+                      jobsStorageClass:
+                        type: string
+                      metagpuEnabled:
+                        type: boolean
+                      runJobsOnSelfCluster:
+                        type: string
+                      sentryUrl:
+                        type: string
+                    type: object
+                  cnvrgClusterProvisionerOperator:
+                    properties:
+                      awsCredsRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                    type: object
+                  cnvrgRouter:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      nodePort:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                  cnvrgScheduler:
+                    properties:
+                      enabled:
+                        type: boolean
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                    type: object
+                  hyper:
+                    properties:
+                      cpuLimit:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      memoryLimit:
+                        type: string
+                      nodePort:
+                        type: integer
+                      port:
+                        type: integer
+                      readinessPeriodSeconds:
+                        type: integer
+                      readinessTimeoutSeconds:
+                        type: integer
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      svcName:
+                        type: string
+                      token:
+                        type: string
+                    type: object
+                  image:
+                    type: string
+                  ldap:
+                    properties:
+                      account:
+                        type: string
+                      adminPassword:
+                        type: string
+                      adminUser:
+                        type: string
+                      base:
+                        type: string
+                      enabled:
+                        type: boolean
+                      host:
+                        type: string
+                      port:
+                        type: string
+                      ssl:
+                        type: string
+                    type: object
+                  mpi:
+                    properties:
+                      enabled:
+                        type: boolean
+                      extraArgs:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      image:
+                        type: string
+                      kubectlDeliveryImage:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      registry:
+                        properties:
+                          name:
+                            type: string
+                          password:
+                            type: string
+                          url:
+                            type: string
+                          user:
+                            type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                    type: object
+                  nomex:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                    type: object
+                  objectStorage:
+                    properties:
+                      accessKey:
+                        type: string
+                      azureAccountName:
+                        type: string
+                      azureContainer:
+                        type: string
+                      bucket:
+                        type: string
+                      endpoint:
+                        type: string
+                      gcpProject:
+                        type: string
+                      gcpSecretRef:
+                        type: string
+                      region:
+                        type: string
+                      secretKey:
+                        type: string
+                      type:
+                        enum:
+                        - minio
+                        - aws
+                        - azure
+                        - gcp
+                        type: string
+                    type: object
+                  searchkiq:
+                    properties:
+                      enabled:
+                        type: boolean
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                    type: object
+                  sidekiq:
+                    properties:
+                      enabled:
+                        type: boolean
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      split:
+                        type: boolean
+                    type: object
+                  smtp:
+                    properties:
+                      domain:
+                        type: string
+                      opensslVerifyMode:
+                        type: string
+                      password:
+                        type: string
+                      port:
+                        type: integer
+                      sender:
+                        type: string
+                      server:
+                        type: string
+                      username:
+                        type: string
+                    type: object
+                  systemkiq:
+                    properties:
+                      enabled:
+                        type: boolean
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                    type: object
+                  webapp:
+                    properties:
+                      enabled:
+                        type: boolean
+                      failureThreshold:
+                        type: integer
+                      hpa:
+                        properties:
+                          enabled:
+                            type: boolean
+                          maxReplicas:
+                            type: integer
+                          utilization:
+                            type: integer
+                        type: object
+                      initialDelaySeconds:
+                        type: integer
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodePort:
+                        type: integer
+                      passengerMaxPoolSize:
+                        type: integer
+                      port:
+                        type: integer
+                      readinessPeriodSeconds:
+                        type: integer
+                      readinessTimeoutSeconds:
+                        type: integer
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      svcName:
+                        type: string
+                    type: object
+                type: object
+              dbs:
+                properties:
+                  es:
+                    properties:
+                      cleanupPolicy:
+                        properties:
+                          all:
+                            type: string
+                          app:
+                            type: string
+                          endpoints:
+                            type: string
+                          jobs:
+                            type: string
+                        type: object
+                      credsRef:
+                        type: string
+                      elastalert:
+                        properties:
+                          authProxyImage:
+                            type: string
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          limits:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          nodePort:
+                            type: integer
+                          nodeSelector:
+                            additionalProperties:
+                              type: string
+                            type: object
+                          port:
+                            type: integer
+                          pvcName:
+                            type: string
+                          requests:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          storageClass:
+                            type: string
+                          storageSize:
+                            type: string
+                          svcName:
+                            type: string
+                        type: object
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      javaOpts:
+                        type: string
+                      kibana:
+                        properties:
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          limits:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          nodePort:
+                            type: integer
+                          port:
+                            type: integer
+                          requests:
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                            type: object
+                          serviceAccount:
+                            type: string
+                          svcName:
+                            type: string
+                        type: object
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodePort:
+                        type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      patchEsNodes:
+                        type: boolean
+                      port:
+                        type: integer
+                      pvcName:
+                        type: string
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  minio:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodePort:
+                        type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      pvcName:
+                        type: string
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  pg:
+                    properties:
+                      credsRef:
+                        type: string
+                      effectiveCacheSize:
+                        type: string
+                      enabled:
+                        type: boolean
+                      hugePages:
+                        properties:
+                          enabled:
+                            type: boolean
+                          memory:
+                            type: string
+                          size:
+                            type: string
+                        type: object
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      maxConnections:
+                        type: integer
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      pvcName:
+                        type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      sharedBuffers:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  prom:
+                    properties:
+                      credsRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                      extraScrapeConfigs:
+                        items:
+                          properties:
+                            labelSelector:
+                              type: string
+                            namespace:
+                              type: string
+                            role:
+                              type: string
+                          type: object
+                        type: array
+                      grafana:
+                        properties:
+                          credsRef:
+                            type: string
+                          enabled:
+                            type: boolean
+                          image:
+                            type: string
+                          nodePort:
+                            type: integer
+                          port:
+                            type: integer
+                          svcName:
+                            type: string
+                        type: object
+                      image:
+                        type: string
+                      port:
+                        type: integer
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                  redis:
+                    properties:
+                      credsRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      port:
+                        type: integer
+                      pvcName:
+                        type: string
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      serviceAccount:
+                        type: string
+                      storageClass:
+                        type: string
+                      storageSize:
+                        type: string
+                      svcName:
+                        type: string
+                    type: object
+                type: object
+              imageHub:
+                type: string
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
+              networking:
+                properties:
+                  https:
+                    properties:
+                      certSecret:
+                        type: string
+                      enabled:
+                        type: boolean
+                      cert:
+                        type: string
+                      key:
+                        type: string
+                    type: object
+                  ingress:
+                    properties:
+                      istioGwEnabled:
+                        type: boolean
+                      istioGwName:
+                        type: string
+                      istioIngressSelectorKey:
+                        type: string
+                      istioIngressSelectorValue:
+                        type: string
+                      perTryTimeout:
+                        type: string
+                      retriesAttempts:
+                        type: integer
+                      timeout:
+                        type: string
+                      type:
+                        type: string
+                      ocpSecureRoutes:
+                        type: boolean
+                    type: object
+                  proxy:
+                    properties:
+                      configRef:
+                        type: string
+                      enabled:
+                        type: boolean
+                      httpProxy:
+                        items:
+                          type: string
+                        type: array
+                      httpsProxy:
+                        items:
+                          type: string
+                        type: array
+                      noProxy:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                type: object
+              priorityClass:
+                properties:
+                  appClassRef:
+                    type: string
+                  jobClassRef:
+                    type: string
+                type: object
+              registry:
+                properties:
+                  name:
+                    type: string
+                  password:
+                    type: string
+                  url:
+                    type: string
+                  user:
+                    type: string
+                type: object
+              sso:
+                properties:
+                  central:
+                    properties:
+                      adminUser:
+                        type: string
+                      centralUiImage:
+                        type: string
+                      clientId:
+                        type: string
+                      clientSecret:
+                        type: string
+                      cnvrgProxyImage:
+                        type: string
+                      cookieDomain:
+                        type: string
+                      emailDomain:
+                        items:
+                          type: string
+                        type: array
+                      enabled:
+                        type: boolean
+                      groupsAuth:
+                        type: boolean
+                      insecureOidcAllowUnverifiedEmail:
+                        type: boolean
+                      jwksURL:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      oauthProxyImage:
+                        type: string
+                      oidcIssuerUrl:
+                        type: string
+                      provider:
+                        type: string
+                      publicUrl:
+                        type: string
+                      readiness:
+                        type: boolean
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      scope:
+                        type: string
+                      serviceUrl:
+                        type: string
+                      sslInsecureSkipVerify:
+                        type: boolean
+                      svcName:
+                        type: string
+                      whitelistDomain:
+                        type: string
+                    type: object
+                  enabled:
+                    type: boolean
+                  jwks:
+                    properties:
+                      cacheImage:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      replicas:
+                        type: integer
+                      svcName:
+                        type: string
+                    type: object
+                  pki:
+                    properties:
+                      enabled:
+                        type: boolean
+                      privateKeySecret:
+                        type: string
+                      publicKeySecret:
+                        type: string
+                      rootCaSecret:
+                        type: string
+                    type: object
+                  proxy:
+                    properties:
+                      address:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      limits:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      readiness:
+                        type: boolean
+                      replicas:
+                        type: integer
+                      requests:
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                        type: object
+                      svcName:
+                        type: string
+                    type: object
+                  version:
+                    type: string
+                type: object
+              tenancy:
+                properties:
+                  enabled:
+                    type: boolean
+                  key:
+                    type: string
+                  value:
+                    type: string
+                type: object
+            type: object
+          status:
+            properties:
+              message:
+                type: string
+              progress:
+                type: integer
+              stackReadiness:
+                additionalProperties:
+                  type: boolean
+                type: object
+              status:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

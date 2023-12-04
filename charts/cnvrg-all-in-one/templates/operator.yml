@@ -1,0 +1,216 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cnvrg-operator
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cnvrg-operator-role
+rules:
+- apiGroups:
+  - ""
+  - admissionregistration.k8s.io
+  - apiextensions.k8s.io
+  - apps
+  - extensions
+  - authentication.k8s.io
+  - authorization.k8s.io
+  - authorization.openshift.io
+  - autoscaling
+  - batch
+  - config.openshift.io
+  - events.k8s.io
+  - mlops.cnvrg.io
+  - policy
+  - rbac.authorization.k8s.io
+  - route.openshift.io
+  - security.openshift.io
+  - storage.k8s.io
+  - scheduling.k8s.io
+  - networking.k8s.io
+  - istio.io
+  - config.istio.io
+  - networking.istio.io
+  - rbac.istio.io
+  - authentication.istio.io
+  - metrics.k8s.io
+  - install.istio.io
+  resources:
+  - bindings
+  - cnvrgapps
+  - cnvrgapps/status
+  - cnvrgapps/finalizers
+  - cnvrgthirdparties
+  - cnvrgthirdparties/status
+  - cnvrgthirdparties/finalizers
+  - configmaps
+  - cronjobs
+  - cronjobs/status
+  - customresourcedefinitions
+  - customresourcedefinitions/status
+  - daemonsets
+  - daemonsets/status
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - deployments/status
+  - endpoints
+  - endpointslices
+  - events
+  - groups
+  - horizontalpodautoscalers
+  - horizontalpodautoscalers/status
+  - ingresses
+  - ingresses/status
+  - jobs
+  - jobs/status
+  - leases
+  - limitranges
+  - persistentvolumeclaims
+  - persistentvolumeclaims/status
+  - persistentvolumes
+  - persistentvolumes/status
+  - poddisruptionbudgets
+  - poddisruptionbudgets/status
+  - pods
+  - pods/attach
+  - pods/binding
+  - pods/ephemeralcontainers
+  - pods/eviction
+  - pods/exec
+  - pods/log
+  - pods/portforward
+  - pods/proxy
+  - pods/status
+  - priorityclasses
+  - replicasets
+  - replicasets/scale
+  - replicasets/status
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  - replicationcontrollers/status
+  - resourcequotas
+  - resourcequotas/status
+  - rolebindingrestrictions
+  - rolebindings
+  - roles
+  - routes
+  - routes/status
+  - routes/custom-host
+  - schedulers
+  - schedulers/status
+  - secrets
+  - securitycontextconstraints
+  - serviceaccounts
+  - serviceaccounts/token
+  - services
+  - services/proxy
+  - services/status
+  - statefulsets
+  - statefulsets/scale
+  - statefulsets/status
+  - storages
+  - storages/status
+  - clusterrolebindings
+  - clusterroles
+  - storageclasses
+  - controllerrevisions
+  - nodes
+  - istiooperators
+  - virtualservices
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - use
+  - delete
+  - deletecollection
+  - impersonate
+  - patch
+- apiGroups:
+  - istio.io
+  - config.istio.io
+  - networking.istio.io
+  - rbac.istio.io
+  - authentication.istio.io
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- apiGroups:
+  - mlops.cnvrg.io
+  resources:
+  - cnvrgclusterprovisioners
+  verbs:
+  - "*"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cnvrg-operator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cnvrg-operator-role
+subjects:
+  - kind: ServiceAccount
+    name: cnvrg-operator
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/dockerconfigjson
+metadata:
+  name: operator-pull-secret
+  namespace: {{ .Release.Namespace }}
+data:
+  .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .Values.registry.url .Values.registry.user .Values.registry.password (printf "%s:%s" .Values.registry.user .Values.registry.password | b64enc) | b64enc }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    control-plane: cnvrg-operator
+  name: cnvrg-operator
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: cnvrg-operator
+  template:
+    metadata:
+      labels:
+        control-plane: cnvrg-operator
+    spec:
+      imagePullSecrets:
+        - name: operator-pull-secret
+      containers:
+        - command:
+            - /opt/app-root/cnvrg-operator
+            - start
+            - --max-concurrent-reconciles
+            - "3"
+          image: "docker.io/cnvrg/cnvrg-operator:5.0.0"
+          imagePullPolicy: Always
+          name: cnvrg-operator
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1000Mi
+            requests:
+              cpu: 500m
+              memory: 200Mi
+      serviceAccountName: cnvrg-operator
+      terminationGracePeriodSeconds: 10
