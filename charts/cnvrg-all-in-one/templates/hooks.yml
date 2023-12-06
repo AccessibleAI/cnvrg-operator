@@ -1,0 +1,30 @@
+####################################### Uninstall hooks #######################################
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-cnvrg-cleanup
+  namespace: {{ .Release.Namespace}}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: cnvrg-operator
+      containers:
+        - name: delete-cnvrgapp
+          image: "{{ .Values.imageHub }}/cnvrg-tools:v0.3"
+          args:
+            - /bin/bash
+            - -c
+            - |
+              set -x
+              echo "running cleanup"
+              kubectl delete cnvrgapp cnvrg-app -n {{ .Release.Namespace }} --ignore-not-found
+              while (( $(kubectl get cnvrgapp cnvrg-app -n {{ .Release.Namespace }} --ignore-not-found | grep cnvrg-app | wc -l ) != 0 )); do
+                echo "waiting for cnvrgapp will be deleted. . . ";
+                sleep 1
+              done
+      restartPolicy: Never
+  backoffLimit: 4
