@@ -22,6 +22,8 @@ test: generate fmt vet manifests
 	rm -f ./controllers/test-report.html ./controllers/junit.xml
 	CNVRG_OPERATOR_MAX_CONCURRENT_RECONCILES=1 go test ./controllers/ -v -timeout 40m
 
+docker:
+	docker buildx build --platform=linux/amd64 --load -t test .
 test-report:
 	docker run -v $$(pwd)/controllers:/tmp cnvrg/xunit-viewer xunit-viewer -r /tmp/junit.xml -o /tmp/test-report.html
 

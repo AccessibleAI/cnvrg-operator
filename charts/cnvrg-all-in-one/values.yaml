@@ -1,3 +1,6 @@
+domainpool:
+  clusterGatewayRef: cluster-gateway
+  baseDomain: stg.intelcloud.cnvrg.io
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg

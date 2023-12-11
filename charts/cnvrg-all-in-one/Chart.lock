@@ -1,0 +1,6 @@
+dependencies:
+- name: domainpool
+  repository: https://catalog.stg.intelcloud.cnvrg.io/stage
+  version: 0.1.1
+digest: sha256:ea1793042e1ae78dda8970a565225d3fd8b8dec84714a70f150f589a58f9e08a
+generated: "2023-12-06T11:51:02.366403+02:00"
