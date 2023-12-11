@@ -21,7 +21,7 @@ import (
 
 var log logr.Logger
 
-func discoverAICloudHost(clientset client.Client) () {
+func discoverAICloudHost(clientset client.Client) {
 
 }
 
@@ -99,10 +99,6 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 		if !reflect.DeepEqual(defaultSpec.Networking.Proxy.NoProxy, app.Spec.Networking.Proxy.NoProxy) {
 			app.Spec.Networking.Proxy.NoProxy = nil
 		}
-	}
-
-	if app.Spec.Networking.Ingress.Type == mlopsv1.AICloudIngress {
-
 	}
 
 	// discover defaults for OpenShift Route Ingress
