@@ -16,4 +16,4 @@ spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: cnvrg-infra-prometheus
+      prometheus: cnvrg-infra-prometheus

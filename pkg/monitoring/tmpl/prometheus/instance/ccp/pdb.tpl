@@ -16,4 +16,4 @@ spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: cnvrg-ccp-prometheus
+      prometheus: cnvrg-ccp-prometheus
