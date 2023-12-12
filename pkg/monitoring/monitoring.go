@@ -2,12 +2,13 @@ package monitoring
 
 import (
 	"fmt"
+	"os"
+
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/markbates/pkger"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"os"
 )
 
 const path = "/pkg/monitoring/tmpl"
@@ -136,6 +137,15 @@ func infraPrometheusInstanceState() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.PrometheusRuleGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/prometheus/instance/infra/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
 		},
@@ -376,6 +386,15 @@ func ccpPrometheusInstance() []*desired.State {
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},
 			GVK:            desired.Kinds[desired.PrometheusGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+			TemplatePath:   path + "/prometheus/instance/ccp/pdb.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.PodDisruptionBudgetGVK],
 			Own:            true,
 			Updatable:      true,
 		},
