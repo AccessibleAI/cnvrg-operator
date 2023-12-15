@@ -608,24 +608,24 @@ spec:
             sum by (namespace) (
                 sum by (namespace, pod) (
                     max by (namespace, pod, container) (
-                        kube_pod_container_resource_requests_memory_bytes{job="kube-state-metrics"}
+                        kube_pod_container_resource_requests{resource="memory", job="kube-state-metrics"}
                     ) * on(namespace, pod) group_left() max by (namespace, pod) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                     )
                 )
             )
-          record: namespace:kube_pod_container_resource_requests_memory_bytes:sum
+          record: sum(kube_pod_container_resource_requests{resource="memory"}) by (namespace)
         - expr: |
             sum by (namespace) (
                 sum by (namespace, pod) (
                     max by (namespace, pod, container) (
-                        kube_pod_container_resource_requests_cpu_cores{job="kube-state-metrics"}
+                        kube_pod_container_resource_requests{resource="cpu",job="kube-state-metrics"}
                     ) * on(namespace, pod) group_left() max by (namespace, pod) (
                       kube_pod_status_phase{phase=~"Pending|Running"} == 1
                     )
                 )
             )
-          record: namespace:kube_pod_container_resource_requests_cpu_cores:sum
+          record: sum(kube_pod_container_resource_requests{resource="cpu"}) by (namespace)
         - expr: |
             max by (cluster, namespace, workload, pod) (
               label_replace(
