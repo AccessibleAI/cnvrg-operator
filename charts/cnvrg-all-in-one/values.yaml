@@ -166,8 +166,8 @@ controlPlane:
 registry:
   name: cnvrg-app-registry
   url: docker.io
-  user: 'cnvrghelm'
-  password: 'cabbecc7-4330-47b6-85c6-ea0ad5019cfa'
+  user: ''
+  password: ''
 dbs:
   pg:
     enabled: true

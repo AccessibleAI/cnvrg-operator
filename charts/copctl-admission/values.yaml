@@ -1,0 +1,6 @@
+imageHub: docker.io/cnvrg
+registry:
+  name: cnvrg-admission-registry
+  url: docker.io
+  user: ''
+  password: ''

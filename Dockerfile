@@ -1,7 +1,9 @@
 # Build the manager binary
 FROM golang:1.19.1 as builder
-
+ARG git_auth
+ENV GOPRIVATE=github.com/AccessibleAI/cnvrg-shim
 WORKDIR /workspace
+RUN git config --global --add url.https://$git_auth@github.com/.insteadOf https://github.com/
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
