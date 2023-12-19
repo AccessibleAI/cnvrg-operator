@@ -1,8 +1,20 @@
 [req]
-req_extensions = v3_req
 distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
 [req_distinguished_name]
+C = IL
+ST = Zafon
+L = Haifa
+O = cnvrg
+OU = saas-team
+CN = cnvrg-operator-admission.cnvrg-shim.svc
+
 [v3_req]
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+keyUsage = digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = cnvrg-operator-admission.cnvrg-shim.svc

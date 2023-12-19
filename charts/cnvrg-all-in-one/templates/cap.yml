@@ -1,7 +1,7 @@
 apiVersion: mlops.cnvrg.io/v1
 kind: CnvrgApp
 metadata:
-  name: cnvrg-app
+  name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace}}
 spec:
   clusterDomain: {{.Values.clusterDomain}}

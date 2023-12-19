@@ -6,5 +6,6 @@ type: application
 version: 5.0.0
 dependencies:
   - name: domainpool
-    version: 0.1.1
+    version: 0.1.2
     repository: https://catalog.stg.intelcloud.cnvrg.io/stage
+    condition: domainpool.enabled

@@ -154,6 +154,12 @@ rules:
   - cnvrgclusterprovisioners
   verbs:
   - "*"
+- apiGroups:
+  - metacloud.cnvrg.io
+  resources:
+    - domainpools
+  verbs:
+    - delete
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -212,20 +218,5 @@ spec:
             requests:
               cpu: 500m
               memory: 200Mi
-        - command:
-            - /opt/app-root/cnvrg-operator
-            - start
-            - --max-concurrent-reconciles
-            - "3"
-          image: "docker.io/cnvrg/cnvrg-operator:5.0.0"
-          imagePullPolicy: Always
-          name: cnvrg-operator
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 1000Mi
-            requests:
-              cpu: 500m
-              memory: 200Mi
       serviceAccountName: cnvrg-operator
-      terminationGracePeriodSeconds: 10¡
+      terminationGracePeriodSeconds: 10

@@ -1,6 +1,9 @@
 domainpool:
+  enabled: true
   clusterGatewayRef: cluster-gateway
   baseDomain: stg.intelcloud.cnvrg.io
+  annotations:
+    "helm.sh/hook": "pre-install"
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg

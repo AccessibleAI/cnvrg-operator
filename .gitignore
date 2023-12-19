@@ -29,3 +29,4 @@ controllers/junit.xml
 controllers/test-report.html
 bundle
 hack/scripts/docgen/node_modules
+.devspace
