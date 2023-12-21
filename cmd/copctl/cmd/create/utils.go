@@ -6,7 +6,6 @@ import (
 	"go.uber.org/zap"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
-	"strings"
 )
 
 func clientset() *kubernetes.Clientset {
@@ -28,12 +27,4 @@ func privateKey() *rsa.PrivateKey {
 		zap.S().Fatal(err)
 	}
 	return privKey
-}
-
-func commonNameToNsAndSvc(commonName string) (ns string, svc string) {
-	endpoint := strings.Split(commonName, ".")
-	if len(endpoint) < 3 {
-		zap.S().Error("wrong common name, expected format: <svc-name>.<ns-name>.svc ")
-	}
-	return endpoint[1], endpoint[0]
 }

@@ -17,6 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"math/big"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -40,30 +41,64 @@ var webhookCmd = &cobra.Command{
 	Aliases: []string{"w"},
 	Short:   "Generate certs for Admission Webhook",
 	Run: func(cmd *cobra.Command, args []string) {
-		commonName := viper.GetString("common-name")
-		certsDir := viper.GetString("certs-dir")
-		// re-create the cert folder
-		if viper.GetBool("override") {
-			clean(certsDir, commonName)
-		}
-		// get key for CA
-		cakey := privateKey()
-		// create CA certificate
-		ca, caPEM := createCA(cakey)
-		// create certificate and key for server
-		crt, key := serverCrtAndKey(commonName, ca, cakey)
-		// create mutation webhook configuration
-		ns, svc := commonNameToNsAndSvc(commonName)
-		createMutatingWebhookCfg(
-			admission.NewAICloudDomainHandler().
-				HookCfg(ns, svc, caPEM.Bytes()),
-		)
-		// dump certificate to disc
-		dumpToDisk(caPEM, crt, key, certsDir)
+		NewWebhook(
+			viper.GetString("common-name"),
+			viper.GetString("certs-dir"),
+			viper.GetBool("override"),
+		).run()
 	},
 }
 
-func createCA(key *rsa.PrivateKey) (ca *x509.Certificate, caPEM *bytes.Buffer) {
+type Webhook struct {
+	CommonName string
+	CertsDir   string
+	Override   bool
+}
+
+func NewWebhook(commonName, certsDir string, override bool) *Webhook {
+	return &Webhook{
+		CommonName: commonName,
+		CertsDir:   certsDir,
+		Override:   override,
+	}
+}
+
+func (h *Webhook) run() {
+	// re-create the cert folder
+	if h.Override {
+		h.clean()
+	}
+	// get key for CA
+	cakey := privateKey()
+	// create CA certificate
+	ca, caPEM := h.createCA(cakey)
+	// create certificate and key for server
+	crt, key := h.serverCrtAndKey(ca, cakey)
+	// create mutation webhook configuration
+	ns, svc := h.commonNameToNsAndSvc()
+	h.createMutatingWebhookCfg(
+		admission.NewAICloudDomainHandler().
+			HookCfg(ns, svc, caPEM.Bytes()),
+	)
+	// dump certificate to disc
+	h.dumpToDisk(caPEM, crt, key)
+}
+
+func (h *Webhook) commonNameToNsAndSvc() (ns string, svc string) {
+	endpoint := strings.Split(h.CommonName, ".")
+	if len(endpoint) < 3 {
+		zap.S().Error("wrong common name, expected format: <svc-name>.<ns-name>.svc ")
+	}
+	return endpoint[1], endpoint[0]
+}
+
+func (h *Webhook) clean() {
+	if err := os.RemoveAll(h.CertsDir); err != nil {
+		zap.S().Error(err)
+	}
+}
+
+func (h *Webhook) createCA(key *rsa.PrivateKey) (ca *x509.Certificate, caPEM *bytes.Buffer) {
 	ca = &x509.Certificate{
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
@@ -92,14 +127,14 @@ func createCA(key *rsa.PrivateKey) (ca *x509.Certificate, caPEM *bytes.Buffer) {
 	return ca, caPEM
 }
 
-func serverCrtAndKey(commonName string, ca *x509.Certificate, cakey *rsa.PrivateKey) (serverCrtPEM *bytes.Buffer, serverKeyPEM *bytes.Buffer) {
+func (h *Webhook) serverCrtAndKey(ca *x509.Certificate, cakey *rsa.PrivateKey) (serverCrtPEM *bytes.Buffer, serverKeyPEM *bytes.Buffer) {
 
 	serverCrt := &x509.Certificate{
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
-			CommonName: commonName,
+			CommonName: h.CommonName,
 		},
-		DNSNames:    []string{commonName},
+		DNSNames:    []string{h.CommonName},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().AddDate(10, 0, 0),
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
@@ -131,34 +166,26 @@ func serverCrtAndKey(commonName string, ca *x509.Certificate, cakey *rsa.Private
 	return
 }
 
-func dumpToDisk(caCrt, serverCrt, serverKey *bytes.Buffer, certsDir string) {
+func (h *Webhook) dumpToDisk(caCrt, serverCrt, serverKey *bytes.Buffer) {
 
 	// create dir for cert and key
-	if err := os.MkdirAll(certsDir, 0755); err != nil {
+	if err := os.MkdirAll(h.CertsDir, 0755); err != nil {
 		zap.S().Fatal(err)
 	}
 	// dump key to file
-	if err := os.WriteFile(certsDir+"/ca.crt", caCrt.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(h.CertsDir+"/ca.crt", caCrt.Bytes(), 0644); err != nil {
 		zap.S().Fatal(err)
 	}
-	if err := os.WriteFile(certsDir+"/server.crt", serverCrt.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(h.CertsDir+"/server.crt", serverCrt.Bytes(), 0644); err != nil {
 		zap.S().Fatal(err)
 	}
-	if err := os.WriteFile(certsDir+"/server.key", serverKey.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(h.CertsDir+"/server.key", serverKey.Bytes(), 0644); err != nil {
 		zap.S().Fatal(err)
 	}
 
 }
 
-func createAICloudDomainWebhookCfg(ns, svc string, caBundle []byte) {
-	zap.S().Infof("creating ai cloud domain mutation webhook")
-	createMutatingWebhookCfg(
-		admission.NewAICloudDomainHandler().
-			HookCfg(ns, svc, caBundle),
-	)
-}
-
-func createMutatingWebhookCfg(hookCfg *admissionv1.MutatingWebhookConfiguration) {
+func (h *Webhook) createMutatingWebhookCfg(hookCfg *admissionv1.MutatingWebhookConfiguration) {
 	zap.S().Infof("creating webhook: %s", hookCfg.Name)
 
 	err := clientset().

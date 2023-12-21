@@ -30,3 +30,4 @@ controllers/test-report.html
 bundle
 hack/scripts/docgen/node_modules
 .devspace
+certs
