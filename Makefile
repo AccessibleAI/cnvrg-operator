@@ -22,7 +22,7 @@ test: generate fmt vet manifests
 	rm -f ./controllers/test-report.html ./controllers/junit.xml
 	CNVRG_OPERATOR_MAX_CONCURRENT_RECONCILES=1 go test ./controllers/ -v -timeout 40m
 
-copctl-docker:
+`copctl-docker`:
 	docker buildx build --platform=linux/amd64 --build-arg git_auth=$(GIT_AUTH) --push -t cnvrg/copctl:latest .
 
 test-report:

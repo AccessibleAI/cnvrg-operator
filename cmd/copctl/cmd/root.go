@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/create"
+	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/start"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -10,14 +12,14 @@ import (
 )
 
 var (
-	rootCmd = &cobra.Command{
+	RootCmd = &cobra.Command{
 		Use:   "copctl",
 		Short: "cnvrg operator ctl",
 	}
 )
 
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -25,6 +27,8 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	RootCmd.AddCommand(start.Cmd)
+	RootCmd.AddCommand(create.Cmd)
 }
 
 func initConfig() {

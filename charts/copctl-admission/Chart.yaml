@@ -4,8 +4,3 @@ description: A cnvrg.io AI:OS chart for K8s
 name: cnvrg-all-in-one
 type: application
 version: 5.0.0
-dependencies:
-  - name: domainpool
-    version: 0.1.2
-    repository: https://catalog.stg.intelcloud.cnvrg.io/stage
-    condition: domainpool.enabled

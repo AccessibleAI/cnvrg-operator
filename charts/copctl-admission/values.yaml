@@ -1,4 +1,5 @@
 imageHub: docker.io/cnvrg
+ca: genCA "foo-ca" 365
 registry:
   name: cnvrg-admission-registry
   url: docker.io

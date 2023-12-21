@@ -1,4 +1,4 @@
-package cmd
+package start
 
 import (
 	"crypto/tls"
@@ -37,12 +37,13 @@ func init() {
 	viper.BindPFlag("crt", admissionCtrlCmd.PersistentFlags().Lookup("crt"))
 	viper.BindPFlag("key", admissionCtrlCmd.PersistentFlags().Lookup("key"))
 
-	rootCmd.AddCommand(admissionCtrlCmd)
+	Cmd.AddCommand(admissionCtrlCmd)
 }
 
 var admissionCtrlCmd = &cobra.Command{
-	Use:   "admission",
-	Short: "start cnvrg's operator K8s dynamic admission controller",
+	Use:     "admission-controller",
+	Aliases: []string{"a"},
+	Short:   "start cnvrg's operator K8s dynamic admission controller",
 	Run: func(cmd *cobra.Command, args []string) {
 		cert := viper.GetString("crt")
 		key := viper.GetString("key")

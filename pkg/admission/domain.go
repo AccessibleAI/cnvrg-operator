@@ -8,6 +8,7 @@ import (
 	mcv1alpha1 "github.com/AccessibleAI/cnvrg-shim/apis/metacloud/v1alpha1"
 	"io"
 	v1 "k8s.io/api/admission/v1"
+	admissionv1 "k8s.io/api/admissionregistration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -62,6 +63,48 @@ func (h *AICloudDomainHandler) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	endWithOk(resp, w)
+}
+
+func (h *AICloudDomainHandler) HookCfg(ns, svc string, caBundle []byte) *admissionv1.MutatingWebhookConfiguration {
+
+	hookName := fmt.Sprintf("%s.%s.svc", svc, ns)
+	path := h.HandlerPath()
+	failPolicy := admissionv1.Fail
+	nsScope := admissionv1.NamespacedScope
+	sideEffect := admissionv1.SideEffectClassNone
+
+	return &admissionv1.MutatingWebhookConfiguration{
+		ObjectMeta: metav1.ObjectMeta{Name: hookName},
+		Webhooks: []admissionv1.MutatingWebhook{
+			{
+				Name: hookName,
+				ClientConfig: admissionv1.WebhookClientConfig{
+					Service: &admissionv1.ServiceReference{
+						Namespace: ns,
+						Name:      svc,
+						Path:      &path,
+					},
+					CABundle: caBundle,
+				},
+				Rules: []admissionv1.RuleWithOperations{
+					{
+						Operations: []admissionv1.OperationType{
+							admissionv1.Create,
+						},
+						Rule: admissionv1.Rule{
+							APIGroups:   []string{"mlops.cnvrg.io"},
+							APIVersions: []string{"v1"},
+							Resources:   []string{"cnvrgapps"},
+							Scope:       &nsScope,
+						},
+					},
+				},
+				FailurePolicy:           &failPolicy,
+				SideEffects:             &sideEffect,
+				AdmissionReviewVersions: []string{"v1"},
+			},
+		},
+	}
 }
 
 func (h *AICloudDomainHandler) HandlerPath() string {

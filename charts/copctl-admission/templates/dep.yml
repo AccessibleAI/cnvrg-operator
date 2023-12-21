@@ -19,17 +19,31 @@ spec:
         - name: operator-pull-secret
       containers:
         - command:
-            - /opt/app-root/copctl
-            - admission
+            - /bin/bash
+            - -c
+            - |
+              sleep inf
+              /opt/app-root/copctl \
+              create \
+              kube-certs \
+              -c cnvrg-operator-admission.cnvrg-shim.svc \
+              &&
+              /opt/app-root/copctl \
+              start \
+              admission-controller \
+              --crt=certs/server.crt \
+              --key=certs/server.key
           image: "{{.Values.imageHub}}/copctl:latest"
           imagePullPolicy: Always
           name: cnvrg-admission-controller
+          ports:
+            - containerPort: 8080
           resources:
             limits:
               cpu: 1000m
               memory: 1000Mi
             requests:
-              cpu: 100m
-              memory: 200Mi
+              cpu: 200m
+              memory: 400Mi
       serviceAccountName: cnvrg-admission-controller
       terminationGracePeriodSeconds: 10

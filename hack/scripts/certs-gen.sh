@@ -29,7 +29,7 @@ CN = ${COMMON_NAME}
 
 [v3_req]
 keyUsage = digitalSignature, keyEncipherment
-extendedKeyUsage = clientAuth, serverAuth
+extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 
 [alt_names]
