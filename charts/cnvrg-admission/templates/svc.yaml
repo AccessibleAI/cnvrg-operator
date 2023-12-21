@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.hookSvc}}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    control-plane: cnvrg-admission-controller
+    {{- include "admission.labels" . | indent 4 }}
+  annotations:
+    {{- include "admission.annotations" . | indent 4 }}
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    control-plane: cnvrg-admission-controller

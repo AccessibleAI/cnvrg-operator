@@ -2,7 +2,12 @@ apiVersion: v1
 kind: Secret
 type: kubernetes.io/dockerconfigjson
 metadata:
-  name: operator-pull-secret
+  name: admission-pull-secret
   namespace: {{ .Release.Namespace }}
+  labels:
+    control-plane: cnvrg-admission-controller
+    {{- include "admission.labels" . | indent 4 }}
+  annotations:
+    {{- include "admission.annotations" . | indent 4 }}
 data:
   .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .Values.registry.url .Values.registry.user .Values.registry.password (printf "%s:%s" .Values.registry.user .Values.registry.password | b64enc) | b64enc }}

@@ -1,0 +1,27 @@
+{{- if .Values.startupJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: admission-startup-readiness-job
+  namespace: {{ .Release.Namespace}}
+  labels:
+    {{- include "startupJob.labels" . | indent 4 }}
+  annotations:
+    {{- include "startupJob.annotations" . | indent 4 }}
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: admission-pull-secret
+      containers:
+        - name: admission-startup-readiness-job
+          image: "{{ .Values.imageHub }}/cnvrg-tools:v0.3"
+          args:
+            - /bin/bash
+            - -c
+            - |
+              set -x
+              curl -k --max-time 30 https://{{.Values.hookSvc}}.{{.Release.Namespace}}.svc/ready
+      restartPolicy: Never
+  backoffLimit: 4
+{{- end }}

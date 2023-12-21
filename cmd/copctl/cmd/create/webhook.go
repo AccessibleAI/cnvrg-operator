@@ -37,7 +37,7 @@ func init() {
 }
 
 var webhookCmd = &cobra.Command{
-	Use:     "webhook-certs",
+	Use:     "webhook",
 	Aliases: []string{"w"},
 	Short:   "Generate certs for Admission Webhook",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -87,7 +87,7 @@ func (h *Webhook) run() {
 func (h *Webhook) commonNameToNsAndSvc() (ns string, svc string) {
 	endpoint := strings.Split(h.CommonName, ".")
 	if len(endpoint) < 3 {
-		zap.S().Error("wrong common name, expected format: <svc-name>.<ns-name>.svc ")
+		zap.S().Fatalf("wrong common name, expected format: <svc-name>.<ns-name>.svc ")
 	}
 	return endpoint[1], endpoint[0]
 }
@@ -186,6 +186,7 @@ func (h *Webhook) dumpToDisk(caCrt, serverCrt, serverKey *bytes.Buffer) {
 }
 
 func (h *Webhook) createMutatingWebhookCfg(hookCfg *admissionv1.MutatingWebhookConfiguration) {
+
 	zap.S().Infof("creating webhook: %s", hookCfg.Name)
 
 	err := clientset().

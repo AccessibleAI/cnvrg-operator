@@ -3,40 +3,46 @@ kind: ServiceAccount
 metadata:
   name: cnvrg-admission-controller
   namespace: {{ .Release.Namespace }}
+  labels:
+    control-plane: cnvrg-admission-controller
+    {{- include "admission.labels" . | indent 4 }}
+  annotations:
+    {{- include "admission.annotations" . | indent 4 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cnvrg-admission-controller
   namespace: {{ .Release.Namespace }}
+  labels:
+    control-plane: cnvrg-admission-controller
+    {{- include "admission.labels" . | indent 4 }}
+  annotations:
+    {{- include "admission.annotations" . | indent 4 }}
 rules:
 - apiGroups:
-  - certificates.k8s.io
+  - admissionregistration.k8s.io
   resources:
-  - certificatesigningrequests
+  - mutatingwebhookconfigurations
   verbs:
-  - get
+  - create
+  - delete
+- apiGroups:
+  - metacloud.cnvrg.io
+  resources:
+  - domains
+  verbs:
   - list
-  - watch
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests/approval
-  verbs:
-  - update
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - signers
-  resourceNames:
-  - example.com/my-signer-name # example.com/* can be used to authorize for all signers in the 'example.com' domain
-  verbs:
-  - approve
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cnvrg-admission-controller
+  labels:
+    control-plane: cnvrg-admission-controller
+    {{- include "admission.labels" . | indent 4 }}
+  annotations:
+    {{- include "admission.annotations" . | indent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

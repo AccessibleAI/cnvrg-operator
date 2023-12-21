@@ -53,16 +53,19 @@ var admissionCtrlCmd = &cobra.Command{
 		}
 
 		// Handler for CnvrgCap clusterDomain deployed on AI Cloud
-		//http.HandleFunc("/cap/clusterdomain/mutate", admission.MutateCnvrgAppClusterDomainHandler)
 		aiCloudDomainDiscoveryHandler := admission.NewAICloudDomainHandler()
+		readiness := admission.NewReadinessHandler()
 		http.HandleFunc(aiCloudDomainDiscoveryHandler.HandlerPath(), aiCloudDomainDiscoveryHandler.Handler)
+		http.HandleFunc(readiness.HandlerPath(), readiness.Handler)
+
+		addr := "0.0.0.0:8080"
 
 		// Create HTTPS server configuration
 		s := &http.Server{
-			Addr:      "0.0.0.0:8080",
+			Addr:      addr,
 			TLSConfig: &tls.Config{Certificates: []tls.Certificate{pair}},
 		}
-		zap.S().Info("Admission controller started")
+		zap.S().Infof("admission controller started on %s", addr)
 		zap.S().Fatal(s.ListenAndServeTLS("", ""))
 	},
 }

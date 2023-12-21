@@ -1,0 +1,16 @@
+imageHub: docker.io/cnvrg
+hookSvc: cnvrg-operator-admission
+labels: {}
+annotations: {}
+startupJob:
+  enabled: true
+  labels: { }
+  annotations: { }
+admissionHook:
+  labels: { }
+  annotations: {}
+registry:
+  name: cnvrg-admission-registry
+  url: docker.io
+  user: ''
+  password: ''

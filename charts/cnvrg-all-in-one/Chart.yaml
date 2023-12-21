@@ -9,3 +9,7 @@ dependencies:
     version: 0.1.2
     repository: https://catalog.stg.intelcloud.cnvrg.io/stage
     condition: domainpool.enabled
+  - name: copadmission
+    version: 1.0.0
+    repository: https://catalog.stg.intelcloud.cnvrg.io/stage
+    condition: copadmission.enabled

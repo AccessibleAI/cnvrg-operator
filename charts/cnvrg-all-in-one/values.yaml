@@ -4,6 +4,17 @@ domainpool:
   baseDomain: stg.intelcloud.cnvrg.io
   annotations:
     "helm.sh/hook": "pre-install"
+copadmission:
+  enabled: true
+  admissionHook:
+    annotations:
+      "helm.sh/hook": "pre-install"
+      "helm.sh/hook-weight": "-5"
+  startupJob:
+    enabled: true
+    annotations:
+      "helm.sh/hook": "pre-install"
+      "helm.sh/hook-weight": "0"
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg

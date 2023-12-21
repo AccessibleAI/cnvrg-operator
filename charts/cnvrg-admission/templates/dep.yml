@@ -1,10 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    control-plane: cnvrg-admission-controller
   name: cnvrg-admission-controller
   namespace: {{ .Release.Namespace }}
+  labels:
+    control-plane: cnvrg-admission-controller
+    {{- include "admission.labels" . | indent 4 }}
+  annotations:
+    {{- include "admission.annotations" . | indent 4 }}
 spec:
   replicas: 1
   selector:
@@ -16,23 +19,22 @@ spec:
         control-plane: cnvrg-admission-controller
     spec:
       imagePullSecrets:
-        - name: operator-pull-secret
+        - name: admission-pull-secret
       containers:
         - command:
             - /bin/bash
             - -c
             - |
-              sleep inf
               /opt/app-root/copctl \
               create \
-              kube-certs \
-              -c cnvrg-operator-admission.cnvrg-shim.svc \
+              webhook \
+              -c {{.Values.hookSvc}}.{{.Release.Namespace}}.svc \
               &&
               /opt/app-root/copctl \
               start \
               admission-controller \
-              --crt=certs/server.crt \
-              --key=certs/server.key
+              --crt=/opt/app-root/certs/server.crt \
+              --key=/opt/app-root/certs/server.key
           image: "{{.Values.imageHub}}/copctl:latest"
           imagePullPolicy: Always
           name: cnvrg-admission-controller
@@ -45,5 +47,15 @@ spec:
             requests:
               cpu: 200m
               memory: 400Mi
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTPS
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTPS
       serviceAccountName: cnvrg-admission-controller
       terminationGracePeriodSeconds: 10
