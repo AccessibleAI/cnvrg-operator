@@ -132,7 +132,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\",cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"memory\"cluster=\"$cluster\"})",
+              "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\",cluster=\"$cluster\"}) / sum(kube_node_status_allocatable{resource=\"memory\", cluster=\"$cluster\"})",
               "format": "time_series",
               "instant": true,
               "intervalFactor": 2,
@@ -829,7 +829,7 @@
               "step": 10
             },
             {
-              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=\"$cluster\"}) by (namespace) / sum(kube_pod_container_resource_requests{resource=\"cpu\"{cluster=\"$cluster\"}) by (namespace)",
+              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=\"$cluster\"}) by (namespace) / sum(kube_pod_container_resource_requests{resource=\"cpu\",cluster=\"$cluster\") by (namespace)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
