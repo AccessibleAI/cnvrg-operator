@@ -76,7 +76,7 @@ var fluentbitDefault = Fluentbit{
 var cnvrgAppLoggingDefault = CnvrgAppLogging{
 	Elastalert: Elastalert{
 		Enabled:        false,
-		Image:          "elastalert2:2.15.0",
+		Image:          "elastalert2:server-2.15",
 		CredsRef:       "elastalert-creds",
 		AuthProxyImage: "nginx:1.20",
 		Port:           80,
