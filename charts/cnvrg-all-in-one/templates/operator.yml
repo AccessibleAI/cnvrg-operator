@@ -204,6 +204,26 @@ spec:
         - name: operator-pull-secret
       containers:
         - command:
+            - /bin/bash
+            - -c
+            - |
+              /opt/app-root/copctl \
+              create \
+              status \
+              --name={{ .Release.Name }}
+              --namespace={{ .Release.Namespace }}
+              --interval=5
+          image: "docker.io/cnvrg/copctl:latest"
+          imagePullPolicy: Always
+          name: service-instance-status-reporter
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1000Mi
+            requests:
+              cpu: 400m
+              memory: 200Mi
+        - command:
             - /opt/app-root/cnvrg-operator
             - start
             - --max-concurrent-reconciles

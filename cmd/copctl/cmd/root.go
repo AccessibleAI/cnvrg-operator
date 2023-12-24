@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/create"
-	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/get"
 	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/start"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,7 +29,6 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.AddCommand(start.Cmd)
 	RootCmd.AddCommand(create.Cmd)
-	RootCmd.AddCommand(get.Cmd)
 }
 
 func initConfig() {
