@@ -76,7 +76,7 @@
               "step": 10
             },
             {
-              "expr": "sum(\n    kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
+              "expr": "sum(\n    kube_pod_container_resource_requests{resource=\"cpu\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "requests",
@@ -84,7 +84,7 @@
               "step": 10
             },
             {
-              "expr": "sum(\n    kube_pod_container_resource_limits_cpu_cores{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
+              "expr": "sum(\n    kube_pod_container_resource_limits{resource=\"cpu\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "limits",
@@ -410,7 +410,7 @@
               "step": 10
             },
             {
-              "expr": "sum(kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -419,7 +419,7 @@
               "step": 10
             },
             {
-              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container) / sum(kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container) / sum(kube_pod_container_resource_requests{resource=\"cpu\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -428,7 +428,7 @@
               "step": 10
             },
             {
-              "expr": "sum(kube_pod_container_resource_limits_cpu_cores{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -437,7 +437,7 @@
               "step": 10
             },
             {
-              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container) / sum(kube_pod_container_resource_limits_cpu_cores{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container) / sum(kube_pod_container_resource_limits{resource=\"cpu\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -560,7 +560,7 @@
               "step": 10
             },
             {
-              "expr": "sum(\n    kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
+              "expr": "sum(\n    kube_pod_container_resource_requests{resource=\"memory\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "requests",
@@ -568,7 +568,7 @@
               "step": 10
             },
             {
-              "expr": "sum(\n    kube_pod_container_resource_limits_memory_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
+              "expr": "sum(\n    kube_pod_container_resource_limits{resource=\"memory\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"})\n",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "limits",
@@ -844,7 +844,7 @@
               "step": 10
             },
             {
-              "expr": "sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -853,7 +853,7 @@
               "step": 10
             },
             {
-              "expr": "sum(container_memory_working_set_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(container_memory_working_set_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_requests{resource=\"memory\", cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -862,7 +862,7 @@
               "step": 10
             },
             {
-              "expr": "sum(kube_pod_container_resource_limits_memory_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", container!=\"\"}) by (container)",
+              "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", container!=\"\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,
@@ -871,7 +871,7 @@
               "step": 10
             },
             {
-              "expr": "sum(container_memory_working_set_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", container!=\"\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_limits_memory_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
+              "expr": "sum(container_memory_working_set_bytes{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\", container!=\"\", image!=\"\"}) by (container) / sum(kube_pod_container_resource_limits{resource=\"memory\",cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}) by (container)",
               "format": "table",
               "instant": true,
               "intervalFactor": 2,

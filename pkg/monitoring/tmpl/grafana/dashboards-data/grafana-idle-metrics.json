@@ -264,7 +264,7 @@
       "pluginVersion": "6.7.4",
       "targets": [
         {
-          "expr": "(avg_over_time(container_memory_working_set_bytes{container=\"main\", name=~\".*$pod.*\"}[$idle_timeout]) / on (instanse) kube_pod_container_resource_limits_memory_bytes{pod=~\".*$pod.*\"}) * 100",
+          "expr": "(avg_over_time(container_memory_working_set_bytes{container=\"main\", name=~\".*$pod.*\"}[$idle_timeout]) / on (instanse) kube_pod_container_resource_limits{resource=\"memory\", pod=~\".*$pod.*\"}) * 100",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
