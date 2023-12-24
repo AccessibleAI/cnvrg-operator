@@ -78,6 +78,9 @@ func (h *AICloudDomainHandler) HookCfg(ns, svc string, caBundle []byte) *admissi
 		Webhooks: []admissionv1.MutatingWebhook{
 			{
 				Name: hookName,
+				NamespaceSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"name": ns},
+				},
 				ClientConfig: admissionv1.WebhookClientConfig{
 					Service: &admissionv1.ServiceReference{
 						Namespace: ns,

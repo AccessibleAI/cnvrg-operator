@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/utils"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/admission"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -69,7 +70,7 @@ func (h *Webhook) run() {
 		h.clean()
 	}
 	// get key for CA
-	cakey := privateKey()
+	cakey := utils.PrivateKey()
 	// create CA certificate
 	ca, caPEM := h.createCA(cakey)
 	// create certificate and key for server
@@ -141,7 +142,7 @@ func (h *Webhook) serverCrtAndKey(ca *x509.Certificate, cakey *rsa.PrivateKey) (
 		KeyUsage:    x509.KeyUsageDigitalSignature,
 	}
 
-	serverKey := privateKey()
+	serverKey := utils.PrivateKey()
 	certBytes, err := x509.CreateCertificate(rand.Reader, serverCrt, ca, &serverKey.PublicKey, cakey)
 	if err != nil {
 		zap.S().Fatalf("error creating server certificate, err: %s ", err.Error())
@@ -189,7 +190,7 @@ func (h *Webhook) createMutatingWebhookCfg(hookCfg *admissionv1.MutatingWebhookC
 
 	zap.S().Infof("creating webhook: %s", hookCfg.Name)
 
-	err := clientset().
+	err := utils.Clientset().
 		AdmissionregistrationV1().
 		MutatingWebhookConfigurations().
 		Delete(context.Background(), hookCfg.Name, metav1.DeleteOptions{})
@@ -198,7 +199,7 @@ func (h *Webhook) createMutatingWebhookCfg(hookCfg *admissionv1.MutatingWebhookC
 		zap.S().Fatalf("error deleting webhook: %s, err: %s ", hookCfg.Name, err.Error())
 	}
 
-	if _, err := clientset().
+	if _, err := utils.Clientset().
 		AdmissionregistrationV1().
 		MutatingWebhookConfigurations().
 		Create(context.Background(), hookCfg, metav1.CreateOptions{}); err != nil {

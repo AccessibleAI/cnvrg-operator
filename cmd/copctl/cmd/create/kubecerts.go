@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -47,7 +48,7 @@ var kubeCertsCmd = &cobra.Command{
 		if viper.GetBool("override") {
 			clean(viper.GetString("certs-dir"), viper.GetString("common-name"))
 		}
-		pkey := privateKey()
+		pkey := utils.PrivateKey()
 		approveCsr(
 			createCsr(
 				csrPem(
@@ -64,7 +65,7 @@ var kubeCertsCmd = &cobra.Command{
 
 func clean(certsDir string, commonName string) {
 	zap.S().Info("cleaning up exiting certs")
-	err := clientset().
+	err := utils.Clientset().
 		CertificatesV1().
 		CertificateSigningRequests().
 		Delete(context.Background(), commonName, metav1.DeleteOptions{})
@@ -127,7 +128,7 @@ func createCsr(csrPem *bytes.Buffer, commonName string) *certsv1.CertificateSign
 	//signerName := "kubernetes.io/kube-apiserver-client-kubelet"
 	//signerName := "kubernetes.io/kube-apiserver-client"
 	signerName := "kubernetes.io/kubelet-serving"
-	csr, err := clientset().CertificatesV1().
+	csr, err := utils.Clientset().CertificatesV1().
 		CertificateSigningRequests().
 		Create(context.Background(), &certsv1.CertificateSigningRequest{
 			ObjectMeta: metav1.ObjectMeta{Name: commonName},
@@ -159,7 +160,7 @@ func approveCsr(csr *certsv1.CertificateSigningRequest) {
 		LastTransitionTime: metav1.Now(),
 	})
 
-	if _, err := clientset().CertificatesV1().
+	if _, err := utils.Clientset().CertificatesV1().
 		CertificateSigningRequests().
 		UpdateApproval(context.Background(), csr.ObjectMeta.Name, csr, metav1.UpdateOptions{}); err != nil {
 		zap.S().Fatal(err)
@@ -167,7 +168,7 @@ func approveCsr(csr *certsv1.CertificateSigningRequest) {
 }
 
 func fetchCertificateFromCsr(commonName string) []byte {
-	csr, err := clientset().
+	csr, err := utils.Clientset().
 		CertificatesV1().
 		CertificateSigningRequests().
 		Get(context.Background(), commonName, metav1.GetOptions{})

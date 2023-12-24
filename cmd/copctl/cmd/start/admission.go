@@ -2,7 +2,6 @@ package start
 
 import (
 	"crypto/tls"
-	"fmt"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/admission"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -10,30 +9,11 @@ import (
 	"net/http"
 )
 
-type PlatformType string
-
-const (
-	CAGPPlatform PlatformType = "cagp"
-)
-
 func init() {
-	admissionCtrlCmd.PersistentFlags().StringP("platform", "", "cagp",
-		fmt.Sprintf("one of: %s|", CAGPPlatform))
-	admissionCtrlCmd.PersistentFlags().StringP("domain-pool", "", "zerossl", "domain pool to use when deploying on CAGP")
-	admissionCtrlCmd.PersistentFlags().StringP("domain-claim", "", "cnvrg-domain-claim", "domain claim to create")
-	admissionCtrlCmd.PersistentFlags().StringP("gateway-name", "", "cnvrg-gateway", "gateway to create")
-	admissionCtrlCmd.PersistentFlags().StringP("namespace", "", "cnvrg", "namespace")
-	admissionCtrlCmd.PersistentFlags().StringP("reg-user", "", "reg-user", "registry user")
-	admissionCtrlCmd.PersistentFlags().StringP("reg-password", "", "reg-password", "registry password")
+
 	admissionCtrlCmd.PersistentFlags().StringP("crt", "", "", "path to certificate file")
 	admissionCtrlCmd.PersistentFlags().StringP("key", "", "", "path to key file")
 
-	viper.BindPFlag("platform", admissionCtrlCmd.PersistentFlags().Lookup("platform"))
-	viper.BindPFlag("domain-pool", admissionCtrlCmd.PersistentFlags().Lookup("domain-pool"))
-	viper.BindPFlag("domain-claim", admissionCtrlCmd.PersistentFlags().Lookup("domain-claim"))
-	viper.BindPFlag("namespace", admissionCtrlCmd.PersistentFlags().Lookup("namespace"))
-	viper.BindPFlag("reg-user", admissionCtrlCmd.PersistentFlags().Lookup("reg-user"))
-	viper.BindPFlag("reg-password", admissionCtrlCmd.PersistentFlags().Lookup("reg-password"))
 	viper.BindPFlag("crt", admissionCtrlCmd.PersistentFlags().Lookup("crt"))
 	viper.BindPFlag("key", admissionCtrlCmd.PersistentFlags().Lookup("key"))
 

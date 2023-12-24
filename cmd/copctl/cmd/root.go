@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/create"
+	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/get"
 	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/cmd/start"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,6 +30,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.AddCommand(start.Cmd)
 	RootCmd.AddCommand(create.Cmd)
+	RootCmd.AddCommand(get.Cmd)
 }
 
 func initConfig() {
@@ -41,6 +43,7 @@ func initConfig() {
 func initZapLog() {
 	config := zap.NewDevelopmentConfig()
 	//config := zap.NewProductionConfig()
+	config.EncoderConfig.StacktraceKey = ""
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
