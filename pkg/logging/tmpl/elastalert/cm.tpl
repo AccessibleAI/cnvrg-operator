@@ -31,10 +31,10 @@ data:
         "relative": true,
         "path": "/server_data"
       },
-      "es_ssl": false,
-      "es_verify_certs": false,
       "es_host": "{{ .Spec.Dbs.Es.SvcName }}",
       "es_port": {{ .Spec.Dbs.Es.Port }},
+      "es_ssl": false,
+      "ea_verify_certs": false,
       "writeback_index": "elastalert_status"
     }
   config.yaml: |
