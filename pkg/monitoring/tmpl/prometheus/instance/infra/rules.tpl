@@ -614,7 +614,7 @@ spec:
                     )
                 )
             )
-          record: sum(kube_pod_container_resource_requests{resource="memory"}) by (namespace)
+          record: namespace:kube_pod_container_resource_requests_memory_bytes:sum
         - expr: |
             sum by (namespace) (
                 sum by (namespace, pod) (
@@ -625,7 +625,7 @@ spec:
                     )
                 )
             )
-          record: sum(kube_pod_container_resource_requests{resource="cpu"}) by (namespace)
+          record: namespace:kube_pod_container_resource_requests_cpu_cores:sum
         - expr: |
             max by (cluster, namespace, workload, pod) (
               label_replace(
