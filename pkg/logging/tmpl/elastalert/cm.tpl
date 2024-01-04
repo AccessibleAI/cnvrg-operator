@@ -19,18 +19,6 @@ data:
       "wsport": 3333,
       "elastalertPath": "/opt/elastalert",
       "verbose": true,
-      "use_ssl": false,
-      "verify_certs": false,
-      "run_every": {
-        "minutes": 1
-      },
-      "buffer_time": {
-        "minutes": 15
-      },
-      "alert_time_limit": {
-        "days": 2
-      },
-      "rules_folder": "rules",
       "rulesPath": {
         "relative": true,
         "path": "/rules"
@@ -45,6 +33,8 @@ data:
       },
       "es_host": "{{ .Spec.Dbs.Es.SvcName }}",
       "es_port": {{ .Spec.Dbs.Es.Port }},
+      "es_ssl": false,
+      "ea_verify_certs": false,
       "writeback_index": "elastalert_status"
     }
   config.yaml: |
