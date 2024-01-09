@@ -104,6 +104,8 @@ jobs:
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
+          private_repo=github.com/AccessibleAI/cnvrg-shim
+          git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
     - name: Build and push tagged image
       id: docker_build_tag_branch
@@ -117,6 +119,8 @@ jobs:
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
+          private_repo=github.com/AccessibleAI/cnvrg-shim
+          git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
     - name: Generate Cnvrg Changelog
       uses: AccessibleAI/github-changelog-action@1.0.0
