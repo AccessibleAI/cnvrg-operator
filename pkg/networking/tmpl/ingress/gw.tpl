@@ -20,6 +20,12 @@ spec:
       {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
       tls:
         httpsRedirect: true
+    - port:
+        number: 8001
+        name: grpc
+        protocol: GRPC
+      hosts:
+        - "*.{{ .Spec.ClusterDomain }}"
     - hosts:
         - "*.{{ .Spec.ClusterDomain }}"
       port:
