@@ -12,7 +12,7 @@ spec:
     istio: cnvrg-ingressgateway
   servers:
     - port:
-        number: 80
+        number: 70
         name: http
         protocol: HTTP
       hosts:
