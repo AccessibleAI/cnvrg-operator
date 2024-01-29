@@ -249,7 +249,7 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				fmt.Sprintf(`http_address = "0.0.0.0:%d"`, proxyPort),
 				fmt.Sprintf(`redirect_url = "%v"`, getSSORedirectUrl(obj, svc)),
 				fmt.Sprintf("skip_auth_regex = %v", skipAuthUrls),
-				fmt.Sprintf(`token_validation_regex = %v`, tokenValidationRegexes),
+				fmt.Sprintf("skip_auth_routes = [\"^\\/api\"]"),
 				fmt.Sprintf(`email_domains = %v`, emailsDomains),
 				fmt.Sprintf(`client_id = "%v"`, sso.ClientID),
 				fmt.Sprintf(`client_secret = "%v"`, sso.ClientSecret),
