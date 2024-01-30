@@ -45,6 +45,7 @@ spec:
         - --port=8081
         - --telemetry-host=127.0.0.1
         - --telemetry-port=8082
+        - --metric-labels-allowlist=nodes=[*]
         image: {{ image .Spec.ImageHub .Spec.Monitoring.KubeStateMetrics.Image }}
         name: kube-state-metrics
         resources:
