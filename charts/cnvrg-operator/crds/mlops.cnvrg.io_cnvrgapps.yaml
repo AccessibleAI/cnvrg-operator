@@ -746,12 +746,12 @@ spec:
                 properties:
                   https:
                     properties:
+                      cert:
+                        type: string
                       certSecret:
                         type: string
                       enabled:
                         type: boolean
-                      cert:
-                        type: string
                       key:
                         type: string
                     type: object
@@ -765,6 +765,8 @@ spec:
                         type: string
                       istioIngressSelectorValue:
                         type: string
+                      ocpSecureRoutes:
+                        type: boolean
                       perTryTimeout:
                         type: string
                       retriesAttempts:
@@ -773,8 +775,6 @@ spec:
                         type: string
                       type:
                         type: string
-                      ocpSecureRoutes:
-                        type: boolean
                     type: object
                   proxy:
                     properties:

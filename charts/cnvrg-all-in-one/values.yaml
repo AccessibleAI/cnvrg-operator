@@ -318,8 +318,8 @@ networking:
     perTryTimeout: 3600s
     istioGwEnabled: true
     istioGwName: ''
-    istioIngressSelectorKey: 'istio'
-    istioIngressSelectorValue: 'ingressgateway'
+    istioIngressSelectorKey: ''
+    istioIngressSelectorValue: ''
     ocpSecureRoutes: false
   https:
     enabled: false
