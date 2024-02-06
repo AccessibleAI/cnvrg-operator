@@ -494,6 +494,8 @@ spec:
                 properties:
                   adminUser:
                     type: string
+                  adminPassword:
+                    type: string
                   azureTenant:
                     type: string
                   clientId:

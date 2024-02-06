@@ -201,6 +201,7 @@ networking:
 sso:
   enabled: false
   adminUser: ""
+  adminPassword: ""
   provider: ""
   emailDomain: [ ]
   clientId: ""
