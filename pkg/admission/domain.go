@@ -36,7 +36,7 @@ func NewAICloudDomainHandler() *AICloudDomainHandler {
 }
 
 func (h *AICloudDomainHandler) Handler(w http.ResponseWriter, r *http.Request) {
-
+	zap.S().Infof("admission review request received from: %s ", r.RemoteAddr)
 	ar, err := h.admissionReviewDecode(h.body(r))
 	if err != nil {
 		endWithError(err, w)
@@ -62,6 +62,7 @@ func (h *AICloudDomainHandler) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	endWithOk(resp, w)
+	zap.S().Info("admission response sent")
 }
 
 func (h *AICloudDomainHandler) patchBody(cap *mlopsv1.CnvrgApp) (string, error) {
@@ -78,13 +79,11 @@ func (h *AICloudDomainHandler) patchBody(cap *mlopsv1.CnvrgApp) (string, error) 
 	if err != nil {
 		return "", err
 	}
-
 	patch := fmt.Sprintf(patchCnvrgAppTpl,
 		clusterDomain,
 		serviceInstanceMetadata.Ingress.SelectorKey,
 		serviceInstanceMetadata.Ingress.SelectorValue,
 	)
-	zap.S().Info(patch)
 	return patch, nil
 }
 
@@ -101,8 +100,8 @@ func (h *AICloudDomainHandler) HookCfg(ns, svc string, caBundle []byte) *admissi
 		Webhooks: []admissionv1.MutatingWebhook{
 			{
 				Name: hookName,
-				NamespaceSelector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{"name": ns},
+				ObjectSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"mlops.cnvrg.io/domain.auto.discovery": "true"},
 				},
 				ClientConfig: admissionv1.WebhookClientConfig{
 					Service: &admissionv1.ServiceReference{
@@ -215,6 +214,7 @@ func (h *AICloudDomainHandler) mutationResponse(uuid types.UID, patchBody string
 		Version: "v1",
 		Kind:    "AdmissionReview",
 	})
+	zap.S().Infof("patch body: %s", patchBody)
 	ar.Response = &v1.AdmissionResponse{
 		UID:       uuid,
 		Allowed:   true,
@@ -222,6 +222,5 @@ func (h *AICloudDomainHandler) mutationResponse(uuid types.UID, patchBody string
 		Patch:     []byte(patchBody),
 		Result:    &metav1.Status{Message: "ok"},
 	}
-
 	return json.Marshal(ar)
 }

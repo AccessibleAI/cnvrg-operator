@@ -13,6 +13,7 @@ import (
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"strings"
 
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
@@ -111,9 +112,8 @@ func runOperator() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		MetricsBindAddress:     viper.GetString("metrics-addr"),
+		Metrics:                metricsserver.Options{BindAddress: viper.GetString("metrics-addr")},
 		HealthProbeBindAddress: viper.GetString("health-probe-addr"),
-		Port:                   9443,
 		LeaderElection:         viper.GetBool("enable-leader-election"),
 		LeaderElectionID:       "99748453.cnvrg.io",
 	})
