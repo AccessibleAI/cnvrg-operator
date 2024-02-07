@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Spec.Dbs.Minio.SvcName }}
+  name: {{ .Spec.Dbs.Minio.SvcName }}-ui
   namespace: {{ ns . }}
   annotations:
     {{- range $k, $v := .Spec.Annotations }}
@@ -13,7 +13,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-  - "{{ .Spec.Dbs.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"
+  - "{{ .Spec.Dbs.Minio.SvcName}}-ui.{{ .Spec.ClusterDomain }}"
   gateways:
   - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:
@@ -23,4 +23,4 @@ spec:
     timeout: 864000s
     route:
     - destination:
-        host: "{{ .Spec.Dbs.Minio.SvcName }}.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
+        host: "{{ .Spec.Dbs.Minio.SvcName }}-ui.{{ ns . }}.svc.{{ .Spec.ClusterInternalDomain }}"
