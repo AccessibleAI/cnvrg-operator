@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: "cnvrg-nomex-{{ .Namespace }}"
+  name: "cnvrg-nomex"
   namespace: {{ .Namespace }}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
@@ -9,9 +9,8 @@ metadata:
     mlops.cnvrg.io/updatable: "false"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: "cnvrg-nomex-{{ .Namespace }}"
+  kind: Role
+  name: "cnvrg-nomex"
 subjects:
   - kind: ServiceAccount
     name: cnvrg-nomex
-    namespace: {{ .Namespace }}

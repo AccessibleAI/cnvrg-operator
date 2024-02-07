@@ -22,14 +22,13 @@ const (
 	RoleGVK                 GVKName = "RoleGVK"
 	RoleBindingGVK          GVKName = "RoleBindingGVK"
 	OcpRouteGVK             GVKName = "OcpRouteGVK"
-	OcpIngressCfgGVK        GVKName = "OcpIngressCfgGVK"
-	OcpSccGVK               GVKName = "OcpSccGVK"
 	IngressGVK              GVKName = "IngressGVK"
 	IstioVsGVK              GVKName = "IstioVsGVK"
 	IstioGVK                GVKName = "IstioGVK"
 	IstioDestinationRuleGVK GVKName = "IstioDestinationRule"
 	IstioGwGVK              GVKName = "IstioGwGVK"
 	StorageClassGVK         GVKName = "StorageClassGVK"
+	PodDisruptionBudgetGVK  GVKName = "PodDisruptionBudget"
 	HpaGVK                  GVKName = "HpaGVK"
 	PriorityClassGVK        GVKName = "PriorityClassGVK"
 	JobGVK                  GVKName = "JobGvk"
@@ -131,18 +130,6 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 		Version: "v1",
 	},
 
-	OcpIngressCfgGVK: schema.GroupVersionKind{
-		Kind:    "Ingress",
-		Group:   "config.openshift.io",
-		Version: "v1",
-	},
-
-	OcpSccGVK: schema.GroupVersionKind{
-		Kind:    "SecurityContextConstraints",
-		Group:   "security.openshift.io",
-		Version: "v1",
-	},
-
 	RoleBindingGVK: schema.GroupVersionKind{
 		Group:   "rbac.authorization.k8s.io",
 		Version: "v1",
@@ -178,9 +165,14 @@ var Kinds = map[GVKName]schema.GroupVersionKind{
 		Version: "v1",
 		Kind:    "Ingress",
 	},
+	PodDisruptionBudgetGVK: schema.GroupVersionKind{
+		Group:   "policy",
+		Version: "v1",
+		Kind:    "PodDisruptionBudget",
+	},
 	HpaGVK: schema.GroupVersionKind{
 		Group:   "autoscaling",
-		Version: "v1",
+		Version: "v2",
 		Kind:    "HorizontalPodAutoscaler",
 	},
 	PriorityClassGVK: schema.GroupVersionKind{

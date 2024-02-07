@@ -45,9 +45,8 @@ type CnvrgAppReconciler struct {
 	Scheme   *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=mlops.cnvrg.io,resources=cnvrgapps/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=*,resources=*,verbs=*
+// +kubebuilder:rbac:groups=mlops.cnvrg.io,namespace=cnvrg,resources=cnvrgapps,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=mlops.cnvrg.io,namespace=cnvrg,resources=cnvrgapps/status,verbs=get;update;patch
 
 func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
@@ -438,6 +437,7 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				app.Dbs.Redis.SvcName,
 				app.Dbs.Es.SvcName,
 			}
+
 			if gvk == desired.Kinds[desired.DeploymentGVK] || gvk == desired.Kinds[desired.StatefulSetGVK] || gvk == desired.Kinds[desired.JobGVK] {
 				if controllers.ContainsString(healthCheckWorkloads, e.ObjectNew.GetName()) {
 					return true

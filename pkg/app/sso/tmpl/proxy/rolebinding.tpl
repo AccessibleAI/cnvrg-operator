@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: {{ .Spec.SSO.Jwks.SvcName }}
+  name: {{.Spec.SSO.Proxy.SvcName}}
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "false"
@@ -15,9 +15,8 @@ metadata:
     {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: {{ .Spec.SSO.Jwks.SvcName }}
+  kind: Role
+  name: {{.Spec.SSO.Proxy.SvcName}}
 subjects:
   - kind: ServiceAccount
-    name: {{ .Spec.SSO.Jwks.SvcName }}
-    namespace: {{.Namespace }}
+    name: {{.Spec.SSO.Proxy.SvcName}}

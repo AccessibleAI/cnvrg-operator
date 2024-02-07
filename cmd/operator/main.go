@@ -12,6 +12,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"strings"
@@ -110,8 +111,21 @@ func setParams(params []param, command *cobra.Command) {
 func runOperator() {
 	ctrl.SetLogger(zapr.NewLogger(initZapLog()))
 
+	namespaces := []string{"cnvrg"} // List of Namespaces
+	defaultNamespaces := make(map[string]cache.Config)
+
+	for _, ns := range namespaces {
+		defaultNamespaces[ns] = cache.Config{}
+	}
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
+		Scheme: scheme,
+		Cache: cache.Options{
+			DefaultNamespaces: defaultNamespaces,
+			//DefaultNamespaces: map[string]cache.Config{
+			//	"namespace": {},
+			//},
+		},
 		Metrics:                metricsserver.Options{BindAddress: viper.GetString("metrics-addr")},
 		HealthProbeBindAddress: viper.GetString("health-probe-addr"),
 		LeaderElection:         viper.GetBool("enable-leader-election"),
