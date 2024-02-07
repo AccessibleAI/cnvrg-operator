@@ -352,6 +352,16 @@ func singleBackendMinio() []*desired.State {
 		},
 		{
 
+			TemplatePath:   path + "/minio/svc-ui.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.SvcGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
+
 			TemplatePath:   path + "/minio/dep.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
@@ -493,6 +503,15 @@ func minioIstioVs() []*desired.State {
 			Own:            true,
 			Updatable:      true,
 		},
+		{
+			TemplatePath:   path + "/minio/vs-ui.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IstioVsGVK],
+			Own:            true,
+			Updatable:      true,
+		},
 	}
 }
 
@@ -513,6 +532,14 @@ func minioIngress() []*desired.State {
 	return []*desired.State{
 		{
 			TemplatePath:   path + "/minio/ingress.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.IngressGVK],
+			Own:            true,
+		},
+		{
+			TemplatePath:   path + "/minio/ingress-ui.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
 			Obj:            &unstructured.Unstructured{},

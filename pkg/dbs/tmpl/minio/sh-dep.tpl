@@ -174,16 +174,19 @@ spec:
             - nas
             - /data
           env:
-            - name: MINIO_ACCESS_KEY
+            - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  name: cp-object-storage
                   key: CNVRG_STORAGE_ACCESS_KEY
-            - name: MINIO_SECRET_KEY
+                  name: cp-object-storage
+            - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cp-object-storage
                   key: CNVRG_STORAGE_SECRET_KEY
+                  name: cp-object-storage
+          envFrom:
+            - secretRef:
+                name: cp-object-storage
           ports:
             - containerPort: {{ .Spec.Dbs.Minio.Port }}
           volumeMounts:
