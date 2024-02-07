@@ -11,7 +11,6 @@ import (
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/registry"
 	sso2 "github.com/AccessibleAI/cnvrg-operator/pkg/app/sso"
-	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
 	"github.com/spf13/viper"
 	"gopkg.in/d4l3k/messagediff.v1"
@@ -20,7 +19,6 @@ import (
 	v1core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
@@ -32,10 +30,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"strings"
 	"time"
 )
 
+const systemStatusHealthCheckLabelName = "cnvrg-system-status-check"
 const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
 
 type CnvrgAppReconciler struct {
@@ -389,11 +387,6 @@ func (r *CnvrgAppReconciler) cleanupDbInitCm(desiredSpec *mlopsv1.CnvrgApp) erro
 }
 
 func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	if viper.GetBool("create-crds") {
-		if err := controlplane.NewControlPlaneCrdsStateManager(r.Client, r.Scheme, r.Log).Apply(); err != nil {
-			return err
-		}
-	}
 
 	appPredicate := predicate.Funcs{
 
@@ -421,28 +414,34 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		},
 	}
 
-	appOwnsPredicate := predicate.Funcs{
+	appOwnsPredicate := r.appOwnsPredicateFuncs()
+
+	r.recorder = mgr.GetEventRecorderFor("cnvrgapp")
+	a := &v1apps.Deployment{}
+	a.GroupVersionKind()
+	cnvrgAppController := ctrl.
+		NewControllerManagedBy(mgr).
+		Owns(&v1apps.Deployment{}, builder.WithPredicates(appOwnsPredicate)).
+		Owns(&v1apps.StatefulSet{}, builder.WithPredicates(appOwnsPredicate)).
+		For(&mlopsv1.CnvrgApp{}, builder.WithPredicates(appPredicate))
+
+	r.Log.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
+
+	return cnvrgAppController.
+		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
+		Complete(r)
+}
+
+func (r *CnvrgAppReconciler) appOwnsPredicateFuncs() predicate.Funcs {
+
+	return predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			gvk := e.ObjectNew.GetObjectKind().GroupVersionKind()
-			app := mlopsv1.DefaultCnvrgAppSpec()
-			healthCheckWorkloads := []string{
-				"ingresscheck",
-				"sidekiq",
-				"searchkiq",
-				"systemkiq",
-				app.ControlPlane.WebApp.SvcName,
-				app.Dbs.Pg.SvcName,
-				app.Dbs.Minio.SvcName,
-				app.Dbs.Redis.SvcName,
-				app.Dbs.Es.SvcName,
+
+			if controllers.ContainsString(labelsMapToList(e.ObjectNew.GetLabels()), systemStatusHealthCheckLabelName) {
+				return true
 			}
 
-			if gvk == desired.Kinds[desired.DeploymentGVK] || gvk == desired.Kinds[desired.StatefulSetGVK] || gvk == desired.Kinds[desired.JobGVK] {
-				if controllers.ContainsString(healthCheckWorkloads, e.ObjectNew.GetName()) {
-					return true
-				}
-			}
 			r.Log.V(1).Info("received update event", "objectName", e.ObjectNew.GetName())
 			return false
 		},
@@ -452,31 +451,6 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return true
 		},
 	}
-	r.recorder = mgr.GetEventRecorderFor("cnvrgapp")
-	cnvrgAppController := ctrl.
-		NewControllerManagedBy(mgr).
-		For(&mlopsv1.CnvrgApp{}, builder.WithPredicates(appPredicate))
-
-	for _, v := range desired.Kinds {
-
-		if strings.Contains(v.Group, "istio.io") {
-			continue
-		}
-		if strings.Contains(v.Group, "openshift.io") {
-			continue
-		}
-		if strings.Contains(v.Group, "coreos.com") {
-			continue
-		}
-		u := &unstructured.Unstructured{}
-		u.SetGroupVersionKind(v)
-		cnvrgAppController.Owns(u, builder.WithPredicates(appOwnsPredicate))
-	}
-
-	r.Log.Info(fmt.Sprintf("max concurrent reconciles: %d", viper.GetInt("max-concurrent-reconciles")))
-	return cnvrgAppController.
-		WithOptions(controller.Options{MaxConcurrentReconciles: viper.GetInt("max-concurrent-reconciles")}).
-		Complete(r)
 }
 
 func (r *CnvrgAppReconciler) CheckJobReadiness(name types.NamespacedName) (bool, error) {

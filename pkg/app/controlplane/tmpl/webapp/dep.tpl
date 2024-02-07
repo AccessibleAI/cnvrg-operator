@@ -14,6 +14,7 @@ metadata:
     app: {{ .Spec.ControlPlane.WebApp.SvcName }}
     owner: cnvrg-control-plane
     cnvrg-component: webapp
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

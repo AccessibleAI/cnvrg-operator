@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
@@ -110,26 +111,20 @@ func setParams(params []param, command *cobra.Command) {
 
 func runOperator() {
 	ctrl.SetLogger(zapr.NewLogger(initZapLog()))
-
-	namespaces := []string{"cnvrg"} // List of Namespaces
-	defaultNamespaces := make(map[string]cache.Config)
-
-	for _, ns := range namespaces {
-		defaultNamespaces[ns] = cache.Config{}
+	selector, err := labels.Parse("name=cnvrg")
+	if err != nil {
+		zap.S().Error(err)
+		return
 	}
+	cacheCfg := cache.Config{LabelSelector: selector}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme: scheme,
 		Cache: cache.Options{
-			DefaultNamespaces: defaultNamespaces,
-			//DefaultNamespaces: map[string]cache.Config{
-			//	"namespace": {},
-			//},
+			DefaultNamespaces: map[string]cache.Config{"cnvrg": cacheCfg},
 		},
 		Metrics:                metricsserver.Options{BindAddress: viper.GetString("metrics-addr")},
 		HealthProbeBindAddress: viper.GetString("health-probe-addr"),
-		LeaderElection:         viper.GetBool("enable-leader-election"),
-		LeaderElectionID:       "99748453.cnvrg.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

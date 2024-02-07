@@ -13,6 +13,7 @@ metadata:
   labels:
     app: {{ .Spec.Dbs.Minio.SvcName }}
     cnvrg-component: minio
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

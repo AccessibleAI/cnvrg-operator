@@ -14,6 +14,7 @@ metadata:
     app: sidekiq
     owner: cnvrg-control-plane
     cnvrg-component: sidekiq
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
