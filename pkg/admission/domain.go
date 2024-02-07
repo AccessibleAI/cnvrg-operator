@@ -51,7 +51,7 @@ func (h *AICloudDomainHandler) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clusterDomain, err := h.discoverClusterDomain(cnvrgApp)
+	clusterDomain, err := h.DiscoverClusterDomain(cnvrgApp)
 	if err != nil {
 		endWithError(err, w)
 		return
@@ -142,7 +142,7 @@ func (h *AICloudDomainHandler) cnvrgAppDecode(b []byte) (*mlopsv1.CnvrgApp, erro
 	return cnvrgApp, nil
 }
 
-func (h *AICloudDomainHandler) discoverClusterDomain(cap *mlopsv1.CnvrgApp) (clusterDomain string, err error) {
+func (h *AICloudDomainHandler) DiscoverClusterDomain(cap *mlopsv1.CnvrgApp) (clusterDomain string, err error) {
 
 	// do nothing if cluster domain already set
 	if cap.Spec.ClusterDomain != "" {

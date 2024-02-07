@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/controllers"
+	"github.com/AccessibleAI/cnvrg-operator/pkg/admission"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/app/networking"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
@@ -164,6 +165,17 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 		if app.Spec.SSO.Central.CookieDomain == "" {
 			defaultSpec.SSO.Central.CookieDomain = fmt.Sprintf(".%s", app.Spec.ClusterDomain)
 		}
+	}
+
+	if app.Spec.ClusterDomain == "" {
+
+		domainDiscovery := admission.NewAICloudDomainHandler()
+		clusterDomain, err := domainDiscovery.DiscoverClusterDomain(app)
+		if err != nil {
+			return err
+		}
+		app.Spec.ClusterDomain = clusterDomain
+
 	}
 
 	return nil

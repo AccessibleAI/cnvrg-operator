@@ -5,13 +5,13 @@ domainpool:
   annotations:
     "helm.sh/hook": "pre-install"
 copadmission:
-  enabled: true
+  enabled: false
   admissionHook:
     annotations:
       "helm.sh/hook": "pre-install"
       "helm.sh/hook-weight": "-5"
   startupJob:
-    enabled: true
+    enabled: false
     annotations:
       "helm.sh/hook": "pre-install"
       "helm.sh/hook-weight": "0"
