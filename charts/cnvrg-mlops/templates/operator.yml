@@ -63,6 +63,8 @@ spec:
             - start
             - --max-concurrent-reconciles
             - "3"
+            - --namespace
+            - {{.Release.Namespace}}
           image: "docker.io/cnvrg/cnvrg-operator:slim.non.priv"
           imagePullPolicy: Always
           name: cnvrg-operator

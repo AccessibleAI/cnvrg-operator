@@ -337,38 +337,6 @@ func (r *CnvrgAppReconciler) cleanup(cnvrgApp *mlopsv1.CnvrgApp) error {
 		return err
 	}
 
-	// cleanup pvc
-	if err := r.cleanupPVCs(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *CnvrgAppReconciler) cleanupPVCs() error {
-	if !viper.GetBool("cleanup-pvc") {
-		r.Log.Info("cleanup-pvc is false, skipping pvc deletion!")
-		return nil
-	}
-	r.Log.Info("running pvc cleanup")
-	ctx := context.Background()
-	pvcList := v1core.PersistentVolumeClaimList{}
-	if err := r.List(ctx, &pvcList); err != nil {
-		r.Log.Error(err, "failed cleanup pvcs")
-		return err
-	}
-	for _, pvc := range pvcList.Items {
-		if _, ok := pvc.ObjectMeta.Labels["app"]; ok {
-			if pvc.ObjectMeta.Labels["app"] == "prometheus" || pvc.ObjectMeta.Labels["app"] == "elasticsearch" {
-				if err := r.Delete(ctx, &pvc); err != nil && errors.IsNotFound(err) {
-					r.Log.Info("pvc already deleted")
-				} else if err != nil {
-					r.Log.Error(err, "error deleting prometheus pvc")
-					return err
-				}
-			}
-		}
-	}
 	return nil
 }
 
