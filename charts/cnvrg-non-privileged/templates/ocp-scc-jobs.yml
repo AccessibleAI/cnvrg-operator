@@ -1,11 +1,7 @@
 kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
-  name: "cnvrg-scc-control-plane-{{ .Namespace }}"
-  annotations:
-    mlops.cnvrg.io/default-loader: "false"
-    mlops.cnvrg.io/own: "false"
-    mlops.cnvrg.io/updatable: "false"
+  name: "cnvrg-jobs"
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -23,5 +19,5 @@ fsGroup:
   type: RunAsAny
 supplementalGroups:
   type: RunAsAny
-groups:
-- "system:serviceaccounts:{{ .Namespace }}"
+users:
+- "system:serviceaccount:cnvrg:cnvrg-job"

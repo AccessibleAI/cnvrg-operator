@@ -24,12 +24,6 @@ type CpStateManager struct {
 	app *mlopsv1.CnvrgApp
 }
 
-func NewControlPlaneCrdsStateManager(c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
-	l := log.WithValues("stateManager", "controlPlaneCrds")
-	asm := desired.NewAssetsStateManager(nil, c, s, l, fs, fsRoot+"/crds", nil)
-	return &CpCrdsStateManager{AssetsStateManager: asm}
-}
-
 func NewControlPlaneStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
 	l := log.WithValues("stateManager", "controlPlane")
 	asm := desired.NewAssetsStateManager(app, c, s, l, fs, fsRoot, nil)
@@ -72,14 +66,14 @@ func (m *CpStateManager) Load() error {
 	}
 	m.AddToAssets(rbac)
 
-	if m.app.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-		assetName := []string{"ocp-scc.tpl"}
-		ocpScc := desired.NewAssetsGroup(fs, fsRoot+"/conf/rbac", m.Log(), &desired.LoadFilter{AssetName: assetName})
-		if err := ocpScc.LoadAssets(); err != nil {
-			return err
-		}
-		m.AddToAssets(ocpScc)
-	}
+	//if m.app.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
+	//	assetName := []string{"ocp-scc.tpl"}
+	//	ocpScc := desired.NewAssetsGroup(fs, fsRoot+"/conf/rbac", m.Log(), &desired.LoadFilter{AssetName: assetName})
+	//	if err := ocpScc.LoadAssets(); err != nil {
+	//		return err
+	//	}
+	//	m.AddToAssets(ocpScc)
+	//}
 
 	if m.app.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
 		ccp := desired.NewAssetsGroup(fs, fsRoot+"/ccp", m.Log(), f)

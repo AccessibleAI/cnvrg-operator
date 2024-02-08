@@ -1,11 +1,7 @@
 kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
-  name: "cnvrg-scc-control-plane-{{ .Namespace }}"
-  annotations:
-    mlops.cnvrg.io/default-loader: "false"
-    mlops.cnvrg.io/own: "false"
-    mlops.cnvrg.io/updatable: "false"
+  name: "cnvrg-scc-control-plane"
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -16,12 +12,20 @@ allowPrivilegedContainer: false
 allowedCapabilities: null
 readOnlyRootFilesystem: false
 runAsUser:
-  type: RunAsAny
+  type: MustRunAsRange
+  uidRangeMin: 26
+  uidRangeMax: 1000
 seLinuxContext:
   type: RunAsAny
 fsGroup:
-  type: RunAsAny
+  type: MustRunAs
+  ranges:
+  - min: 26
+    max: 1000
 supplementalGroups:
-  type: RunAsAny
+  type: MustRunAs
+  ranges:
+  - min: 26
+    max: 1000
 groups:
-- "system:serviceaccounts:{{ .Namespace }}"
+- "system:serviceaccounts:cnvrg"

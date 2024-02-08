@@ -102,6 +102,7 @@ controlPlane:
       CNVRG_ENABLE_MOUNT_FOLDERS: false
       CNVRG_MOUNT_HOST_FOLDERS: false
       CNVRG_PROMETHEUS_METRICS: true
+      OCP_ENABLED: true
     sentryUrl: ''
     runJobsOnSelfCluster: ''
     agentCustomTag: agnostic-logs
@@ -155,7 +156,7 @@ controlPlane:
       cpu: 1000m
       memory: 1Gi
   nomex:
-    enabled: true
+    enabled: false
     image: nomex:v1.0.0
 registry:
   name: cnvrg-app-registry
@@ -238,7 +239,7 @@ dbs:
       cpu: '4'
       memory: 8Gi
     javaOpts: ''
-    patchEsNodes: true
+    patchEsNodes: false
     nodeSelector:
     credsRef: es-creds
     pvcName: es-storage

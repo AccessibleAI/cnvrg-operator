@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
@@ -111,19 +110,17 @@ func setParams(params []param, command *cobra.Command) {
 
 func runOperator() {
 	ctrl.SetLogger(zapr.NewLogger(initZapLog()))
-	selector, err := labels.Parse("name=cnvrg")
-	if err != nil {
-		zap.S().Error(err)
-		return
-	}
-	cacheCfg := cache.Config{LabelSelector: selector}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme: scheme,
 		Cache: cache.Options{
-			DefaultNamespaces: map[string]cache.Config{"cnvrg": cacheCfg},
+			DefaultNamespaces: map[string]cache.Config{
+				"cnvrg": {},
+			},
 		},
-		Metrics:                metricsserver.Options{BindAddress: viper.GetString("metrics-addr")},
+		Metrics: metricsserver.Options{
+			BindAddress: viper.GetString("metrics-addr"),
+		},
 		HealthProbeBindAddress: viper.GetString("health-probe-addr"),
 	})
 	if err != nil {
