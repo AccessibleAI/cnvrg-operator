@@ -1,7 +1,7 @@
 kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
-  name: "cnvrg-pg-scc"
+  name: "cnvrg-pg-scc-{{.Release.Name}}"
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -32,7 +32,7 @@ users:
 kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
-  name: "cnvrg-minio-redis-es-scc"
+  name: "cnvrg-minio-redis-es-scc-{{.Release.Name}}"
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -66,7 +66,7 @@ users:
 kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
-  name: "cnvrg-jobs"
+  name: "cnvrg-jobs-{{.Release.Name}}"
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
