@@ -63,7 +63,7 @@ spec:
             - start
             - --max-concurrent-reconciles
             - "3"
-          image: "docker.io/cnvrg/cnvrg-operator:DEV-22107-no-cluster-roles"
+          image: "docker.io/cnvrg/cnvrg-operator:slim.non.priv"
           imagePullPolicy: Always
           name: cnvrg-operator
           resources:
@@ -73,5 +73,13 @@ spec:
             requests:
               cpu: 500m
               memory: 200Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: "RuntimeDefault"
+            capabilities:
+              drop:
+                - "ALL"
       serviceAccountName: cnvrg-operator
       terminationGracePeriodSeconds: 10

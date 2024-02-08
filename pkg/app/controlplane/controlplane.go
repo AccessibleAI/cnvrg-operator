@@ -66,15 +66,6 @@ func (m *CpStateManager) Load() error {
 	}
 	m.AddToAssets(rbac)
 
-	//if m.app.Spec.Networking.Ingress.Type == mlopsv1.OpenShiftIngress {
-	//	assetName := []string{"ocp-scc.tpl"}
-	//	ocpScc := desired.NewAssetsGroup(fs, fsRoot+"/conf/rbac", m.Log(), &desired.LoadFilter{AssetName: assetName})
-	//	if err := ocpScc.LoadAssets(); err != nil {
-	//		return err
-	//	}
-	//	m.AddToAssets(ocpScc)
-	//}
-
 	if m.app.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
 		ccp := desired.NewAssetsGroup(fs, fsRoot+"/ccp", m.Log(), f)
 		if err := ccp.LoadAssets(); err != nil {
