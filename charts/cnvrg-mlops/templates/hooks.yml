@@ -23,8 +23,8 @@ spec:
             - |
               set -x
               echo "running cleanup"
-              kubectl delete cnvrgapp {{ .Release.Name }} -n {{ .Release.Namespace }} --ignore-not-found
-              while (( $(kubectl get cnvrgapp {{ .Release.Name }} -n {{ .Release.Namespace }} --ignore-not-found | grep {{ .Release.Name }} | wc -l ) != 0 )); do
+              kubectl delete cnvrgapp cnvrg-app -n {{ .Release.Namespace }} --ignore-not-found
+              while (( $(kubectl get cnvrgapp cnvrg-app -n {{ .Release.Namespace }} --ignore-not-found | grep cnvrg-app | wc -l ) != 0 )); do
                 echo "waiting for cnvrgapp will be deleted. . . ";
                 sleep 1
               done

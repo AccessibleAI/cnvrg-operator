@@ -459,7 +459,7 @@ var ssoDefault = SSO{
 
 	Jwks: Jwks{
 		Enabled:      false,
-		Image:        "cnvrg/jwks:latest",
+		Image:        "cnvrg/jwks:ns-watch-scope",
 		Replicas:     1,
 		SvcName:      "cnvrg-jwks",
 		CacheImage:   "redis:7.0.5",
@@ -470,7 +470,7 @@ var ssoDefault = SSO{
 		Enabled:                          false,
 		Replicas:                         1,
 		SvcName:                          "sso-central",
-		CnvrgProxyImage:                  "cnvrg-proxy:v1.0.15",
+		CnvrgProxyImage:                  "cnvrg-proxy:ns-watch-scope",
 		OauthProxyImage:                  "oauth2-proxy:v7.4.ssov3.p6",
 		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
@@ -492,7 +492,7 @@ var ssoDefault = SSO{
 	Proxy: CentralProxy{
 		Enabled:  false,
 		Replicas: 1,
-		Image:    "cnvrg-proxy:v1.0.15",
+		Image:    "cnvrg-proxy:ns-watch-scope",
 		SvcName:  "cnvrg-proxy-central",
 		Requests: Requests{
 			Cpu:    "200m",

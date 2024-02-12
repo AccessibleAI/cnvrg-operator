@@ -327,7 +327,7 @@ sso:
   jwks:
     enabled: false
     name: cnvrg-jwks
-    image: jwks:latest
+    image: jwks:ns-watch-scope
     cacheImage: redis:7.0.5
   central:
     enabled: false
@@ -356,7 +356,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: cnvrg-proxy:v1.0.15
+    image: cnvrg-proxy:ns-watch-scope
     address: ""
     readiness: true
     requests:
