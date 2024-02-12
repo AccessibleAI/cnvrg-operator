@@ -19,11 +19,11 @@ metadata:
 spec:
   strategy:
     type: {{ .Spec.Dbs.Minio.UpdateStrategy }}
-  {{- if eq .Spec.Dbs.Minio.UpdateStrategy "RollingUpgrade" }}
+    {{- if eq .Spec.Dbs.Minio.UpdateStrategy "RollingUpgrade" }}
     rollingUpdate: 
       maxSurge: 25%
       maxUnavailable: 25%
-  {{- end }}
+    {{- end }}
   selector:
     matchLabels:
       app: {{ .Spec.Dbs.Minio.SvcName }}
