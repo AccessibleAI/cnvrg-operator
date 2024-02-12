@@ -219,6 +219,7 @@ var minioDefaults = Minio{
 	SvcName:        "minio",
 	NodePort:       30090,
 	StorageClass:   "",
+	UpdateStrategy: "RollingUpdate",
 	Requests: Requests{
 		Cpu:    "200m",
 		Memory: "2Gi",

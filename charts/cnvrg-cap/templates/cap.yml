@@ -220,6 +220,7 @@ spec:
       svcName: {{.Values.dbs.minio.svcName}}
       nodePort: {{.Values.dbs.minio.nodePort}}
       storageClass: {{.Values.dbs.minio.storageClass}}
+      updateStrategy: {{.Values.dbs.minio.updateStrategy}}
       requests:
         cpu: "{{.Values.dbs.minio.requests.cpu}}"
         memory: {{.Values.dbs.minio.requests.memory}}

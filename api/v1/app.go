@@ -281,6 +281,7 @@ type Minio struct {
 	SvcName        string            `json:"svcName,omitempty"`
 	NodePort       int               `json:"nodePort,omitempty"`
 	StorageClass   string            `json:"storageClass,omitempty"`
+	UpdateStrategy string            `json:"updateStrategy,omitempty"`
 	Requests       Requests          `json:"requests,omitempty"`
 	Limits         Limits            `json:"limits,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
