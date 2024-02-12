@@ -17,6 +17,10 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  {{- if ne .Spec.Dbs.Minio.UpdateStrategy "RollingUpdate" }}
+  strategy:
+    type: Recreate
+  {{- end }}
   selector:
     matchLabels:
       app: {{ .Spec.Dbs.Minio.SvcName }}
