@@ -214,6 +214,7 @@ dbs:
     svcName: minio
     nodePort: 30090
     storageClass: ''
+    updateStrategy: RollingUpdate
     requests:
       cpu: 200m
       memory: 2Gi
