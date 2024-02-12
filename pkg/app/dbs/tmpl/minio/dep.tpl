@@ -17,9 +17,12 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  {{- if ne .Spec.Dbs.Minio.UpdateStrategy "RollingUpdate" }}
   strategy:
-    type: Recreate
+    type: {{ .Spec.Dbs.Minio.UpdateStrategy }}
+  {{- if eq .Spec.Dbs.Minio.UpdateStrategy "RollingUpgrade" }}
+    rollingUpdate: 
+      maxSurge: 25%
+      maxUnavailable: 25%
   {{- end }}
   selector:
     matchLabels:
