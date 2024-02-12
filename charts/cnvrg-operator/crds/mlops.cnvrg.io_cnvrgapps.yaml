@@ -594,6 +594,8 @@ spec:
                         type: string
                       storageClass:
                         type: string
+                      updateStrategy:
+                        type: string
                       storageSize:
                         type: string
                       svcName:
