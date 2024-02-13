@@ -21,7 +21,7 @@ spec:
   {{- end }}
   ports:
   - name: http
-    port: 80
+    port: {{ .Spec.Dbs.Minio.Port }}
     targetPort: {{ .Spec.Dbs.Minio.Port }}
     {{- if eq .Spec.Networking.Ingress.Type "nodeport" }}
     nodePort: {{ .Spec.Dbs.Minio.NodePort }}
