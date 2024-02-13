@@ -65,7 +65,7 @@ spec:
             - "3"
             - --namespace
             - {{.Release.Namespace}}
-          image: "docker.io/cnvrg/cnvrg-operator:slim.non.priv"
+          image: "{{.Values.imageHub}}/cnvrg-operator:v5.0.1.snp"
           imagePullPolicy: Always
           name: cnvrg-operator
           resources:
