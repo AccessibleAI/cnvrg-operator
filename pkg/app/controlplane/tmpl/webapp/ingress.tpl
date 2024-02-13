@@ -24,7 +24,7 @@ metadata:
   name: {{ .Spec.ControlPlane.WebApp.SvcName }}
   namespace: {{ .Namespace }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Spec.Networking.Ingress.IngressClassName }}
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
