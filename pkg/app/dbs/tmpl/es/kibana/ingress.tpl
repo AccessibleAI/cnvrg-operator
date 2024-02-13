@@ -24,7 +24,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Spec.Networking.Ingress.IngressClassName }}
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
