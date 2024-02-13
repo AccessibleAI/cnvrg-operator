@@ -5,24 +5,22 @@ import (
 	"encoding/json"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
-	mcv1alpha1 "github.com/AccessibleAI/cnvrg-shim/apis/metacloud/v1alpha1"
+	simetadata "github.com/AccessibleAI/cnvrg-shim/pkg/serviceinstaller/metadata"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 	"io"
 	v1 "k8s.io/api/admission/v1"
 	admissionv1 "k8s.io/api/admissionregistration/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/klog/v2"
 	"net/http"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
-)
-
-const (
-	patchClusterDomainTpl = `[{"op":"replace","path":"/spec/clusterDomain","value":"%s"}]`
 )
 
 type AICloudDomainHandler struct {
@@ -38,7 +36,7 @@ func NewAICloudDomainHandler() *AICloudDomainHandler {
 }
 
 func (h *AICloudDomainHandler) Handler(w http.ResponseWriter, r *http.Request) {
-
+	zap.S().Infof("admission review request received from: %s ", r.RemoteAddr)
 	ar, err := h.admissionReviewDecode(h.body(r))
 	if err != nil {
 		endWithError(err, w)
@@ -51,18 +49,42 @@ func (h *AICloudDomainHandler) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clusterDomain, err := h.discoverClusterDomain(cnvrgApp)
+	patchBody, err := h.patchBody(cnvrgApp)
 	if err != nil {
 		endWithError(err, w)
 		return
 	}
-	resp, err := h.mutationResponse(ar.Request.UID, clusterDomain)
+
+	resp, err := h.mutationResponse(ar.Request.UID, patchBody)
 	if err != nil {
 		endWithError(err, w)
 		return
 	}
 
 	endWithOk(resp, w)
+	zap.S().Info("admission response sent")
+}
+
+func (h *AICloudDomainHandler) patchBody(cap *mlopsv1.CnvrgApp) (string, error) {
+	patchCnvrgAppTpl := `[
+			{"op":"replace","path":"/spec/clusterDomain","value":"%s"},
+			{"op":"replace","path":"/spec/networking/ingress/istioIngressSelectorKey","value":"%s"},
+			{"op":"replace","path":"/spec/networking/ingress/istioIngressSelectorValue","value":"%s"}]`
+
+	serviceInstanceMetadata, err := h.ServiceInstanceMetadata(cap.Namespace)
+	if err != nil {
+		return "", err
+	}
+	clusterDomain, err := h.ClusterDomain(cap, serviceInstanceMetadata)
+	if err != nil {
+		return "", err
+	}
+	patch := fmt.Sprintf(patchCnvrgAppTpl,
+		clusterDomain,
+		serviceInstanceMetadata.Ingress.SelectorKey,
+		serviceInstanceMetadata.Ingress.SelectorValue,
+	)
+	return patch, nil
 }
 
 func (h *AICloudDomainHandler) HookCfg(ns, svc string, caBundle []byte) *admissionv1.MutatingWebhookConfiguration {
@@ -78,8 +100,8 @@ func (h *AICloudDomainHandler) HookCfg(ns, svc string, caBundle []byte) *admissi
 		Webhooks: []admissionv1.MutatingWebhook{
 			{
 				Name: hookName,
-				NamespaceSelector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{"name": ns},
+				ObjectSelector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{"mlops.cnvrg.io/domain.auto.discovery": "true"},
 				},
 				ClientConfig: admissionv1.WebhookClientConfig{
 					Service: &admissionv1.ServiceReference{
@@ -142,36 +164,30 @@ func (h *AICloudDomainHandler) cnvrgAppDecode(b []byte) (*mlopsv1.CnvrgApp, erro
 	return cnvrgApp, nil
 }
 
-func (h *AICloudDomainHandler) discoverClusterDomain(cap *mlopsv1.CnvrgApp) (clusterDomain string, err error) {
+func (h *AICloudDomainHandler) ClusterDomain(cap *mlopsv1.CnvrgApp, siMeta *simetadata.ServiceInstanceMetadata) (clusterDomain string, err error) {
 
 	// do nothing if cluster domain already set
 	if cap.Spec.ClusterDomain != "" {
 		return cap.Spec.ClusterDomain, nil
 	}
-	// discover cluster domain based on Domain & DomainPool & Release Name
-	return h.clusterDomain(cap.Name)
+	return strings.Replace(siMeta.Domain, "*.", "", 1), nil
 }
 
-func (h *AICloudDomainHandler) clusterDomain(releaseName string) (string, error) {
+func (h *AICloudDomainHandler) ServiceInstanceMetadata(releaseNs string) (*simetadata.ServiceInstanceMetadata, error) {
+	aiCloudMetadataCm := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Namespace: releaseNs, Name: "serviceinstancemetadata"},
+	}
+	cmKey := types.NamespacedName{Namespace: releaseNs, Name: "serviceinstancemetadata"}
+	if err := KubeClient().Get(context.Background(), cmKey, aiCloudMetadataCm, []client.GetOption{}...); err != nil {
+		return nil, err
+	}
 
-	// compose list options based on label selector domainFromReleaseNameDomainpool-pool=<release-name>
-	opts, err := h.domainListOptions(releaseName)
-	if err != nil {
-		return "", err
+	instanceMetadata := &simetadata.ServiceInstanceMetadata{}
+	if err := yaml.Unmarshal([]byte(aiCloudMetadataCm.Data[simetadata.IngressKeyName]), instanceMetadata); err != nil {
+		return nil, err
 	}
-	// list all the domains who match the selector
-	domains := &mcv1alpha1.DomainList{}
-	if err := KubeClient().List(context.Background(), domains, opts...); err != nil {
-		return "", err
-	}
-	// return an error in case of empty list
-	if len(domains.Items) == 0 {
-		return "", fmt.Errorf("empty domains list, unable to detect MLOps clusterDomain")
-	}
-	clusterDomain := strings.Replace(domains.Items[0].Spec.CommonName, "*.", "", 1)
-	// log and return
-	klog.Infof("going to use %s for MLOps instance", clusterDomain)
-	return clusterDomain, nil
+
+	return instanceMetadata, nil
 
 }
 
@@ -190,7 +206,7 @@ func (h *AICloudDomainHandler) domainListOptions(releaseName string) ([]client.L
 
 }
 
-func (h *AICloudDomainHandler) mutationResponse(uuid types.UID, clusterDomain string) ([]byte, error) {
+func (h *AICloudDomainHandler) mutationResponse(uuid types.UID, patchBody string) ([]byte, error) {
 	pt := v1.PatchTypeJSONPatch
 	ar := &v1.AdmissionReview{}
 	ar.SetGroupVersionKind(schema.GroupVersionKind{
@@ -198,13 +214,13 @@ func (h *AICloudDomainHandler) mutationResponse(uuid types.UID, clusterDomain st
 		Version: "v1",
 		Kind:    "AdmissionReview",
 	})
+	zap.S().Infof("patch body: %s", patchBody)
 	ar.Response = &v1.AdmissionResponse{
 		UID:       uuid,
 		Allowed:   true,
 		PatchType: &pt,
-		Patch:     []byte(fmt.Sprintf(patchClusterDomainTpl, clusterDomain)),
+		Patch:     []byte(patchBody),
 		Result:    &metav1.Status{Message: "ok"},
 	}
-
 	return json.Marshal(ar)
 }

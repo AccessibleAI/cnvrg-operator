@@ -3,8 +3,6 @@ kind: CnvrgApp
 metadata:
   name: cnvrg-app
   namespace: {{ .Release.Namespace}}
-  labels:
-    mlops.cnvrg.io/domain.auto.discovery: "true"
 spec:
   clusterDomain: {{.Values.clusterDomain}}
   clusterInternalDomain: {{.Values.clusterInternalDomain}}

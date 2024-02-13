@@ -21,10 +21,6 @@ import (
 
 var log logr.Logger
 
-func discoverAICloudHost(clientset client.Client) {
-
-}
-
 func discoverOcpDefaultRouteHost(clientset client.Client) (ocpDefaultRouteHost string, err error) {
 	routeCfg := &unstructured.Unstructured{}
 	routeCfg.SetGroupVersionKind(desired.Kinds["OcpIngressCfgGVK"])
@@ -167,4 +163,11 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 	}
 
 	return nil
+}
+
+func labelsMapToList(labels map[string]string) (labelList []string) {
+	for labelName, _ := range labels {
+		labelList = append(labelList, labelName)
+	}
+	return labelList
 }

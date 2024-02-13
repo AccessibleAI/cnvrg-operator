@@ -18,6 +18,7 @@ metadata:
     {{- end }}
   labels:
     app: {{ .Spec.Dbs.Es.SvcName }}
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

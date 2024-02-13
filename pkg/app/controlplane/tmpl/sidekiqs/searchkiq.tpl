@@ -14,6 +14,7 @@ metadata:
     app: searchkiq
     owner: cnvrg-control-plane
     cnvrg-component: searchkiq
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

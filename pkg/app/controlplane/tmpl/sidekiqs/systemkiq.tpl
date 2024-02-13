@@ -14,6 +14,7 @@ metadata:
     app: systemkiq
     owner: cnvrg-control-plane
     cnvrg-component: systemkiq
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

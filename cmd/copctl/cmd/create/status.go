@@ -3,14 +3,12 @@ package create
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/cmd/copctl/utils"
 	"github.com/AccessibleAI/cnvrg-shim/apis/metacloud/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"istio.io/istio/pkg/config/protocol"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -162,13 +160,13 @@ func (s *Status) writeStatus(payload []byte) error {
 
 func (s *Status) generateStatus(cnvrgApp *mlopsv1.CnvrgApp) *v1alpha1.ServiceInstanceStatus {
 
-	port := 80
-	proto := protocol.HTTP
+	//port := 80
+	//proto := protocol.HTTP
 	status := v1alpha1.StatusHealthy
 
 	if cnvrgApp.Spec.Networking.HTTPS.Enabled {
-		proto = protocol.HTTPS
-		port = 443
+		//proto = protocol.HTTPS
+		//port = 443
 	}
 
 	if cnvrgApp.Status.Status != "READY" {
@@ -177,18 +175,18 @@ func (s *Status) generateStatus(cnvrgApp *mlopsv1.CnvrgApp) *v1alpha1.ServiceIns
 
 	return &v1alpha1.ServiceInstanceStatus{
 		Status: status,
-		Sins: []v1alpha1.Sins{
-			{
-				Name: cnvrgApp.Name,
-				IngressEndpoints: []v1alpha1.IngressEndpoint{
-					{
-						Protocol: proto,
-						Address:  []string{fmt.Sprintf("app.%s", cnvrgApp.Spec.ClusterDomain)},
-						Port:     uint32(port),
-					},
-				},
-			},
-		},
+		//Sins: []v1alpha1.Sins{
+		//	{
+		//		Name: cnvrgApp.Name,
+		//		IngressEndpoints: []v1alpha1.IngressEndpoint{
+		//			{
+		//				Protocol: proto,
+		//				Address:  []string{fmt.Sprintf("app.%s", cnvrgApp.Spec.ClusterDomain)},
+		//				Port:     uint32(port),
+		//			},
+		//		},
+		//	},
+		//},
 	}
 
 }

@@ -12,45 +12,45 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"strings"
 
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 )
 
-type param struct {
-	name      string
-	shorthand string
-	value     interface{}
-	usage     string
-	required  bool
-}
-
 var (
 	BuildVersion string
-)
-
-var (
-	scheme            = runtime.NewScheme()
-	setupLog          = ctrl.Log.WithName("setup")
-	rootParams        = []param{}
-	runOperatorParams = []param{
-		{name: "metrics-addr", shorthand: "", value: ":8080", usage: "The address the metric endpoint binds to."},
-		{name: "health-probe-addr", shorthand: "", value: ":8081", usage: "The address the health probes endpoints (/healthz, /readyz) binds to."},
-		{name: "enable-leader-election", shorthand: "", value: false, usage: "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager."},
-		{name: "dry-run", shorthand: "", value: false, usage: "Only parse templates, without applying"},
-		{name: "templates-dump-dir", shorthand: "", value: "", usage: "destination dir for rendering templates for debugging"},
-		{name: "verbose", shorthand: "v", value: false, usage: "Verbose output"},
-		{name: "max-concurrent-reconciles", shorthand: "", value: 1, usage: "Max concurrent reconciles"},
-		{name: "cleanup-pvc", shorthand: "", value: false, usage: "set to true to delete PVCs on CR delete"},
-		{name: "create-crds", shorthand: "", value: false, usage: "automatically apply Operator CRDs on each start"},
-	}
+	scheme       = runtime.NewScheme()
+	setupLog     = ctrl.Log.WithName("setup")
 )
 
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = mlopsv1.AddToScheme(scheme)
-	// +kubebuilder:scaffold:scheme
+
+	startOperatorCmd.PersistentFlags().StringP(
+		"metrics-addr", "", ":8080", "The address the metric endpoint binds to.")
+	startOperatorCmd.PersistentFlags().StringP(
+		"health-probe-addr", "", ":8081",
+		"The address the health probes endpoints (/healthz, /readyz) binds to.")
+	startOperatorCmd.PersistentFlags().BoolP(
+		"enable-leader-election", "", false,
+		"Enable leader election for controller manager. "+
+			"Enabling this will ensure there is only one active controller manager.")
+	startOperatorCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
+	startOperatorCmd.PersistentFlags().IntP(
+		"max-concurrent-reconciles", "", 1, "Max concurrent reconciles")
+	startOperatorCmd.PersistentFlags().StringP(
+		"namespace", "", "cnvrg", "the ns into which the operator has been deployed")
+
+	viper.BindPFlag("metrics-addr", startOperatorCmd.PersistentFlags().Lookup("metrics-addr"))
+	viper.BindPFlag("health-probe-addr", startOperatorCmd.PersistentFlags().Lookup("health-probe-addr"))
+	viper.BindPFlag("enable-leader-election", startOperatorCmd.PersistentFlags().Lookup("enable-leader-election"))
+	viper.BindPFlag("verbose", startOperatorCmd.PersistentFlags().Lookup("verbose"))
+	viper.BindPFlag("max-concurrent-reconciles", startOperatorCmd.PersistentFlags().Lookup("max-concurrent-reconciles"))
+	viper.BindPFlag("namespace", startOperatorCmd.PersistentFlags().Lookup("namespace"))
 }
 
 // Root cmd and params
@@ -59,7 +59,7 @@ var rootCmd = &cobra.Command{
 	Short: "cnvrg-operator - K8s operator for deploying cnvrg stack",
 }
 
-var runOperatorCmd = &cobra.Command{
+var startOperatorCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start cnvrg operator",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -90,32 +90,20 @@ func initZapLog() *zap.Logger {
 	return logger
 }
 
-func setParams(params []param, command *cobra.Command) {
-	for _, param := range params {
-		switch v := param.value.(type) {
-		case int:
-			command.PersistentFlags().IntP(param.name, param.shorthand, v, param.usage)
-		case string:
-			command.PersistentFlags().StringP(param.name, param.shorthand, v, param.usage)
-		case bool:
-			command.PersistentFlags().BoolP(param.name, param.shorthand, v, param.usage)
-		}
-		if err := viper.BindPFlag(param.name, command.PersistentFlags().Lookup(param.name)); err != nil {
-			panic(err)
-		}
-	}
-}
-
 func runOperator() {
 	ctrl.SetLogger(zapr.NewLogger(initZapLog()))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     viper.GetString("metrics-addr"),
+		Scheme: scheme,
+		Cache: cache.Options{
+			DefaultNamespaces: map[string]cache.Config{
+				viper.GetString("namespace"): {},
+			},
+		},
+		Metrics: metricsserver.Options{
+			BindAddress: viper.GetString("metrics-addr"),
+		},
 		HealthProbeBindAddress: viper.GetString("health-probe-addr"),
-		Port:                   9443,
-		LeaderElection:         viper.GetBool("enable-leader-election"),
-		LeaderElectionID:       "99748453.cnvrg.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -153,11 +141,8 @@ func setupCommands() {
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("CNVRG_OPERATOR")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	// Setup commands
-	setParams(runOperatorParams, runOperatorCmd)
-	setParams(rootParams, rootCmd)
 	rootCmd.AddCommand(operatorVersion)
-	rootCmd.AddCommand(runOperatorCmd)
+	rootCmd.AddCommand(startOperatorCmd)
 }
 
 func main() {

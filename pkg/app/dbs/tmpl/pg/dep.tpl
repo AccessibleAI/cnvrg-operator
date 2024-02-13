@@ -13,6 +13,7 @@ metadata:
   labels:
     app: {{.Spec.Dbs.Pg.SvcName }}
     cnvrg-component: pg
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

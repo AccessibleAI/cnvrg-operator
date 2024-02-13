@@ -1,6 +1,5 @@
 # Build the manager binary
-FROM golang:1.19.1 as builder
-
+FROM golang:1.21.1 as builder
 ARG git_auth
 ARG private_repo
 

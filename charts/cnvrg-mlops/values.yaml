@@ -1,25 +1,8 @@
-domainpool:
-  enabled: true
-  clusterGatewayRef: cluster-gateway
-  baseDomain: stg.intelcloud.cnvrg.io
-  annotations:
-    "helm.sh/hook": "pre-install"
-copadmission:
-  enabled: true
-  admissionHook:
-    annotations:
-      "helm.sh/hook": "pre-install"
-      "helm.sh/hook-weight": "-5"
-  startupJob:
-    enabled: true
-    annotations:
-      "helm.sh/hook": "pre-install"
-      "helm.sh/hook-weight": "0"
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg
 controlPlane:
-  image: app:v4.7.52-DEV-15824-cnvrg-agnostic-infra-41
+  image: core:3.6.99
   webapp:
     replicas: 1
     enabled: true
@@ -119,6 +102,7 @@ controlPlane:
       CNVRG_ENABLE_MOUNT_FOLDERS: false
       CNVRG_MOUNT_HOST_FOLDERS: false
       CNVRG_PROMETHEUS_METRICS: true
+      OCP_ENABLED: true
     sentryUrl: ''
     runJobsOnSelfCluster: ''
     agentCustomTag: agnostic-logs
@@ -172,7 +156,7 @@ controlPlane:
       cpu: 1000m
       memory: 1Gi
   nomex:
-    enabled: true
+    enabled: false
     image: nomex:v1.0.0
 registry:
   name: cnvrg-app-registry
@@ -255,7 +239,7 @@ dbs:
       cpu: '4'
       memory: 8Gi
     javaOpts: ''
-    patchEsNodes: true
+    patchEsNodes: false
     nodeSelector:
     credsRef: es-creds
     pvcName: es-storage
@@ -318,8 +302,8 @@ networking:
     perTryTimeout: 3600s
     istioGwEnabled: true
     istioGwName: ''
-    istioIngressSelectorKey: ''
-    istioIngressSelectorValue: ''
+    istioIngressSelectorKey: 'istio'
+    istioIngressSelectorValue: 'ingressgateway'
     ocpSecureRoutes: false
   https:
     enabled: false
@@ -343,7 +327,7 @@ sso:
   jwks:
     enabled: false
     name: cnvrg-jwks
-    image: jwks:latest
+    image: jwks:ns-watch-scope
     cacheImage: redis:7.0.5
   central:
     enabled: false
@@ -353,7 +337,7 @@ sso:
     adminUser: ''
     provider: ''
     emailDomain:
-    - "*"
+      - "*"
     clientId: ''
     clientSecret: ''
     oidcIssuerUrl: ''
@@ -372,7 +356,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: cnvrg-proxy:v1.0.15
+    image: cnvrg-proxy:ns-watch-scope
     address: ""
     readiness: true
     requests:

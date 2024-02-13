@@ -74,12 +74,15 @@ func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
 		groups = append(groups, c.domainId())
 	}
 	d := map[string]interface{}{
-		"Namespace":                        c.app.Namespace,
-		"EmailDomain":                      c.app.Spec.SSO.Central.EmailDomain,
-		"Provider":                         c.app.Spec.SSO.Central.Provider,
-		"ClientId":                         c.app.Spec.SSO.Central.ClientID,
-		"ClientSecret":                     c.app.Spec.SSO.Central.ClientSecret,
-		"RedirectUrl":                      fmt.Sprintf("%s://%s.%s", c.schema(), c.app.Spec.SSO.Central.SvcName, c.app.Spec.ClusterDomain),
+		"Namespace":    c.app.Namespace,
+		"EmailDomain":  c.app.Spec.SSO.Central.EmailDomain,
+		"Provider":     c.app.Spec.SSO.Central.Provider,
+		"ClientId":     c.app.Spec.SSO.Central.ClientID,
+		"ClientSecret": c.app.Spec.SSO.Central.ClientSecret,
+		"RedirectUrl": fmt.Sprintf("%s://%s.%s/oauth2/callback",
+			c.schema(),
+			c.app.Spec.SSO.Central.SvcName,
+			c.app.Spec.ClusterDomain),
 		"OidcIssuerURL":                    c.app.Spec.SSO.Central.OidcIssuerURL,
 		"Scope":                            c.app.Spec.SSO.Central.Scope,
 		"InsecureOidcAllowUnverifiedEmail": c.app.Spec.SSO.Central.InsecureOidcAllowUnverifiedEmail,

@@ -1,0 +1,91 @@
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: "cnvrg-pg-scc-{{.Release.Name}}"
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities: null
+readOnlyRootFilesystem: false
+runAsUser:
+  type: MustRunAs
+  uid: 26
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: MustRunAs
+  ranges:
+    - min: 26
+      max: 26
+supplementalGroups:
+  type: MustRunAs
+  ranges:
+    - min: 26
+      max: 26
+users:
+- "system:serviceaccount:{{.Release.Namespace}}:{{.Values.dbs.pg.serviceAccount}}"
+---
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: "cnvrg-minio-redis-es-scc-{{.Release.Name}}"
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities: null
+readOnlyRootFilesystem: false
+runAsUser:
+  type: MustRunAs
+  uid: 1000
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: MustRunAs
+  ranges:
+    - min: 1000
+      max: 1000
+supplementalGroups:
+  type: MustRunAs
+  ranges:
+    - min: 1000
+      max: 1000
+users:
+  - "system:serviceaccount:{{.Release.Namespace}}:{{.Values.dbs.minio.serviceAccount}}"
+  - "system:serviceaccount:{{.Release.Namespace}}:{{.Values.dbs.redis.serviceAccount}}"
+  - "system:serviceaccount:{{.Release.Namespace}}:{{.Values.dbs.es.serviceAccount}}"
+  - "system:serviceaccount:{{.Release.Namespace}}:cnvrg-prom"
+  - "system:serviceaccount:{{.Release.Namespace}}:cnvrg-jwks"
+  - "system:serviceaccount:{{.Release.Namespace}}:cnvrg-proxy-central"
+---
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: "cnvrg-jobs-{{.Release.Name}}"
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: false
+allowedCapabilities: null
+readOnlyRootFilesystem: false
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+  - "system:serviceaccount:cnvrg:cnvrg-job"
+

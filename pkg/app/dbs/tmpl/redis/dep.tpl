@@ -13,6 +13,7 @@ metadata:
   labels:
     app: {{.Spec.Dbs.Redis.SvcName }}
     cnvrg-component: redis
+    cnvrg-system-status-check: "true"
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}

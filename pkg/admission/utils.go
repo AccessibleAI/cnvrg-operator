@@ -7,8 +7,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"net/http"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	ctrlzap "sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
 func endWithError(err error, w http.ResponseWriter) {
@@ -24,6 +26,7 @@ func endWithOk(data []byte, w http.ResponseWriter) {
 }
 
 func KubeClient() client.Client {
+	ctrl.SetLogger(ctrlzap.New(ctrlzap.UseFlagOptions(&ctrlzap.Options{Development: false})))
 	rc, err := config.GetConfig()
 	if err != nil {
 		zap.S().Fatal(err)

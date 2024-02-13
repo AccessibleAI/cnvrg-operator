@@ -18,6 +18,7 @@ data:
   config.yaml: |-
     discovery:
       secret:
+        namespace: {{.Namespace}}
         labelKey: domainId
         dataKey: CNVRG_PKI_PUBLIC_KEY
     cache:
