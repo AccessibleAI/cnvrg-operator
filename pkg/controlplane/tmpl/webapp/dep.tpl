@@ -180,8 +180,8 @@ spec:
       volumes:
       {{- if isTrue .Spec.SSO.Enabled }}
       - name: "oauth-proxy-webapp"
-        configMap:
-          name: "oauth-proxy-webapp-4-test-only"
+        secret:
+         secretName: "oauth-proxy-webapp"
       {{- end }}
       {{- if eq .Spec.ControlPlane.ObjectStorage.Type "gcp" }}
       - name: {{ .Spec.ControlPlane.ObjectStorage.GcpSecretRef }}
