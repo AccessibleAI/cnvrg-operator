@@ -775,6 +775,8 @@ spec:
                         type: string
                       ocpSecureRoutes:
                         type: boolean
+                      ingressClassName:
+                        type: string
                     type: object
                   proxy:
                     properties:
