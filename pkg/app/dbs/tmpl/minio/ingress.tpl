@@ -18,7 +18,9 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
+  {{- if ne .Spec.Networking.Ingress.IngressClassName "" }}
   ingressClassName: {{ .Spec.Networking.Ingress.IngressClassName }}
+  {{- end }}
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
