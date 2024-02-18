@@ -51,6 +51,7 @@ data:
   {{- range $featureFlagName, $featureFlagValue := .Spec.ControlPlane.BaseConfig.FeatureFlags }}
   {{$featureFlagName}}: "{{$featureFlagValue}}"
   {{- end }}
+  CNVRG_IMAGE_HUB: "{{ .Spec.ImageHub }}"
 
 
 
