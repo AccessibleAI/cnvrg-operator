@@ -112,6 +112,14 @@ rules:
   - networking.k8s.io
   resources:
   - networkpolicies
+  - ingresses
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
   verbs:
   - list
   - watch

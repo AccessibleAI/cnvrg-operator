@@ -7,7 +7,7 @@ metadata:
     {{- end }}
   labels:
     app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: v1.9.7
+    app.kubernetes.io/version: v2.8.1
     {{- range $k, $v := .Spec.Labels }}
     {{$k}}: "{{$v}}"
     {{- end }}
@@ -26,7 +26,7 @@ spec:
         {{- end }}
       labels:
         app.kubernetes.io/name: kube-state-metrics
-        app.kubernetes.io/version: v1.9.7
+        app.kubernetes.io/version: v2.8.1
         {{- range $k, $v := .Spec.Labels }}
         {{$k}}: "{{$v}}"
         {{- end }}
@@ -45,6 +45,7 @@ spec:
         - --port=8081
         - --telemetry-host=127.0.0.1
         - --telemetry-port=8082
+        - --metric-labels-allowlist=nodes=[*]
         image: {{ image .Spec.ImageHub .Spec.Monitoring.KubeStateMetrics.Image }}
         name: kube-state-metrics
         resources:
