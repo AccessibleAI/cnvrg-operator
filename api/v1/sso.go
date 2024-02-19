@@ -23,7 +23,7 @@ type OauthProxyServiceConf struct {
 
 var ssoDefault = SSO{
 	Enabled:                          false,
-	Image:                            "saas-oauth2-proxy:latest",
+	Image:                            "oauth2-proxy:v7.4.ssov3.p6",
 	AdminUser:                        "",
 	Provider:                         "",
 	EmailDomain:                      nil,
