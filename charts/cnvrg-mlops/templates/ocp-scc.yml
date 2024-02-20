@@ -87,5 +87,6 @@ fsGroup:
 supplementalGroups:
   type: RunAsAny
 users:
-  - "system:serviceaccount:cnvrg:cnvrg-job"
+  - "system:serviceaccount:{{.Release.Namespace}}:cnvrg-job"
+  - "system:serviceaccount:{{.Release.Namespace}}:cnvrg-spark-job"
 
