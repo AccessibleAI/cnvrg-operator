@@ -361,6 +361,7 @@ type Ingress struct {
 	IstioIngressSelectorKey   string      `json:"istioIngressSelectorKey,omitempty"`
 	IstioIngressSelectorValue string      `json:"istioIngressSelectorValue,omitempty"`
 	OcpSecureRoutes           bool        `json:"ocpSecureRoutes,omitempty"`
+	IngressClassName          string      `json:"ingressClassName,omitempty"`
 }
 
 type HTTPS struct {

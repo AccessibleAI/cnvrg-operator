@@ -38,3 +38,4 @@ data:
   {{- if isTrue .Spec.Networking.Ingress.OcpSecureRoutes }}
   OCP_SECURE_ROUTES: "true"
   {{- end }}
+  INGRESS_CLASS_NAME: {{ .Spec.Networking.Ingress.IngressClassName }}

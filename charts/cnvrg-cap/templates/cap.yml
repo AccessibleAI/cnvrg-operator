@@ -310,6 +310,7 @@ spec:
       istioIngressSelectorKey: {{.Values.networking.ingress.istioIngressSelectorKey}}
       istioIngressSelectorValue: {{.Values.networking.ingress.istioIngressSelectorValue}}
       ocpSecureRoutes: {{.Values.networking.ingress.ocpSecureRoutes}}
+      ingressClassName: {{.Values.networking.ingress.ingressClassName}}
     https:
       enabled: {{.Values.networking.https.enabled}}
       certSecret: {{.Values.networking.https.certSecret}}

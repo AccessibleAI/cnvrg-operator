@@ -439,6 +439,7 @@ var networkingDefault = Networking{
 		IstioIngressSelectorKey:   "istio",
 		IstioIngressSelectorValue: "ingressgateway",
 		OcpSecureRoutes:           false,
+		IngressClassName:          "",
 	},
 	HTTPS: HTTPS{Enabled: false},
 	Proxy: Proxy{Enabled: false, ConfigRef: "cp-proxy"},
