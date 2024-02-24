@@ -52,7 +52,9 @@ spec:
           metrics:
             - resource:
                 name: cpu
-                targetAverageUtilization: 80
+                target:
+                  averageUtilization: 80
+                  type: Utilization
               type: Resource
           minReplicas: 1
           scaleTargetRef:
