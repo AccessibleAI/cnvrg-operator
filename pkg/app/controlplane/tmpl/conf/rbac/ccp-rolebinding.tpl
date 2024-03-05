@@ -16,8 +16,8 @@ metadata:
     {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: cnvrg-control-plane
+  kind: ClusterRole
+  name: admin
 subjects:
   - kind: ServiceAccount
     name: cnvrg-control-plane

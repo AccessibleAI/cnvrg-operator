@@ -16,8 +16,8 @@ metadata:
     {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: cnvrg-privileged-job
+  kind: ClusterRole
+  name: admin
 subjects:
   - kind: ServiceAccount
     name: cnvrg-spark-job

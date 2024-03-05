@@ -9,8 +9,8 @@ metadata:
     mlops.cnvrg.io/updatable: "false"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: "cnvrg-nomex"
+  kind: ClusterRole
+  name: admin
 subjects:
   - kind: ServiceAccount
     name: cnvrg-nomex

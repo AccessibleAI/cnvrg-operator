@@ -16,8 +16,8 @@ metadata:
     {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
+  kind: ClusterRole
+  name: admin
 subjects:
   - kind: ServiceAccount
     name: {{ .Spec.Dbs.Es.Kibana.SvcName }}
