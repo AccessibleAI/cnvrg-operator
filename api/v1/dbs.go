@@ -171,7 +171,7 @@ var pgDefault = Pg{
 var redisDefault = Redis{
 	Enabled:        false,
 	ServiceAccount: "redis",
-	Image:          "cnvrg-redis:rails7-test",
+	Image:          "cnvrg-redis:v7.0.0",
 	SvcName:        "redis",
 	Port:           6379,
 	StorageSize:    "10Gi",
