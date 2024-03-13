@@ -22,7 +22,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{.Spec.Dbs.Prom.Grafana.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.Dbs.Prom.Grafana.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   gateways:
   - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:

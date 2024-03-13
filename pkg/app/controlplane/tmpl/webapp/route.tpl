@@ -23,7 +23,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{ .Spec.ControlPlane.WebApp.SvcName }}.{{ .Spec.ClusterDomain }}"
+  host: "{{ .Spec.ControlPlane.WebApp.SvcName }}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   port:
     {{- if isTrue .Spec.SSO.Enabled }}
     targetPort: 8888

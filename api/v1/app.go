@@ -378,10 +378,16 @@ type Proxy struct {
 	NoProxy    []string `json:"noProxy,omitempty"`
 }
 
+type ClusterDomainPrefix struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Prefix  string `json:"prefix,omitempty"`
+}
+
 type Networking struct {
-	Ingress Ingress `json:"ingress,omitempty"`
-	HTTPS   HTTPS   `json:"https,omitempty"`
-	Proxy   Proxy   `json:"proxy,omitempty"`
+	Ingress             Ingress             `json:"ingress,omitempty"`
+	HTTPS               HTTPS               `json:"https,omitempty"`
+	Proxy               Proxy               `json:"proxy,omitempty"`
+	ClusterDomainPrefix ClusterDomainPrefix `json:"clusterDomainPrefix,omitempty"`
 }
 
 type SSO struct {

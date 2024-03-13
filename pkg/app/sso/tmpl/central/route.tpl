@@ -17,7 +17,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}"
+  host: "{{.Spec.SSO.Central.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   port:
     targetPort: 8080
   to:

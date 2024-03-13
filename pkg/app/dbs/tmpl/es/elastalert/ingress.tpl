@@ -22,11 +22,11 @@ spec:
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
-      - {{ .Spec.Dbs.Es.Elastalert.SvcName }}.{{ .Spec.ClusterDomain }}
+      - {{ .Spec.Dbs.Es.Elastalert.SvcName }}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
   {{- end }}
   rules:
-    - host: "{{.Spec.Dbs.Es.Elastalert.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - host: "{{.Spec.Dbs.Es.Elastalert.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /

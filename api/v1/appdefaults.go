@@ -440,8 +440,9 @@ var networkingDefault = Networking{
 		IstioIngressSelectorValue: "ingressgateway",
 		OcpSecureRoutes:           false,
 	},
-	HTTPS: HTTPS{Enabled: false},
-	Proxy: Proxy{Enabled: false, ConfigRef: "cp-proxy"},
+	HTTPS:               HTTPS{Enabled: false},
+	Proxy:               Proxy{Enabled: false, ConfigRef: "cp-proxy"},
+	ClusterDomainPrefix: ClusterDomainPrefix{Enabled: false},
 }
 
 var ssoDefault = SSO{

@@ -321,6 +321,9 @@ spec:
       httpProxy: {{ toJson .Values.networking.proxy.httpProxy  }}
       httpsProxy: {{ toJson .Values.networking.proxy.httpsProxy}}
       noProxy: {{ toJson .Values.networking.proxy.noProxy}}
+    clusterDomainPrefix:
+      enabled: {{ .Values.networking.clusterDomainPrefix.enabled }}
+      prefix: {{ .Values.networking.clusterDomainPrefix.prefix }}
   sso:
     enabled: {{.Values.sso.enabled}}
     version: {{.Values.sso.version}}

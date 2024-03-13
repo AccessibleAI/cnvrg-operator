@@ -22,7 +22,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.ControlPlane.WebApp.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:

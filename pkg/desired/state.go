@@ -24,7 +24,9 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				return cnvrgApp.Spec.ClusterDomain + ":" +
 					strconv.Itoa(cnvrgApp.Spec.ControlPlane.WebApp.NodePort)
 			} else {
-				return cnvrgApp.Spec.ControlPlane.WebApp.SvcName + "." + cnvrgApp.Spec.ClusterDomain
+				return cnvrgApp.Spec.ControlPlane.WebApp.SvcName +
+					cnvrgApp.Spec.Networking.ClusterDomainPrefix.Prefix + "." +
+					cnvrgApp.Spec.ClusterDomain
 			}
 		},
 
@@ -64,9 +66,15 @@ func cnvrgTemplateFuncs() map[string]interface{} {
 				return fmt.Sprintf("http://%s:%d", cnvrgApp.Spec.ClusterDomain, cnvrgApp.Spec.Dbs.Minio.NodePort)
 			} else {
 				if cnvrgApp.Spec.Networking.HTTPS.Enabled {
-					return fmt.Sprintf("https://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+					return fmt.Sprintf("https://%s%s.%s",
+						cnvrgApp.Spec.Dbs.Minio.SvcName,
+						cnvrgApp.Spec.Networking.ClusterDomainPrefix.Prefix,
+						cnvrgApp.Spec.ClusterDomain)
 				} else {
-					return fmt.Sprintf("http://%s.%s", cnvrgApp.Spec.Dbs.Minio.SvcName, cnvrgApp.Spec.ClusterDomain)
+					return fmt.Sprintf("http://%s%s.%s",
+						cnvrgApp.Spec.Dbs.Minio.SvcName,
+						cnvrgApp.Spec.Networking.ClusterDomainPrefix.Prefix,
+						cnvrgApp.Spec.ClusterDomain)
 				}
 			}
 		},

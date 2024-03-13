@@ -28,11 +28,11 @@ spec:
   {{- if and ( isTrue .Spec.Networking.HTTPS.Enabled ) (ne .Spec.Networking.HTTPS.CertSecret "") }}
   tls:
   - hosts:
-      - {{ .Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}
+      - {{ .Spec.ControlPlane.WebApp.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}
     secretName: {{ .Spec.Networking.HTTPS.CertSecret }}
   {{- end }}
   rules:
-    - host: "{{.Spec.ControlPlane.WebApp.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - host: "{{.Spec.ControlPlane.WebApp.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
       http:
         paths:
           - path: /

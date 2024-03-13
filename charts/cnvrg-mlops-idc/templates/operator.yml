@@ -66,7 +66,7 @@ spec:
             - "3"
             - --namespace
             - {{.Release.Namespace}}
-          image: "{{.Values.imageHub}}/cnvrg-operator:v5.0.1.snp"
+          image: "{{.Values.imageHub}}/cnvrg-operator:5.0.0-DEV-22200-definable-application-host-names-943"
           imagePullPolicy: Always
           name: cnvrg-operator
           resources:

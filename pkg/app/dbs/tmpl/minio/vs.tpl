@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-  - "{{ .Spec.Dbs.Minio.SvcName}}.{{ .Spec.ClusterDomain }}"
+  - "{{ .Spec.Dbs.Minio.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   gateways:
   - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:

@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{.Spec.SSO.Central.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.SSO.Central.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   gateways:
     - {{ .Spec.Networking.Ingress.IstioGwName }}
   http:

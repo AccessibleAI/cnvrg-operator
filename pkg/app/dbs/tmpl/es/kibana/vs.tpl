@@ -22,7 +22,7 @@ metadata:
     {{- end }}
 spec:
   hosts:
-    - "{{.Spec.Dbs.Es.Kibana.SvcName}}.{{ .Spec.ClusterDomain }}"
+    - "{{.Spec.Dbs.Es.Kibana.SvcName}}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   gateways:
   - {{ .Spec.Networking.Ingress.IstioGwName}}
   http:

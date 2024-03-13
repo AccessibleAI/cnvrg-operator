@@ -744,6 +744,13 @@ spec:
                 type: object
               networking:
                 properties:
+                  clusterDomainPrefix:
+                    properties:
+                      enabled:
+                        type: boolean
+                      prefix:
+                        type: string
+                    type: object
                   https:
                     properties:
                       cert:

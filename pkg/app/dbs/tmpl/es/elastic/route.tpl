@@ -17,7 +17,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{ .Spec.Dbs.Es.SvcName }}.{{ .Spec.ClusterDomain }}"
+  host: "{{ .Spec.Dbs.Es.SvcName }}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   port:
     targetPort: {{ .Spec.Dbs.Es.Port }}
   to:

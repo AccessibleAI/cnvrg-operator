@@ -23,7 +23,7 @@ metadata:
     {{$k}}: "{{$v}}"
     {{- end }}
 spec:
-  host: "{{ .Spec.Dbs.Es.Kibana.SvcName }}.{{ .Spec.ClusterDomain }}"
+  host: "{{ .Spec.Dbs.Es.Kibana.SvcName }}{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   port:
     {{- if isTrue .Spec.SSO.Enabled }}
     targetPort: 8888

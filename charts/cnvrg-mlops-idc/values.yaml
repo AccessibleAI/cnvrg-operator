@@ -315,6 +315,9 @@ networking:
     httpProxy: []
     httpsProxy: []
     noProxy: []
+  clusterDomainPrefix:
+    enabled: true
+    prefix: ""
 sso:
   enabled: false
   version: v3

@@ -12,6 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
+	mathrand "math/rand"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sort"
@@ -63,6 +64,9 @@ func getTlsCert(app *mlopsv1.CnvrgApp, clientset client.Client) (cert string, ke
 }
 
 func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.CnvrgAppSpec, clientset client.Client) error {
+
+	// set cluster domain prefix if enabled
+	setClusterDomainPrefix(app, defaultSpec)
 
 	// set default heap size for ES if not set by user
 	if strings.Contains(app.Spec.Dbs.Es.Requests.Memory, "Gi") && app.Spec.Dbs.Es.JavaOpts == "" {
@@ -131,7 +135,11 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 			scheme = "https"
 		}
 		if app.Spec.SSO.Central.PublicUrl == "" {
-			defaultSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s.%s", scheme, defaultSpec.SSO.Central.SvcName, app.Spec.ClusterDomain)
+			defaultSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s%s.%s",
+				scheme,
+				defaultSpec.SSO.Central.SvcName,
+				defaultSpec.Networking.ClusterDomainPrefix.Prefix,
+				app.Spec.ClusterDomain)
 		}
 		if app.Spec.SSO.Proxy.Address == "" {
 			defaultSpec.SSO.Proxy.Address = fmt.Sprintf("%s.%s.svc.%s",
@@ -142,8 +150,9 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 		}
 		if app.Spec.SSO.Central.JwksURL == "" {
 
-			defaultSpec.SSO.Central.JwksURL = fmt.Sprintf("%s://%s.%s/v1/%s/.well-known/jwks.json?client_id", scheme,
+			defaultSpec.SSO.Central.JwksURL = fmt.Sprintf("%s://%s%s.%s/v1/%s/.well-known/jwks.json?client_id", scheme,
 				defaultSpec.SSO.Jwks.SvcName,
+				defaultSpec.Networking.ClusterDomainPrefix.Prefix,
 				app.Spec.ClusterDomain,
 				strings.Split(app.Spec.ClusterDomain, ".")[0],
 			)
@@ -165,9 +174,26 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 	return nil
 }
 
+func setClusterDomainPrefix(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.CnvrgAppSpec) {
+	if app.Spec.Networking.ClusterDomainPrefix.Enabled && app.Spec.Networking.ClusterDomainPrefix.Prefix == "" {
+		defaultSpec.Networking.ClusterDomainPrefix.Prefix = fmt.Sprintf("-%s", RandomString(5))
+	}
+}
+
 func labelsMapToList(labels map[string]string) (labelList []string) {
 	for labelName, _ := range labels {
 		labelList = append(labelList, labelName)
 	}
 	return labelList
+}
+
+func RandomString(length int) string {
+	var output strings.Builder
+	charSet := "abcdefghijklmnopqrstuvwxyz0123456789"
+	for i := 0; i < length; i++ {
+		random := mathrand.Intn(len(charSet))
+		randomChar := charSet[random]
+		output.WriteString(string(randomChar))
+	}
+	return output.String()
 }
