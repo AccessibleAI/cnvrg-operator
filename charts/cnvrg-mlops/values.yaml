@@ -1,3 +1,4 @@
+cnvrgOperatorVersion: v5.0.1.snp
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 imageHub: docker.io/cnvrg
@@ -316,6 +317,9 @@ networking:
     httpProxy: []
     httpsProxy: []
     noProxy: []
+  clusterDomainPrefix:
+    enabled: false
+    prefix: ""
 sso:
   enabled: false
   version: v3
