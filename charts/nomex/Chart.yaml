@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nomex
+description: A cnvrg.io nodes metrics metadata exporter
+type: application
+version: 1.0.0
+appVersion: 1.0.0

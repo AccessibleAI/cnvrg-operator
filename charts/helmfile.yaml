@@ -1,0 +1,25 @@
+releases:
+  - name: istio-base
+    chart: istio/base
+    version: 1.21.2
+    namespace: istio-system
+    labels:
+      stage: istio-infra
+
+  - name: istiod
+    chart: istio/istiod
+    version: 1.21.2
+    namespace: istio-system
+    labels:
+      stage: istio-infra
+
+  - name: istio-ingress
+    chart: istio/gateway
+    version: 1.21.2
+    namespace: istio-system
+    labels:
+      stage: istio-gateway
+
+repositories:
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
