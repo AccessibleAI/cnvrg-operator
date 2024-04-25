@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.2.3
+description: A cnvrg.io MPI Operator Helm Chart
+name: mpi
+type: application
+version: 0.2.3
