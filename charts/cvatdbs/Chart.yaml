@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cvatdbs
+description: A cnvrg.io CVAT DBs chart (PG + Redis)
+type: application
+version: 1.0.0
+appVersion: 1.0.0

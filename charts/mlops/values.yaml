@@ -1,4 +1,4 @@
-operatorVersion: 5.0.0-DEV-22200-definable-application-host-names-943
+operatorVersion: ''
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 platform: k8s
@@ -286,7 +286,7 @@ networking:
     istioGwEnabled: true
     istioGwName: ''
     istioIngressSelectorKey: 'istio'
-    istioIngressSelectorValue: 'ingressgateway'
+    istioIngressSelectorValue: 'ingress'
     ocpSecureRoutes: false
   https:
     enabled: false
