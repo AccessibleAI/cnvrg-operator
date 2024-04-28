@@ -437,7 +437,7 @@ var networkingDefault = Networking{
 		IstioGwEnabled:            true,
 		IstioGwName:               "",
 		IstioIngressSelectorKey:   "istio",
-		IstioIngressSelectorValue: "ingressgateway",
+		IstioIngressSelectorValue: "ingress",
 		OcpSecureRoutes:           false,
 	},
 	HTTPS:               HTTPS{Enabled: false},
