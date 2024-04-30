@@ -6,7 +6,7 @@ metadata:
   annotations:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "true"
-    mlops.cnvrg.io/updatable: "true"
+    mlops.cnvrg.io/updatable: "false"
 data:
   prometheus.yml: |
     global:
