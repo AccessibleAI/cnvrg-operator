@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cvat-redis
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: cvat-redis
+spec:
+  selector:
+    matchLabels:
+      app: cvat-redis
+  template:
+    metadata:
+      labels:
+        app: cvat-redis
+    spec:
+      serviceAccountName: cvat-redis
+      containers:
+        - image: {{ .Values.redis.image }}
+          name: redis
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: {{ .Values.redis.resources.limits.cpu }}
+              memory: {{ .Values.redis.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.redis.resources.requests.cpu }}
+              memory: {{ .Values.redis.resources.requests.memory }}
