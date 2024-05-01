@@ -5,5 +5,8 @@ dependencies:
 - name: mpi
   repository: https://charts.slim.cnvrg.io/cnvrg
   version: 0.2.3
-digest: sha256:1f3911f3e720dd5679d035ae502478639a3a5bfe3cc5990daa3793a7027d4369
-generated: "2024-04-24T17:27:38.935015+03:00"
+- name: cvatdbs
+  repository: https://charts.slim.cnvrg.io/cnvrg
+  version: 1.0.0
+digest: sha256:45fc77f321c5c8623a06d99313cae5cc24e10d9654bf2c9f0d346fce161f747e
+generated: "2024-04-30T12:03:16.858587+03:00"

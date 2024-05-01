@@ -1,0 +1,15 @@
+{{- if .Values.cvat.storage.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.cvat.storage.pvcName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.cvat.storage.size }}
+  storageClassName: {{ .Values.cvat.storage.class }}
+{{- end }}
+

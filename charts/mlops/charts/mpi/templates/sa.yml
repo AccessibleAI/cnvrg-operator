@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: mpi-operator
-  namespace: {{ .Release.Namespace }}
-imagePullSecrets:
-  - name: {{ .Values.imagePullSecretRef }}
-  - name: {{ .Values.registry.name }}

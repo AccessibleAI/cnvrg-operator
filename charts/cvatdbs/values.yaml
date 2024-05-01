@@ -1,5 +1,11 @@
 imageHub: docker.io/cnvrg
 imagePullSecretRef: cnvrg-app-registry
+cvat:
+  storage:
+    enabled: false
+    pvcName: cvat-nfs
+    class: ""
+    size: 100Gi
 pg:
   image: postgresql-12-centos7:latest
   confRef: cvat-pg

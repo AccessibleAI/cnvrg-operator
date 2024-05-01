@@ -358,3 +358,5 @@ tenancy:
 priorityClass:
   appClassRef: ""
   jobClassRef: ""
+cvatdbs:
+  enabled: false

@@ -179,7 +179,3 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
-
-dep:
-	helmfile apply -lstage=istio-infra --wait
-	helmfile apply -lstage=istio-gateway --wait
