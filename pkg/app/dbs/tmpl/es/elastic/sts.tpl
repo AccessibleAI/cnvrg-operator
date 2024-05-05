@@ -101,23 +101,6 @@ spec:
       {{- end }}
       serviceAccountName: {{ .Spec.Dbs.Es.ServiceAccount }}
       enableServiceLinks: false
-      initContainers:
-      {{- if isTrue .Spec.Dbs.Es.PatchEsNodes }}
-      - name: "maxmap"
-        image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}
-        imagePullPolicy: "Always"
-        command: ["/bin/bash","-c","sysctl -w vm.max_map_count=262144"]
-        securityContext:
-          privileged: true
-          runAsUser: 0
-        resources:
-          limits:
-            cpu: 200m
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
-      {{- end }}
       containers:
       - name: elastic
         image: {{ image .Spec.ImageHub .Spec.Dbs.Es.Image }}
@@ -165,6 +148,8 @@ spec:
           value: /usr/share/elasticsearch/config/certs/tls.crt
         - name: xpack.security.transport.ssl.certificate_authorities
           value: /usr/share/elasticsearch/config/certs/ca.crt
+        - name: node.store.allow_mmap
+          value: "false"
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}

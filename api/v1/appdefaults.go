@@ -298,10 +298,9 @@ var esDefault = Es{
 		Cpu:    "4",
 		Memory: "8Gi",
 	},
-	JavaOpts:     "",
-	PatchEsNodes: false,
-	CredsRef:     "es-creds",
-	PvcName:      "es-storage",
+	JavaOpts: "",
+	CredsRef: "es-creds",
+	PvcName:  "es-storage",
 	CleanupPolicy: CleanupPolicy{
 		All:       "3d",
 		App:       "30d",

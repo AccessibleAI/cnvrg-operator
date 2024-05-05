@@ -131,7 +131,7 @@ deploy: manifests
 manifests: controller-gen
 	$(CONTROLLER_GEN) crd paths=./... output:artifacts:config=config/crd/bases
 	cp config/crd/bases/* pkg/app/controlplane/tmpl/crds
-	cp config/crd/bases/* charts/cnvrg-operator/crds
+	cp config/crd/bases/* charts/mlops/crds
 	sed 's/controller-gen$:/mlops.cnvrg.io\/default-loader: "true"\n    &/' pkg/app/controlplane/tmpl/crds/mlops.cnvrg.io_cnvrgapps.yaml > tmp && cat tmp > pkg/app/controlplane/tmpl/crds/mlops.cnvrg.io_cnvrgapps.yaml && rm tmp
 	sed 's/controller-gen$:/mlops.cnvrg.io\/own: "false"\n    &/' pkg/app/controlplane/tmpl/crds/mlops.cnvrg.io_cnvrgapps.yaml > tmp && cat tmp > pkg/app/controlplane/tmpl/crds/mlops.cnvrg.io_cnvrgapps.yaml && rm tmp
 	sed 's/controller-gen$:/mlops.cnvrg.io\/updatable: "true"\n    &/' pkg/app/controlplane/tmpl/crds/mlops.cnvrg.io_cnvrgapps.yaml > tmp && cat tmp > pkg/app/controlplane/tmpl/crds/mlops.cnvrg.io_cnvrgapps.yaml && rm tmp

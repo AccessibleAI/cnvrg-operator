@@ -537,8 +537,6 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      patchEsNodes:
-                        type: boolean
                       port:
                         type: integer
                       pvcName:

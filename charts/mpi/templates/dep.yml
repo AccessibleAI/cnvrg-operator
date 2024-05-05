@@ -26,4 +26,6 @@ spec:
             - {{ .Release.Namespace }}
             - --namespace
             - {{ .Release.Namespace }}
+          securityContext:
+            allowPrivilegeEscalation: false
 

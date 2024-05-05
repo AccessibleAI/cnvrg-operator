@@ -225,7 +225,6 @@ spec:
         cpu: "{{.Values.dbs.es.limits.cpu}}"
         memory: {{.Values.dbs.es.limits.memory}}
       javaOpts: {{.Values.dbs.es.javaOpts}}
-      patchEsNodes: {{.Values.dbs.es.patchEsNodes}}
       nodeSelector: null
       credsRef: {{.Values.dbs.es.credsRef}}
       pvcName: {{.Values.dbs.es.pvcName}}

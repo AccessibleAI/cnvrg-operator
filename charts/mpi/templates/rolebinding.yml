@@ -1,4 +1,4 @@
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: mpi-operator
@@ -6,7 +6,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: mpi-operator
+  name: mpi-operator-{{.Release.Namespace}}
 subjects:
   - kind: ServiceAccount
     name: mpi-operator

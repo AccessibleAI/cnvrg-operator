@@ -327,7 +327,6 @@ type Es struct {
 	Requests       Requests          `json:"requests,omitempty"`
 	Limits         Limits            `json:"limits,omitempty"`
 	JavaOpts       string            `json:"javaOpts,omitempty"`
-	PatchEsNodes   bool              `json:"patchEsNodes,omitempty"`
 	NodeSelector   map[string]string `json:"nodeSelector,omitempty"`
 	CredsRef       string            `json:"credsRef,omitempty"`
 	PvcName        string            `json:"pvcName,omitempty"`

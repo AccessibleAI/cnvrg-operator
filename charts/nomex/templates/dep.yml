@@ -26,3 +26,5 @@ spec:
           - /opt/app-root/nomex
         ports:
         - containerPort: 2112
+        securityContext:
+          allowPrivilegeEscalation: false

@@ -104,7 +104,7 @@ controlPlane:
       CNVRG_ENABLE_MOUNT_FOLDERS: false
       CNVRG_MOUNT_HOST_FOLDERS: false
       CNVRG_PROMETHEUS_METRICS: true
-      OCP_ENABLED: false
+      OCP_ENABLED: true
     sentryUrl: ''
     runJobsOnSelfCluster: ''
     agentCustomTag: agnostic-logs
@@ -222,7 +222,6 @@ dbs:
       cpu: '4'
       memory: 8Gi
     javaOpts: ''
-    patchEsNodes: false
     nodeSelector:
     credsRef: es-creds
     pvcName: es-storage
