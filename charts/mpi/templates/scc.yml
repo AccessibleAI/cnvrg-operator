@@ -1,0 +1,23 @@
+{{- if .Values.scc }}
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: "cnvrg-mpi-run-as-any-{{.Release.Namespace}}"
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities: null
+readOnlyRootFilesystem: false
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+fsGroup:
+  type: RunAsAny
+users:
+  - "system:serviceaccount:{{.Release.Namespace}}:mpi-operator"
+{{- end }}

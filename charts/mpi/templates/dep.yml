@@ -28,4 +28,8 @@ spec:
             - {{ .Release.Namespace }}
           securityContext:
             allowPrivilegeEscalation: false
+            runAsUser: 0
+            capabilities:
+              drop:
+                - ALL
 

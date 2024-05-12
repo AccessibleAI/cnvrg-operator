@@ -178,18 +178,7 @@ type ControlPlane struct {
 	Ldap                            Ldap                            `json:"ldap,omitempty"`
 	SMTP                            SMTP                            `json:"smtp,omitempty"`
 	ObjectStorage                   ObjectStorage                   `json:"objectStorage,omitempty"`
-	Mpi                             Mpi                             `json:"mpi,omitempty"`
 	Nomex                           Nomex                           `json:"nomex,omitempty"`
-}
-
-type Mpi struct {
-	Enabled              bool              `json:"enabled,omitempty"`
-	Image                string            `json:"image,omitempty"`
-	KubectlDeliveryImage string            `json:"kubectlDeliveryImage,omitempty"`
-	ExtraArgs            map[string]string `json:"extraArgs,omitempty"`
-	Registry             Registry          `json:"registry,omitempty"`
-	Requests             Requests          `json:"requests,omitempty"`
-	Limits               Limits            `json:"limits,omitempty"`
 }
 
 type PriorityClass struct {

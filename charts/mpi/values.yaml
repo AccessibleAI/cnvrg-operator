@@ -2,6 +2,7 @@ imageHub: docker.io
 image: mpioperator/mpi-operator:v0.2.3
 kubectlDeliveryImage: mpioperator/kubectl-delivery:v0.2.3
 imagePullSecretRef: cnvrg-app-registry
+scc: false
 registry:
   name: "mpi-private-registry"
   url: "docker.io"

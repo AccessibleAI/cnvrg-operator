@@ -31,3 +31,4 @@ bundle
 hack/scripts/docgen/node_modules
 .devspace
 certs
+charts/mlops/charts

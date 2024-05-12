@@ -24,7 +24,27 @@ spec:
         image: {{ .Values.imageHub}}/{{.Values.image }}
         command:
           - /opt/app-root/nomex
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 2112
+          failureThreshold: 5
+          successThreshold: 1
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 2112
+          failureThreshold: 5
+          successThreshold: 1
+          periodSeconds: 15
         ports:
         - containerPort: 2112
         securityContext:
           allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault

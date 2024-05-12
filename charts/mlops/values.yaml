@@ -104,7 +104,7 @@ controlPlane:
       CNVRG_ENABLE_MOUNT_FOLDERS: false
       CNVRG_MOUNT_HOST_FOLDERS: false
       CNVRG_PROMETHEUS_METRICS: true
-      OCP_ENABLED: true
+      OCP_ENABLED: false
     sentryUrl: ''
     runJobsOnSelfCluster: ''
     agentCustomTag: agnostic-logs
@@ -359,3 +359,6 @@ priorityClass:
   jobClassRef: ""
 cvatdbs:
   enabled: false
+mpi:
+  enabled: false
+  scc: false

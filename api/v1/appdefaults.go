@@ -138,27 +138,6 @@ var controlPlaneDefault = ControlPlane{
 		NodePort: 30081,
 	},
 
-	Mpi: Mpi{
-		Enabled:              false,
-		Image:                "mpioperator/mpi-operator:v0.2.3",
-		KubectlDeliveryImage: "mpioperator/kubectl-delivery:v0.2.3",
-		ExtraArgs:            nil,
-		Requests: Requests{
-			Cpu:    "100m",
-			Memory: "100Mi",
-		},
-		Limits: Limits{
-			Cpu:    "1000m",
-			Memory: "1Gi",
-		},
-		Registry: Registry{
-			Name:     "mpi-private-registry",
-			URL:      "docker.io",
-			User:     "",
-			Password: "",
-		},
-	},
-
 	BaseConfig: BaseConfig{
 		JobsStorageClass:   "",
 		FeatureFlags:       nil,

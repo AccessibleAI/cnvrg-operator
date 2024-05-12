@@ -82,14 +82,6 @@ func (m *CpStateManager) Load() error {
 		m.AddToAssets(hyper)
 	}
 
-	if m.app.Spec.ControlPlane.Mpi.Enabled {
-		mpi := desired.NewAssetsGroup(fs, m.RootPath()+"/mpi", m.Log(), nil)
-		if err := mpi.LoadAssets(); err != nil {
-			return err
-		}
-		m.AddToAssets(mpi)
-	}
-
 	if m.app.Spec.ControlPlane.CnvrgScheduler.Enabled {
 		scheduler := desired.NewAssetsGroup(fs, m.RootPath()+"/scheduler", m.Log(), nil)
 		if err := scheduler.LoadAssets(); err != nil {
