@@ -95,22 +95,22 @@ jobs:
     - name: Build and push tagged image
       id: docker_build_tag
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/DEV-15047-slim-cnvrg') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/master') }}
       with:
         context: ./
         file: ./Dockerfile
         push: true
-        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:5.0.0
+        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
-          private_repo=github.com/AccessibleAI/cnvrg-shim
+          private_repo=github.com/AccessibleAI/cnvrg-operator
           git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
     - name: Build and push tagged image
       id: docker_build_tag_branch
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/DEV-15047-slim-cnvrg') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/master') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -118,7 +118,7 @@ jobs:
         tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
-          private_repo=github.com/AccessibleAI/cnvrg-shim
+          private_repo=github.com/AccessibleAI/cnvrg-operator
           git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
 #    - name: Generate Cnvrg Changelog
