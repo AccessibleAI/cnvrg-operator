@@ -4,6 +4,18 @@ description: A cnvrg.io MLOps platform Helm Chart
 type: application
 version: 5.1.0
 appVersion: 5.1.0
-
+dependencies:
+  - name: nomex
+    version: 1.0.0
+    repository: https://charts.slim.cnvrg.io/cnvrg
+    condition: nomex.enabled
+  - name: mpi
+    version: 0.2.3
+    repository: https://charts.slim.cnvrg.io/cnvrg
+    condition: mpi.enabled
+  - name: cvatdbs
+    version: 1.0.0
+    repository: https://charts.slim.cnvrg.io/cnvrg
+    condition: cvatdbs.enabled
 
 
