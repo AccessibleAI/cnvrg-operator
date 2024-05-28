@@ -67,13 +67,6 @@ type Systemkiq struct {
 	Hpa      Hpa      `json:"hpa,omitempty"`
 }
 
-type CnvrgRouter struct {
-	Enabled  bool   `json:"enabled,omitempty"`
-	Image    string `json:"image,omitempty"`
-	SvcName  string `json:"svcName,omitempty"`
-	NodePort int    `json:"nodePort,omitempty"`
-}
-
 type Hyper struct {
 	Enabled                 bool     `json:"enabled,omitempty"`
 	Image                   string   `json:"image,omitempty"`
@@ -165,20 +158,18 @@ type BaseConfig struct {
 }
 
 type ControlPlane struct {
-	Image                           string                          `json:"image,omitempty"`
-	WebApp                          WebApp                          `json:"webapp,omitempty"`
-	Sidekiq                         Sidekiq                         `json:"sidekiq,omitempty"`
-	Searchkiq                       Searchkiq                       `json:"searchkiq,omitempty"`
-	Systemkiq                       Systemkiq                       `json:"systemkiq,omitempty"`
-	Hyper                           Hyper                           `json:"hyper,omitempty"`
-	CnvrgScheduler                  CnvrgScheduler                  `json:"cnvrgScheduler,omitempty"`
-	CnvrgClusterProvisionerOperator CnvrgClusterProvisionerOperator `json:"cnvrgClusterProvisionerOperator,omitempty"`
-	CnvrgRouter                     CnvrgRouter                     `json:"cnvrgRouter,omitempty"`
-	BaseConfig                      BaseConfig                      `json:"baseConfig,omitempty"`
-	Ldap                            Ldap                            `json:"ldap,omitempty"`
-	SMTP                            SMTP                            `json:"smtp,omitempty"`
-	ObjectStorage                   ObjectStorage                   `json:"objectStorage,omitempty"`
-	Nomex                           Nomex                           `json:"nomex,omitempty"`
+	Image          string         `json:"image,omitempty"`
+	WebApp         WebApp         `json:"webapp,omitempty"`
+	Sidekiq        Sidekiq        `json:"sidekiq,omitempty"`
+	Searchkiq      Searchkiq      `json:"searchkiq,omitempty"`
+	Systemkiq      Systemkiq      `json:"systemkiq,omitempty"`
+	Hyper          Hyper          `json:"hyper,omitempty"`
+	CnvrgScheduler CnvrgScheduler `json:"cnvrgScheduler,omitempty"`
+	BaseConfig     BaseConfig     `json:"baseConfig,omitempty"`
+	Ldap           Ldap           `json:"ldap,omitempty"`
+	SMTP           SMTP           `json:"smtp,omitempty"`
+	ObjectStorage  ObjectStorage  `json:"objectStorage,omitempty"`
+	Nomex          Nomex          `json:"nomex,omitempty"`
 }
 
 type PriorityClass struct {

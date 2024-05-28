@@ -66,14 +66,6 @@ func (m *CpStateManager) Load() error {
 	}
 	m.AddToAssets(rbac)
 
-	if m.app.Spec.ControlPlane.CnvrgClusterProvisionerOperator.Enabled {
-		ccp := desired.NewAssetsGroup(fs, fsRoot+"/ccp", m.Log(), f)
-		if err := ccp.LoadAssets(); err != nil {
-			return err
-		}
-		m.AddToAssets(ccp)
-	}
-
 	if m.app.Spec.ControlPlane.Hyper.Enabled {
 		hyper := desired.NewAssetsGroup(fs, m.RootPath()+"/hyper", m.Log(), nil)
 		if err := hyper.LoadAssets(); err != nil {

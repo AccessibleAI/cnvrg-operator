@@ -85,40 +85,6 @@ spec:
                       sentryUrl:
                         type: string
                     type: object
-                  cnvrgClusterProvisionerOperator:
-                    properties:
-                      awsCredsRef:
-                        type: string
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      limits:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      requests:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                    type: object
-                  cnvrgRouter:
-                    properties:
-                      enabled:
-                        type: boolean
-                      image:
-                        type: string
-                      nodePort:
-                        type: integer
-                      svcName:
-                        type: string
-                    type: object
                   cnvrgScheduler:
                     properties:
                       enabled:

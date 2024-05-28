@@ -66,7 +66,11 @@ spec:
             - "3"
             - --namespace
             - {{.Release.Namespace}}
+          {{- if .Values.version.operator }}
+          image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.version.operator}}"
+          {{- else }}
           image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.operatorVersion}}"
+          {{- end }}
           imagePullPolicy: Always
           name: cnvrg-operator
           resources:

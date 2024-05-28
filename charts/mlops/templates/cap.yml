@@ -8,7 +8,11 @@ spec:
   clusterInternalDomain: {{.Values.clusterInternalDomain}}
   imageHub: {{.Values.imageHub}}
   controlPlane:
+    {{- if .Values.version.app}}
+    image: {{.Values.version.app}}
+    {{- else }}
     image: {{.Values.controlPlane.image}}
+    {{- end }}
     webapp:
       replicas: {{.Values.controlPlane.webapp.replicas}}
       enabled: {{.Values.controlPlane.webapp.enabled}}
@@ -97,11 +101,6 @@ spec:
         cpu: "{{.Values.controlPlane.cnvrgScheduler.limits.cpu}}"
         memory: {{.Values.controlPlane.cnvrgScheduler.limits.memory}}
       replicas: {{.Values.controlPlane.cnvrgScheduler.replicas}}
-    cnvrgRouter:
-      enabled: {{.Values.controlPlane.cnvrgRouter.enabled}}
-      image: {{.Values.controlPlane.cnvrgRouter.image}}
-      svcName: {{.Values.controlPlane.cnvrgRouter.svcName}}
-      nodePort: {{.Values.controlPlane.cnvrgRouter.nodePort}}
     baseConfig:
       jobsStorageClass: {{.Values.controlPlane.baseConfig.jobsStorageClass}}
       featureFlags:
@@ -110,7 +109,11 @@ spec:
       {{- end }}
       sentryUrl: {{.Values.controlPlane.baseConfig.sentryUrl}}
       runJobsOnSelfCluster: {{.Values.controlPlane.baseConfig.runJobsOnSelfCluster}}
+      {{- if .Values.version.agent }}
+      agentCustomTag: {{.Values.version.agent}}
+      {{- else }}
       agentCustomTag: {{.Values.controlPlane.baseConfig.agentCustomTag}}
+      {{- end }}
       intercom: "{{.Values.controlPlane.baseConfig.intercom}}"
       cnvrgJobUid: "{{.Values.controlPlane.baseConfig.cnvrgJobUid}}"
       cnvrgJobRbacStrict: {{.Values.controlPlane.baseConfig.cnvrgJobRbacStrict}}

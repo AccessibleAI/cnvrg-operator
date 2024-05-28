@@ -1,3 +1,7 @@
+version:
+  operator: ''
+  app: ''
+  agent: ''
 operatorVersion: ''
 clusterDomain: ''
 clusterInternalDomain: cluster.local
@@ -93,11 +97,6 @@ controlPlane:
       cpu: '2'
       memory: 4Gi
     replicas: 1
-  cnvrgRouter:
-    enabled: false
-    image: nginx:1.21.0
-    svcName: cnvrg-router
-    nodePort: 30081
   baseConfig:
     jobsStorageClass: ''
     featureFlags:
@@ -107,7 +106,7 @@ controlPlane:
       OCP_ENABLED: false
     sentryUrl: ''
     runJobsOnSelfCluster: ''
-    agentCustomTag: agnostic-logs
+    agentCustomTag: ''
     intercom: 'true'
     cnvrgJobUid: '0'
     cnvrgJobRbacStrict: false

@@ -117,27 +117,6 @@ var controlPlaneDefault = ControlPlane{
 		Replicas: 1,
 	},
 
-	CnvrgClusterProvisionerOperator: CnvrgClusterProvisionerOperator{
-		Enabled: false,
-		Requests: Requests{
-			Cpu:    "200m",
-			Memory: "1Gi",
-		},
-		Limits: Limits{
-			Cpu:    "2",
-			Memory: "4Gi",
-		},
-		Image:       "cnvrg/ccp-operator:v1",
-		AwsCredsRef: "",
-	},
-
-	CnvrgRouter: CnvrgRouter{
-		Enabled:  false,
-		Image:    "nginx:1.21.0",
-		SvcName:  "cnvrg-router",
-		NodePort: 30081,
-	},
-
 	BaseConfig: BaseConfig{
 		JobsStorageClass:   "",
 		FeatureFlags:       nil,
