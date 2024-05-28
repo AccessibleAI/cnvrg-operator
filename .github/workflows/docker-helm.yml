@@ -82,7 +82,7 @@ jobs:
     - name: Build and push main latest
       id: docker_build_main
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -95,7 +95,7 @@ jobs:
     - name: Build and push tagged image
       id: docker_build_tag
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/master') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -110,7 +110,7 @@ jobs:
     - name: Build and push tagged image
       id: docker_build_tag_branch
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/master') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -184,7 +184,7 @@ jobs:
 #        cat charts/cnvrg-operator/Chart.yaml
 #
 #    - name: Package and release helm
-#      if: ${{ github.ref == 'refs/heads/master' }}
+#      if: ${{ github.ref == 'refs/heads/main' }}
 #      env:
 #        CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
 #        CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
