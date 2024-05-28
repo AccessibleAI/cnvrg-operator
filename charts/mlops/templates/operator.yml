@@ -68,8 +68,10 @@ spec:
             - {{.Release.Namespace}}
           {{- if .Values.version.operator }}
           image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.version.operator}}"
-          {{- else }}
+          {{- else if .Values.operatorVersion }}
           image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.operatorVersion}}"
+          {{- else }}
+          image: "{{.Values.imageHub}}/cnvrg-operator:{{.Chart.Version}}"
           {{- end }}
           imagePullPolicy: Always
           name: cnvrg-operator
