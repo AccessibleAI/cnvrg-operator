@@ -82,7 +82,7 @@ jobs:
     - name: Build and push main latest
       id: docker_build_main
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -95,106 +95,104 @@ jobs:
     - name: Build and push tagged image
       id: docker_build_tag
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/DEV-15047-slim-cnvrg') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
         push: true
-        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:5.0.0
+        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
-          private_repo=github.com/AccessibleAI/cnvrg-shim
+          private_repo=github.com/AccessibleAI/cnvrg-operator
           git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
     - name: Build and push tagged image
       id: docker_build_tag_branch
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/DEV-15047-slim-cnvrg') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
         push: true
-        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:5.0.0-${{ steps.extract_info.outputs.branch }}-${{ github.run_number }}
+        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
-          private_repo=github.com/AccessibleAI/cnvrg-shim
+          private_repo=github.com/AccessibleAI/cnvrg-operator
           git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
-#    - name: Generate Cnvrg Changelog
-#      uses: AccessibleAI/github-changelog-action@1.0.0
-#      id: cnvrg_changelog
-#      with:
-#        from_version: ${{ steps.tag_bump.outputs.tag }}
-#        to_version:  ${{ steps.tag_bump.outputs.new_tag }}
-#        jira_token: ${{ secrets.JIRA_TOKEN }}
-#        slack_webhook_url: false
-#      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+    - name: Generate Cnvrg Changelog
+      uses: AccessibleAI/github-changelog-action@1.0.0
+      id: cnvrg_changelog
+      with:
+        from_version: ${{ steps.tag_bump.outputs.tag }}
+        to_version:  ${{ steps.tag_bump.outputs.new_tag }}
+        jira_token: ${{ secrets.JIRA_TOKEN }}
+        slack_webhook_url: false
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
-#    - name: Generate Non Cnvrg Changelog
-#      id: changelog
-#      uses: metcalfc/changelog-generator@v3.0.0
-#      with:
-#        myToken: ${{ secrets.GITHUB_TOKEN }}
-#        head-ref: ${{ steps.tag_bump.outputs.tag }}
-#        base-ref: ${{ steps.tag_bump.outputs.new_tag }}
-#      if: ${{ steps.cnvrg_changelog.outputs.empty == 'true' && steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+    - name: Generate Non Cnvrg Changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@v3.0.0
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        head-ref: ${{ steps.tag_bump.outputs.tag }}
+        base-ref: ${{ steps.tag_bump.outputs.new_tag }}
+      if: ${{ steps.cnvrg_changelog.outputs.empty == 'true' && steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
-#    - name: Generate changelog
-#      id: changelog_final
-#      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
-#      run: |
-#        set -o noglob
-#        if ${{ steps.cnvrg_changelog.outputs.empty }}; then
-#          log=$(cat << "EOF"
-#        ${{ steps.changelog.outputs.changelog }}
-#        EOF
-#        )
-#        else
-#          log=$(cat << "EOF"
-#        ${{ steps.cnvrg_changelog.outputs.changelog }}
-#        EOF
-#        )
-#        fi
-#        log="${log//'%'/'%25'}"
-#        log="${log//$'\n'/'%0A'}"
-#        log="${log//$'\r'/'%0D'}"
-#        echo "::set-output name=changelog::$log"
+    - name: Generate changelog
+      id: changelog_final
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      run: |
+        set -o noglob
+        if ${{ steps.cnvrg_changelog.outputs.empty }}; then
+          log=$(cat << "EOF"
+        ${{ steps.changelog.outputs.changelog }}
+        EOF
+        )
+        else
+          log=$(cat << "EOF"
+        ${{ steps.cnvrg_changelog.outputs.changelog }}
+        EOF
+        )
+        fi
+        log="${log//'%'/'%25'}"
+        log="${log//$'\n'/'%0A'}"
+        log="${log//$'\r'/'%0D'}"
+        echo "::set-output name=changelog::$log"
 
-#    - name: Print the final changelog
-#      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
-#      run: |
-#        cat << "EOF"
-#        ${{ steps.changelog_final.outputs.changelog }}
-#        EOF
+    - name: Print the final changelog
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      run: |
+        cat << "EOF"
+        ${{ steps.changelog_final.outputs.changelog }}
+        EOF
 
-#    - name: Changelog Release
-#      uses: softprops/action-gh-release@v1
-#      with:
-#        body: ${{steps.changelog_final.outputs.changelog}}
-#        tag_name: ${{ steps.tag_bump.outputs.new_tag }}
-#        prerelease: ${{ steps.tag_bump.outputs.prerelease }}
-#        generate_release_notes: true
-#      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+    - name: Changelog Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body: ${{steps.changelog_final.outputs.changelog}}
+        tag_name: ${{ steps.tag_bump.outputs.new_tag }}
+        prerelease: ${{ steps.tag_bump.outputs.prerelease }}
+        generate_release_notes: true
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
-#    - name: Change Chart Version
-#      run: |
-#        sed -i 's#1.0.0#$slim-operator-{{ steps.tag_bump.outputs.new_tag }}#g' charts/cnvrg-operator/Chart.yaml
-#        sed -i 's#1.0.0#$slim-cnvrg-cap-{{ steps.tag_bump.outputs.new_tag }}#g' charts/cnvrg-cap/Chart.yaml
-#        cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
-#
-#    - name: Package and release helm
-#      if: ${{ github.ref == 'refs/heads/DEV-15047-slim-cnvrg' }}
-#      env:
-#        CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
-#        CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
-#      run: |
-#          helm plugin install https://github.com/chartmuseum/helm-push.git
-#          helm package charts/cnvrg-operator -d .
-#          helm cm-push charts/cnvrg-operator https://charts.slim.cnvrg.io/cnvrg-operator -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
-#          helm package charts/cnvrg-cap -d .
-#          helm cm-push charts/cnvrg-cap https://charts.slim.cnvrg.io/cnvrg-cap -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+    - name: Change Chart Version
+      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
+      run: |
+        sed -i 's#5.1.0#${{ steps.tag_bump.outputs.new_tag }}#g' charts/mlops/Chart.yaml
+        cat charts/mlops/Chart.yaml
+
+    - name: Package and release helm
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      env:
+        CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
+        CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
+      run: |
+          helm plugin install https://github.com/chartmuseum/helm-push.git
+          helm package charts/mlops -d .
+          helm cm-push charts/mlops https://charts.slim.cnvrg.io/ -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
