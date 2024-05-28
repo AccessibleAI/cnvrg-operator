@@ -192,6 +192,7 @@ jobs:
       run: |
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm repo add cnvrg https://charts.slim.cnvrg.io/cnvrg
+          helm dependency build charts/mlops
           helm cm-push charts/mlops -f cnvrg -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --context-path /cnvrg
 
     - name: Slack Notification
