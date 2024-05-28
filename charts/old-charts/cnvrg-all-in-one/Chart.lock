@@ -1,9 +1,0 @@
-dependencies:
-- name: domainpool
-  repository: https://catalog.stg.intelcloud.cnvrg.io/stage
-  version: 0.1.2
-- name: copadmission
-  repository: https://catalog.stg.intelcloud.cnvrg.io/stage
-  version: 1.0.0
-digest: sha256:cc71158e2f162d2cb8ee872ef0f25147933956d87bc5513aee3f0393d15a1249
-generated: "2023-12-21T18:03:21.468301+02:00"

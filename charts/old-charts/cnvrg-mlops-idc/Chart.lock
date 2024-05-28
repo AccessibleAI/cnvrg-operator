@@ -1,6 +1,0 @@
-dependencies:
-- name: cnvrg-nomex
-  repository: https://charts.slim.cnvrg.io/nomex
-  version: 1.0.0
-digest: sha256:0bedb6d08efc610eea60c60dfeb3e2d0f0062e12381ae5dc9bb745c48c00fdce
-generated: "2024-04-24T12:22:25.234236+03:00"

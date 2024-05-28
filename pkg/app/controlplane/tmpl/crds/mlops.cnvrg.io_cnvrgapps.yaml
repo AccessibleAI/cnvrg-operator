@@ -200,44 +200,6 @@ spec:
                       ssl:
                         type: string
                     type: object
-                  mpi:
-                    properties:
-                      enabled:
-                        type: boolean
-                      extraArgs:
-                        additionalProperties:
-                          type: string
-                        type: object
-                      image:
-                        type: string
-                      kubectlDeliveryImage:
-                        type: string
-                      limits:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                      registry:
-                        properties:
-                          name:
-                            type: string
-                          password:
-                            type: string
-                          url:
-                            type: string
-                          user:
-                            type: string
-                        type: object
-                      requests:
-                        properties:
-                          cpu:
-                            type: string
-                          memory:
-                            type: string
-                        type: object
-                    type: object
                   nomex:
                     properties:
                       enabled:

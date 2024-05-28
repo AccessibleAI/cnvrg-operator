@@ -1,6 +1,0 @@
-apiVersion: v2
-name: cnvrg-mlops-platform
-description: A cnvrg.io operator chart for K8s
-type: application
-version: 5.0.0
-appVersion: 1.2.3
