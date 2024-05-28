@@ -191,6 +191,9 @@ jobs:
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
       run: |
           helm plugin install https://github.com/chartmuseum/helm-push.git
+          cd charts/mlops
+          helm dependency update
+          cd ../..
           helm package charts/mlops -d .
           helm cm-push charts/mlops https://charts.slim.cnvrg.io/ -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
 
