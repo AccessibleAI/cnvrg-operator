@@ -115,8 +115,7 @@ jobs:
         context: ./
         file: ./Dockerfile
         push: true
-        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:5.0.0-${{ steps.extract_info.outputs.branch }}-${{ github.run_number }}
-        build-args: |
+        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
           private_repo=github.com/AccessibleAI/cnvrg-shim
