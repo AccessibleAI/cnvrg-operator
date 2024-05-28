@@ -195,7 +195,7 @@ jobs:
           helm dependency update
           cd ../..
           helm package charts/mlops -d .
-          helm cm-push charts/mlops https://charts.slim.cnvrg.io/ -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+          helm cm-push mlops-{{ steps.tag_bump.outputs.new_tag }}.tgz charts/mlops https://charts.slim.cnvrg.io/ -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
