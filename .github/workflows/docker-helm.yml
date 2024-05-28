@@ -178,20 +178,21 @@ jobs:
         generate_release_notes: true
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
 
-#    - name: Change Chart Version
-#      run: |
-#        sed -i 's#1.0.0#$slim-operator-{{ steps.tag_bump.outputs.new_tag }}#g' charts/cnvrg-operator/Chart.yaml
-#        cat charts/cnvrg-operator/Chart.yaml
-#
-#    - name: Package and release helm
-#      if: ${{ github.ref == 'refs/heads/main' }}
-#      env:
-#        CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
-#        CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
-#      run: |
-#          helm plugin install https://github.com/chartmuseum/helm-push.git
-#          helm package charts/cnvrg-operator -d .
-#          helm cm-push charts/cnvrg-operator https://charts.slim.cnvrg.io/cnvrg-operator -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+    - name: Change Chart Version
+      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
+      run: |
+        sed -i 's#5.1.0#${{ steps.tag_bump.outputs.new_tag }}#g' charts/mlops/Chart.yaml
+        cat charts/mlops/Chart.yaml
+
+    - name: Package and release helm
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+      env:
+        CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
+        CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
+      run: |
+          helm plugin install https://github.com/chartmuseum/helm-push.git
+          helm package charts/mlops -d .
+          helm cm-push charts/mlops https://charts.slim.cnvrg.io/ -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
