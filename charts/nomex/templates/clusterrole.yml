@@ -9,3 +9,9 @@ rules:
       - nodes
     verbs:
       - list
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - list
