@@ -173,7 +173,7 @@ dbs:
   redis:
     enabled: true
     serviceAccount: redis
-    image: cnvrg-redis:v3.0.5.c2
+    image: cnvrg-redis:v7.0.0
     svcName: redis
     port: 6379
     storageSize: 10Gi
