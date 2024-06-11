@@ -2,11 +2,12 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cnvrg-operator-rolebinding
+  namespace: cnvrg
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cnvrg-operator-role
 subjects:
-- kind: ServiceAccount
-  name: cnvrg-operator
-  namespace: cnvrg-infra
+  - kind: ServiceAccount
+    name: cnvrg-operator
+    namespace: cnvrg

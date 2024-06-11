@@ -16,31 +16,30 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Change Chart Version
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: |
-        VERSION=1.0.0 envsubst < chart/Chart.yaml | tee tmp-file && mv tmp-file chart/Chart.yaml
-        cat chart/Chart.yaml
-
-    - name: Set up Helm
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      uses: azure/setup-helm@v3.4
-
-    - name: Run chart-testing (lint)
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: helm lint chart/
-
-    - name: Create kind cluster
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      uses: helm/kind-action@v1.2.0
-
-    - name: Install Crds
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: kubectl apply -f chart/crds/ ; sleep 2
-
-    - name: Run chart-testing (install)
-      if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
-      run: helm install cnvrg ./chart  --dry-run --namespace=cnvrg  --debug
+#    - name: Change Chart Version
+#      run: |
+#        VERSION=1.0.0 envsubst < charts/cnvrg-cap/Chart.yaml | tee tmp-file && mv tmp-file charts/cnvrg-cap/Chart.yaml
+#        VERSION=1.0.0 envsubst < charts/cnvrg-operator/Chart.yaml | tee tmp-file && mv tmp-file charts/cnvrg-operator/Chart.yaml
+#        cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
+#
+#    - name: Set up Helm
+#      uses: azure/setup-helm@v3.5
+#
+#    - name: Run chart-testing (lint)
+#      run: |
+#        helm lint charts/cnvrg-cap/
+#        helm lint charts/cnvrg-operator/
+#
+#    - name: Create kind cluster
+#      uses: helm/kind-action@v1.7.0
+#
+#    - name: Install Crds
+#      run: kubectl apply -f charts/cnvrg-operator/crds/ ; sleep 2
+#
+#    - name: Run chart-testing (install)
+#      run: |
+#        helm install cnvrg ./charts/cnvrg-operator --dry-run --namespace=cnvrg-system --debug
+# helm install cnvrg ./charts/cnvrg-cap --dry-run --namespace=cnvrg --debug
 
     - name: Bump version and push tag
       uses: AccessibleAI/github-tag-action@1.0.0
@@ -83,7 +82,7 @@ jobs:
     - name: Build and push main latest
       id: docker_build_main
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master') }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -96,7 +95,7 @@ jobs:
     - name: Build and push tagged image
       id: docker_build_tag
       uses: docker/build-push-action@v2
-      if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref == 'refs/heads/main') }}
       with:
         context: ./
         file: ./Dockerfile
@@ -105,6 +104,23 @@ jobs:
         build-args: |
           BUILD_SHA=${{ steps.extract_info.outputs.head }}
           BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
+          private_repo=github.com/AccessibleAI/cnvrg-operator
+          git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
+
+    - name: Build and push tagged image
+      id: docker_build_tag_branch
+      uses: docker/build-push-action@v2
+      if: ${{ steps.tag_bump.outputs.bumped == 'true' && (github.ref != 'refs/heads/main') }}
+      with:
+        context: ./
+        file: ./Dockerfile
+        push: true
+        tags: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}
+        build-args: |
+          BUILD_SHA=${{ steps.extract_info.outputs.head }}
+          BUILD_VERSION=${{ steps.tag_bump.outputs.new_tag }}
+          private_repo=github.com/AccessibleAI/cnvrg-operator
+          git_auth=${{ secrets.CNVRG_RUNNER_AUTH }}
 
     - name: Generate Cnvrg Changelog
       uses: AccessibleAI/github-changelog-action@1.0.0
@@ -165,8 +181,8 @@ jobs:
     - name: Change Chart Version
       if: ${{ github.ref == 'refs/heads/main'  ||  github.ref == 'refs/heads/master' }}
       run: |
-        sed -i 's#1.0.0#${{ steps.tag_bump.outputs.new_tag }}#g' chart/Chart.yaml
-        cat chart/Chart.yaml
+        sed -i 's#5.1.0#${{ steps.tag_bump.outputs.new_tag }}#g' charts/mlops/Chart.yaml
+        cat charts/mlops/Chart.yaml
 
     - name: Package and release helm
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
@@ -175,8 +191,9 @@ jobs:
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
       run: |
           helm plugin install https://github.com/chartmuseum/helm-push.git
-          helm package chart -d .
-          helm cm-push chart https://charts.v3.cnvrg.io -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --force
+          helm repo add cnvrg https://charts.slim.cnvrg.io/cnvrg
+          helm dependency build charts/mlops
+          helm cm-push charts/mlops -f cnvrg -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --context-path /cnvrg
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2

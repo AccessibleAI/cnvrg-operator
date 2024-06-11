@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nomex
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: nomex
+    component: nomex
+spec:
+  selector:
+    matchLabels:
+      app: nomex
+      component: nomex
+  template:
+    metadata:
+      labels:
+        app: nomex
+        component: nomex
+    spec:
+      serviceAccountName: cnvrg-nomex
+      containers:
+      - name: nomex
+        imagePullPolicy: Always
+        image: {{ .Values.imageHub}}/{{.Values.image }}
+        command:
+          - /opt/app-root/nomex
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 2112
+          failureThreshold: 5
+          successThreshold: 1
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 2112
+          failureThreshold: 5
+          successThreshold: 1
+          periodSeconds: 15
+        ports:
+        - containerPort: 2112
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault

@@ -1,4 +1,4 @@
-
+.DS_Store
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -27,3 +27,8 @@ config/samples/private
 *.code-workspace
 controllers/junit.xml
 controllers/test-report.html
+bundle
+hack/scripts/docgen/node_modules
+.devspace
+certs
+charts/mlops/charts

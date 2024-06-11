@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mpi-operator
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mpi-operator
+  template:
+    metadata:
+      labels:
+        app: mpi-operator
+    spec:
+      serviceAccountName: mpi-operator
+      containers:
+        - name: mpi-operator
+          imagePullPolicy: Always
+          image: {{ .Values.imageHub }}/{{.Values.image}}
+          args:
+            - -alsologtostderr
+            - --kubectl-delivery-image
+            - {{ .Values.imageHub }}/{{.Values.kubectlDeliveryImage}}
+            - --lock-namespace
+            - {{ .Release.Namespace }}
+            - --namespace
+            - {{ .Release.Namespace }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+            capabilities:
+              drop:
+                - ALL
+

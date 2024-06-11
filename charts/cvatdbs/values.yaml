@@ -1,0 +1,31 @@
+imageHub: docker.io/cnvrg
+imagePullSecretRef: cnvrg-app-registry
+cvat:
+  storage:
+    enabled: false
+    pvcName: cvat-nfs
+    class: ""
+    size: 100Gi
+pg:
+  image: postgresql-12-centos7:latest
+  confRef: cvat-pg
+  storage:
+    size: 100Gi
+    class: ''
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 200m
+      memory: 1Gi
+redis:
+  image: redis:7.0.5
+  confRef: cvat-redis
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 200Mi

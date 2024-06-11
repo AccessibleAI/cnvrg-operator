@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cvat-redis
+  namespace: {{ .Release.Namespace }}
+imagePullSecrets:
+  - name: cvat-redis

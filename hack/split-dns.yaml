@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-zone
+  namespace: kube-system
+data:
+  custom-zone: |
+    $ORIGIN cnvrg-on-idc.azops.cnvrg.io.
+    cnvrg-on-idc.azops.cnvrg.io.     IN  SOA   ns.cnvrg-on-idc.azops.cnvrg.io. username.cnvrg-on-idc.azops.cnvrg.io. ( 2007120710 1d 2h 4w 1h )
+    *                    IN  A     100.82.189.186
+    *                    IN  A     100.82.189.93
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    cnvrg-on-idc.azops.cnvrg.io:53 {
+       file /tmp/custom-zone/custom-zone
+    }
+    .:53 {
+        errors
+        health
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          pods insecure
+          ttl 30
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf
+        cache 30
+        loop
+        reload
+        loadbalance
+    }

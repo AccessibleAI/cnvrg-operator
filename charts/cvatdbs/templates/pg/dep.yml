@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cvat-pg
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cvat-pg
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cvat-pg
+    spec:
+      serviceAccountName: cvat-pg
+      securityContext:
+        runAsUser: 26
+        fsGroup: 26
+      containers:
+        - name: postgresql
+          envFrom:
+            - secretRef:
+                name: cvat-pg
+          image: {{ .Values.imageHub}}/{{.Values.pg.image}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - --live
+            initialDelaySeconds: 120
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+            - mountPath: /var/lib/pgsql/data
+              name: postgres-data
+            - mountPath: /dev/shm
+              name: dshm
+          resources:
+            limits:
+              cpu: {{ .Values.pg.resources.limits.cpu }}
+              memory: {{ .Values.pg.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.pg.resources.requests.cpu }}
+              memory: {{ .Values.pg.resources.requests.memory }}
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: cvat-pg
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

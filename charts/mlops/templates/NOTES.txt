@@ -1,0 +1,13 @@
+🚀 Thank you for installing cnvrg.io!
+
+Wait until all the pods in the {{ .Release.Namespace }} namespace are running and healthy.
+Once all pods are running, get the app url by running:
+kubectl get cap cnvrg-app -n{{ .Release.Namespace }} -ojson | grep clusterDomain | awk '{print "app."$2}' | tr -d '"|,'
+If something goes wrong (how come? 🙀), check app init container logs:
+kubectl logs -n{{ .Release.Namespace }} --tail 10 -lapp=app -c ingresscheck
+
+Join our community at https://community.cnvrg.io
+Talk to our team via email at hi@cnvrg.io
+
+
+

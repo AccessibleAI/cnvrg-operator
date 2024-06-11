@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvat-pg
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pg.storage.size }}
+  {{- if ne .Values.pg.storage.class "" }}
+  storageClassName: {{ .Values.pg.storage.class }}
+  {{- end }}
+
