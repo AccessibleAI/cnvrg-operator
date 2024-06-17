@@ -23,7 +23,7 @@ data:
             target_label: container_name
           - source_labels: [__meta_kubernetes_namespace]
             action: replace
-            target_label: namespace
+            target_label: scraper_namespace
         kubernetes_sd_configs:
           - role: pod
             selectors:
