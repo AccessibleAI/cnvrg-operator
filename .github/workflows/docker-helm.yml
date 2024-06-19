@@ -213,4 +213,3 @@ jobs:
           *Version: ${{ steps.tag_bump.outputs.new_tag }}*
           <${{ steps.extract_info.outputs.repo_url }}/releases|Release Notes:>
           ${{steps.changelog_final.outputs.changelog}}
-
