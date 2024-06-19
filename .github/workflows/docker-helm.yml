@@ -209,7 +209,6 @@ jobs:
         SLACK_TITLE: "Repo Name"
         SLACK_MESSAGE: |
           <${{ steps.extract_info.outputs.repo_url }}|${{github.event.repository.name}}>
-          *Docker Image: cnvrg/${{ steps.extract_info.outputs.docker_repo }}:${{ steps.tag_bump.outputs.new_tag }}*
           *Version: ${{ steps.tag_bump.outputs.new_tag }}*
           <${{ steps.extract_info.outputs.repo_url }}/releases|Release Notes:>
-          ${{steps.changelog_final.outputs.changelog}}
+          ${{steps.cnvrg_changelog.outputs.changelog}}
