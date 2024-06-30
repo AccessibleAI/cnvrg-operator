@@ -24,6 +24,9 @@ data:
           - source_labels: [__meta_kubernetes_namespace]
             action: replace
             target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            action: replace
+            target_label: node_name
         kubernetes_sd_configs:
           - role: pod
             selectors:
