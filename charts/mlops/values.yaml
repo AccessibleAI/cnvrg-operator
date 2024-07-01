@@ -89,7 +89,7 @@ controlPlane:
     readinessPeriodSeconds: 100
     readinessTimeoutSeconds: 60
   cnvrgScheduler:
-    enabled: false
+    enabled: true
     requests:
       cpu: 200m
       memory: 1000Mi
