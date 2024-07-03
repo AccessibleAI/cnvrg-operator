@@ -1,3 +1,5 @@
+GOTEST      ?= CGO_ENABLED=0 go test
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -18,7 +20,7 @@ bundle:
 	kustomize build config/manifests | operator-sdk generate bundle -q --overwrite --version 4.3.16
 
 # Run tests
-test: generate fmt vet manifests
+test: generate fmt vet manifests test-controller
 	rm -f ./controllers/test-report.html ./controllers/junit.xml
 	CNVRG_OPERATOR_MAX_CONCURRENT_RECONCILES=1 go test ./controllers/ -v -timeout 40m
 
@@ -178,4 +180,12 @@ CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
+.PHONY: fetch-ext-bin
+fetch-ext-bin: ## fetch external kubebuilder bins required to run testenv
+	source ./scripts/fetch_ext_bins.sh; fetch_tools; setup_envs;
+
+.PHONY: test-controller
+test-controller: fetch-ext-bin
+	$(GOTEST) ./controllers/test/...
 
