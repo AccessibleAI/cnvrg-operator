@@ -14,6 +14,7 @@ data:
       evaluation_interval: 10s
     scrape_configs:
       - job_name: cnvrg-metrics
+        honor_labels: true
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
