@@ -33,6 +33,7 @@ spec:
   template:
     metadata:
       annotations:
+        cnvrg-component: webapp
         {{- range $k, $v := .Spec.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}
