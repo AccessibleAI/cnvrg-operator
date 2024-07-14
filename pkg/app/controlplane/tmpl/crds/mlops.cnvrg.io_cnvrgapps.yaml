@@ -897,6 +897,8 @@ spec:
             type: object
           status:
             properties:
+              lastFeatureFlagHash:
+                type: string
               message:
                 type: string
               progress:
@@ -907,6 +909,8 @@ spec:
                 type: object
               status:
                 type: string
+            required:
+            - lastFeatureFlagHash
             type: object
         type: object
     served: true

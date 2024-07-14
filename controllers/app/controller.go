@@ -35,6 +35,7 @@ import (
 
 const systemStatusHealthCheckLabelName = "cnvrg-system-status-check"
 const CnvrgappFinalizer = "cnvrgapp.mlops.cnvrg.io/finalizer"
+const RolloutAnnotation = "kubectl.kubernetes.io/restartedAt"
 
 type CnvrgAppReconciler struct {
 	client.Client
@@ -47,7 +48,6 @@ type CnvrgAppReconciler struct {
 // +kubebuilder:rbac:groups=mlops.cnvrg.io,namespace=cnvrg,resources=cnvrgapps/status,verbs=get;update;patch
 
 func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-
 	log = r.Log.WithValues("name", req.NamespacedName)
 	log.Info("starting cnvrgapp reconciliation")
 
@@ -90,20 +90,34 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil
 	}
 	// check if enabled control plane workloads are all in ready status
-	ready, percentageReady, stackReadiness, err := r.getControlPlaneReadinessStatus(cnvrgApp)
+	stackReadiness, err := r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
 	// even if all control plane workloads are ready, let operator finish the full reconcile loop
-	if percentageReady == 100 {
-		percentageReady = 99
+	if stackReadiness.percentageReady == 100 {
+		stackReadiness.percentageReady = 99
 	}
+
+	//check are feature flags were updated
+	var featureFlagsChanged bool
+	newFeatureFlagsHash := hashStringsMap(cnvrgApp.Spec.ControlPlane.BaseConfig.FeatureFlags)
+
+	lastFeatureFlagsHash := cnvrgApp.Status.LastFeatureFlagsHash
+
+	// feature flags are changed
+	if newFeatureFlagsHash != lastFeatureFlagsHash && lastFeatureFlagsHash != "" {
+		featureFlagsChanged = true
+	}
+
 	s := mlopsv1.Status{
-		Status:         mlopsv1.StatusReconciling,
-		Message:        fmt.Sprintf("reconciling... (%d%%)", percentageReady),
-		Progress:       percentageReady,
-		StackReadiness: stackReadiness}
+		Status:               mlopsv1.StatusReconciling,
+		Message:              fmt.Sprintf("reconciling... (%d%%)", stackReadiness.percentageReady),
+		Progress:             stackReadiness.percentageReady,
+		StackReadiness:       stackReadiness.readyState,
+		LastFeatureFlagsHash: newFeatureFlagsHash,
+	}
 	r.updateStatusMessage(s, cnvrgApp)
 
 	// apply spec manifests
@@ -113,27 +127,82 @@ func (r *CnvrgAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	// get control plan readiness
-	ready, percentageReady, stackReadiness, err = r.getControlPlaneReadinessStatus(cnvrgApp)
+	stackReadiness, err = r.getControlPlaneReadinessStatus(cnvrgApp)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", percentageReady)
+
+	var rollingOnFeatureFlagUpdate bool
+
+	//feature flags were changed, therefore need rollout scheduler
+	if featureFlagsChanged {
+		rollingOnFeatureFlagUpdate = true
+
+		if cnvrgApp.Spec.ControlPlane.WebApp.Enabled {
+			err := r.RollDeployment(types.NamespacedName{Name: cnvrgApp.Spec.ControlPlane.WebApp.SvcName, Namespace: cnvrgApp.Namespace})
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		if cnvrgApp.Spec.ControlPlane.Sidekiq.Enabled {
+			err = r.RollDeployment(types.NamespacedName{Name: sidekiq, Namespace: cnvrgApp.Namespace})
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		if cnvrgApp.Spec.ControlPlane.Searchkiq.Enabled {
+			err = r.RollDeployment(types.NamespacedName{Name: searchkiq, Namespace: cnvrgApp.Namespace})
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		if cnvrgApp.Spec.ControlPlane.Systemkiq.Enabled {
+			err = r.RollDeployment(types.NamespacedName{Name: systemkiq, Namespace: cnvrgApp.Namespace})
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		if cnvrgApp.Spec.ControlPlane.CnvrgScheduler.Enabled {
+			err = r.RollDeployment(types.NamespacedName{Name: scheduler, Namespace: cnvrgApp.Namespace})
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	}
+
+	statusMsg := fmt.Sprintf("successfully reconciled, ready (%d%%)", stackReadiness.percentageReady)
 	log.Info(statusMsg)
 
-	if ready { // u r done, done
+	if stackReadiness.isReady && !rollingOnFeatureFlagUpdate { // u r done and no need to roll due to feature flags change, done
 		s := mlopsv1.Status{
-			Status:         mlopsv1.StatusReady,
-			Message:        statusMsg,
-			Progress:       percentageReady,
-			StackReadiness: stackReadiness}
+			Status:               mlopsv1.StatusReady,
+			Message:              statusMsg,
+			Progress:             stackReadiness.percentageReady,
+			StackReadiness:       stackReadiness.readyState,
+			LastFeatureFlagsHash: newFeatureFlagsHash,
+		}
 		r.updateStatusMessage(s, cnvrgApp)
 		log.Info("stack is ready!")
 		r.recorder.Event(cnvrgApp, "Normal", "Created", fmt.Sprintf("cnvrgapp %s successfully deployed", req.NamespacedName))
 		return ctrl.Result{}, nil
 	} else { // reconcile again
 		requeueAfter, _ := time.ParseDuration("30s")
-		log.Info("stack not ready yet, requeuing...")
-		r.recorder.Event(cnvrgApp, "Normal", "Creating", fmt.Sprintf("cnvrgapp %s not ready yet, done: %d%%", req.NamespacedName, percentageReady))
+		var logMessage, eventMessage string
+		if rollingOnFeatureFlagUpdate {
+			logMessage = "rolling apps due to feature flags change..."
+			eventMessage = "rolling: feature flags changed"
+
+		} else {
+			logMessage = "stack not ready yet, requeuing..."
+			eventMessage = fmt.Sprintf("cnvrgapp %s not ready yet, done: %d%%", req.NamespacedName, stackReadiness.percentageReady)
+
+		}
+		log.Info(logMessage)
+		r.recorder.Event(cnvrgApp, "Normal", "Creating", eventMessage)
 		return ctrl.Result{RequeueAfter: requeueAfter}, nil
 	}
 }
@@ -254,6 +323,7 @@ func (r *CnvrgAppReconciler) updateStatusMessage(status mlopsv1.Status, app *mlo
 	if status.StackReadiness != nil {
 		app.Status.StackReadiness = status.StackReadiness
 	}
+	app.Status.LastFeatureFlagsHash = status.LastFeatureFlagsHash
 	if err := r.Status().Update(context.Background(), app); err != nil {
 		r.recorder.Event(app, "Warning", "StatusUpdateError", err.Error())
 	}
@@ -401,7 +471,6 @@ func (r *CnvrgAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *CnvrgAppReconciler) appOwnsPredicateFuncs() predicate.Funcs {
-
 	return predicate.Funcs{
 
 		UpdateFunc: func(e event.UpdateEvent) bool {
@@ -456,7 +525,6 @@ func (r *CnvrgAppReconciler) CheckDeploymentReadiness(name types.NamespacedName)
 }
 
 func (r *CnvrgAppReconciler) CheckStatefulSetReadiness(name types.NamespacedName) (bool, error) {
-
 	ctx := context.Background()
 	sts := &v1apps.StatefulSet{}
 
@@ -471,4 +539,24 @@ func (r *CnvrgAppReconciler) CheckStatefulSetReadiness(name types.NamespacedName
 	}
 
 	return false, nil
+}
+
+func (r *CnvrgAppReconciler) RollDeployment(name types.NamespacedName) error {
+	ctx := context.Background()
+	deployment := &v1apps.Deployment{}
+
+	if err := r.Get(ctx, name, deployment); err != nil {
+		return fmt.Errorf("failed to get deployment for rollout %s/%s : %v", name.Namespace, name.Name, err)
+	}
+
+	if deployment.Spec.Template.ObjectMeta.Annotations == nil {
+		deployment.Spec.Template.ObjectMeta.Annotations = make(map[string]string)
+	}
+	deployment.Spec.Template.ObjectMeta.Annotations[RolloutAnnotation] = time.Now().Format(time.RFC3339)
+
+	if err := r.Client.Update(ctx, deployment); err != nil {
+		return fmt.Errorf("failed to get update deployment for rollout %s/%s : %v", name.Namespace, name.Name, err)
+	}
+
+	return nil
 }

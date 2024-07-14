@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
+	v1 "k8s.io/api/apps/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	ktypes "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -57,12 +58,30 @@ func EventuallyGet(key ktypes.NamespacedName, obj client.Object, intervals ...in
 	EventuallyWithOffset(1, GetF(key, obj), intervals...).ShouldNot(BeNil())
 }
 
+// EventuallyUpdate helps with updates that tend to race with controller updates.
+func EventuallyUpdate(key ktypes.NamespacedName, obj client.Object, modify func(o client.Object), opts ...client.UpdateOption) {
+	EventuallyWithOffset(1, func() error {
+		if err := Get(key, obj); err != nil {
+			return err
+		}
+		modify(obj)
+		return Update(obj, opts...)
+	}).Should(Succeed())
+}
+
 // GetF returns a function that wraps the k8s client get.
 // It helps with the use of async matchers.
 func GetF(key ktypes.NamespacedName, obj client.Object) func() (interface{}, error) {
 	return func() (interface{}, error) {
 		err := Get(key, obj)
 		return obj, err
+	}
+}
+
+func GetTemplateAnnotationsF(key ktypes.NamespacedName, obj v1.Deployment) func() (interface{}, error) {
+	return func() (interface{}, error) {
+		err := Get(key, &obj)
+		return obj.Spec.Template.Annotations, err
 	}
 }
 
@@ -147,4 +166,9 @@ func EventuallyFinalize(key ktypes.NamespacedName, obj client.Object, intervals 
 // Update wraps the k8s client update.
 func Update(obj client.Object, opts ...client.UpdateOption) error {
 	return tc.client.Update(tc.ctx, obj, opts...)
+}
+
+// EventuallyTemplateAnnotationIsPresent helps with the asserting on the annotation filed in deployment template, assert if annotation key is present
+func EventuallyTemplateAnnotationIsPresent(key ktypes.NamespacedName, obj v1.Deployment, annotation string, intervals ...interface{}) {
+	EventuallyWithOffset(1, GetTemplateAnnotationsF(key, obj), intervals...).Should(gomega.HaveKey(annotation))
 }

@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        cnvrg-component: scheduler
         {{- range $k, $v := .Spec.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}
