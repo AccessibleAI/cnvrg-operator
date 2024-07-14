@@ -15,6 +15,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	"testing"
 	"time"
@@ -50,6 +52,8 @@ var _ = BeforeSuite(func() {
 	done := make(chan struct{})
 
 	go func() {
+		logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
+
 		projectBaseDir := "../../"
 		crdPaths := []string{
 			filepath.Join(projectBaseDir, "charts/mlops/crds/"),

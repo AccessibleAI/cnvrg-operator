@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/controllers"
@@ -196,4 +197,26 @@ func RandomString(length int) string {
 		output.WriteString(string(randomChar))
 	}
 	return output.String()
+}
+
+func hashStringsMap(m map[string]string) string {
+	h := sha256.New()
+
+	keys := make([]string, len(m))
+	i := 0
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := m[k]
+
+		b := sha256.Sum256([]byte(fmt.Sprintf("%v", k)))
+		h.Write(b[:])
+		b = sha256.Sum256([]byte(fmt.Sprintf("%v", v)))
+		h.Write(b[:])
+	}
+
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
