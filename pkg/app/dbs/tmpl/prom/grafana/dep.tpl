@@ -49,11 +49,17 @@ spec:
           - name: GF_AUTH_ANONYMOUS_ENABLED
             value: "true"
           - name: GF_AUTH_ANONYMOUS_ORG_ROLE
-            value: Admin
+            value: Viewer
+          - name: GF_AUTH_ORG_ROLE
+            value: Viewer
           - name: GF_SECURITY_ALLOW_EMBEDDING
             value: "true"
           - name: GF_SERVER_HTTP_ADDR
             value: "0.0.0.0"
+          - name: GF_AUTH_DISABLE_LOGIN_FORM
+            value: "true"
+          - name: GF_DISABLE_INITIAL_ADMIN_CREATION
+            value: "true"
           - name: GF_SERVER_HTTP_PORT
             value: "{{ .Spec.Dbs.Prom.Grafana.Port }}"
         ports:
