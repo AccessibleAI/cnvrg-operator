@@ -270,7 +270,7 @@ var esDefault = Es{
 		ServiceAccount: "kibana",
 		SvcName:        "kibana",
 		Port:           8080,
-		Image:          "kibana-oss:7.8.1",
+		Image:          "cnvrg/kibana:7:11.2",
 		NodePort:       30601,
 		Requests: Requests{
 			Cpu:    "100m",
@@ -322,7 +322,7 @@ var promDefaults = Prom{
 	StorageSize: "50Gi",
 	Grafana: Grafana{
 		Enabled:  false,
-		Image:    "grafana-oss:9.1.7",
+		Image:    "grafana/grafana-oss:9.5.20",
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,
