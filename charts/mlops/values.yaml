@@ -234,7 +234,7 @@ dbs:
       serviceAccount: kibana
       svcName: kibana
       port: 8080
-      image: kibana-oss:7.8.1
+      image: cnvrg/kibana:7.11.2
       nodePort: 30601
       requests:
         cpu: 100m
@@ -270,7 +270,7 @@ dbs:
     storageSize: 50Gi
     grafana:
       enabled: true
-      image: grafana-oss:9.1.7
+      image: grafana/grafana-oss:9.5.20
       svcName: grafana
       port: 8080
       nodePort: 30012
