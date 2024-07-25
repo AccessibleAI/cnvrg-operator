@@ -234,7 +234,7 @@ dbs:
       serviceAccount: kibana
       svcName: kibana
       port: 8080
-      image: cnvrg/kibana:7:11.2
+      image: cnvrg/kibana:7.11.2
       nodePort: 30601
       requests:
         cpu: 100m

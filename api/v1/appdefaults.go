@@ -270,7 +270,7 @@ var esDefault = Es{
 		ServiceAccount: "kibana",
 		SvcName:        "kibana",
 		Port:           8080,
-		Image:          "cnvrg/kibana:7:11.2",
+		Image:          "cnvrg/kibana:7.11.2",
 		NodePort:       30601,
 		Requests: Requests{
 			Cpu:    "100m",
