@@ -208,7 +208,7 @@ dbs:
   es:
     enabled: true
     serviceAccount: es
-    image: cnvrg-es:7.17.5
+    image: cnvrg-es:v7.17.22
     port: 9200
     storageSize: 80Gi
     svcName: elasticsearch
