@@ -242,7 +242,7 @@ var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
 	Replicas:       1,
-	Image:          "cnvrg-es:7.17.5",
+	Image:          "cnvrg-es:v7.17.22",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
