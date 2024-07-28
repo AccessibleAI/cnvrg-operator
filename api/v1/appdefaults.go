@@ -220,7 +220,7 @@ var pgDefault = Pg{
 var redisDefault = Redis{
 	Enabled:        false,
 	ServiceAccount: "redis",
-	Image:          "cnvrg-redis:v3.0.5.c2",
+	Image:          "cnvrg-redis:v7.0.0",
 	SvcName:        "redis",
 	Port:           6379,
 	StorageSize:    "10Gi",
@@ -242,7 +242,7 @@ var esDefault = Es{
 	Enabled:        false,
 	ServiceAccount: "es",
 	Replicas:       1,
-	Image:          "cnvrg-es:7.17.5",
+	Image:          "cnvrg-es:v7.17.22",
 	Port:           9200,
 	StorageSize:    "80Gi",
 	SvcName:        "elasticsearch",
