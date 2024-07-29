@@ -137,6 +137,15 @@ server:
   name: kibana
   host: %s
   port: %s
+status:
+  allowAnonymous: true
+xpack.security.authc.providers:
+  anonymous.anonymous1:
+    order: 0
+    credentials:
+      username: %s
+      password: %s
+
 elasticsearch:
   hosts:
   - %s
@@ -144,7 +153,7 @@ elasticsearch:
   password: %s
   customHeaders:
     Authorization: "Basic %s"
-`, host, port, esHost, esUser, esPass, esBasicAuth)
+`, host, port, esUser, esPass, esHost, esUser, esPass, esBasicAuth)
 		},
 
 		"isTrue": func(boolPointer bool) bool { // this is legacy function and should be removed in the future
