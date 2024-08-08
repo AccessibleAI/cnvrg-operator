@@ -1,5 +1,5 @@
 version:
-  operator: &version ''
+  operator: &versionOperator ''
   app: ''
   agent: ''
 operatorVersion: &operatorVersion ''
@@ -363,5 +363,5 @@ mpi:
   scc: false
 metastorageprovisioner:
   enabled: true
+  version: *versionOperator
   operatorVersion: *operatorVersion
-  version: *version

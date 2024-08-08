@@ -10,6 +10,6 @@ dependencies:
   version: 1.0.0
 - name: metastorageprovisioner
   repository: file://../metastorageprovisioner
-  version: 1.0.0
-digest: sha256:5fe8adcf1438412e930e04c06bf25b9b42c385e966a4a1a5b06791a8b1b76748
-generated: "2024-08-07T15:44:11.247629+03:00"
+  version: 5.1.0
+digest: sha256:ed3288e6e029ab1fcd80cfb474c96055d7d075e0440b6b21b83512c9be153e86
+generated: "2024-08-08T15:20:10.335775+03:00"
