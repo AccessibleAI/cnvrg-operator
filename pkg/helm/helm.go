@@ -39,6 +39,7 @@ type ChartConfig struct {
 
 func NewHelm(config ChartConfig, l logr.Logger) (*Helm, error) {
 	helmSettings.SetNamespace(config.Namespace)
+	helmSettings.RepositoryCache = "/tmp/.helm"
 	installer := &Helm{
 		envSettings: helmSettings,
 		log:         l.WithValues("installer", "helm"),

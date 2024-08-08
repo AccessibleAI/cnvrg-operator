@@ -23,13 +23,12 @@ spec:
         imagePullPolicy: Always
         {{- if .Values.version }}
         image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.version}}"
-        {{- else if .Values.operatorVersion }}
-        image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.operatorVersion}}"
         {{- else }}
         image: "{{.Values.imageHub}}/cnvrg-operator:{{.Chart.Version}}"
         {{- end }}
         command:
-          - /opt/app-root/metastorageprovisioner
+          - /opt/app-root/cnvrg-metastorageprovisioner
+          - start
         securityContext:
           allowPrivilegeEscalation: false
           runAsNonRoot: true

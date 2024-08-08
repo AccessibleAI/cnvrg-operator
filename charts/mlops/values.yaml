@@ -1,8 +1,8 @@
 version:
-  operator: &versionOperator ''
+  operator: ''
   app: ''
   agent: ''
-operatorVersion: &operatorVersion ''
+operatorVersion: ''
 clusterDomain: ''
 clusterInternalDomain: cluster.local
 platform: k8s
@@ -363,5 +363,5 @@ mpi:
   scc: false
 metastorageprovisioner:
   enabled: true
-  version: *versionOperator
-  operatorVersion: *operatorVersion
+  version: ''
+

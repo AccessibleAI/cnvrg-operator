@@ -9,3 +9,15 @@ rules:
       - persistentvolumes
     verbs:
       - "*"
+  - apiGroups:
+      - "mlops.cnvrg.io"
+    resources:
+      - metastorageprovisioners
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
