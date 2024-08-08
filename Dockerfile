@@ -32,4 +32,5 @@ USER 1000
 WORKDIR /opt/app-root
 COPY license /licenses
 COPY --from=builder /workspace/cnvrg-operator .
+COPY --from=builder /workspace/cnvrg-metastorageprovisioner .
 

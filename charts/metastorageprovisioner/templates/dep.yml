@@ -23,13 +23,15 @@ spec:
         imagePullPolicy: Always
         {{- if .Values.version }}
         image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.version}}"
-        {{- else if .Values.operatorVersion }}
-        image: "{{.Values.imageHub}}/cnvrg-operator:{{.Values.operatorVersion}}"
         {{- else }}
         image: "{{.Values.imageHub}}/cnvrg-operator:{{.Chart.Version}}"
         {{- end }}
         command:
-          - /opt/app-root/metastorageprovisioner
+          - /opt/app-root/cnvrg-metastorageprovisioner
+          - start
+        env:
+          - name: HELM_REPOSITORY_CACHE
+            value: /tmp/
         securityContext:
           allowPrivilegeEscalation: false
           runAsNonRoot: true
