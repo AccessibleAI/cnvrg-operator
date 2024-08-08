@@ -16,7 +16,8 @@ COPY pkg/ pkg/
 COPY cmd/ cmd/
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator cmd/operator/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-operator cmd/operator/main.go \
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o cnvrg-metastorageprovisioner cmd/metastorageprovisioner/main.go
 
 
 FROM registry.access.redhat.com/ubi9/ubi:latest

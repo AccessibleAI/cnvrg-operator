@@ -8,5 +8,8 @@ dependencies:
 - name: cvatdbs
   repository: https://charts.slim.cnvrg.io/cnvrg
   version: 1.0.0
-digest: sha256:873ffcf4a714f915e7f67358a5c9832afcb2acc50e4620d9abc3190e9b7a4632
-generated: "2024-06-17T13:46:42.215402+03:00"
+- name: metastorageprovisioner
+  repository: file://../metastorageprovisioner
+  version: 1.0.0
+digest: sha256:5fe8adcf1438412e930e04c06bf25b9b42c385e966a4a1a5b06791a8b1b76748
+generated: "2024-08-07T15:44:11.247629+03:00"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cnvrg-metastorageprovisioner
+  namespace: {{ .Release.Namespace }}
+imagePullSecrets:
+  - name: {{ .Values.imagePullSecretRef }}
