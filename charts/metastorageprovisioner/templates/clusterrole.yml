@@ -1,0 +1,29 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "cnvrg-metastorageprovisioner-{{ .Release.Namespace }}"
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+    verbs:
+      - "*"
+  - apiGroups:
+      - "mlops.cnvrg.io"
+    resources:
+      - metastorageprovisioners
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - storageclasses
+    verbs:
+      - "*"
