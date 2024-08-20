@@ -2,7 +2,7 @@ apiVersion: v2
 name: mlops
 description: A cnvrg.io MLOps platform Helm Chart
 type: application
-version: 5.1.0
+version: 5.1.0 # NOTE: if changed should be updated in  charts/metastorageprovisioner/Chart.yaml accordingly
 appVersion: 5.1.0
 dependencies:
   - name: nomex
@@ -17,5 +17,9 @@ dependencies:
     version: 1.0.0
     repository: https://charts.slim.cnvrg.io/cnvrg
     condition: cvatdbs.enabled
+  - name: metastorageprovisioner
+    version: 5.1.0
+    repository: file://../metastorageprovisioner
+    condition: metastorageprovisioner.enabled
 
 

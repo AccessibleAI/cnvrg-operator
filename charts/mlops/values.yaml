@@ -361,3 +361,7 @@ cvatdbs:
 mpi:
   enabled: false
   scc: false
+metastorageprovisioner:
+  enabled: true
+  version: ''
+

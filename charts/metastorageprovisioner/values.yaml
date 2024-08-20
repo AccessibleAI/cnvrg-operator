@@ -1,0 +1,3 @@
+imageHub: docker.io/cnvrg
+imagePullSecretRef: cnvrg-app-registry
+version: ''
