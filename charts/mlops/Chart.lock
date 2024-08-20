@@ -9,7 +9,7 @@ dependencies:
   repository: https://charts.slim.cnvrg.io/cnvrg
   version: 1.0.0
 - name: metastorageprovisioner
-  repository: file://../metastorageprovisioner
-  version: 5.1.0
-digest: sha256:ed3288e6e029ab1fcd80cfb474c96055d7d075e0440b6b21b83512c9be153e86
-generated: "2024-08-08T15:20:10.335775+03:00"
+  repository: https://charts.slim.cnvrg.io/cnvrg
+  version: 1.0.0
+digest: sha256:2ac77f395b4b9b9294f26328e57ff8e96479d75657ba5a8085e6ccee823368b4
+generated: "2024-08-20T13:17:06.105285+03:00"
