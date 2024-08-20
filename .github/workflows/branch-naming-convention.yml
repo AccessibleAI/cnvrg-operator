@@ -14,7 +14,6 @@ jobs:
           min_length: 5 # Min length of the branch name
           max_length: 300 # Max length of the branch name
       - name: Package and release helm
-        if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
         env:
           CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
           CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
