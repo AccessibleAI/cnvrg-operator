@@ -13,3 +13,12 @@ jobs:
           ignore: master,main,saas # Ignore exactly matching branch names from convention
           min_length: 5 # Min length of the branch name
           max_length: 300 # Max length of the branch name
+      - name: Package and release helm
+        if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
+        env:
+          CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
+          CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
+        run: |
+          helm plugin install https://github.com/chartmuseum/helm-push.git
+          helm repo add cnvrg https://charts.slim.cnvrg.io/cnvrg
+          helm cm-push charts/metastorageprovisioner -f cnvrg -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --context-path /cnvrg
