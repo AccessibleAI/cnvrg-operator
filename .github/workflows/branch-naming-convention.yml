@@ -13,6 +13,9 @@ jobs:
           ignore: master,main,saas # Ignore exactly matching branch names from convention
           min_length: 5 # Min length of the branch name
           max_length: 300 # Max length of the branch name
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Package and release helm
         env:
           CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
