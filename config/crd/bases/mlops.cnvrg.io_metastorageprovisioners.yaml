@@ -1,0 +1,71 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: metastorageprovisioners.mlops.cnvrg.io
+spec:
+  group: mlops.cnvrg.io
+  names:
+    kind: MetaStorageProvisioner
+    listKind: MetaStorageProvisionerList
+    plural: metastorageprovisioners
+    singular: metastorageprovisioner
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MetaStorageProvisioner represents the storage provisioner to
+          be installed
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: StorageProvisionerSpec defines the desired state of MetaStorageProvisioner
+            properties:
+              NFSProvisioner:
+                description: only one of the following should be set
+                properties:
+                  nfsPath:
+                    type: string
+                  nfsServer:
+                    type: string
+                  storageClassName:
+                    type: string
+                required:
+                - nfsPath
+                - nfsServer
+                type: object
+            type: object
+          status:
+            description: StorageProvisionerStatus defines the observed state of MetaStorageProvisioner
+            properties:
+              status:
+                type: string
+            required:
+            - status
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

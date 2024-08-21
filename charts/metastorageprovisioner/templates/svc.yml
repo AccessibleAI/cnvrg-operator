@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: metastorageprovisioner
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: metastorageprovisioner
+spec:
+  ports:
+  - port: 2112
+  selector:
+    app: metastorageprovisioner

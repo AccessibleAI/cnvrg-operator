@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metastorageprovisioner
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: metastorageprovisioner
+    component: metastorageprovisioner
+spec:
+  selector:
+    matchLabels:
+      app: metastorageprovisioner
+      component: metastorageprovisioner
+  template:
+    metadata:
+      labels:
+        app: metastorageprovisioner
+        component: metastorageprovisioner
+    spec:
+      serviceAccountName: cnvrg-metastorageprovisioner
+      containers:
+      - name: metastorageprovisioner
+        imagePullPolicy: Always
+        image: "{{.Values.imageHub}}/cnvrg-operator:5.1.20"
+        command:
+          - /opt/app-root/cnvrg-metastorageprovisioner
+          - start
+        env:
+          - name: HELM_CACHE_HOME
+            value: /tmp/
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
