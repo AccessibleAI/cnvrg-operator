@@ -28,6 +28,7 @@ spec:
   template:
     metadata:
       annotations:
+        cnvrg-component: searchkiq
         {{- range $k, $v := .Spec.Annotations }}
         {{$k}}: "{{$v}}"
         {{- end }}

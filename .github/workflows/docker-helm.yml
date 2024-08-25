@@ -201,7 +201,7 @@ jobs:
       env:
         SLACK_USERNAME: Github Actions
         SLACK_WEBHOOK: ${{ secrets.SLACK_GITHUB_APP_TOKEN  }}
-        SLACK_CHANNEL: "#release-notes-metacloud"
+        SLACK_CHANNEL: "#release-notes"
         SLACK_ICON: https://avatars.githubusercontent.com/u/44036562?s=48&v=4
         SLACK_COLOR: ${{ job.status }}
         SLACK_FOOTER: ""

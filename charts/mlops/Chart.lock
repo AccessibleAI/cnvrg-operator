@@ -1,12 +1,15 @@
 dependencies:
 - name: nomex
   repository: https://charts.slim.cnvrg.io/cnvrg
-  version: 1.0.0
+  version: 2.0.0
 - name: mpi
   repository: https://charts.slim.cnvrg.io/cnvrg
   version: 0.2.3
 - name: cvatdbs
   repository: https://charts.slim.cnvrg.io/cnvrg
   version: 1.0.0
-digest: sha256:45fc77f321c5c8623a06d99313cae5cc24e10d9654bf2c9f0d346fce161f747e
-generated: "2024-04-30T12:03:16.858587+03:00"
+- name: metastorageprovisioner
+  repository: file://../metastorageprovisioner
+  version: 5.1.0
+digest: sha256:ed3288e6e029ab1fcd80cfb474c96055d7d075e0440b6b21b83512c9be153e86
+generated: "2024-08-08T15:20:10.335775+03:00"
