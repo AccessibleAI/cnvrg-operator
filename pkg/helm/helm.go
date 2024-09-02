@@ -31,6 +31,7 @@ type ChartConfig struct {
 	Namespace   string
 	Pass        string
 	ReleaseName string
+	ChartName   string
 	Url         string
 	User        string
 	Values      map[string]interface{}
@@ -99,7 +100,7 @@ func (h *Helm) configureRegistryClient() error {
 func (h *Helm) loadChart(cpo *action.ChartPathOptions) (*chart.Chart, error) {
 	cpo.Version = h.chartConfig.Version
 	cpo.RepoURL = h.chartConfig.Url
-	cp, err := cpo.LocateChart(h.chartConfig.ReleaseName, h.envSettings)
+	cp, err := cpo.LocateChart(h.chartConfig.ChartName, h.envSettings)
 	if err != nil {
 		return nil, err
 	}

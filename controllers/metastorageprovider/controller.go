@@ -87,7 +87,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 		// readiness checker for NFS provisioner
 		checker = func() (bool, error) {
-			deployment := types.NamespacedName{Name: nfsProvisionerReleaseName, Namespace: r.Namespace}
+			deployment := types.NamespacedName{Name: provisionerObject.Name, Namespace: r.Namespace}
 			return CheckDeploymentReadiness(r.Client, deployment)
 		}
 	}
@@ -115,7 +115,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	// if not ready, requeue
 	if !ready {
 		r.EventLogger.WithMessage("waiting for deployment readiness").WithStatus(v1alpha1.Pending).Log(ctx)
-		return ctrl.Result{RequeueAfter: 5}, nil
+		return ctrl.Result{RequeueAfter: 30}, nil
 	}
 
 	// provisioner is ready
@@ -138,7 +138,9 @@ func (r *Reconciler) nfsConfig(provisionerObject *v1alpha1.MetaStorageProvisione
 		"path":   provisionerObject.Spec.NFSProvisioner.NFSPath,
 	}
 
-	chartConfig = r.ChartConfig(values)
+	values["fullnameOverride"] = provisionerObject.Name
+
+	chartConfig = r.NFSChartConfig(provisionerObject.Name, values)
 	return chartConfig
 }
 
@@ -150,10 +152,11 @@ func (r *Reconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *Reconciler) ChartConfig(values map[string]interface{}) installer.ChartConfig {
+func (r *Reconciler) NFSChartConfig(name string, values map[string]interface{}) installer.ChartConfig {
 	return installer.ChartConfig{
 		Namespace:   r.Namespace,
-		ReleaseName: nfsProvisionerReleaseName,
+		ReleaseName: name,
+		ChartName:   nfsProvisionerReleaseName,
 		Url:         fmt.Sprintf("https://kubernetes-sigs.github.io/%s", nfsProvisionerReleaseName),
 		Values:      values,
 		Version:     nfsProvisionerVersion,
@@ -178,7 +181,7 @@ func (r *Reconciler) ReconcileDelete(ctx context.Context, provisioner *v1alpha1.
 	logger := log.FromContext(ctx)
 	r.EventLogger.WithMessage("deleting meta storage provisioner").WithStatus(v1alpha1.Deleting).Log(ctx)
 
-	chartConfig := r.ChartConfig(nil)
+	chartConfig := r.NFSChartConfig(provisioner.Name, nil)
 	helm, err := installer.NewHelm(chartConfig, logger)
 	if err != nil {
 		return fmt.Errorf("error while creating helm installer: %w", err)

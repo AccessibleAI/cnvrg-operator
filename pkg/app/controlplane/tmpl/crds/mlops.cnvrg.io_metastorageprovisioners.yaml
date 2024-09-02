@@ -14,11 +14,13 @@ spec:
     singular: metastorageprovisioner
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: MetaStorageProvisioner represents the storage provisioner to
-          be installed
         properties:
           apiVersion:
             description: |-
