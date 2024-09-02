@@ -264,3 +264,14 @@ rules:
     - patch
     - update
     - watch
+- apiGroups:
+    - mlops.cnvrg.io
+  resources:
+    - metastorageprovisioners
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete

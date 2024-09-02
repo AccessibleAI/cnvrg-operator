@@ -93,6 +93,9 @@ metadata:
     mlops.cnvrg.io/default-loader: "true"
     mlops.cnvrg.io/own: "false"
     mlops.cnvrg.io/updatable: "true"
+    mlops.cnvrg.io/default-loader: "true"
+    mlops.cnvrg.io/own: "false"
+    mlops.cnvrg.io/updatable: "true"
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
   name: cnvrgthirdparties.mlops.cnvrg.io
