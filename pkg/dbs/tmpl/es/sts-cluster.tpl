@@ -68,10 +68,6 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       volumes:
-        - name: es-ilm
-          configMap:
-            name: "es-ilm"
-            defaultMode: 0755
         - name: {{ .Spec.Dbs.Es.ServiceAccount }}-certs
           secret:
            secretName: {{ .Spec.Dbs.Es.ServiceAccount }}-certs
@@ -160,8 +156,6 @@ spec:
         envFrom:
           - secretRef:
               name: {{ .Spec.Dbs.Es.CredsRef }}
-          - configMapRef:
-              name: es-ilm-cm
         ports:
         - name: http
           containerPort: {{ .Spec.Dbs.Es.Port }}
@@ -238,18 +232,9 @@ spec:
           periodSeconds: 10
           successThreshold: 3
           timeoutSeconds: 5
-        lifecycle:
-          postStart:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - /tmp/elastic/elastic_cleanup.sh&
         volumeMounts:
         - name: {{ .Spec.Dbs.Es.PvcName  }}
           mountPath: "/usr/share/elasticsearch/data"
         - name: {{ .Spec.Dbs.Es.ServiceAccount }}-certs
           mountPath: /usr/share/elasticsearch/config/certs
           readOnly: true
-        - name: es-ilm
-          mountPath: "/tmp/elastic/"

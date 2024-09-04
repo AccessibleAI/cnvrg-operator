@@ -14,7 +14,7 @@ metadata:
 data:
   elastic_cleanup.sh: |+
     #!/bin/bash
-    ES_URL=http://localhost:9200
+    ES_URL=http://elasticsearch:9200
     while [[ "$(curl -u "elastic:${CNVRG_ES_PASS}" -s -o /dev/null -w '%{http_code}\n' $ES_URL)" != "200" ]]; do sleep 2; done
     while [[ "$(curl -X PUT -u "elastic:${CNVRG_ES_PASS}" "${ES_URL}/_security/user/${CNVRG_ES_USER}?pretty"  -H 'Content-Type: application/json'  -d "{ \"password\" : \"${CNVRG_ES_PASS}\", \"roles\" : [ \"superuser\" ] }"  -s -o /dev/null -w '%{http_code}\n')" != "200" ]]; do sleep 2; done
     curl -X PUT -u "${CNVRG_ES_USER}:${CNVRG_ES_PASS}" "${ES_URL}/_ilm/policy/cleanup_policy_app?pretty"  -H 'Content-Type: application/json'  -d '{ "policy": { "phases": { "hot": { "actions": {} }, "delete": { "min_age": "30d", "actions": { "delete": {} } } } } }'

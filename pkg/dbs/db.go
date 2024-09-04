@@ -49,6 +49,15 @@ func esCluster() []*desired.State {
 			Updatable:      true,
 		},
 		{
+			TemplatePath:   path + "/es/sts-job.tpl",
+			Template:       nil,
+			ParsedTemplate: "",
+			Obj:            &unstructured.Unstructured{},
+			GVK:            desired.Kinds[desired.JobGVK],
+			Own:            true,
+			Updatable:      true,
+		},
+		{
 			TemplatePath:   path + "/es/svc-headless.tpl",
 			Template:       nil,
 			ParsedTemplate: "",
