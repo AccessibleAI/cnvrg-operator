@@ -27,6 +27,7 @@ spec:
           volumeMounts:
             - name: es-ilm
               mountPath: "/tmp/elastic/"
+      restartPolicy: OnFailure
       volumes:
         - name: es-ilm
           configMap:
