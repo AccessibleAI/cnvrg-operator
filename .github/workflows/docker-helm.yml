@@ -16,30 +16,6 @@ jobs:
       with:
         fetch-depth: 0
 
-#    - name: Change Chart Version
-#      run: |
-#        VERSION=1.0.0 envsubst < charts/cnvrg-cap/Chart.yaml | tee tmp-file && mv tmp-file charts/cnvrg-cap/Chart.yaml
-#        VERSION=1.0.0 envsubst < charts/cnvrg-operator/Chart.yaml | tee tmp-file && mv tmp-file charts/cnvrg-operator/Chart.yaml
-#        cat charts/cnvrg-operator/Chart.yaml && cat charts/cnvrg-cap/Chart.yaml
-#
-#    - name: Set up Helm
-#      uses: azure/setup-helm@v3.5
-#
-#    - name: Run chart-testing (lint)
-#      run: |
-#        helm lint charts/cnvrg-cap/
-#        helm lint charts/cnvrg-operator/
-#
-#    - name: Create kind cluster
-#      uses: helm/kind-action@v1.7.0
-#
-#    - name: Install Crds
-#      run: kubectl apply -f charts/cnvrg-operator/crds/ ; sleep 2
-#
-#    - name: Run chart-testing (install)
-#      run: |
-#        helm install cnvrg ./charts/cnvrg-operator --dry-run --namespace=cnvrg-system --debug
-# helm install cnvrg ./charts/cnvrg-cap --dry-run --namespace=cnvrg --debug
 
     - name: Bump version and push tag
       uses: AccessibleAI/github-tag-action@1.0.0
@@ -61,10 +37,10 @@ jobs:
       shell: bash
       if: ${{ steps.tag_bump.outputs.bumped == 'true' }}
       run: |
-          echo "::set-output name=docker_repo::cnvrg-operator"
-          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/*/})"
-          echo "##[set-output name=head;]$(git rev-parse --short HEAD)"
-          echo "##[set-output name=repo_url;]$(echo $GITHUB_SERVER_URL/$GITHUB_REPOSITORY)"
+        echo "::set-output name=docker_repo::cnvrg-operator"
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/*/})"
+        echo "##[set-output name=head;]$(git rev-parse --short HEAD)"
+        echo "##[set-output name=repo_url;]$(echo $GITHUB_SERVER_URL/$GITHUB_REPOSITORY)"
       id: extract_info
 
     - name: Login to Docker Hub
@@ -127,7 +103,7 @@ jobs:
       id: cnvrg_changelog
       with:
         from_version: ${{ steps.tag_bump.outputs.tag }}
-        to_version:  ${{ steps.tag_bump.outputs.new_tag }}
+        to_version: ${{ steps.tag_bump.outputs.new_tag }}
         jira_token: ${{ secrets.JIRA_TOKEN }}
         slack_webhook_url: false
       if: ${{ steps.tag_bump.outputs.bumped == 'true' && steps.tag_bump.outputs.prerelease == 'false' }}
@@ -190,10 +166,10 @@ jobs:
         CHARTMUSEUM_USER: ${{ secrets.CHARTMUSEUM_USER }}
         CHARTMUSEUM_PASSWORD: ${{ secrets.CHARTMUSEUM_PASSWORD }}
       run: |
-          helm plugin install https://github.com/chartmuseum/helm-push.git
-          helm repo add cnvrg https://charts.slim.cnvrg.io/cnvrg
-          helm dependency build charts/mlops
-          helm cm-push charts/mlops -f cnvrg -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --context-path /cnvrg
+        helm plugin install https://github.com/chartmuseum/helm-push.git
+        helm repo add cnvrg https://chartmuseum-new.cnvrg.io
+        helm dependency build charts/mlops
+        helm cm-push charts/mlops -f cnvrg -u=${CHARTMUSEUM_USER} -p=${CHARTMUSEUM_PASSWORD} --context-path /cnvrg
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
