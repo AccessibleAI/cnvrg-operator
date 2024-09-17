@@ -7,7 +7,7 @@ cvat:
     class: ""
     size: 100Gi
 pg:
-  image: postgresql-12-centos7:pg17alpine
+  image: postgresql-12-centos7:pg17rc1
   confRef: cvat-pg
   storage:
     size: 100Gi
@@ -20,7 +20,7 @@ pg:
       cpu: 200m
       memory: 1Gi
 redis:
-  image: redis:7.4.0-alpine
+  image: redis:7.4.0
   confRef: cvat-redis
   resources:
     limits:
