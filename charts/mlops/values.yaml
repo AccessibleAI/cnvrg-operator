@@ -149,7 +149,7 @@ dbs:
   pg:
     enabled: true
     serviceAccount: pg
-    image: postgresql-12-centos7:latest
+    image: postgresql-12-centos7:pg17alpine
     port: 5432
     storageSize: 80Gi
     svcName: postgres
@@ -173,7 +173,7 @@ dbs:
   redis:
     enabled: true
     serviceAccount: redis
-    image: cnvrg-redis:v7.0.0
+    image: redis:7.4.0-alpine
     svcName: redis
     port: 6379
     storageSize: 10Gi
@@ -191,7 +191,7 @@ dbs:
     enabled: true
     serviceAccount: minio
     replicas: 1
-    image: minio:RELEASE.2021-05-22T02-34-39Z
+    image: minio:RELEASE.2024-09-13T20-26-02Z
     port: 9000
     storageSize: 100Gi
     svcName: minio
@@ -265,12 +265,12 @@ dbs:
     enabled: true
     credsRef: prom-creds
     extraScrapeConfigs:
-    image: prometheus:v2.37.1
+    image: prometheus:v2.45.0-stable
     storageClass: ""
     storageSize: 50Gi
     grafana:
       enabled: true
-      image: grafana/grafana-oss:9.5.20
+      image: grafana/grafana-oss:11.2.0
       svcName: grafana
       port: 8080
       nodePort: 30012
@@ -312,7 +312,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:ns-watch-scope
-    cacheImage: redis:7.0.5
+    cacheImage: redis:7.4.0-alpine
   central:
     enabled: false
     publicUrl: ''

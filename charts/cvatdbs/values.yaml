@@ -1,4 +1,4 @@
-imageHub: docker.io
+imageHub: docker.io/cnvrg
 imagePullSecretRef: cnvrg-app-registry
 cvat:
   storage:
@@ -7,7 +7,7 @@ cvat:
     class: ""
     size: 100Gi
 pg:
-  image: postgres:17rc1-alpine
+  image: postgresql-12-centos7:pg17alpine
   confRef: cvat-pg
   storage:
     size: 100Gi
