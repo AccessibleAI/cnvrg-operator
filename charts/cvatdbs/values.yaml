@@ -7,7 +7,7 @@ cvat:
     class: ""
     size: 100Gi
 pg:
-  image: postgresql-12-centos7:pg17rc1
+  image: postgresql-12-centos7:pg16
   confRef: cvat-pg
   storage:
     size: 100Gi

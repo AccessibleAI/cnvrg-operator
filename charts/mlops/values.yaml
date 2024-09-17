@@ -149,7 +149,7 @@ dbs:
   pg:
     enabled: true
     serviceAccount: pg
-    image: postgresql-12-centos7:pg17rc1
+    image: postgresql-12-centos7:pg16
     port: 5432
     storageSize: 80Gi
     svcName: postgres
