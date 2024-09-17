@@ -99,7 +99,7 @@ var EastWestDefault = EastWest{
 
 var istioDefault = Istio{
 	Enabled:               false,
-	OperatorImage:         "istio-operator:1.13.5",
+	OperatorImage:         "istio-operator:1.17.3",
 	PilotImage:            "pilot:1.13.5",
 	ExternalIP:            nil,
 	IngressSvcAnnotations: nil,
