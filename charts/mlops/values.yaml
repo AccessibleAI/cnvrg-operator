@@ -312,7 +312,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:ns-watch-scope
-    cacheImage: redis:7.0.5
+    cacheImage: redis:7.4.0
   central:
     enabled: false
     publicUrl: ''
