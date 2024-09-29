@@ -66,6 +66,7 @@ spec:
           - start
           - --authz-addr=127.0.0.1:50052
           - --ingress-type={{.Spec.Networking.Ingress.Type}}
+          - --namespace={{.Namespace }}
         ports:
           - containerPort: 8888
         {{- if isTrue .Spec.SSO.Proxy.Readiness }}
@@ -90,6 +91,7 @@ spec:
           - /opt/app-root/authz
           - start
           - --ingress-type={{.Spec.Networking.Ingress.Type}}
+          - --namespace={{.Namespace }}
         resources:
           limits:
             cpu: {{ .Spec.SSO.Proxy.Limits.Cpu }}
