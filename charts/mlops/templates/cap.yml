@@ -104,6 +104,9 @@ spec:
     baseConfig:
       jobsStorageClass: {{.Values.controlPlane.baseConfig.jobsStorageClass}}
       featureFlags:
+      {{- if eq .Values.platform "ocp"}}
+        OCP_ENABLED: "true"
+      {{- end }}
       {{- range $fk, $fv := .Values.controlPlane.baseConfig.featureFlags }}
         {{$fk}}: "{{$fv}}"
       {{- end }}
@@ -284,7 +287,11 @@ spec:
         credsRef: {{.Values.dbs.prom.grafana.credsRef}}
   networking:
     ingress:
+      {{- if eq .Values.platform "ocp"}}
+      type: "openshift"
+      {{- else}}
       type: {{.Values.networking.ingress.type}}
+      {{- end }}
       timeout: {{.Values.networking.ingress.timeout}}
       retriesAttempts: {{.Values.networking.ingress.retriesAttempts}}
       perTryTimeout: {{.Values.networking.ingress.perTryTimeout}}
@@ -311,16 +318,16 @@ spec:
     enabled: {{.Values.sso.enabled}}
     version: {{.Values.sso.version}}
     pki:
-      enabled: {{.Values.sso.pki.enabled}}
+      enabled: {{.Values.sso.enabled}}
       rootCaSecret: {{.Values.sso.pki.rootCaSecret}}
       privateKeySecret: {{.Values.sso.pki.privateKeySecret}}
       publicKeySecret: {{.Values.sso.pki.publicKeySecret}}
     jwks:
-      enabled: {{.Values.sso.jwks.enabled}}
+      enabled: {{.Values.sso.enabled}}
       image: {{.Values.sso.jwks.image}}
       cacheImage: {{.Values.sso.jwks.cacheImage}}
     central:
-      enabled: {{.Values.sso.central.enabled}}
+      enabled: {{.Values.sso.enabled}}
       publicUrl: {{.Values.sso.central.publicUrl}}
       oauthProxyImage: {{.Values.sso.central.oauthProxyImage}}
       centralUiImage: {{.Values.sso.central.centralUiImage}}
@@ -344,7 +351,7 @@ spec:
         cpu: "{{.Values.sso.central.limits.cpu}}"
         memory: "{{.Values.sso.central.limits.memory}}"
     proxy:
-      enabled: {{.Values.sso.proxy.enabled}}
+      enabled: {{.Values.sso.enabled}}
       image: {{.Values.sso.proxy.image}}
       address: {{.Values.sso.proxy.address}}
       readiness: {{.Values.sso.proxy.readiness}}

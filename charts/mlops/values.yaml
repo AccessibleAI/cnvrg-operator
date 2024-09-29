@@ -340,7 +340,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: cnvrg-proxy:ns-watch-scope
+    image: cnvrg-proxy:4d10ded
     address: ""
     readiness: true
     requests:
