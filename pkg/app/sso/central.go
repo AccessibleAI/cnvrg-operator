@@ -64,7 +64,11 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 		"Namespace":   c.app.Namespace,
 		"SsoDomainId": strings.Split(c.app.Spec.ClusterDomain, ".")[0],
 		"Spec":        c.app.Spec,
-		"AppUrl":      fmt.Sprintf("%s://%s.%s", c.schema(), c.app.Spec.ControlPlane.WebApp.SvcName, c.app.Spec.ClusterDomain),
+		"AppUrl": fmt.Sprintf("%s://%s%s.%s", c.schema(),
+			c.app.Spec.Networking.ClusterDomainPrefix.Prefix,
+			c.app.Spec.ControlPlane.WebApp.SvcName,
+			c.app.Spec.ClusterDomain,
+		),
 	}
 }
 
@@ -79,9 +83,10 @@ func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
 		"Provider":     c.app.Spec.SSO.Central.Provider,
 		"ClientId":     c.app.Spec.SSO.Central.ClientID,
 		"ClientSecret": c.app.Spec.SSO.Central.ClientSecret,
-		"RedirectUrl": fmt.Sprintf("%s://%s.%s/oauth2/callback",
+		"RedirectUrl": fmt.Sprintf("%s://%s%s.%s/oauth2/callback",
 			c.schema(),
 			c.app.Spec.SSO.Central.SvcName,
+			c.app.Spec.Networking.ClusterDomainPrefix.Prefix,
 			c.app.Spec.ClusterDomain),
 		"OidcIssuerURL":                    c.app.Spec.SSO.Central.OidcIssuerURL,
 		"Scope":                            c.app.Spec.SSO.Central.Scope,
