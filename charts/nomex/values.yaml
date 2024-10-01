@@ -1,3 +1,3 @@
 imageHub: docker.io/cnvrg
-image: nomex:v1.0.0
+image: nomex:v2.0.0
 imagePullSecretRef: cnvrg-app-registry
