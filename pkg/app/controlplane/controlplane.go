@@ -1,12 +1,15 @@
 package controlplane
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -51,8 +54,64 @@ func (m *CpStateManager) LoadKiqs(kiqName string, hpa bool) error {
 	return nil
 }
 
+func (m *CpStateManager) renderSmtpConfigs() error {
+	assets := []string{fsRoot + "/conf/cm/secret-smtp.tpl"}
+	f := &desired.LoadFilter{AssetName: assets}
+	cfg := desired.NewAssetsGroup(fs, m.RootPath(), m.Log(), f)
+	if err := cfg.LoadAssets(); err != nil {
+		return err
+	}
+
+	configData, err := m.smtpCfgData()
+	if err != nil {
+		return err
+	}
+
+	if err = cfg.Render(configData); err != nil {
+		return err
+	}
+
+	m.AddToState(cfg)
+
+	return nil
+}
+
+func (m *CpStateManager) smtpCfgData() (map[string]interface{}, error) {
+	var userName, password string
+
+	if m.app.Spec.ControlPlane.SMTP.CredentialsSecretRef != "" {
+		secret := &corev1.Secret{}
+		if err := m.C.Get(context.Background(), types.NamespacedName{Name: m.app.Spec.ControlPlane.SMTP.CredentialsSecretRef, Namespace: m.app.Namespace}, secret); err != nil {
+			return nil, err
+		}
+		userName = string(secret.Data["username"])
+		password = string(secret.Data["password"])
+	} else {
+		userName = m.app.Spec.ControlPlane.SMTP.Username
+		password = m.app.Spec.ControlPlane.SMTP.Password
+	}
+
+	d := map[string]interface{}{
+		"Namespace":         m.app.Namespace,
+		"Annotations":       m.app.Spec.Annotations,
+		"Server":            m.app.Spec.ControlPlane.SMTP.Server,
+		"Port":              m.app.Spec.ControlPlane.SMTP.Port,
+		"Username":          userName,
+		"Password":          password,
+		"Domain":            m.app.Spec.ControlPlane.SMTP.Domain,
+		"OpenSSLVerifyMode": m.app.Spec.ControlPlane.SMTP.OpensslVerifyMode,
+		"Sender":            m.app.Spec.ControlPlane.SMTP.Sender,
+	}
+
+	return d, nil
+}
+
 func (m *CpStateManager) Load() error {
 	f := &desired.LoadFilter{DefaultLoader: true}
+
+	if err := m.renderSmtpConfigs(); err != nil {
+		return err
+	}
 
 	conf := desired.NewAssetsGroup(fs, fsRoot+"/conf/cm", m.Log(), f)
 	if err := conf.LoadAssets(); err != nil {

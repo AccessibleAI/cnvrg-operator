@@ -1,10 +1,12 @@
 package sso
 
 import (
+	"context"
 	"fmt"
 	mlopsv1 "github.com/AccessibleAI/cnvrg-operator/api/v1"
 	"github.com/AccessibleAI/cnvrg-operator/pkg/desired"
 	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
@@ -12,7 +14,8 @@ import (
 
 type CentralStateManager struct {
 	*desired.AssetsStateManager
-	app *mlopsv1.CnvrgApp
+	app    *mlopsv1.CnvrgApp
+	client client.Client
 }
 
 func NewCentralStateManager(app *mlopsv1.CnvrgApp, c client.Client, s *runtime.Scheme, log logr.Logger) desired.StateManager {
@@ -32,7 +35,12 @@ func (c *CentralStateManager) renderSsoConfigs() error {
 		return err
 	}
 
-	if err := cfg.Render(c.proxyCfgData()); err != nil {
+	configData, err := c.proxyCfgData()
+	if err != nil {
+		return err
+	}
+
+	if err = cfg.Render(configData); err != nil {
 		return err
 	}
 
@@ -72,17 +80,47 @@ func (c *CentralStateManager) depData() map[string]interface{} {
 	}
 }
 
-func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
+func (c *CentralStateManager) proxyCfgData() (map[string]interface{}, error) {
 	var groups []string
 	if c.app.Spec.SSO.Central.GroupsAuth {
 		groups = append(groups, c.domainId())
 	}
+
+	var clientId, clientSecret string
+
+	// if credentials secret ref is set, get clientId and clientSecret from the secret
+	if c.app.Spec.SSO.Central.CredentialsSecretRef != "" {
+		credentialsSecret := &corev1.Secret{}
+		err := c.client.Get(context.Background(), client.ObjectKey{Namespace: c.app.Namespace, Name: c.app.Spec.SSO.Central.CredentialsSecretRef}, credentialsSecret)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := credentialsSecret.Data["ClientId"]; !ok {
+			return nil, fmt.Errorf("credentialSecretRef configured for SSO, but clientId not found in secret %s", c.app.Spec.SSO.Central.CredentialsSecretRef)
+		}
+		if _, ok := credentialsSecret.Data["ClientSecret"]; !ok {
+			return nil, fmt.Errorf("credentialSecretRef configured for SSO, but clientSecret not found in secret %s", c.app.Spec.SSO.Central.CredentialsSecretRef)
+		}
+
+		clientId = string(credentialsSecret.Data["clientId"])
+		clientSecret = string(credentialsSecret.Data["clientSecret"])
+	}
+
+	if c.app.Spec.SSO.Central.ClientID != "" {
+		clientId = c.app.Spec.SSO.Central.ClientID
+	}
+
+	if c.app.Spec.SSO.Central.ClientSecret != "" {
+		clientSecret = c.app.Spec.SSO.Central.ClientSecret
+	}
+
 	d := map[string]interface{}{
 		"Namespace":    c.app.Namespace,
 		"EmailDomain":  c.app.Spec.SSO.Central.EmailDomain,
 		"Provider":     c.app.Spec.SSO.Central.Provider,
-		"ClientId":     c.app.Spec.SSO.Central.ClientID,
-		"ClientSecret": c.app.Spec.SSO.Central.ClientSecret,
+		"ClientId":     clientId,
+		"ClientSecret": clientSecret,
 		"RedirectUrl": fmt.Sprintf("%s://%s%s.%s/oauth2/callback",
 			c.schema(),
 			c.app.Spec.SSO.Central.SvcName,
@@ -97,7 +135,7 @@ func (c *CentralStateManager) proxyCfgData() map[string]interface{} {
 		"ExtraJwtIssuer":                   c.jwksUrlWithAudience(),
 		"Groups":                           groups,
 	}
-	return d
+	return d, nil
 }
 
 func (c *CentralStateManager) domainId() string {
