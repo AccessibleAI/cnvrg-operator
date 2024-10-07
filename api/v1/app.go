@@ -122,13 +122,14 @@ type Ldap struct {
 }
 
 type SMTP struct {
-	Server            string `json:"server,omitempty"`
-	Port              int    `json:"port,omitempty"`
-	Username          string `json:"username,omitempty"`
-	Password          string `json:"password,omitempty"`
-	Domain            string `json:"domain,omitempty"`
-	OpensslVerifyMode string `json:"opensslVerifyMode,omitempty"`
-	Sender            string `json:"sender,omitempty"`
+	Server               string `json:"server,omitempty"`
+	Port                 int    `json:"port,omitempty"`
+	CredentialsSecretRef string `json:"credentialsSecretRef,/omitempty"`
+	Username             string `json:"username,omitempty"`
+	Password             string `json:"password,omitempty"`
+	Domain               string `json:"domain,omitempty"`
+	OpensslVerifyMode    string `json:"opensslVerifyMode,omitempty"`
+	Sender               string `json:"sender,omitempty"`
 }
 
 type ObjectStorage struct {
@@ -407,6 +408,7 @@ type CentralSSO struct {
 	EmailDomain                      []string          `json:"emailDomain,omitempty"`
 	ClientID                         string            `json:"clientId,omitempty"`
 	ClientSecret                     string            `json:"clientSecret,omitempty"`
+	CredentialsSecretRef             string            `json:"credentialsSecretRef,omitempty"`
 	OidcIssuerURL                    string            `json:"oidcIssuerUrl,omitempty"`
 	ServiceUrl                       string            `json:"serviceUrl,omitempty"`
 	Scope                            string            `json:"scope,omitempty"`

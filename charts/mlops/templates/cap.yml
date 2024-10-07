@@ -338,6 +338,7 @@ spec:
       emailDomain: {{ toJson .Values.sso.central.emailDomain }}
       clientId: {{.Values.sso.central.clientId}}
       clientSecret: {{.Values.sso.central.clientSecret}}
+      credentialsSecretRef: {{.Values.sso.central.credentialsSecretRef}}
       oidcIssuerUrl: {{.Values.sso.central.oidcIssuerUrl}}
       serviceUrl: {{.Values.sso.central.serviceUrl}}
       scope: {{.Values.sso.central.scope}}
