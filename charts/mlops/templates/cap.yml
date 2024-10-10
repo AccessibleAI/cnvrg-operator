@@ -138,6 +138,7 @@ spec:
       port: {{.Values.controlPlane.smtp.port}}
       username: {{.Values.controlPlane.smtp.username}}
       password: {{.Values.controlPlane.smtp.password}}
+      credentialsSecretRef: {{.Values.controlPlane.smtp.credentialsSecretRef}}
       domain: {{.Values.controlPlane.smtp.domain}}
       opensslVerifyMode: {{.Values.controlPlane.smtp.opensslVerifyMode}}
       sender: {{.Values.controlPlane.smtp.sender}}
