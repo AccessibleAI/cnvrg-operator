@@ -128,6 +128,7 @@ controlPlane:
     domain: ''
     opensslVerifyMode: ''
     sender: info@cnvrg.io
+    credentialsSecretRef: ''
   objectStorage:
     type: minio
     bucket: cnvrg-storage
@@ -172,7 +173,7 @@ dbs:
   redis:
     enabled: true
     serviceAccount: redis
-    image: cnvrg-redis:v3.0.5.c2
+    image: redis:7.4.0
     svcName: redis
     port: 6379
     storageSize: 10Gi
@@ -190,7 +191,7 @@ dbs:
     enabled: true
     serviceAccount: minio
     replicas: 1
-    image: minio:RELEASE.2021-05-22T02-34-39Z
+    image: minio:RELEASE.2024-09-13T20-26-02Z
     port: 9000
     storageSize: 100Gi
     svcName: minio
@@ -207,7 +208,7 @@ dbs:
   es:
     enabled: true
     serviceAccount: es
-    image: cnvrg-es:7.17.5
+    image: cnvrg-es:v7.17.22
     port: 9200
     storageSize: 80Gi
     svcName: elasticsearch
@@ -233,7 +234,7 @@ dbs:
       serviceAccount: kibana
       svcName: kibana
       port: 8080
-      image: kibana-oss:7.8.1
+      image: cnvrg/kibana:7.11.2
       nodePort: 30601
       requests:
         cpu: 100m
@@ -264,12 +265,12 @@ dbs:
     enabled: true
     credsRef: prom-creds
     extraScrapeConfigs:
-    image: prometheus:v2.37.1
+    image: prometheus:v2.45.0-stable
     storageClass: ""
     storageSize: 50Gi
     grafana:
       enabled: true
-      image: grafana-oss:9.1.7
+      image: grafana/grafana-oss:11.2.0
       svcName: grafana
       port: 8080
       nodePort: 30012
@@ -311,7 +312,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:ns-watch-scope
-    cacheImage: redis:7.0.5
+    cacheImage: redis:7.4.0
   central:
     enabled: false
     publicUrl: ''
@@ -323,6 +324,7 @@ sso:
       - "*"
     clientId: ''
     clientSecret: ''
+    credentialsSecretRef: ''
     oidcIssuerUrl: ''
     serviceUrl: ''
     scope: openid email profile
@@ -363,4 +365,3 @@ mpi:
 metastorageprovisioner:
   enabled: true
   version: ''
-
