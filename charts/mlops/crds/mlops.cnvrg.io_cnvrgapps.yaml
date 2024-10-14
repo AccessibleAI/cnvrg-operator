@@ -267,6 +267,8 @@ spec:
                     type: object
                   smtp:
                     properties:
+                      credentialsSecretRef:
+                        type: string
                       domain:
                         type: string
                       opensslVerifyMode:
@@ -767,6 +769,8 @@ spec:
                       cnvrgProxyImage:
                         type: string
                       cookieDomain:
+                        type: string
+                      credentialsSecretRef:
                         type: string
                       emailDomain:
                         items:
