@@ -89,7 +89,7 @@ controlPlane:
     readinessPeriodSeconds: 100
     readinessTimeoutSeconds: 60
   cnvrgScheduler:
-    enabled: true
+    enabled: false
     requests:
       cpu: 200m
       memory: 1000Mi
@@ -172,7 +172,7 @@ dbs:
   redis:
     enabled: true
     serviceAccount: redis
-    image: cnvrg-redis:v3.0.5.c2
+    image: cnvrg-redis:v7.0.0
     svcName: redis
     port: 6379
     storageSize: 10Gi
@@ -207,7 +207,7 @@ dbs:
   es:
     enabled: true
     serviceAccount: es
-    image: cnvrg-es:7.17.5
+    image: cnvrg-es:v7.17.22
     port: 9200
     storageSize: 80Gi
     svcName: elasticsearch
@@ -233,7 +233,7 @@ dbs:
       serviceAccount: kibana
       svcName: kibana
       port: 8080
-      image: kibana-oss:7.8.1
+      image: cnvrg/kibana:7.11.2
       nodePort: 30601
       requests:
         cpu: 100m
@@ -269,7 +269,7 @@ dbs:
     storageSize: 50Gi
     grafana:
       enabled: true
-      image: grafana-oss:9.1.7
+      image: grafana/grafana-oss:9.5.20
       svcName: grafana
       port: 8080
       nodePort: 30012
