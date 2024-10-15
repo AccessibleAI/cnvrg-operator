@@ -72,7 +72,7 @@ controlPlane:
       maxReplicas: 5
   hyper:
     enabled: true
-    image: hyper-server:latest
+    image: hyper-server:v2.0
     port: 5050
     replicas: 1
     nodePort: 30050
@@ -149,7 +149,7 @@ dbs:
   pg:
     enabled: true
     serviceAccount: pg
-    image: postgresql-12-centos7:latest
+    image: postgresql-12-centos7:pg13
     port: 5432
     storageSize: 80Gi
     svcName: postgres
