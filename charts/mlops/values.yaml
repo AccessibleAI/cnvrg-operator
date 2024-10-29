@@ -245,8 +245,8 @@ dbs:
       credsRef: kibana-creds
     elastalert:
       enabled: true
-      image: elastalert:3.0.0-beta.1
-      authProxyImage: nginx:1.20
+      image: elastalert:v5.1
+      authProxyImage: nginx:1.27.1
       credsRef: elastalert-creds
       port: 8080
       nodePort: 32030
