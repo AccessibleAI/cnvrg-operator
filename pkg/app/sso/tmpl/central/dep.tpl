@@ -106,8 +106,8 @@ spec:
         {{- end }}
       volumes:
       - name: "proxy-config"
-        configMap:
-         name: "proxy-config"
+        secret:
+          secretName: "proxy-config"
       - name: "private-key"
         secret:
           secretName: {{ .Spec.SSO.Pki.PrivateKeySecret }}
