@@ -1,4 +1,4 @@
-kind: ConfigMap
+kind: Secret
 apiVersion: v1
 metadata:
   name: proxy-config
@@ -7,7 +7,7 @@ metadata:
     mlops.cnvrg.io/default-loader: "false"
     mlops.cnvrg.io/own: "true"
     mlops.cnvrg.io/updatable: "false"
-data:
+stringData:
   conf: |-
     http_address = "0.0.0.0:8080"
     upstreams = [
