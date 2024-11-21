@@ -339,7 +339,7 @@ sso:
       memory: 4Gi
   proxy:
     enabled: false
-    image: cnvrg-proxy:4d10ded
+    image: cnvrg/cap:v0.0.11-weekly-rc-25-11-1
     address: ""
     readiness: true
     requests:
