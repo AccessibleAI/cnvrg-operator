@@ -72,7 +72,7 @@ controlPlane:
       maxReplicas: 5
   hyper:
     enabled: true
-    image: hyper-server:latest
+    image: hyper-server:v2.0
     port: 5050
     replicas: 1
     nodePort: 30050
@@ -128,6 +128,7 @@ controlPlane:
     domain: ''
     opensslVerifyMode: ''
     sender: info@cnvrg.io
+    credentialsSecretRef: ''
   objectStorage:
     type: minio
     bucket: cnvrg-storage
@@ -148,7 +149,7 @@ dbs:
   pg:
     enabled: true
     serviceAccount: pg
-    image: postgresql-12-centos7:latest
+    image: postgresql-12-centos7:pg13
     port: 5432
     storageSize: 80Gi
     svcName: postgres
@@ -172,7 +173,7 @@ dbs:
   redis:
     enabled: true
     serviceAccount: redis
-    image: cnvrg-redis:v7.0.0
+    image: redis:7.4.0
     svcName: redis
     port: 6379
     storageSize: 10Gi
@@ -190,7 +191,7 @@ dbs:
     enabled: true
     serviceAccount: minio
     replicas: 1
-    image: minio:RELEASE.2021-05-22T02-34-39Z
+    image: minio:RELEASE.2024-09-13T20-26-02Z
     port: 9000
     storageSize: 100Gi
     svcName: minio
@@ -233,7 +234,7 @@ dbs:
       serviceAccount: kibana
       svcName: kibana
       port: 8080
-      image: cnvrg/kibana:7.11.2
+      image: cnvrg/kibana:7.17.25
       nodePort: 30601
       requests:
         cpu: 100m
@@ -244,8 +245,8 @@ dbs:
       credsRef: kibana-creds
     elastalert:
       enabled: true
-      image: elastalert:3.0.0-beta.1
-      authProxyImage: nginx:1.20
+      image: elastalert:v5.1
+      authProxyImage: nginx:1.27.1
       credsRef: elastalert-creds
       port: 8080
       nodePort: 32030
@@ -264,12 +265,12 @@ dbs:
     enabled: true
     credsRef: prom-creds
     extraScrapeConfigs:
-    image: prometheus:v2.37.1
+    image: prometheus:v2.55
     storageClass: ""
     storageSize: 50Gi
     grafana:
       enabled: true
-      image: grafana/grafana-oss:9.5.20
+      image: grafana/grafana-oss:11.2.0
       svcName: grafana
       port: 8080
       nodePort: 30012
@@ -311,7 +312,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:ns-watch-scope
-    cacheImage: redis:7.0.5
+    cacheImage: redis:7.4.0
   central:
     enabled: false
     publicUrl: ''
@@ -323,6 +324,7 @@ sso:
       - "*"
     clientId: ''
     clientSecret: ''
+    credentialsSecretRef: ''
     oidcIssuerUrl: ''
     serviceUrl: ''
     scope: openid email profile
@@ -364,4 +366,3 @@ mpi:
 metastorageprovisioner:
   enabled: true
   version: ''
-
