@@ -342,7 +342,6 @@ sso:
   proxy:
     enabled: false
     image: cap:v0.0.12
-    image: cnvrg-proxy:4d10ded
     address: ""
     readiness: true
     requests:
