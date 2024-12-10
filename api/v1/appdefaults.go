@@ -191,7 +191,7 @@ var minioDefaults = Minio{
 var pgDefault = Pg{
 	Enabled:        false,
 	ServiceAccount: "pg",
-	Image:          "postgresql-12-centos7:latest",
+	Image:          "postgresql-12-centos7:pg13",
 	Port:           5432,
 	StorageSize:    "80Gi",
 	SvcName:        "postgres",
@@ -270,7 +270,7 @@ var esDefault = Es{
 		ServiceAccount: "kibana",
 		SvcName:        "kibana",
 		Port:           8080,
-		Image:          "cnvrg/kibana:7.11.2",
+		Image:          "cnvrg/kibana:v7.17.25",
 		NodePort:       30601,
 		Requests: Requests{
 			Cpu:    "100m",
@@ -318,7 +318,7 @@ var promDefaults = Prom{
 	CredsRef:    "prom-creds",
 	SvcName:     "prometheus",
 	Port:        9090,
-	Image:       "prometheus:v2.37.1",
+	Image:       "prometheus:v2.55",
 	StorageSize: "50Gi",
 	Grafana: Grafana{
 		Enabled:  false,
@@ -428,7 +428,7 @@ var ssoDefault = SSO{
 		Enabled:                          false,
 		Replicas:                         1,
 		SvcName:                          "sso-central",
-		CnvrgProxyImage:                  "cnvrg-proxy:ns-watch-scope",
+		CnvrgProxyImage:                  "cap:v0.0.12",
 		OauthProxyImage:                  "oauth2-proxy:v7.4.ssov3.p6",
 		CentralUiImage:                   "centralsso:latest",
 		EmailDomain:                      []string{"*"},
@@ -450,7 +450,7 @@ var ssoDefault = SSO{
 	Proxy: CentralProxy{
 		Enabled:  false,
 		Replicas: 1,
-		Image:    "cnvrg-proxy:ns-watch-scope",
+		Image:    "cap:v0.0.12",
 		SvcName:  "cnvrg-proxy-central",
 		Requests: Requests{
 			Cpu:    "200m",
