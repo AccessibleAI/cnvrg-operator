@@ -35,4 +35,4 @@ spec:
               service:
                 name: {{ .Spec.Dbs.Minio.SvcName }}-console
                 port:
-                  number: {{ .Spec.Dbs.Minio.Port }}
+                  number: 9090
