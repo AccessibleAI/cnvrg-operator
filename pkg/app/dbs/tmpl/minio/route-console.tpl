@@ -19,7 +19,7 @@ metadata:
 spec:
   host: "{{ .Spec.Dbs.Minio.SvcName }}-console{{.Spec.Networking.ClusterDomainPrefix.Prefix}}.{{ .Spec.ClusterDomain }}"
   port:
-    targetPort: {{ .Spec.Dbs.Minio.Port }}
+    targetPort: 9090
   to:
     kind: Service
     name: {{ .Spec.Dbs.Minio.SvcName }}-console
