@@ -171,7 +171,7 @@ var minioDefaults = Minio{
 	Enabled:        false,
 	ServiceAccount: "minio",
 	Replicas:       1,
-	Image:          "minio:RELEASE.2025-01-20T14-49-07Z",
+	Image:          "minio:RELEASE.2024-09-13T20-26-02Z",
 	Port:           9000,
 	StorageSize:    "100Gi",
 	SvcName:        "minio",
@@ -322,7 +322,7 @@ var promDefaults = Prom{
 	StorageSize: "50Gi",
 	Grafana: Grafana{
 		Enabled:  false,
-		Image:    "grafana/grafana-oss@sha256:fe82dcd57a59650b90dc91c06606910b05951447935449a20af1da57857bb7c0",
+		Image:    "grafana-oss:11.4.0",
 		SvcName:  "grafana",
 		Port:     8080,
 		NodePort: 30012,
