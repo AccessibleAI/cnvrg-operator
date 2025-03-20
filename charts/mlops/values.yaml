@@ -149,12 +149,12 @@ dbs:
   pg:
     enabled: true
     serviceAccount: pg
-    image: postgresql-12-centos7:pg13
+    image: postgresql-12-centos7:latest
     port: 5432
     storageSize: 80Gi
     svcName: postgres
     storageClass: ''
-    volumePath: /bitnami/postgresql
+    volumePath: /var/lib/pgsql/data
     requests:
       cpu: '1'
       memory: 4Gi
