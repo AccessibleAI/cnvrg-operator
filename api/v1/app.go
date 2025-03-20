@@ -241,6 +241,7 @@ type Pg struct {
 	StorageSize        string            `json:"storageSize,omitempty"`
 	SvcName            string            `json:"svcName,omitempty"`
 	StorageClass       string            `json:"storageClass,omitempty"`
+	VolumePath         string            `json:"volumePath,omitempty"`
 	Requests           Requests          `json:"requests,omitempty"`
 	Limits             Limits            `json:"limits,omitempty"`
 	MaxConnections     int               `json:"maxConnections,omitempty"`

@@ -196,6 +196,7 @@ var pgDefault = Pg{
 	StorageSize:    "80Gi",
 	SvcName:        "postgres",
 	StorageClass:   "",
+	VolumePath:     "/bitnami/postgresql",
 	Requests: Requests{
 		Cpu:    "1",
 		Memory: "4Gi",

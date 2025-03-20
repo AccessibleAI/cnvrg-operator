@@ -588,6 +588,8 @@ spec:
                         type: string
                       svcName:
                         type: string
+                      volumePath:
+                        type: string
                     type: object
                   prom:
                     properties:
