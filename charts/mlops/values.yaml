@@ -154,6 +154,7 @@ dbs:
     storageSize: 80Gi
     svcName: postgres
     storageClass: ''
+    volumePath: /bitnami/postgresql
     requests:
       cpu: '1'
       memory: 4Gi

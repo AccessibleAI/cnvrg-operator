@@ -41,6 +41,7 @@ func (m *PgStateManager) RenderDeployment() error {
 		"SharedBuffers":      m.app.Spec.Dbs.Pg.SharedBuffers,
 		"EffectiveCacheSize": m.app.Spec.Dbs.Pg.EffectiveCacheSize,
 		"SvcName":            m.app.Spec.Dbs.Pg.SvcName,
+		"VolumePath":         m.app.Spec.Dbs.Pg.VolumePath,
 	}
 	if err := m.pgSecret.Render(pgSecretData); err != nil {
 		return err
