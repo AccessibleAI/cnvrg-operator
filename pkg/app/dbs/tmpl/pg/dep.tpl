@@ -89,7 +89,7 @@ spec:
             privileged: false
           terminationMessagePath: /dev/termination-log
           volumeMounts:
-            - mountPath: /var/lib/pgsql/data
+            - mountPath: /bitnami/pgsql
               name: postgres-data
             - mountPath: /dev/shm
               name: dshm
