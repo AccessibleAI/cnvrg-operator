@@ -89,7 +89,7 @@ spec:
             privileged: false
           terminationMessagePath: /dev/termination-log
           volumeMounts:
-            - mountPath: {{ .VolumePath }}
+            - mountPath: {{ .Spec.Dbs.Pg.VolumePath }}
               name: postgres-data
             - mountPath: /dev/shm
               name: dshm
