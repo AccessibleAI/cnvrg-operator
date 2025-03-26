@@ -176,6 +176,7 @@ spec:
       maxConnections: {{.Values.dbs.pg.maxConnections}}
       sharedBuffers: {{.Values.dbs.pg.sharedBuffers}}
       effectiveCacheSize: {{.Values.dbs.pg.effectiveCacheSize}}
+      volumePath: {{.Values.dbs.pg.volumePath}}
       hugePages:
         enabled: {{.Values.dbs.pg.hugePages.enabled}}
         size: {{.Values.dbs.pg.hugePages.size}}
