@@ -266,12 +266,12 @@ dbs:
     enabled: true
     credsRef: prom-creds
     extraScrapeConfigs:
-    image: prometheus:v2.55
+    image: prometheus:v3.1.0
     storageClass: ""
     storageSize: 50Gi
     grafana:
       enabled: true
-      image: grafana/grafana-oss:11.2.0
+      image: grafana-oss:11.4.0
       svcName: grafana
       port: 8080
       nodePort: 30012
