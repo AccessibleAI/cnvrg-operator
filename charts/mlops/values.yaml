@@ -149,7 +149,7 @@ dbs:
   pg:
     enabled: true
     serviceAccount: pg
-    image: postgresql-12-centos7:latest
+    image: postgresql-12-centos7:pg17
     port: 5432
     storageSize: 80Gi
     svcName: postgres
@@ -192,7 +192,7 @@ dbs:
     enabled: true
     serviceAccount: minio
     replicas: 1
-    image: minio:RELEASE.2024-09-13T20-26-02Z
+    image: minio:RELEASE.2025-04-22T22-12-26Z
     port: 9000
     storageSize: 100Gi
     svcName: minio
@@ -247,7 +247,7 @@ dbs:
     elastalert:
       enabled: true
       image: elastalert:v5.1
-      authProxyImage: nginx:1.27.1
+      authProxyImage: nginx:1.28.0
       credsRef: elastalert-creds
       port: 8080
       nodePort: 32030
@@ -313,7 +313,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:ns-watch-scope
-    cacheImage: redis:7.4.0
+    cacheImage: redis:v8.0.1
   central:
     enabled: false
     publicUrl: ''
