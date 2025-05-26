@@ -174,7 +174,7 @@ dbs:
   redis:
     enabled: true
     serviceAccount: redis
-    image: redis:7.4.0
+    image: redis:v8.0.1
     svcName: redis
     port: 6379
     storageSize: 10Gi
@@ -192,7 +192,7 @@ dbs:
     enabled: true
     serviceAccount: minio
     replicas: 1
-    image: minio:RELEASE.2024-09-13T20-26-02Z
+    image: minio:RELEASE.2025-04-22T22-12-26Z
     port: 9000
     storageSize: 100Gi
     svcName: minio
@@ -313,7 +313,7 @@ sso:
     enabled: false
     name: cnvrg-jwks
     image: jwks:ns-watch-scope
-    cacheImage: redis:7.4.0
+    cacheImage: redis:v8.0.1
   central:
     enabled: false
     publicUrl: ''
