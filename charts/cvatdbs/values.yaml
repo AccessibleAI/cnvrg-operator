@@ -20,7 +20,7 @@ pg:
       cpu: 200m
       memory: 1Gi
 redis:
-  image: redis:7.4.0
+  image: redis:v8.0.1
   confRef: cvat-redis
   resources:
     limits:
