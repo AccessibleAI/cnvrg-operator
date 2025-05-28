@@ -171,7 +171,7 @@ var minioDefaults = Minio{
 	Enabled:        false,
 	ServiceAccount: "minio",
 	Replicas:       1,
-	Image:          "minio:RELEASE.2021-05-22T02-34-39Z",
+	Image:          "minio:RELEASE.2025-04-22T22-12-26Z",
 	Port:           9000,
 	StorageSize:    "100Gi",
 	SvcName:        "minio",
@@ -221,7 +221,7 @@ var pgDefault = Pg{
 var redisDefault = Redis{
 	Enabled:        false,
 	ServiceAccount: "redis",
-	Image:          "cnvrg-redis:v7.0.0",
+	Image:          "cnvrg-redis:v8.0.1",
 	SvcName:        "redis",
 	Port:           6379,
 	StorageSize:    "10Gi",
@@ -368,7 +368,7 @@ var cvatPgDefault = Pg{
 var cvatRedisDefault = Redis{
 	Enabled:        false,
 	ServiceAccount: "cvat-redis",
-	Image:          "redis:7.0.5",
+	Image:          "redis:v8.0.1",
 	SvcName:        "cvat-redis",
 	Port:           6379,
 	StorageSize:    "10Gi",
@@ -421,7 +421,7 @@ var ssoDefault = SSO{
 		Image:        "cnvrg/jwks:ns-watch-scope",
 		Replicas:     1,
 		SvcName:      "cnvrg-jwks",
-		CacheImage:   "redis:7.0.5",
+		CacheImage:   "redis:v8.0.1",
 		NodeSelector: nil,
 	},
 
@@ -429,9 +429,9 @@ var ssoDefault = SSO{
 		Enabled:                          false,
 		Replicas:                         1,
 		SvcName:                          "sso-central",
-		CnvrgProxyImage:                  "cap:v0.0.12",
-		OauthProxyImage:                  "oauth2-proxy:v7.4.ssov3.p6",
-		CentralUiImage:                   "centralsso:latest",
+		CnvrgProxyImage:                  "cap:v0.0.14",
+		OauthProxyImage:                  "oauth2-proxy:v7.9.0",
+		CentralUiImage:                   "centralsso:0.0.1",
 		EmailDomain:                      []string{"*"},
 		Scope:                            "openid email profile",
 		InsecureOidcAllowUnverifiedEmail: true,
@@ -451,7 +451,7 @@ var ssoDefault = SSO{
 	Proxy: CentralProxy{
 		Enabled:  false,
 		Replicas: 1,
-		Image:    "cap:v0.0.12",
+		Image:    "cap:v0.0.14",
 		SvcName:  "cnvrg-proxy-central",
 		Requests: Requests{
 			Cpu:    "200m",

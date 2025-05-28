@@ -230,7 +230,7 @@ let params = {
         "redis": {
             "enabled": true,
             "serviceAccount": "redis",
-            "image": "cnvrg-redis:v7.0.0",
+            "image": "cnvrg-redis:v8.0.1",
             "svcName": "redis",
             "port": 6379,
             "storageSize": "10Gi",
@@ -251,7 +251,7 @@ let params = {
             "enabled": true,
             "serviceAccount": "minio",
             "replicas": 1,
-            "image": "minio:RELEASE.2021-05-22T02-34-39Z",
+            "image": "minio:RELEASE.2025-04-22T22-12-26Z",
             "port": 9000,
             "storageSize": "100Gi",
             "svcName": "minio",
@@ -395,7 +395,7 @@ let params = {
             "enabled": false,
             "publicUrl": "",
             "oauthProxyImage": "oauth2-proxy:v7.4.ssov3.p6",
-            "centralUiImage": "centralsso:latest",
+            "centralUiImage": "centralsso:0.0.1",
             "adminUser": "",
             "provider": "",
             "emailDomain": [

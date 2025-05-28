@@ -40,22 +40,32 @@ func (p *PkiStateManager) domainId() string {
 }
 
 func (p *PkiStateManager) generate() error {
-	pkey, err := rsa.GenerateKey(rand.Reader, 2048)
+	pkey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return err
 	}
-	// private key
-	privatePemBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(pkey)}
+
+	// --- Private key (PKCS#8 - FIPS compliant) ---
+	privBytes, err := x509.MarshalPKCS8PrivateKey(pkey)
+	if err != nil {
+		return err
+	}
+	privatePemBlock := &pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: privBytes,
+	}
 	p.PrivateKey = string(pem.EncodeToMemory(privatePemBlock))
 
-	// public key
-	b, err := x509.MarshalPKIXPublicKey(&pkey.PublicKey)
+	// --- Public key (PKIX format) ---
+	pubBytes, err := x509.MarshalPKIXPublicKey(&pkey.PublicKey)
 	if err != nil {
 		return err
 	}
-	publicPemBlock := &pem.Block{Type: "PUBLIC KEY", Bytes: b}
+	publicPemBlock := &pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: pubBytes,
+	}
 	p.PublicKey = string(pem.EncodeToMemory(publicPemBlock))
-
 	return nil
 }
 

@@ -15,8 +15,8 @@ stringData:
          "file:///cnvrg-static/#/opstatic/"
     ]
     skip_auth_regex = [
-        "^\/opstatic/",
-        "^\/ready"
+        '^\/opstatic/',
+        '^\/ready'
     ]
     custom_templates_dir = "/cnvrg-static"
     email_domains = [
