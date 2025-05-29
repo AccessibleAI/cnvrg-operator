@@ -96,14 +96,6 @@ spec:
           requests:
             cpu: {{ .Spec.SSO.Central.Requests.Cpu }}
             memory: {{ .Spec.SSO.Central.Requests.Memory }}
-        {{- if isTrue .Spec.SSO.Central.Readiness }}
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 20
-        {{- end }}
       volumes:
       - name: "proxy-config"
         secret:
