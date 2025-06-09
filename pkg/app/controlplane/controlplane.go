@@ -107,9 +107,33 @@ func (m *CpStateManager) smtpCfgData() (map[string]interface{}, error) {
 	return d, nil
 }
 
+func (m *CpStateManager) ssoData() error {
+	// if credentials secret ref is set, get clientId and clientSecret from the secret
+	if m.app.Spec.SSO.Central.CredentialsSecretRef != "" {
+		credentialsSecret := &corev1.Secret{}
+		err := m.C.Get(context.Background(), client.ObjectKey{Namespace: m.app.Namespace, Name: m.app.Spec.SSO.Central.CredentialsSecretRef}, credentialsSecret)
+		if err != nil {
+			return err
+		}
+		if _, ok := credentialsSecret.Data["clientId"]; !ok {
+			return fmt.Errorf("credentialSecretRef configured for SSO, but clientId not found in secret %s", m.app.Spec.SSO.Central.CredentialsSecretRef)
+		}
+		if _, ok := credentialsSecret.Data["clientSecret"]; !ok {
+			return fmt.Errorf("credentialSecretRef configured for SSO, but clientSecret not found in secret %s", m.app.Spec.SSO.Central.CredentialsSecretRef)
+		}
+
+		m.app.Spec.SSO.Central.ClientID = string(credentialsSecret.Data["clientId"])
+		m.app.Spec.SSO.Central.ClientSecret = string(credentialsSecret.Data["clientSecret"])
+	}
+	return nil
+}
+
 func (m *CpStateManager) Load() error {
 	f := &desired.LoadFilter{DefaultLoader: true}
 
+	if err := m.ssoData(); err != nil {
+		return err
+	}
 	conf := desired.NewAssetsGroup(fs, fsRoot+"/conf/cm", m.Log(), f)
 	if err := conf.LoadAssets(); err != nil {
 		return err

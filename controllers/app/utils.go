@@ -139,7 +139,7 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 			defaultSpec.SSO.Central.PublicUrl = fmt.Sprintf("%s://%s%s.%s",
 				scheme,
 				defaultSpec.SSO.Central.SvcName,
-				defaultSpec.Networking.ClusterDomainPrefix.Prefix,
+				app.Spec.Networking.ClusterDomainPrefix.Prefix,
 				app.Spec.ClusterDomain)
 		}
 		if app.Spec.SSO.Proxy.Address == "" {
@@ -153,7 +153,7 @@ func CalculateAndApplyAppDefaults(app *mlopsv1.CnvrgApp, defaultSpec *mlopsv1.Cn
 
 			defaultSpec.SSO.Central.JwksURL = fmt.Sprintf("%s://%s%s.%s/v1/%s/.well-known/jwks.json?client_id", scheme,
 				defaultSpec.SSO.Jwks.SvcName,
-				defaultSpec.Networking.ClusterDomainPrefix.Prefix,
+				app.Spec.Networking.ClusterDomainPrefix.Prefix,
 				app.Spec.ClusterDomain,
 				strings.Split(app.Spec.ClusterDomain, ".")[0],
 			)
