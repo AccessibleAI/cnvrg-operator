@@ -247,7 +247,7 @@ dbs:
     elastalert:
       enabled: true
       image: elastalert:v5.1
-      authProxyImage: nginx:1.27.1
+      authProxyImage: nginx:1.28.0
       credsRef: elastalert-creds
       port: 8080
       nodePort: 32030
