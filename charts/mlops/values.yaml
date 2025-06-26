@@ -247,7 +247,7 @@ dbs:
     elastalert:
       enabled: true
       image: elastalert:v5.1
-      authProxyImage: nginx:1.27.1
+      authProxyImage: nginx:1.28.0
       credsRef: elastalert-creds
       port: 8080
       nodePort: 32030
@@ -312,7 +312,7 @@ sso:
   jwks:
     enabled: false
     name: cnvrg-jwks
-    image: jwks:ns-watch-scope
+    image: jwks:v1.0.7
     cacheImage: redis:v8.0.1
   central:
     enabled: false

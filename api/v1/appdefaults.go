@@ -287,7 +287,7 @@ var esDefault = Es{
 		Enabled:        false,
 		Image:          "elastalert:3.0.0-beta.1",
 		CredsRef:       "elastalert-creds",
-		AuthProxyImage: "nginx:1.20",
+		AuthProxyImage: "nginx:1.28.0",
 		Port:           8080,
 		NodePort:       32030,
 		StorageSize:    "30Gi",
@@ -418,7 +418,7 @@ var ssoDefault = SSO{
 
 	Jwks: Jwks{
 		Enabled:      false,
-		Image:        "cnvrg/jwks:ns-watch-scope",
+		Image:        "cnvrg/jwks:v1.0.7",
 		Replicas:     1,
 		SvcName:      "cnvrg-jwks",
 		CacheImage:   "redis:v8.0.1",

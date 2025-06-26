@@ -316,7 +316,7 @@ let params = {
             "elastalert": {
                 "enabled": true,
                 "image": "elastalert:3.0.0-beta.1",
-                "authProxyImage": "nginx:1.20",
+                "authProxyImage": "nginx:1.28.0",
                 "credsRef": "elastalert-creds",
                 "port": 8080,
                 "nodePort": 32030,
@@ -389,7 +389,7 @@ let params = {
             "enabled": false,
             "name": "cnvrg-jwks",
             "image": "jwks:latest",
-            "cacheImage": "redis:7.0.5"
+            "cacheImage": "redis:v8.0.1"
         },
         "central": {
             "enabled": false,
